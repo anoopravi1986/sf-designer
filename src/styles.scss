@@ -1,1 +1,10 @@
 /* You can add global styles to this file, and also import other style files */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+
+// fpd-main-bar .fpd-navigation>.fpd-nav-item.fpd-active{color:#fff;}
+// fpd-main-bar .fpd-navigation>.fpd-nav-item.fpd-active:before{background: #000;opacity: 1;}
+// fpd-main-bar .fpd-navigation>.fpd-nav-item.fpd-active .fpd-label{color: #fff;}

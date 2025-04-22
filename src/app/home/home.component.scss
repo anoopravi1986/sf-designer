@@ -1,0 +1,62 @@
+.fpd-layout-container {
+    display: flex;
+    height: 100vh;
+    background-color: #121212;
+    color: #ffffff;
+    overflow: hidden;
+  
+    .fpd-sidebar {
+      width: 260px;
+      background-color: #1c1c1c;
+      border-right: 1px solid #2e2e2e;
+      overflow-y: auto;
+    }
+  
+    .fpd-canvas-container {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: #1e1e2f;
+  
+      .fpd-ui {
+        width: 1000px;
+        height: 600px;
+        background-color: #fff;
+        border-radius: 10px;
+        box-shadow: 0 0 20px rgba(0, 123, 255, 0.5);
+      }
+    }
+  
+    .fpd-right-panel {
+      width: 240px;
+      background-color: #1c1c1c;
+      border-left: 1px solid #2e2e2e;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+  
+      .action-btn {
+        background: #007bff;
+        color: white;
+        border: none;
+        padding: 12px;
+        border-radius: 6px;
+        font-size: 14px;
+        cursor: pointer;
+        transition: background 0.2s;
+  
+        &:hover {
+          background: #0056b3;
+        }
+      }
+    }
+  }
+  
+
+
+  .header{
+    background: linear-gradient(to bottom, #1a1a1a, #a33004);
+
+  }
