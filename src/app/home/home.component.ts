@@ -112,7 +112,7 @@ export class HomeComponent implements AfterViewInit {
               }
             }
           ],
-          fileServerURL: 'http://localhost/fpd/file-handler.php',
+          fileServerURL: 'https://file.handler.php.stageprojects.xyz/',
           uploadZone: {
             useDataURL: true  // ✅ allows upload directly in browser
           },
