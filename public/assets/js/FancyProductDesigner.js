@@ -19424,11 +19424,12 @@
                         (this.container = document.createElement("fpd-module-text")),
                         e.append(this.container),
                         this.container.querySelector(".fpd-btn").addEventListener("click", (e) => {
+                            console.log("click");
                             let i = this.container.querySelector("textarea"),
                                 n = i.value;
                             if (t.currentViewInstance && n.length > 0) {
                                 const e = t.currentViewInstance.options;
-                                let i = z(e.customTextParameters, { textBox: Boolean(this.fpdInstance.mainOptions.customTextAsTextbox), resizable: !0, isCustom: !0, _addToUZ: t.currentViewInstance.currentUploadZone, _calcWidth: !0 });
+                                let i = z(e.customTextParameters, { textBox: Boolean(this.fpdInstance.mainOptions.customTextAsTextbox), resizable: 0, isCustom: 0, _addToUZ: t.currentViewInstance.currentUploadZone, _calcWidth: !0, colors:'#000', fontFamily: 'Lobster', fontSize: 30,'resizable':1 });
                                 t.currentViewInstance.fabricCanvas.addElement("text", n, n, i);
                             }
                             i.value = "";
