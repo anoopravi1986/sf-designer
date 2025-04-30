@@ -1,14 +1,84 @@
 
   
-  <div class="p-2 bg-white header">
-    <!-- <i data-lucide="home"></i> -->
+  <!-- <div class="p-2 bg-white header">
     <img 
       src="https://designer-b0677.firebaseapp.com/assets/images/logo.png" 
       alt="StyleflipLogo" 
       class="max-w-[240px] h-auto mx-auto"
     />
-  </div>
-  <div class="fas !flex !bg-[#f53744] fa-camera bg-black text-white p-6 rounded rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6 !bg-white hidden !hidden">
+  </div> -->
+  <!-- <img 
+      src="https://designer-b0677.firebaseapp.com/assets/images/logo.png" 
+      alt="StyleflipLogo" 
+      class="max-w-[240px] h-auto mx-auto fixed left-0"
+    /> -->
+    <div class="fixed top-0 right-0 w-[30%] bg-transparent z-50 flex items-center justify-end gap-4 px-4 h-[50px] text-sm">
+      <!-- Design Name Box -->
+      <div class="bg-transparent border border-white/20 text-white px-5 py-2 rounded shadow-sm w-[200px] text-sm truncate overflow-hidden whitespace-nowrap">
+        {{activeImageTitle}}
+      </div>
+
+      <!-- Profile Initial Icon -->
+      <div class="w-10 h-10 rounded-full bg-white text-[#f53744] flex items-center justify-center font-semibold text-lg">
+        A
+      </div>
+
+      <div class="relative" #dropdownWrapper>
+        <button (click)="toggleDropdown()" class="flex items-center gap-2 bg-white text-black px-5 py-1.5 text-lg rounded hover:bg-gray-100 transition">
+          <i data-lucide="share-2" class="w-4 h-4"></i>
+          Share
+        </button>
+      
+        <!-- Dropdown Box -->
+        <div *ngIf="showDropdown" class="absolute right-0 mt-2 w-[300px] bg-white border border-gray-200 rounded shadow-md p-4 z-50">
+          <p>Share this design with others!</p>
+
+          <div class="grid grid-cols-3 gap-4 text-center bg-white p-4 rounded">
+
+            <!-- Download -->
+            <button id="download-button" class="flex flex-col items-center justify-center space-y-2 text-black">
+              <div class="bg-white border border-gray-300 rounded-full p-3">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="m11.25 15.85-4.38-4.38a.75.75 0 0 0-1.06 1.06l4.95 4.95c.69.68 1.8.68 2.48 0l4.95-4.95a.75.75 0 1 0-1.06-1.06l-4.38 4.38V4.25a.75.75 0 1 0-1.5 0v11.6zm-7.5 3.4h16.5a.75.75 0 1 1 0 1.5H3.75a.75.75 0 1 1 0-1.5z"></path></svg>
+              </div>
+              <span class="text-sm font-medium">Download</span>
+            </button>
+          
+            <!-- Preview -->
+            <button (click)="preview()" class="flex flex-col items-center justify-center space-y-2 text-black">
+              <div class="bg-white border border-gray-300 rounded-full p-3">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="eye" class="lucide lucide-eye eye"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"></path><circle cx="12" cy="12" r="3"></circle></svg>
+              </div>
+              <span class="text-sm font-medium">Preview</span>
+            </button>
+          
+            <!-- Print -->
+            <button id="print-button" class="flex flex-col items-center justify-center space-y-2 text-black">
+              <div class="bg-white border border-gray-300 rounded-full p-3">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" fill="none"><path fill="currentColor" fill-rule="evenodd" d="M5.334 6.666h14A2.667 2.667 0 0 1 22 9.333h2a5.333 5.333 0 0 1 5.334 5.333v6.667a2.667 2.667 0 0 1-2.667 2.666 4 4 0 1 1-8 0H12a4 4 0 1 1-7.985-.348 2.666 2.666 0 0 1-1.348-2.318v-12a2.667 2.667 0 0 1 2.667-2.667Zm22 9.333v-1.333A3.333 3.333 0 0 0 24 11.333h-2v4.666h5.334ZM22 18h5.334v3.334a.667.667 0 0 1-.667.666h-.535A3.999 3.999 0 0 0 22 20.055v-2.056Zm-2-8.666v11.685a4.02 4.02 0 0 0-.798.981h-7.737a3.998 3.998 0 0 0-6.711-.337.663.663 0 0 1-.087-.33v-12c0-.368.298-.666.667-.666h14c.368 0 .666.298.666.667ZM10 23.999a2 2 0 1 1-4 0 2 2 0 0 1 4 0Zm12.667 2a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z" clip-rule="evenodd"></path></svg>
+              </div>
+              <span class="text-sm font-medium">Print</span>
+            </button>
+          
+            <!-- Save Design -->
+            <button id="save-button" class="flex flex-col items-center justify-center space-y-2 text-black col-span-3 sm:col-span-1">
+              <div class="bg-white border border-gray-300 rounded-full p-3">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="folder-open" class="lucide lucide-folder-open"><path d="m6 14 1.5-2.9A2 2 0 0 1 9.24 10H20a2 2 0 0 1 1.94 2.5l-1.54 6a2 2 0 0 1-1.95 1.5H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H18a2 2 0 0 1 2 2v2"></path></svg>
+              </div>
+              <span class="text-sm font-medium">Save</span>
+            </button>
+          
+          </div>
+          
+          
+        </div>
+      </div>
+    
+      
+    
+      
+    </div>
+    <button class="hide-icon rounded-full h-10 w-6 fixed top-1/2 left-[387px] z-[99] bg-white shadow-[0px_0px_0px_1px_rgba(64,87,109,0.04),0px_6px_20px_-4px_rgba(64,87,109,0.3)]" type="button" aria-label="Collapse"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"><path fill="currentColor" d="M10.025 10.965 7.237 8.177a.25.25 0 0 1 0-.354l2.788-2.788a.75.75 0 0 0-1.06-1.06l-2.79 2.788a1.75 1.75 0 0 0 0 2.474l2.788 2.789a.75.75 0 1 0 1.06-1.06"></path></svg></button>
+  <div class="w-[100%] text-center !text-sm justify-center !normal-case bg-[#f7f7f7] fas !flex flex flex-col !bg-[#f53744] fa-camera bg-black text-white p-6 rounded rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6 !bg-white hidden !hidden">
     Hello, Tailwind!
   </div>
   <div id="clothing-designer" class="fpd-wrapper fpd-container fpd-sidebar fpd-views-inside-left fpd-shadow-1 fpd-module-visible"></div>
