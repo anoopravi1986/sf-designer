@@ -55,7 +55,13 @@
   }
   
 
-
+::ng-deep .box-white-inactive{
+  .fpd-active{
+    &:before{box-shadow: none !important;    border: none !important;}
+    svg{stroke: #000 !important;}
+    span{color: #0d1216b3 !important}
+  }
+}
   .header{
     background: linear-gradient(0deg, rgba(241,241,241,1) 0%, rgba(228,228,228,1) 35%, rgba(212,212,212,1) 100%);
   }

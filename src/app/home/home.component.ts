@@ -26,6 +26,7 @@ export class HomeComponent implements AfterViewInit {
     
     if (isPlatformBrowser(this.platformId)) {
       setTimeout(() => {
+
         const fpdTarget = document.getElementById('fpd-target');
         if (!fpdTarget) return;
 
@@ -40,6 +41,7 @@ export class HomeComponent implements AfterViewInit {
           // toolbarPlacement: "inside-top",
           editorMode: false,
           smartGuides: true,
+          imageEditor: true,
           customTextParameters: {
               colors: false,
               removable: true,
@@ -63,9 +65,10 @@ export class HomeComponent implements AfterViewInit {
               'top': [],
               // 'right': ['manage-layers', 'magnify-glass', 'zoom', 'reset-product', 'qr-code', 'ruler'],
               'right': [],
-              // 'bottom': ['undo', 'redo'],
-              'left': ['undo', 'redo'],
-              'center': ['download','preview-lightbox','paste']
+              // 'bottom': ['zoom'],
+              'left': ['undo', 'redo', 'download','zoom'],
+              'center': []
+              // 'center': ['download','preview-lightbox','paste','zoom','reset-product','qr-code','ruler']
           },
           selectedColor: "#f5f5f5",
           boundingBoxColor: "#005ede",
@@ -110,26 +113,62 @@ export class HomeComponent implements AfterViewInit {
           ],
           textTemplates: [
             {
-              text: "Text Template Content",
+              text: "I love Styleflip",
               properties: {
-                fontSize: 30,
-                fontFamily: "Lobster"
+                fontSize: 50,
+                fontFamily: "Bangers",
+                fill: "#ff5722",              // Vibrant orange
+                stroke: "#000000",            // Black outline
+                strokeWidth: 2,
+                shadow: "rgba(0,0,0,0.3) 2px 2px 3px",
+                curved: true,                 // Enable curved text
+                curveSpacing: 5,              // Space between letters
+                curveRadius: 180,             // Adjust radius of the curve
+                curveReverse: false,
+                curvable: 1 
               }
             },
             {
-              text: "Another Text Template",
+              text: "Fun Times",
               properties: {
-                fontSize: 50,
-                fontFamily: "Pacifico"
+                fontSize: 45,
+                fontFamily: "Fredoka One",
+                fill: "#3f51b5",              // Blue
+                stroke: "#010101",
+                curvable: 1,            // White outline
+                strokeWidth: 3,
+                shadow: "rgba(255,255,255,0.5) 0px 0px 6px"
+              }
+            },
+            {
+              text: "Creative Soul",
+              properties: {
+                fontSize: 48,
+                fontFamily: "Pacifico",
+                fill: "#e91e63",              // Pink
+                stroke: "#ffc107",            // Yellow outline
+                strokeWidth: 2,
+                shadow: "rgba(0,0,0,0.2) 1px 1px 4px"
+              }
+            },
+            {
+              text: "Dream Big",
+              properties: {
+                fontSize: 52,
+                fontFamily: "Lobster",
+                fill: "#4caf50",              // Green
+                stroke: "#ffffff",            // White outline
+                strokeWidth: 2,
+                shadow: "rgba(0,0,0,0.4) 3px 3px 5px"
               }
             }
           ],
-          // fileServerURL: 'https://file.handler.php.stageprojects.xyz/',
-          fileServerURL: 'http://localhost/fpd/file-handler.php',
+          fileServerURL: 'https://file.handler.php.stageprojects.xyz/',
+          // fileServerURL: 'http://localhost/fpd/file-handler.php',
           uploadZone: {
             useDataURL: true  // ✅ allows upload directly in browser
           },
-          facebookAppId: '916578735380892',
+          facebookAppId: '325741021422456',
           instagramClientId: 'bbe4d544897b4fb0b1bae5a6b44a310b',
           instagramRedirectUri: 'assets/html/instagram_auth.html',
           instagramTokenUri: '',
@@ -145,9 +184,9 @@ export class HomeComponent implements AfterViewInit {
 
           lazyLoad: true,
           toolbarPlacement: 'smart',
-          imageParameters:{
-            advancedEditing: true
-          }
+          // imageParameters:{
+          //   advancedEditing: true
+          // }
         };
 
         this.designer = new FancyProductDesigner(
@@ -172,14 +211,19 @@ export class HomeComponent implements AfterViewInit {
            // Inside ngAfterViewInit or wherever you initialize FPD
            const firstItem = $('.fpd-module-products .fpd-item').first();
            const title = firstItem.data('title');
-           this.activeImageTitle = 'Mannnnn';
+           this.activeImageTitle = 'Apple Macbook Pro 16 2019 512GB SSD Storage';
          
            $(document).on('click', 'fpd-module-products .fpd-item', (event) => {
              const clickedTitle = $(event.currentTarget).data('title');
              this.activeImageTitle = clickedTitle;
            });
-        
+           
       }, 300);
+
+      setTimeout(() => {
+
+        this.bottomMenu();
+      }, 10);
     }
 
 
@@ -197,6 +241,8 @@ export class HomeComponent implements AfterViewInit {
             console.log("click happen");
             this.savedContent = mainBar.innerHTML;
             mainBar.style.maxWidth = '80px';
+            mainBar.style.backgroundColor = '#f0f1f5'; 
+            mainBar.classList.add('box-white-inactive');
             hideIcon.style.display = 'none'; // 👈 hide the icon
           });
     
@@ -204,6 +250,8 @@ export class HomeComponent implements AfterViewInit {
           const contentObserver = new MutationObserver(() => {
             if (mainBar.innerHTML !== this.savedContent) {
               mainBar.style.maxWidth = '';
+              mainBar.style.backgroundColor = '#fff';
+              mainBar.classList.remove('box-white-inactive');
               hideIcon.style.display = 'inline-block'; // 👈 show icon again
             }
           });
@@ -222,6 +270,8 @@ export class HomeComponent implements AfterViewInit {
                 if (target.classList.contains('fpd-active')) {
                   console.log("fpd-active class detected on:", target);
                   mainBar.style.maxWidth = '';
+                  mainBar.style.backgroundColor = '#fff';
+                  mainBar.classList.remove('box-white-inactive');
                   hideIcon.style.display = 'inline-block'; // 👈 show icon again
                 }
               }
@@ -251,6 +301,15 @@ export class HomeComponent implements AfterViewInit {
 
    
        
+  }
+  bottomMenu(){
+    const sourceElement = document.getElementById('content-text');
+    console.log("sourceElement", sourceElement);
+    if (sourceElement) {
+      const htmlContent = sourceElement.innerHTML;
+      localStorage.setItem('savedContentText', htmlContent);
+      console.log('Content saved to localStorage');
+    }
   }
   previewImage: string = '';
 showPreviewModal: boolean = false;
