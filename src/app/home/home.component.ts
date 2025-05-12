@@ -252,7 +252,7 @@ export class HomeComponent implements AfterViewInit {
               mainBar.style.maxWidth = '';
               mainBar.style.backgroundColor = '#fff';
               mainBar.classList.remove('box-white-inactive');
-              hideIcon.style.display = 'inline-block'; // 👈 show icon again
+              hideIcon.style.display = 'flex'; // 👈 show icon again
             }
           });
     

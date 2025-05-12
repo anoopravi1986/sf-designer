@@ -19607,7 +19607,7 @@
                 }
                 connectedCallback() {
                     this.innerHTML =
-                        '<div data-moduleicon="component" data-defaulttext="Elements" data-title="Elements"> <div class="fpd-head"> <div class="fpd-input-back-search !shadow-none border border-[#35475a33] border-solid rounded-lg"> <div class="fpd-back fpd-btn !bg-white"> <svg xmlns="http://www.w3.org/2000/svg" class="min-w-[24px]" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M15.2 16.34a7.5 7.5 0 1 1 1.38-1.45l4.2 4.2a1 1 0 1 1-1.42 1.41l-4.16-4.16zm-4.7.16a6 6 0 1 0 0-12 6 6 0 0 0 0 12z"></path></svg> </div> <div class="fpd-input-search"> <input type="text" placeholder="Search Elements..." /> <span class="fpd-icon-magnify"></span> </div> </div> </div> <div class="fpd-scroll-area"> <div class="fpd-grid fpd-grid-contain fpd-padding one !flex !flex-col"> </div> </div>';
+                        '<div data-moduleicon="component" data-defaulttext="Elements" data-title="Elements"> <div class="fpd-head"> <div class="fpd-input-back-search input-search-box !shadow-none border border-[#35475a33] border-solid !rounded-[8px] ml-[5px] w-[calc(100% - 22px)]"> <div class="fpd-back fpd-btn !bg-white"> <svg xmlns="http://www.w3.org/2000/svg" class="min-w-[24px] text-black relative top-[-2px]" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M15.2 16.34a7.5 7.5 0 1 1 1.38-1.45l4.2 4.2a1 1 0 1 1-1.42 1.41l-4.16-4.16zm-4.7.16a6 6 0 1 0 0-12 6 6 0 0 0 0 12z"></path></svg> </div> <div class="fpd-input-search"> <input type="text" class="!text-sm placeholder-gray-500 !pl-2" placeholder="Search elements" /> <span class="fpd-icon-magnify"></span> </div> </div> </div> <div class="fpd-scroll-area"> <div class="fpd-grid fpd-grid-contain fpd-padding one !flex !flex-col"> </div> </div>';
                 }
             }
             function Xe(t, e) {
@@ -19882,7 +19882,7 @@
                     // See All / See Less Button
                     if (images.length > 2) {
                         const toggleBtn = document.createElement("button");
-                        toggleBtn.innerText = "See All";
+                        toggleBtn.innerText = "See all";
                         toggleBtn.className = "fpd-see-all absolute top-[10px] right-[10px] text-[#0d1216db] font-bold";
                         
                         let isExpanded = false;
@@ -19955,7 +19955,7 @@
                                   // Subcategory See All
                                   if ((subCat.designs || []).length > 3) {
                                     const subSeeAllBtn = document.createElement("button");
-                                    subSeeAllBtn.innerText = "See All";
+                                    subSeeAllBtn.innerText = "See all";
                                     subSeeAllBtn.className = "text-blue-600 underline ml-auto mt-2 block mr-[10px]";
                                     subSeeAllBtn.addEventListener("click", () => {
                                         // Clear the grid
@@ -20064,7 +20064,7 @@
                                   hiddenImagesContainer.classList.add("hidden");
                                   hiddenImagesContainer.classList.remove("!grid", "grid-cols-3", "auto-rows-[100px]", "gap-[5px]", "mb-3");
                               
-                                  toggleBtn.innerText = "See All";
+                                  toggleBtn.innerText = "See all";
                                 }
                               }
                           });
