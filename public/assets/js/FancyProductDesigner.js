@@ -19508,7 +19508,7 @@
                         console.log('00000000000000000000000000028828',i)
                         const savedContent = localStorage.getItem('savedContentText');
                         const target = this.container.querySelector("#text-templates");
-
+                        console.log("savedContent", savedContent, "target", target);
                         if (savedContent && target) {
                         // Create a temporary DOM parser
                         const tempDiv = document.createElement('div');
@@ -19549,6 +19549,52 @@
                         });
                         }
 
+
+                        document.querySelectorAll('.fpd-item.fpd-itemimg').forEach((r) => {
+                        r.addEventListener("click", (i) => {
+                            if (t.currentViewInstance) {
+                            console.log("clicked");
+
+                            const viewOptions = t.currentViewInstance.options;
+
+                            // Get text content and data-parameters
+                            const span = r.querySelector('span');
+                            const textContent = span?.textContent || 'Sample Text';
+
+                            const dataParams = r.getAttribute('data-parameters');
+                            console.log("dataParams", dataParams);
+                            let parsedParams = {};
+
+                            try {
+                                parsedParams = JSON.parse(dataParams);
+                            } catch (err) {
+                                console.error("Invalid JSON in data-parameters", err);
+                            }
+
+                            let props = {
+                                ...parsedParams,
+                                isCustom: true,
+                                textBox: Boolean(this.fpdInstance.mainOptions.customTextAsTextbox),
+                                resizable: true,
+                                _addToUZ: t.currentViewInstance.currentUploadZone,
+                                _calcWidth: true,
+                            };
+
+                            // Style helper function if available
+                            let styledProps = typeof z === 'function' ? z(viewOptions.customTextParameters, props) : props;
+
+                            styledProps.fill = props.colors || "#ff0000";
+                            styledProps.colors = props.colors || "#ff0000";
+                            styledProps.fontFamily = props.font || "Arial";
+                            styledProps.fontSize = props.textSize || 24;
+
+                            t.currentViewInstance.fabricCanvas.addElement("text", textContent, textContent, styledProps);
+                            }
+                        });
+                        });
+
+
+
                         console.log("text-templates", ja);
                         t.mainOptions.textTemplates.forEach((e) => {
                             const n = e.properties;
@@ -19575,6 +19621,7 @@
                             r.className = "fpd-item !bg-white";
                             r.addEventListener("click", (i) => {
                               if (t.currentViewInstance) {
+                                console.log("clicked");
                                 const i = t.currentViewInstance.options;
                                 let props = { ...e.properties };
                                 props.isCustom = true;
@@ -24424,6 +24471,7 @@
                     });
                 }
                 addCanvasDesign(t, e) {
+                    console.log("addCanvasDesign", t, e);
                     console.log("e.parameters",e.parameters)
                     let i = arguments.length > 2 && void 0 !== arguments[2] ? arguments[2] : {};
                     this.currentViewInstance &&

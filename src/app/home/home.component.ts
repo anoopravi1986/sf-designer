@@ -147,6 +147,7 @@ export class HomeComponent implements AfterViewInit {
                 fontFamily: "Pacifico",
                 fill: "#e91e63",              // Pink
                 stroke: "#ffc107",            // Yellow outline
+                curvable: 1, 
                 strokeWidth: 2,
                 shadow: "rgba(0,0,0,0.2) 1px 1px 4px"
               }
@@ -159,6 +160,7 @@ export class HomeComponent implements AfterViewInit {
                 fill: "#4caf50",              // Green
                 stroke: "#ffffff",            // White outline
                 strokeWidth: 2,
+                curvable: 1, 
                 shadow: "rgba(0,0,0,0.4) 3px 3px 5px"
               }
             }
