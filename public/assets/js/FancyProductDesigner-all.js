@@ -15467,6 +15467,7 @@
 	
 					$.getJSON(instance.mainOptions.designsJSON)
 					.done(function(data) {
+						console.log("desig js 1",data)
 						/*data = data[0];
 						data = data.designs;*/
 						instance.setupDesigns(data);
@@ -63803,6 +63804,7 @@
 	
 					$.getJSON(instance.mainOptions.designsJSON)
 					.done(function(data) {
+						console.log("desig js 2",data)
 						/*data = data[0];
 						data = data.designs;*/
 						instance.setupDesigns(data);

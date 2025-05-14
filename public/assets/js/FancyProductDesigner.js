@@ -19506,92 +19506,93 @@
                         
                         var i = this.container.querySelector(".fpd-text-templates .fpd-grid");
                         console.log('00000000000000000000000000028828',i)
+                        
                         const savedContent = localStorage.getItem('savedContentText');
                         const target = this.container.querySelector("#text-templates");
-                        console.log("savedContent", savedContent, "target", target);
+
                         if (savedContent && target) {
-                        // Create a temporary DOM parser
                         const tempDiv = document.createElement('div');
                         tempDiv.innerHTML = savedContent;
 
-                        const spans = tempDiv.querySelectorAll('span');
+                        const products = tempDiv.querySelectorAll('.fpd-product');
 
-                        spans.forEach((span, index) => {
-                            const text = span.textContent || '';
-                            const title = span.getAttribute('title') || 'Any Text';
-                            const params = span.getAttribute('data-parameters') || '{}';
+                        products.forEach((product) => {
+                            const title = product.getAttribute('title') || 'Untitled';
+                            const thumbnail = product.getAttribute('data-thumbnail') || '';
+                            const spans = product.querySelectorAll('span');
 
-                            // You can adjust font, color, background-image, etc., based on the params here
-
+                            if (spans.length > 0) {
+                            // Create ONE .fpd-item container
                             const newDiv = document.createElement('div');
                             newDiv.className = 'fpd-item fpd-itemimg';
-                            newDiv.setAttribute('data-zchangeable', 'true');
-                            newDiv.setAttribute('data-source', 'Spider Man');
                             newDiv.setAttribute('data-title', title);
-                            newDiv.setAttribute('data-search', title.toLowerCase());
                             newDiv.setAttribute('data-type', 'text');
-                            newDiv.setAttribute('data-parameters', params);
+                            newDiv.setAttribute('data-thumbnail', thumbnail);
 
-                            // Add the picture tag
                             const picture = document.createElement('picture');
-                            picture.setAttribute('data-img', 'Spider Man');
-                            picture.style.backgroundImage = 'url(assets/images/designs/spiderman.jpg)';
+                            picture.setAttribute('data-img', title);
+                            picture.style.backgroundImage = `url(${thumbnail})`;
                             newDiv.appendChild(picture);
 
-                            // Add the span tag
-                            const spanTag = document.createElement('span');
-                            spanTag.className = 'pankaj design1';
-                            spanTag.innerText = text;
-                            newDiv.appendChild(spanTag);
+                            // For visual reference, add span previews
+                            spans.forEach((span) => {
+                                const spanTag = document.createElement('span');
+                                spanTag.className = 'pankaj design1';
+                                spanTag.innerText = span?.textContent || '';
+                                newDiv.appendChild(spanTag);
+                            });
 
-                            // Append to your final target container
+                            // Add click handler to process each span individually
+                            newDiv.addEventListener("click", () => {
+                                if (!t.currentViewInstance) return;
+
+                                const viewOptions = t.currentViewInstance.options;
+
+                                const innerSpans = newDiv.querySelectorAll('span');
+
+                                innerSpans.forEach((innerSpan, index) => {
+                                const textContent = innerSpan.textContent || '';
+                                const originalSpan = spans[index]; // Use the matching original for parameters
+                                let parsedParams = {};
+
+                                try {
+                                    const rawParams = originalSpan.getAttribute('data-parameters') || '{}';
+                                    parsedParams = JSON.parse(rawParams);
+                                } catch (err) {
+                                    console.error("Invalid JSON in data-parameters", err);
+                                }
+
+                                let props = {
+                                    ...parsedParams,
+                                    isCustom: true,
+                                    textBox: Boolean(this.fpdInstance.mainOptions.customTextAsTextbox),
+                                    resizable: true,
+                                    _addToUZ: t.currentViewInstance.currentUploadZone,
+                                    _calcWidth: true,
+                                };
+
+                                let styledProps = typeof z === 'function' ? z(viewOptions.customTextParameters, props) : props;
+
+                                styledProps.fill = props.colors || "#ff0000";
+                                styledProps.colors = props.colors || "#ff0000";
+                                styledProps.fontFamily = props.font || "Arial";
+                                styledProps.fontSize = props.textSize || 24;
+
+                                // Handle top and left positions
+                                if (parsedParams.left) styledProps.left = parsedParams.left;
+                                if (parsedParams.top) styledProps.top = parsedParams.top;
+
+                                t.currentViewInstance.fabricCanvas.addElement("text", textContent, textContent, styledProps);
+                                });
+                            });
+
                             target.appendChild(newDiv);
+                            }
                         });
                         }
 
 
-                        document.querySelectorAll('.fpd-item.fpd-itemimg').forEach((r) => {
-                        r.addEventListener("click", (i) => {
-                            if (t.currentViewInstance) {
-                            console.log("clicked");
 
-                            const viewOptions = t.currentViewInstance.options;
-
-                            // Get text content and data-parameters
-                            const span = r.querySelector('span');
-                            const textContent = span?.textContent || 'Sample Text';
-
-                            const dataParams = r.getAttribute('data-parameters');
-                            console.log("dataParams", dataParams);
-                            let parsedParams = {};
-
-                            try {
-                                parsedParams = JSON.parse(dataParams);
-                            } catch (err) {
-                                console.error("Invalid JSON in data-parameters", err);
-                            }
-
-                            let props = {
-                                ...parsedParams,
-                                isCustom: true,
-                                textBox: Boolean(this.fpdInstance.mainOptions.customTextAsTextbox),
-                                resizable: true,
-                                _addToUZ: t.currentViewInstance.currentUploadZone,
-                                _calcWidth: true,
-                            };
-
-                            // Style helper function if available
-                            let styledProps = typeof z === 'function' ? z(viewOptions.customTextParameters, props) : props;
-
-                            styledProps.fill = props.colors || "#ff0000";
-                            styledProps.colors = props.colors || "#ff0000";
-                            styledProps.fontFamily = props.font || "Arial";
-                            styledProps.fontSize = props.textSize || 24;
-
-                            t.currentViewInstance.fabricCanvas.addElement("text", textContent, textContent, styledProps);
-                            }
-                        });
-                        });
 
 
 
@@ -22628,6 +22629,7 @@
                 const i = lt(Number(t), this.fpdInstance.viewsNav.unitFormat),
                     n = lt(Number(e), this.fpdInstance.viewsNav.unitFormat);
                 let s = this.fpdInstance.viewsNav.calcPageOptions(i, n);
+                console.log("coming here")
                 this.fpdInstance.addView({ title: t + "x" + e, thumbnail: "", elements: [], options: s }), this.hideModals();
             }
             function Ur(t) {
@@ -24474,6 +24476,7 @@
                     console.log("addCanvasDesign", t, e);
                     console.log("e.parameters",e.parameters)
                     let i = arguments.length > 2 && void 0 !== arguments[2] ? arguments[2] : {};
+                    debugger
                     this.currentViewInstance &&
                         (this.toggleSpinner(!0, this.translator.getTranslation("misc", "loading_image")),
                         (i = z(this.currentViewInstance.options.customImageParameters, i)),
