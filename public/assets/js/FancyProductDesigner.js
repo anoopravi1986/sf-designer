@@ -19300,7 +19300,7 @@
                 connectedCallback() {
                     console.log("fpd-module-products-first00000000000");
                     this.innerHTML =
-                        '<div data-moduleicon="layout-panel-left" data-defaulttext="Products" data-title="Design"><div class="fpd-head"> <div class="fpd-input-back-search input-search-box !shadow-none border border-[#35475a33] border-solid !rounded-[8px] ml-[5px] w-[calc(100% - 22px)]"> <div class="fpd-back fpd-btn !bg-white"> <svg xmlns="http://www.w3.org/2000/svg" class="min-w-[24px] text-black relative top-[-2px]" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M15.2 16.34a7.5 7.5 0 1 1 1.38-1.45l4.2 4.2a1 1 0 1 1-1.42 1.41l-4.16-4.16zm-4.7.16a6 6 0 1 0 0-12 6 6 0 0 0 0 12z"></path></svg> </div> <div class="fpd-input-search"> <input type="text" class="!text-sm placeholder-gray-500 !pl-2" placeholder="Search elements" /> <span class="fpd-icon-magnify"></span> </div> </div> </div><div class="icon-box"><i data-lucide="house"></i></div> <fpd-dropdown class="fpd-product-categories rounded-2xl border border-gray-200 bg-white p-2 dark:border-gray-800 dark:bg-white/[0.03] md:p-2" searchable></fpd-dropdown> <div class="fpd-scroll-area"> <div class="fpd-grid fpd-grid-contain fpd-padding one-tt" id="ProductModule"><div class="searchox bg-white rounded-lg relative flex"><div id="search-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M15.2 16.34a7.5 7.5 0 1 1 1.38-1.45l4.2 4.2a1 1 0 1 1-1.42 1.41l-4.16-4.16zm-4.7.16a6 6 0 1 0 0-12 6 6 0 0 0 0 12z"></path></svg></div><div><input type="text" class="appearance-none bg-inherit border-0 box-border text-inherit font-normal min-w-[8px] outline-none w-full" /></div></div> </div> </div> </div>';
+                        '<div data-moduleicon="book-copy" data-defaulttext="Products" data-title="Design"><div class="fpd-head"> <div class="fpd-input-back-search input-search-box !shadow-none border border-[#35475a33] border-solid !rounded-[8px] ml-[5px] w-[calc(100% - 22px)]"> <div class="fpd-back fpd-btn !bg-white"> <svg xmlns="http://www.w3.org/2000/svg" class="min-w-[24px] text-black relative top-[-2px]" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M15.2 16.34a7.5 7.5 0 1 1 1.38-1.45l4.2 4.2a1 1 0 1 1-1.42 1.41l-4.16-4.16zm-4.7.16a6 6 0 1 0 0-12 6 6 0 0 0 0 12z"></path></svg> </div> <div class="fpd-input-search"> <input type="text" class="!text-sm placeholder-gray-500 !pl-2" placeholder="Search elements" /> <span class="fpd-icon-magnify"></span> </div> </div> </div><div class="icon-box"><i data-lucide="house"></i></div> <fpd-dropdown class="fpd-product-categories rounded-2xl border border-gray-200 bg-white p-2 dark:border-gray-800 dark:bg-white/[0.03] md:p-2 mr-[8px] pl-[6px]" searchable></fpd-dropdown> <div class="fpd-scroll-area"> <div class="fpd-grid fpd-grid-contain fpd-padding one-tt" id="ProductModule"><div class="searchox bg-white rounded-lg relative flex"><div id="search-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M15.2 16.34a7.5 7.5 0 1 1 1.38-1.45l4.2 4.2a1 1 0 1 1-1.42 1.41l-4.16-4.16zm-4.7.16a6 6 0 1 0 0-12 6 6 0 0 0 0 12z"></path></svg></div><div><input type="text" class="appearance-none bg-inherit border-0 box-border text-inherit font-normal min-w-[8px] outline-none w-full" /></div></div> </div> </div> </div>';
                 }
             }
             class jaikant extends HTMLElement {
@@ -19310,7 +19310,7 @@
                 connectedCallback() {
                     console.log("fpd-module-productsnew-first00000000000");
                     this.innerHTML =
-                        '<div data-moduleicon="layout-panel-left" data-defaulttext="Designs" data-title="Productsnew"><div class="fpd-head"> <div class="fpd-input-back-search input-search-box !shadow-none border border-[#35475a33] border-solid !rounded-[8px] ml-[5px] w-[calc(100% - 22px)]"> <div class="fpd-back fpd-btn !bg-white"> <svg xmlns="http://www.w3.org/2000/svg" class="min-w-[24px] text-black relative top-[-2px]" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M15.2 16.34a7.5 7.5 0 1 1 1.38-1.45l4.2 4.2a1 1 0 1 1-1.42 1.41l-4.16-4.16zm-4.7.16a6 6 0 1 0 0-12 6 6 0 0 0 0 12z"></path></svg> </div> <div class="fpd-input-search"> <input type="text" class="!text-sm placeholder-gray-500 !pl-2" placeholder="Search elements" /> <span class="fpd-icon-magnify"></span> </div> </div> </div><div class="icon-box"><i data-lucide="house"></i></div> <fpd-dropdown class="fpd-product-categories rounded-2xl border border-gray-200 bg-white p-2 dark:border-gray-800 dark:bg-white/[0.03] md:p-2" searchable></fpd-dropdown> <div class="fpd-scroll-area"> <div class="fpd-grid fpd-grid-contain fpd-padding one-ttt" id="DesignModule"><div class="searchox bg-white rounded-lg relative flex"><div id="search-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M15.2 16.34a7.5 7.5 0 1 1 1.38-1.45l4.2 4.2a1 1 0 1 1-1.42 1.41l-4.16-4.16zm-4.7.16a6 6 0 1 0 0-12 6 6 0 0 0 0 12z"></path></svg></div><div><input type="text" class="appearance-none bg-inherit border-0 box-border text-inherit font-normal min-w-[8px] outline-none w-full" /></div></div> </div> </div> </div>';
+                        '<div data-moduleicon="layout-panel-left" data-defaulttext="Designs" data-title="Productsnew"><div class="fpd-head"> <div class="fpd-input-back-search input-search-box !shadow-none border border-[#35475a33] border-solid !rounded-[8px] ml-[5px] w-[calc(100% - 22px)]"> <div class="fpd-back fpd-btn !bg-white"> <svg xmlns="http://www.w3.org/2000/svg" class="min-w-[24px] text-black relative top-[-2px]" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M15.2 16.34a7.5 7.5 0 1 1 1.38-1.45l4.2 4.2a1 1 0 1 1-1.42 1.41l-4.16-4.16zm-4.7.16a6 6 0 1 0 0-12 6 6 0 0 0 0 12z"></path></svg> </div> <div class="fpd-input-search"> <input type="text" class="!text-sm placeholder-gray-500 !pl-2" placeholder="Search elements" /> <span class="fpd-icon-magnify"></span> </div> </div> </div><div class="icon-box"><i data-lucide="house"></i></div> <fpd-dropdown class="fpd-product-categories rounded-2xl border border-gray-200 bg-white p-2 dark:border-gray-800 dark:bg-white/[0.03] md:p-2 mr-[8px] pl-[6px]" searchable></fpd-dropdown> <div class="fpd-scroll-area"> <div class="fpd-grid fpd-grid-contain fpd-padding one-ttt" id="DesignModule"><div class="searchox bg-white rounded-lg relative flex"><div id="search-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M15.2 16.34a7.5 7.5 0 1 1 1.38-1.45l4.2 4.2a1 1 0 1 1-1.42 1.41l-4.16-4.16zm-4.7.16a6 6 0 1 0 0-12 6 6 0 0 0 0 12z"></path></svg></div><div><input type="text" class="appearance-none bg-inherit border-0 box-border text-inherit font-normal min-w-[8px] outline-none w-full" /></div></div> </div> </div> </div>';
                 }
             }
             function Re(t, e) {
@@ -19661,46 +19661,55 @@
 
                                 const innerSpans = newDiv.querySelectorAll('span');
 
+                                let verticalOffset = 0; // Will accumulate spacing per product
+
                                 innerSpans.forEach((innerSpan, index) => {
-                                const textContent = innerSpan.textContent || '';
-                                const originalSpan = spans[index]; // Use the matching original for parameters
-                                let parsedParams = {};
+                                    const textContent = innerSpan.textContent || '';
+                                    const originalSpan = spans[index];
+                                    let parsedParams = {};
 
-                                try {
-                                    const rawParams = originalSpan.getAttribute('data-parameters') || '{}';
-                                    parsedParams = JSON.parse(rawParams);
-                                } catch (err) {
-                                    console.error("Invalid JSON in data-parameters", err);
-                                }
+                                    try {
+                                        const rawParams = originalSpan.getAttribute('data-parameters') || '{}';
+                                        parsedParams = JSON.parse(rawParams);
+                                    } catch (err) {
+                                        console.error("Invalid JSON in data-parameters", err);
+                                    }
 
-                                let props = {
-                                    ...parsedParams,
-                                    isCustom: true,
-                                    textBox: Boolean(this.fpdInstance.mainOptions.customTextAsTextbox),
-                                    resizable: true,
-                                    _addToUZ: t.currentViewInstance.currentUploadZone,
-                                    _calcWidth: true,
-                                };
+                                    let props = {
+                                        ...parsedParams,
+                                        isCustom: true,
+                                        textBox: Boolean(this.fpdInstance.mainOptions.customTextAsTextbox),
+                                        resizable: true,
+                                        _addToUZ: t.currentViewInstance.currentUploadZone,
+                                        _calcWidth: true,
+                                    };
 
-                                let styledProps = typeof z === 'function' ? z(viewOptions.customTextParameters, props) : props;
+                                    let styledProps = typeof z === 'function' ? z(viewOptions.customTextParameters, props) : props;
 
-                                styledProps.fill = props.colors || "#ff0000";
-                                styledProps.colors = props.colors || "#ff0000";
-                                styledProps.fontFamily = props.font || "Arial";
-                                styledProps.fontSize = props.textSize || 24;
+                                    styledProps.fill = props.colors || "#ff0000";
+                                    styledProps.colors = props.colors || "#ff0000";
+                                    styledProps.fontFamily = props.font || "Arial";
+                                    styledProps.fontSize = props.textSize || 24;
 
-                                // Handle top and left positions
-                                if (parsedParams.left) styledProps.left = parsedParams.left;
-                                if (parsedParams.top) styledProps.top = parsedParams.top;
+                                    // Prevent overlapping: Accumulate vertical offset per text
+                                    const baseTop = parsedParams.top || 0;
+                                    const lineSpacing = parsedParams.curved ? parsedParams.textSize * 2 : parsedParams.textSize * 1.5;
+                                    styledProps.top = baseTop + verticalOffset;
+                                    styledProps.left = parsedParams.left || 0;
 
-                                t.currentViewInstance.fabricCanvas.addElement("text", textContent, textContent, styledProps);
+                                    verticalOffset += lineSpacing; // Add more spacing for the next text
+                                    styledProps.autoCenter = false;
+                                    console.log("styledProps", styledProps);
+                                    t.currentViewInstance.fabricCanvas.addElement("text", textContent, textContent, styledProps);
                                 });
+
                             });
 
                             target.appendChild(newDiv);
                             }
                         });
                         }
+
 
 
 
