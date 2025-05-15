@@ -15279,7 +15279,7 @@
                     let t = arguments.length > 0 && void 0 !== arguments[0] ? arguments[0] : {};
                     if (!t.url) return;
                     const e = document.createElement("div");
-                    (e.className = "fpd-item fpd-hover-thumbnail"), (e.dataset.source = t.url), t.disableDraggable || e.classList.add("fpd-draggable"), t.title && ((e.dataset.title = t.title), e.setAttribute("aria-label", t.title));
+                    (e.className = "fpd-item fpd-hover-thumbnail ts"), (e.dataset.source = t.url), t.disableDraggable || e.classList.add("fpd-draggable"), t.title && ((e.dataset.title = t.title), e.setAttribute("aria-label", t.title));
                     const i = document.createElement("picture");
                     (i.dataset.img = t.thumbnailUrl ? t.thumbnailUrl : t.url), e.append(i);
                     const n = new Image();
@@ -15419,7 +15419,7 @@
                     langJSON: {},
                     colorPickerPalette: [],
                     actions: { left: ["info", "download", "print", "preview-lightbox", "reset-product"], center: ["undo", "redo"], right: ["zoom", "ruler", "guided-tour"] },
-                    mainBarModules: ["products", "images", "text", "designs", "manage-layers"],
+                    mainBarModules: ["products","productsnew", "images", "text", "designs", "manage-layers"],
                     initialActiveModule: "",
                     maxValues: {},
                     watermark: !1,
@@ -15472,6 +15472,7 @@
                     usePrintingBoxAsBounding: !1,
                     printingBox: {},
                     productsJSON: null,
+                    productsJSON1: null,
                     designsJSON: null,
                     customizationRequiredRule: "any",
                     swapProductConfirmation: !1,
@@ -19292,13 +19293,26 @@
                 }
             }
             customElements.define("fpd-main-bar", Fe);
+            alert("fpd-main-bar-first");
+            console.log("fpd-main-bar-first", Fe);
             class je extends HTMLElement {
                 constructor() {
                     super();
                 }
                 connectedCallback() {
+                    console.log("fpd-module-products-first00000000000");
                     this.innerHTML =
-                        '<div data-moduleicon="layout-panel-left" data-defaulttext="Design" data-title="Design"><div class="icon-box"><i data-lucide="house"></i></div> <fpd-dropdown class="fpd-product-categories rounded-2xl border border-gray-200 bg-white p-2 dark:border-gray-800 dark:bg-white/[0.03] md:p-2" searchable></fpd-dropdown> <div class="fpd-scroll-area"> <div class="fpd-grid fpd-grid-contain fpd-padding one-tt"><div class="searchox bg-white rounded-lg relative flex"><div id="search-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M15.2 16.34a7.5 7.5 0 1 1 1.38-1.45l4.2 4.2a1 1 0 1 1-1.42 1.41l-4.16-4.16zm-4.7.16a6 6 0 1 0 0-12 6 6 0 0 0 0 12z"></path></svg></div><div><input type="text" class="appearance-none bg-inherit border-0 box-border text-inherit font-normal min-w-[8px] outline-none w-full" /></div></div> </div> </div> </div>';
+                        '<div data-moduleicon="layout-panel-left" data-defaulttext="Design" data-title="Design"><div class="fpd-head"> <div class="fpd-input-back-search input-search-box !shadow-none border border-[#35475a33] border-solid !rounded-[8px] ml-[5px] w-[calc(100% - 22px)]"> <div class="fpd-back fpd-btn !bg-white"> <svg xmlns="http://www.w3.org/2000/svg" class="min-w-[24px] text-black relative top-[-2px]" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M15.2 16.34a7.5 7.5 0 1 1 1.38-1.45l4.2 4.2a1 1 0 1 1-1.42 1.41l-4.16-4.16zm-4.7.16a6 6 0 1 0 0-12 6 6 0 0 0 0 12z"></path></svg> </div> <div class="fpd-input-search"> <input type="text" class="!text-sm placeholder-gray-500 !pl-2" placeholder="Search elements" /> <span class="fpd-icon-magnify"></span> </div> </div> </div><div class="icon-box"><i data-lucide="house"></i></div> <fpd-dropdown class="fpd-product-categories rounded-2xl border border-gray-200 bg-white p-2 dark:border-gray-800 dark:bg-white/[0.03] md:p-2" searchable></fpd-dropdown> <div class="fpd-scroll-area"> <div class="fpd-grid fpd-grid-contain fpd-padding one-tt" id="ProductModule"><div class="searchox bg-white rounded-lg relative flex"><div id="search-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M15.2 16.34a7.5 7.5 0 1 1 1.38-1.45l4.2 4.2a1 1 0 1 1-1.42 1.41l-4.16-4.16zm-4.7.16a6 6 0 1 0 0-12 6 6 0 0 0 0 12z"></path></svg></div><div><input type="text" class="appearance-none bg-inherit border-0 box-border text-inherit font-normal min-w-[8px] outline-none w-full" /></div></div> </div> </div> </div>';
+                }
+            }
+            class jaikant extends HTMLElement {
+                constructor() {
+                    super();
+                }
+                connectedCallback() {
+                    console.log("fpd-module-productsnew-first00000000000");
+                    this.innerHTML =
+                        '<div data-moduleicon="layout-panel-left" data-defaulttext="Products" data-title="Productsnew"><div class="fpd-head"> <div class="fpd-input-back-search input-search-box !shadow-none border border-[#35475a33] border-solid !rounded-[8px] ml-[5px] w-[calc(100% - 22px)]"> <div class="fpd-back fpd-btn !bg-white"> <svg xmlns="http://www.w3.org/2000/svg" class="min-w-[24px] text-black relative top-[-2px]" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M15.2 16.34a7.5 7.5 0 1 1 1.38-1.45l4.2 4.2a1 1 0 1 1-1.42 1.41l-4.16-4.16zm-4.7.16a6 6 0 1 0 0-12 6 6 0 0 0 0 12z"></path></svg> </div> <div class="fpd-input-search"> <input type="text" class="!text-sm placeholder-gray-500 !pl-2" placeholder="Search elements" /> <span class="fpd-icon-magnify"></span> </div> </div> </div><div class="icon-box"><i data-lucide="house"></i></div> <fpd-dropdown class="fpd-product-categories rounded-2xl border border-gray-200 bg-white p-2 dark:border-gray-800 dark:bg-white/[0.03] md:p-2" searchable></fpd-dropdown> <div class="fpd-scroll-area"> <div class="fpd-grid fpd-grid-contain fpd-padding one-ttt" id="DesignModule"><div class="searchox bg-white rounded-lg relative flex"><div id="search-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M15.2 16.34a7.5 7.5 0 1 1 1.38-1.45l4.2 4.2a1 1 0 1 1-1.42 1.41l-4.16-4.16zm-4.7.16a6 6 0 1 0 0-12 6 6 0 0 0 0 12z"></path></svg></div><div><input type="text" class="appearance-none bg-inherit border-0 box-border text-inherit font-normal min-w-[8px] outline-none w-full" /></div></div> </div> </div> </div>';
                 }
             }
             function Re(t, e) {
@@ -19308,10 +19322,13 @@
                     e.add(t);
             }
             function Ne(t, e, i) {
+
                 if (!e.has(t)) throw new TypeError("attempted to get private field on non-instance");
                 return i;
             }
             customElements.define("fpd-module-products", je);
+            customElements.define("fpd-module-productsnew", jaikant);
+            
             var He = new WeakSet(),
                 ze = new WeakSet();
             class We extends EventTarget {
@@ -19323,9 +19340,12 @@
                         (i = this),
                         (s = 0),
                         (n = (function (t) {
+                            console.log("jaikant",t);
                             var e = (function (t, e) {
+                                console.log("jaikant t",t, "jaikant e", e)
                                 if ("object" != typeof t || null === t) return t;
                                 var i = t[Symbol.toPrimitive];
+                                console.log("jaikant i",i)
                                 if (void 0 !== i) {
                                     var n = i.call(t, "string");
                                     if ("object" != typeof n) return n;
@@ -19365,19 +19385,102 @@
                             n == this.currentCategoryIndex && Ne(this, ze, Ue).call(this, e);
                         });
                 }
+                
                 selectCategory() {
+                    alert("check");
                     let t = arguments.length > 0 && void 0 !== arguments[0] ? arguments[0] : 0;
                     if (((this.currentCategoryIndex = t), (this.container.querySelector(".fpd-grid").innerHTML = ""), this.fpdInstance.products && this.fpdInstance.products.length > 0)) {
+                        console.log("Anoop Data old 2", this.fpdInstance.products);
                         let e;
                         void 0 !== this.fpdInstance.products[0].category
                             ? ((e = this.fpdInstance.products[t].products), (this.container.querySelector(".fpd-dropdown-current").value = this.fpdInstance.products[t].category))
                             : (e = this.fpdInstance.products),
+                             console.log("Anoop Data 22-1", e),
                             e.forEach((t, e) => {
                                 Ne(this, ze, Ue).call(this, t, e);
                             });
                     }
                 }
             }
+            // New Function Call
+            class Wes extends EventTarget {
+                constructor(t, e) {
+                    var i, n, s;
+                    super(),
+                        Re(this, ze),
+                        Re(this, He),
+                        (i = this),
+                        (s = 0),
+                        (n = (function (t) {
+                            console.log("jaikantNew",t);
+                            var e = (function (t, e) {
+                                console.log("jaikantNew t",t, "jaikant e", e)
+                                if ("object" != typeof t || null === t) return t;
+                                var i = t[Symbol.toPrimitive];
+                                console.log("jaikantNew i",i)
+                                if (void 0 !== i) {
+                                    var n = i.call(t, "string");
+                                    if ("object" != typeof n) return n;
+                                    throw new TypeError("@@toPrimitive must return a primitive value.");
+                                }
+                                return String(t);
+                            })(t);
+                            return "symbol" == typeof e ? e : String(e);
+                        })((n = "currentCategoryIndex"))) in i
+                            ? Object.defineProperty(i, n, { value: s, enumerable: !0, configurable: !0, writable: !0 })
+                            : (i[n] = s),
+                        (this.fpdInstance = t),
+                        (this.container = document.createElement("fpd-module-productsnew")),
+                        e.append(this.container),
+                        t.addEventListener("productsSet", (t) => {
+
+                            const e = this.container.querySelector(".fpd-dropdown-list > .fpd-scroll-area");
+                            console.log("Anoop Data", this.fpdInstance.productsnew);
+                            (e.innerHTML = ""),
+                                this.fpdInstance.productsnew &&
+                                    this.fpdInstance.productsnew.length > 0 &&
+                                    (void 0 !== this.fpdInstance.productsnew[0].category &&
+                                        this.fpdInstance.productsnew.length > 1 &&
+                                        (this.container.classList.add("fpd-categories-enabled"),
+                                        this.fpdInstance.productsnew.forEach((t, i) => {
+                                            console.log("Anoop Data for each", t, i);
+                                            const n = document.createElement("span");
+                                            (n.className = "fpd-item"),
+                                                (n.dataset.index = i),
+                                                (n.innerText = t.category),
+                                                n.addEventListener("click", (t) => {
+                                                    this.selectCategory(t.currentTarget.dataset.index);
+                                                }),
+                                                e.append(n);
+                                        })),
+                                    Ne(this, He, Ve).call(this),
+                                    this.selectCategory(0));
+                        }),
+                        t.addEventListener("productAddNew", (t, e, i, n) => {
+                            n == this.currentCategoryIndex && Ne(this, ze, Ue).call(this, e);
+                        });
+                }
+                
+                selectCategory() {
+                    alert("check");
+                    let t = arguments.length > 0 && void 0 !== arguments[0] ? arguments[0] : 0;
+                    console.log("Anoop Data 1", this.fpdInstance.productsnew,"Anoop Data Happy",this.currentCategoryIndex,t);
+                    if (((this.currentCategoryIndex = t), (this.container.querySelector(".fpd-grid").innerHTML = ""), this.fpdInstance.productsnew && this.fpdInstance.productsnew.length > 0)) {
+                        console.log("Anoop Data 2", this.fpdInstance.productsnew);
+                        let e;
+                        void 0 !== this.fpdInstance.productsnew[0].category
+                            ? ((e = this.fpdInstance.productsnew[t].products), (this.container.querySelector(".fpd-dropdown-current").value = this.fpdInstance.productsnew[t].category))
+                            : (e = this.fpdInstance.productsnew),
+
+                            console.log("Anoop Data 22", e),
+                            e.forEach((t, e) => {
+                                Ne(this, ze, Ue).call(this, t, e);
+                            });
+                    
+                    }
+                }
+            }
+            // End New Function Call
             function Ve() {
                 if (this.fpdInstance.mainOptions.editorMode) return;
                 let t = this.fpdInstance.products[0],
@@ -19388,20 +19491,29 @@
                 e && i && "products" == i.dataset.module && i.nextSibling && i.nextSibling.click();
             }
             function Ue(e, i) {
+                console.log("Anoop Data 3", e, i);
                 let n = e[0].productThumbnail ? e[0].productThumbnail : e[0].thumbnail,
                     s = e[0].productTitle ? e[0].productTitle : e[0].title;
                 const r = document.createElement("div");
-                (r.className = "fpd-item fpd-hover-thumbnail"),
+                (r.className = "fpd-item fpd-hover-thumbnail text"),
                     (r.dataset.title = s),
                     (r.dataset.source = n),
                     (r.dataset.index = i),
                     r.addEventListener("click", (e) => {
+                        const parentDiv = e.target.closest('div').parentElement;
+                        const parentDivId = parentDiv?.id;
+                        localStorage.setItem('parentDivId', parentDivId);
+                        // Store it (e.g., in a variable or log it)
+                        console.log('Parent div:', parentDiv?.id);
+                        console.log("Anoop Data 4-ue", e, i);
                         if ((e.preventDefault(), this.fpdInstance.mainOptions.swapProductConfirmation)) {
                             var n = t(this.fpdInstance.translator.getTranslation("modules", "products_confirm_replacement"), !1, "confirm", this.fpdInstance.container);
                             console.log("data value of",n, products_confirm_replacement)
                             const e = n.querySelector(".fpd-confirm");
                             (e.innerText = this.fpdInstance.translator.getTranslation("modules", "products_confirm_button")),
                                 G(e, ["click"], () => {
+                                    console.log("Anoop Data 5", e, i);
+
                                     this.fpdInstance.selectProduct(i, this.currentCategoryIndex), n.remove();
                                 });
                         } else 
@@ -19419,6 +19531,8 @@
                             var a = e.currentTarget;
                             G(confirmBtn, ["click"], () => {
                                 modal.remove();
+                                debugger;
+                                console.log("Anoop Data 5-1");
                                 this.fpdInstance.selectProduct(Number(a.dataset.index), this.currentCategoryIndex);
                             });
                             // this.fpdInstance.selectProduct(Number(e.currentTarget.dataset.index), this.currentCategoryIndex);
@@ -19429,6 +19543,7 @@
                 (a.dataset.img = n), r.append(a), this.fpdInstance.lazyBackgroundObserver.observe(a);
             }
             window.FPDProductsModule = We;
+            window.FPDProductsModuleNew = Wes;
             class Ye extends HTMLElement {
                 constructor() {
                     super();
@@ -21625,6 +21740,7 @@
                                 const s = n.querySelector(".fpd-confirm");
                                 (s.innerText = this.fpdInstance.translator.getTranslation("modules", "layouts_confirm_button", "Sure?")),
                                     G(s, "click", () => {
+                                        console.log("Anoop Data 5-2", e, i);
                                         vs(this, ws, 0),
                                             vs(this, Cs, e.elements.length),
                                             (this.fpdInstance.globalCustomElements = []),
@@ -21843,6 +21959,7 @@
                 constructor(t, e, i) {
                     let n;
                     if ((super(), "products" === i)) n = new We(t, e);
+                    else if ("productsnew" === i) n = new Wes(t, e);
                     else if ("text" === i) n = new Ge(t, e);
                     else if (i.includes("designs")) {
                         let r = null;
@@ -21970,6 +22087,8 @@
                         Qs(this, "currentModules", []),
                         (this.fpdInstance = t);
                     const e = t.container;
+                    alert("constructor")
+                    console.log("constructor", e);
                     if (((this.container = document.createElement("fpd-main-bar")), t.mainOptions.mainBarContainer && !t.mainOptions.modalMode)) {
                         const i = document.querySelector(t.mainOptions.mainBarContainer);
                         i
@@ -22014,13 +22133,16 @@
                     this.updateContentWrapper(), this.setup(t.mainOptions.mainBarModules), this.fpdInstance.translator.translateArea(this.container), $s(this, cr) && this.fpdInstance.translator.translateArea($s(this, nr));
                 }
                 callModule(t) {
+                    alert("check coming here call module");
+                    console.log("Call Module",t)
                     let e,
                         i = arguments.length > 1 && void 0 !== arguments[1] ? arguments[1] : null;
                     if ((Z(this.navElem.querySelectorAll(".fpd-nav-item"), ["fpd-active"]), Z(Array.from(this.contentElem.children), ["fpd-active"]), i))
                         (e = X(this.navElem.querySelector('.fpd-nav-item[data-dynamic-designs-id="' + i + '"]'), ["fpd-active"])), X(this.contentElem.querySelector('[data-dynamic-designs-id="' + i + '"]'), ["fpd-active"]);
                     else {
+                        console.log("Call Module else",t)
                         e = X(this.navElem.querySelector('.fpd-nav-item[data-module="' + t + '"]'), ["fpd-active"]);
-                        console.log("Designer products",t);
+                        console.log("Designer products else t",t);
                         const i = this.contentElem.querySelector("fpd-module-" + t);
                         X(i, ["fpd-active"]), "text" == t && i.querySelector("textarea").focus();
                     }
@@ -22055,6 +22177,7 @@
                 }
                 updateContentWrapper() {
                     const t = this.fpdInstance.container;
+                    console.log("Update Content Wrapper", t);
                     this.toggleContentDisplay(!1),
                         tr(this, hr, !1),
                         tr(this, cr, !1),
@@ -22095,10 +22218,14 @@
                     }
                 }
                 setup() {
+                    alert("check coming here setup");
                     let t = arguments.length > 0 && void 0 !== arguments[0] ? arguments[0] : [];
+                    console.log("Designer products 0-t", t);
                     this.currentModules = [];
                     let e = this.fpdInstance.mainOptions.initialActiveModule ? this.fpdInstance.mainOptions.initialActiveModule : "";
+                    console.log("Designer products 0-e", e);
                     const i = this.container.querySelector(".fpd-navigation");
+                    console.log("Designer products 0", i);
                     0 != t.length || this.fpdInstance.mainOptions.editorMode
                         ? 1 != t.length || this.fpdInstance.container.classList.contains("fpd-topbar") || this.fpdInstance.mainOptions.editorMode
                             ? this.fpdInstance.container.classList.contains("fpd-sidebar") && "" == e
@@ -22113,11 +22240,20 @@
                             }),
                         t.forEach((t) => {
                             console.log("000000000000000000",t)
+                           /* if(t == "productsnew"){
+                                console.log(this.contentElem, "000000000000000000---->if",t, this.fpdInstance)
+                                t = "products";
+                                console.log(this.contentElem, "000000000000000000---->if1",t, this.fpdInstance)
+                            } */
                             let e = "";
+                            console.log("FpD instance", this.fpdInstance);
+                            console.log("Content Elem", this.contentElem);
                             const n = new qs(this.fpdInstance, this.contentElem, t);
-                            console.log("111111111111111",n)
+                            
+                            console.log("111111111111111",n, t)
                             if (!n.moduleInstance || !n.configs) return;
                             this.currentModules.push(t);
+                            console.log("222222222222222t",t)
                             const s = document.createElement("div");
                             s.classList.add("fpd-nav-item"), (s.dataset.module = t), s.addEventListener("click", Ks(this, pr, wr).bind(this)), i.appendChild(s);
                             let r = document.createElement("span");
@@ -22145,6 +22281,7 @@
                                       }))
                                     : ((r.setAttribute("data-lucide", n.configs.icon))),
                                 s.append(r),
+                                console.log('anoop'),
                                 console.log("s",s),
                                 n.configs.langKeys)
                             ) {
@@ -22229,6 +22366,7 @@
             function Sr() {
                 const t = this.fpdInstance.currentViewInstance,
                     e = t.options.customAdds;
+                console.log("Anoop Data 4", t, e);
                 J(document.querySelectorAll('.fpd-nav-item[data-module^="designs"], fpd-module-designs'), ["fpd-disabled"], !e.designs),
                     J(document.querySelectorAll('.fpd-nav-item[data-module="images"], fpd-module-images'), ["fpd-disabled"], !e.uploads),
                     J(document.querySelectorAll('.fpd-nav-item[data-module="text-to-image"]'), ["fpd-disabled"], !e.uploads),
@@ -22243,7 +22381,7 @@
                         }),
                     this.toggleContentDisplay(!1);
             }
-            Qs(vr, "availableModules", ["products", "images", "text", "designs", "manage-layers", "text-layers", "layouts", "save-load", "names-numbers"]), (window.FPDMainBar = vr);
+            Qs(vr, "availableModules", ["products","productsnew", "images", "text", "designs", "manage-layers", "text-layers", "layouts", "save-load", "names-numbers"]), (window.FPDMainBar = vr);
             class Tr extends HTMLElement {
                 constructor() {
                     super();
@@ -24011,6 +24149,7 @@
                         Co(this, "currentViewInstance", null),
                         Co(this, "currentViewIndex", 0),
                         Co(this, "products", []),
+                        Co(this, "productsnew", []),
                         Co(this, "designs", []),
                         Co(this, "modalContainer", document.body),
                         Co(this, "currentCategoryIndex", 0),
@@ -24081,6 +24220,7 @@
                 }
                 setupProducts() {
                     let t = arguments.length > 0 && void 0 !== arguments[0] ? arguments[0] : [];
+                    console.log("setupProductsOld", t),
                     (this.products = []),
                         t.forEach((t) => {
                             t.hasOwnProperty("category")
@@ -24089,28 +24229,76 @@
                                   })
                                 : this.addProduct(t);
                         }),
+                        console.log("setupProductsOldBefore", this.products),
                         this.mainOptions.loadFirstProductInStage && t.length > 0 ? this.selectProduct(0) : this.toggleSpinner(!1),
                         q(this, "productsSet", {});
+                        console.log("setupProductsOld", this.products);
                 }
+                setupProductsNew() {
+                    alert("setupProductsNew");
+                    let t = arguments.length > 0 && void 0 !== arguments[0] ? arguments[0] : [];
+                    console.log("setupProductsNew", t),
+                    (this.productsnew = []),
+                        t.forEach((t) => {
+                            t.hasOwnProperty("category")
+                                ? t.products.forEach((e) => {
+                                    console.log("Middle Layer", e)
+                                      this.addProductNew(e, t.category);
+                                  })
+                                : this.addProductNew(t);
+                        }),
+                        console.log("setupProductsNewLastBefore", this.productsnew),
+                        this.mainOptions.loadFirstProductInStage && t.length > 0 ? this.selectProduct(0) : this.toggleSpinner(!1),
+                        q(this, "productsSet", {});
+
+                        this.productsnew = t;
+                        console.log("setupProductsNewLast", this.productsnew,t);
+                }
+
                 setupDesigns(t) {
                     (this.designs = t), q(this, "designsSet", {});
                 }
+                addProductNew(t, e) {
+                    console.log("addProductanoo1", t, e);
+                    var i = Ao(this, _o, Uo).call(this, e);
+                    void 0 === e ? this.productsnew.push(t) : (!1 === i && ((i = this.productsnew.length), (this.productsnew[i] = { category: e, products: [] })), this.productsnew[i].products.push(t)),
+                        q(this, "productAddNew", { views: t, category: e, catIndex: i });
+                }
                 addProduct(t, e) {
+                    console.log("addProductanoo", t, e);
                     var i = Ao(this, _o, Uo).call(this, e);
                     void 0 === e ? this.products.push(t) : (!1 === i && ((i = this.products.length), (this.products[i] = { category: e, products: [] })), this.products[i].products.push(t)),
                         q(this, "productAdd", { views: t, category: e, catIndex: i });
                 }
+
                 selectProduct(t, e) {
+                    console.log("selectProduct", t, e);
                     let i;
-                    To(this, Io, To(this, Oo, 0)),
-                        (this.currentCategoryIndex = void 0 === e ? this.currentCategoryIndex : e),
-                        (i = this.products && this.products.length && this.products[0].category ? this.products[this.currentCategoryIndex].products : this.products),
-                        (this.currentProductIndex = t),
-                        t < 0 ? (this.currentProductIndex = 0) : t > i.length - 1 && (this.currentProductIndex = i.length - 1);
-                    const n = i[this.currentProductIndex];
-                    this.loadProduct(n, this.mainOptions.replaceInitialElements);
+                    const savedId = localStorage.getItem('parentDivId');
+                    console.log("selectProduct--1--1-", savedId);
+                    if (savedId === 'ProductModule') {
+                        To(this, Io, To(this, Oo, 0)),
+                            (this.currentCategoryIndex = void 0 === e ? this.currentCategoryIndex : e),
+                            (i = this.products && this.products.length && this.products[0].category ? this.products[this.currentCategoryIndex].products : this.products),
+                            (this.currentProductIndex = t),
+                            t < 0 ? (this.currentProductIndex = 0) : t > i.length - 1 && (this.currentProductIndex = i.length - 1);
+                        const n = i[this.currentProductIndex];
+                        console.log("selectProduct", n, this.mainOptions);
+                        this.loadProduct(n, this.mainOptions.replaceInitialElements);
+                    }
+                    else{
+                        To(this, Io, To(this, Oo, 0)),
+                            (this.currentCategoryIndex = void 0 === e ? this.currentCategoryIndex : e),
+                            (i = this.productsnew && this.productsnew.length && this.productsnew[0].category ? this.productsnew[this.currentCategoryIndex].products : this.productsnew),
+                            (this.currentProductIndex = t),
+                            t < 0 ? (this.currentProductIndex = 0) : t > i.length - 1 && (this.currentProductIndex = i.length - 1);
+                        const n = i[this.currentProductIndex];
+                        console.log("selectProduct", n, this.mainOptions);
+                        this.loadProduct(n, this.mainOptions.replaceInitialElements);
+                    }
                 }
                 loadProduct(t) {
+                    console.log("addView-1", t);
                     let e = arguments.length > 1 && void 0 !== arguments[1] && arguments[1],
                         i = arguments.length > 2 && void 0 !== arguments[2] && arguments[2];
                     t &&
@@ -24140,6 +24328,7 @@
                         t && this.addView(t[0]));
                 }
                 addView(t) {
+                    console.log("addView", t);
                     let e = {};
                     Ht.relevantOptions.forEach((t) => {
                         let i = this.mainOptions[t];
@@ -24709,6 +24898,7 @@
                 });
             }
             function Wo() {
+                 
                 q(this, "ready", {}),
                     (this.warningsWrapper = this.container.querySelector(".fpd-warnings")),
                     this.mainOptions.productsJSON &&
@@ -24723,6 +24913,21 @@
                                       alert("Products JSON could not be loaded. Please check that your URL is correct! URL: " + this.mainOptions.productsJSON);
                                   },
                               })),
+
+                    this.mainOptions.productsJSON1 &&
+                        ("object" == typeof this.mainOptions.productsJSON1
+                            ? this.setupProductsNew(this.mainOptions.productsJSON1)
+                            : Vt({
+                                  url: this.mainOptions.productsJSON1,
+                                  onSuccess: (t) => {
+                                    console.log("setupProducts1",t)
+                                    this.setupProductsNew(t);
+                                  },
+                                  onError: () => {
+                                      alert("Products JSON could not be loaded. Please check that your URL is correct! URL: " + this.mainOptions.productsJSON1);
+                                  },
+                              })),
+                   
                     this.mainOptions.designsJSON &&
                         ("object" == typeof this.mainOptions.designsJSON
                             ? this.setupDesigns(this.mainOptions.designsJSON)
@@ -24898,6 +25103,7 @@
             function Go(t) {
                 ["undo", "redo"].includes(t) && this.currentViewInstance.fabricCanvas._renderPrintingBox(), q(this, "historyAction", { type: t }), Ao(this, Bo, qo).call(this);
             }
+            
             function qo() {
                 if (this.currentViewInstance) {
                     const t = this.currentViewInstance.fabricCanvas.historyUndo,
@@ -25005,6 +25211,8 @@
                         t.locked || (this.singleProductPrice += t.truePrice);
                     });
             }
+
+            
             Co(Ho, "version", "6.3.5"),
                 Co(Ho, "forbiddenTextChars", /<|>/g),
                 Co(Ho, "proxyFileServer", ""),

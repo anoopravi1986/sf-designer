@@ -32,6 +32,7 @@ export class HomeComponent implements AfterViewInit {
 
         this.appOptions = {
           productsJSON: 'assets/data/products/product-categories.json',
+          productsJSON1: 'assets/data/products/product-categories-new.json',
           designsJSON: 'assets/data/designs/design-categories.json',
           langJSON: 'assets/data/langs/default.json',
           // layout: 'topbar',
@@ -76,6 +77,7 @@ export class HomeComponent implements AfterViewInit {
           cornerIconColor: "#000000",
           mainBarModules: [
             'products',
+            'productsnew',
             'designs',
             'text',
             'images',
@@ -195,6 +197,10 @@ export class HomeComponent implements AfterViewInit {
           this.document.querySelector('#clothing-designer'),
           this.appOptions
         );
+
+
+
+        
           
           // ✅ Hook up buttons AFTER FPD is ready
           // $('#print-button').click(() => designer.print());
@@ -310,6 +316,7 @@ export class HomeComponent implements AfterViewInit {
     if (sourceElement) {
       const htmlContent = sourceElement.innerHTML;
       localStorage.setItem('savedContentText', htmlContent);
+      localStorage.setItem('parentDivId', 'ProductModule');
       console.log('Content saved to localStorage');
     }
   }
