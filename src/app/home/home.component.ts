@@ -133,7 +133,7 @@ export class HomeComponent implements AfterViewInit {
             {
               text: "Fun Times",
               properties: {
-                fontSize: 45,
+                fontSize: 80,
                 fontFamily: "Fredoka One",
                 fill: "#3f51b5",              // Blue
                 stroke: "#010101",
@@ -145,7 +145,7 @@ export class HomeComponent implements AfterViewInit {
             {
               text: "Creative Soul",
               properties: {
-                fontSize: 48,
+                fontSize: 70,
                 fontFamily: "Pacifico",
                 fill: "#e91e63",              // Pink
                 stroke: "#ffc107",            // Yellow outline
@@ -157,7 +157,7 @@ export class HomeComponent implements AfterViewInit {
             {
               text: "Dream Big",
               properties: {
-                fontSize: 52,
+                fontSize: 98,
                 fontFamily: "Lobster",
                 fill: "#4caf50",              // Green
                 stroke: "#ffffff",            // White outline

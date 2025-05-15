@@ -32,5 +32,6 @@ div.fpd-container .fpd-text-templates #text-templates.fpd-grid{gap: 7px;}
   #clothing-designer div[data-pos="left"] div[aria-label="Redo"]{position: relative;margin-right:8px;&:after{content: '';width: 1px;background: rgb(255 255 255 / 84%);height: 30px;right: -7px;position: absolute;}}
   .fpd-module-content>.fpd-active{padding-top: 18px;}.input-search-box{max-width: calc(100% - 20px);}.fpd-container fpd-module-designs{padding-right: 0;}
   .fpd-saved-designs .fpd-item.fpd-hover-thumbnail{position: relative;border: 1px solid #bdbdbd; .fa-solid.fa-trash{position: absolute;right: 0;        font-size: 15px;top:0}}
+  .fpd-container .fpd-scroll-area{max-width: 350px;}
 }
 
