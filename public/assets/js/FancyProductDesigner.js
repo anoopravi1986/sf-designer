@@ -18916,7 +18916,6 @@
                             this.fpdInstance.loadProduct(s.product), (this.fpdInstance.currentProductIndex = -1);
                         }),
                         G(s.querySelector(".fa-trash"), "click", (t) => {
-                            alert("check")
                             t.stopPropagation();
                             const e = t.currentTarget.parentNode,
                                 i = Array.from(this.gridElem.querySelectorAll(".fpd-item")).indexOf(e);
@@ -19293,7 +19292,6 @@
                 }
             }
             customElements.define("fpd-main-bar", Fe);
-            alert("fpd-main-bar-first");
             console.log("fpd-main-bar-first", Fe);
             class je extends HTMLElement {
                 constructor() {
@@ -19302,7 +19300,7 @@
                 connectedCallback() {
                     console.log("fpd-module-products-first00000000000");
                     this.innerHTML =
-                        '<div data-moduleicon="layout-panel-left" data-defaulttext="Design" data-title="Design"><div class="fpd-head"> <div class="fpd-input-back-search input-search-box !shadow-none border border-[#35475a33] border-solid !rounded-[8px] ml-[5px] w-[calc(100% - 22px)]"> <div class="fpd-back fpd-btn !bg-white"> <svg xmlns="http://www.w3.org/2000/svg" class="min-w-[24px] text-black relative top-[-2px]" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M15.2 16.34a7.5 7.5 0 1 1 1.38-1.45l4.2 4.2a1 1 0 1 1-1.42 1.41l-4.16-4.16zm-4.7.16a6 6 0 1 0 0-12 6 6 0 0 0 0 12z"></path></svg> </div> <div class="fpd-input-search"> <input type="text" class="!text-sm placeholder-gray-500 !pl-2" placeholder="Search elements" /> <span class="fpd-icon-magnify"></span> </div> </div> </div><div class="icon-box"><i data-lucide="house"></i></div> <fpd-dropdown class="fpd-product-categories rounded-2xl border border-gray-200 bg-white p-2 dark:border-gray-800 dark:bg-white/[0.03] md:p-2" searchable></fpd-dropdown> <div class="fpd-scroll-area"> <div class="fpd-grid fpd-grid-contain fpd-padding one-tt" id="ProductModule"><div class="searchox bg-white rounded-lg relative flex"><div id="search-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M15.2 16.34a7.5 7.5 0 1 1 1.38-1.45l4.2 4.2a1 1 0 1 1-1.42 1.41l-4.16-4.16zm-4.7.16a6 6 0 1 0 0-12 6 6 0 0 0 0 12z"></path></svg></div><div><input type="text" class="appearance-none bg-inherit border-0 box-border text-inherit font-normal min-w-[8px] outline-none w-full" /></div></div> </div> </div> </div>';
+                        '<div data-moduleicon="layout-panel-left" data-defaulttext="Products" data-title="Design"><div class="fpd-head"> <div class="fpd-input-back-search input-search-box !shadow-none border border-[#35475a33] border-solid !rounded-[8px] ml-[5px] w-[calc(100% - 22px)]"> <div class="fpd-back fpd-btn !bg-white"> <svg xmlns="http://www.w3.org/2000/svg" class="min-w-[24px] text-black relative top-[-2px]" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M15.2 16.34a7.5 7.5 0 1 1 1.38-1.45l4.2 4.2a1 1 0 1 1-1.42 1.41l-4.16-4.16zm-4.7.16a6 6 0 1 0 0-12 6 6 0 0 0 0 12z"></path></svg> </div> <div class="fpd-input-search"> <input type="text" class="!text-sm placeholder-gray-500 !pl-2" placeholder="Search elements" /> <span class="fpd-icon-magnify"></span> </div> </div> </div><div class="icon-box"><i data-lucide="house"></i></div> <fpd-dropdown class="fpd-product-categories rounded-2xl border border-gray-200 bg-white p-2 dark:border-gray-800 dark:bg-white/[0.03] md:p-2" searchable></fpd-dropdown> <div class="fpd-scroll-area"> <div class="fpd-grid fpd-grid-contain fpd-padding one-tt" id="ProductModule"><div class="searchox bg-white rounded-lg relative flex"><div id="search-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M15.2 16.34a7.5 7.5 0 1 1 1.38-1.45l4.2 4.2a1 1 0 1 1-1.42 1.41l-4.16-4.16zm-4.7.16a6 6 0 1 0 0-12 6 6 0 0 0 0 12z"></path></svg></div><div><input type="text" class="appearance-none bg-inherit border-0 box-border text-inherit font-normal min-w-[8px] outline-none w-full" /></div></div> </div> </div> </div>';
                 }
             }
             class jaikant extends HTMLElement {
@@ -19312,7 +19310,7 @@
                 connectedCallback() {
                     console.log("fpd-module-productsnew-first00000000000");
                     this.innerHTML =
-                        '<div data-moduleicon="layout-panel-left" data-defaulttext="Products" data-title="Productsnew"><div class="fpd-head"> <div class="fpd-input-back-search input-search-box !shadow-none border border-[#35475a33] border-solid !rounded-[8px] ml-[5px] w-[calc(100% - 22px)]"> <div class="fpd-back fpd-btn !bg-white"> <svg xmlns="http://www.w3.org/2000/svg" class="min-w-[24px] text-black relative top-[-2px]" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M15.2 16.34a7.5 7.5 0 1 1 1.38-1.45l4.2 4.2a1 1 0 1 1-1.42 1.41l-4.16-4.16zm-4.7.16a6 6 0 1 0 0-12 6 6 0 0 0 0 12z"></path></svg> </div> <div class="fpd-input-search"> <input type="text" class="!text-sm placeholder-gray-500 !pl-2" placeholder="Search elements" /> <span class="fpd-icon-magnify"></span> </div> </div> </div><div class="icon-box"><i data-lucide="house"></i></div> <fpd-dropdown class="fpd-product-categories rounded-2xl border border-gray-200 bg-white p-2 dark:border-gray-800 dark:bg-white/[0.03] md:p-2" searchable></fpd-dropdown> <div class="fpd-scroll-area"> <div class="fpd-grid fpd-grid-contain fpd-padding one-ttt" id="DesignModule"><div class="searchox bg-white rounded-lg relative flex"><div id="search-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M15.2 16.34a7.5 7.5 0 1 1 1.38-1.45l4.2 4.2a1 1 0 1 1-1.42 1.41l-4.16-4.16zm-4.7.16a6 6 0 1 0 0-12 6 6 0 0 0 0 12z"></path></svg></div><div><input type="text" class="appearance-none bg-inherit border-0 box-border text-inherit font-normal min-w-[8px] outline-none w-full" /></div></div> </div> </div> </div>';
+                        '<div data-moduleicon="layout-panel-left" data-defaulttext="Designs" data-title="Productsnew"><div class="fpd-head"> <div class="fpd-input-back-search input-search-box !shadow-none border border-[#35475a33] border-solid !rounded-[8px] ml-[5px] w-[calc(100% - 22px)]"> <div class="fpd-back fpd-btn !bg-white"> <svg xmlns="http://www.w3.org/2000/svg" class="min-w-[24px] text-black relative top-[-2px]" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M15.2 16.34a7.5 7.5 0 1 1 1.38-1.45l4.2 4.2a1 1 0 1 1-1.42 1.41l-4.16-4.16zm-4.7.16a6 6 0 1 0 0-12 6 6 0 0 0 0 12z"></path></svg> </div> <div class="fpd-input-search"> <input type="text" class="!text-sm placeholder-gray-500 !pl-2" placeholder="Search elements" /> <span class="fpd-icon-magnify"></span> </div> </div> </div><div class="icon-box"><i data-lucide="house"></i></div> <fpd-dropdown class="fpd-product-categories rounded-2xl border border-gray-200 bg-white p-2 dark:border-gray-800 dark:bg-white/[0.03] md:p-2" searchable></fpd-dropdown> <div class="fpd-scroll-area"> <div class="fpd-grid fpd-grid-contain fpd-padding one-ttt" id="DesignModule"><div class="searchox bg-white rounded-lg relative flex"><div id="search-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M15.2 16.34a7.5 7.5 0 1 1 1.38-1.45l4.2 4.2a1 1 0 1 1-1.42 1.41l-4.16-4.16zm-4.7.16a6 6 0 1 0 0-12 6 6 0 0 0 0 12z"></path></svg></div><div><input type="text" class="appearance-none bg-inherit border-0 box-border text-inherit font-normal min-w-[8px] outline-none w-full" /></div></div> </div> </div> </div>';
                 }
             }
             function Re(t, e) {
@@ -19387,7 +19385,6 @@
                 }
                 
                 selectCategory() {
-                    alert("check");
                     let t = arguments.length > 0 && void 0 !== arguments[0] ? arguments[0] : 0;
                     if (((this.currentCategoryIndex = t), (this.container.querySelector(".fpd-grid").innerHTML = ""), this.fpdInstance.products && this.fpdInstance.products.length > 0)) {
                         console.log("Anoop Data old 2", this.fpdInstance.products);
@@ -19462,7 +19459,6 @@
                 }
                 
                 selectCategory() {
-                    alert("check");
                     let t = arguments.length > 0 && void 0 !== arguments[0] ? arguments[0] : 0;
                     console.log("Anoop Data 1", this.fpdInstance.productsnew,"Anoop Data Happy",this.currentCategoryIndex,t);
                     if (((this.currentCategoryIndex = t), (this.container.querySelector(".fpd-grid").innerHTML = ""), this.fpdInstance.productsnew && this.fpdInstance.productsnew.length > 0)) {
@@ -22087,7 +22083,6 @@
                         Qs(this, "currentModules", []),
                         (this.fpdInstance = t);
                     const e = t.container;
-                    alert("constructor")
                     console.log("constructor", e);
                     if (((this.container = document.createElement("fpd-main-bar")), t.mainOptions.mainBarContainer && !t.mainOptions.modalMode)) {
                         const i = document.querySelector(t.mainOptions.mainBarContainer);
@@ -22133,7 +22128,6 @@
                     this.updateContentWrapper(), this.setup(t.mainOptions.mainBarModules), this.fpdInstance.translator.translateArea(this.container), $s(this, cr) && this.fpdInstance.translator.translateArea($s(this, nr));
                 }
                 callModule(t) {
-                    alert("check coming here call module");
                     console.log("Call Module",t)
                     let e,
                         i = arguments.length > 1 && void 0 !== arguments[1] ? arguments[1] : null;
@@ -22218,7 +22212,6 @@
                     }
                 }
                 setup() {
-                    alert("check coming here setup");
                     let t = arguments.length > 0 && void 0 !== arguments[0] ? arguments[0] : [];
                     console.log("Designer products 0-t", t);
                     this.currentModules = [];
@@ -22732,7 +22725,6 @@
                                     if ("edit-size" == n) X(l, ["fpd-show"]);
                                     else if ("duplicate" == n) Rr(this, Hr, Ur).call(this, i);
                                     else if ("delete" == n) {
-                                        alert("chhahahah")
                                         const e = Array.from(this.gridElem.querySelectorAll(".fpd-item")).indexOf(s);
                                         t.removeView(e);
                                     }
@@ -22745,7 +22737,6 @@
                         });
                     }),
                         G(t, "viewRemove", (t) => {
-                            alert("a")
                             const e = this.gridElem.querySelectorAll(".fpd-item").item(t.detail.viewIndex);
                             e && e.remove();
                         }),
@@ -23115,7 +23106,6 @@
                             t.currentViewInstance.fabricCanvas.duplicateElement(t.currentElement);
                         }),
                         G(this.navElem.querySelector(".fpd-tool-remove"), "click", (e) => {
-                            alert("chahhahahlll")
                             t.currentViewInstance.fabricCanvas.removeElement(t.currentElement);
                         }),
                         G(this.subPanel.querySelector(".fpd-panel-color .fpd-remove-shadow"), "click", (e) => {
@@ -24235,7 +24225,6 @@
                         console.log("setupProductsOld", this.products);
                 }
                 setupProductsNew() {
-                    alert("setupProductsNew");
                     let t = arguments.length > 0 && void 0 !== arguments[0] ? arguments[0] : [];
                     console.log("setupProductsNew", t),
                     (this.productsnew = []),
