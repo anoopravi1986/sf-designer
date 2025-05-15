@@ -23,7 +23,7 @@ div.fpd-container fpd-actions-bar{
 // fpd-main-bar .fpd-navigation>.fpd-nav-item.fpd-active{color:#fff;}
 // fpd-main-bar .fpd-navigation>.fpd-nav-item.fpd-active:before{background: #000;opacity: 1;}
 // fpd-main-bar .fpd-navigation>.fpd-nav-item.fpd-active .fpd-label{color: #fff;}
-
+.fpd-container .fpd-grid.fpd-grid-contain>.fpd-item>picture{background-position: center;}.fpd-item.fpd-itemimg{ span{&:nth-of-type(2){display: none;}}}
 @media only screen and (min-width: 991px){fpd-actions-bar div[data-pos="left"]{margin-left: 341px;.fpd-btn span{display: none;}}
   body{overflow: hidden;.fpd-container.fpd-sidebar>fpd-main-bar .fpd-navigation,.fpd-wrapper>fpd-main-wrapper{max-height: calc(100vh - 56px);overflow: auto;}.fpd-wrapper>fpd-main-wrapper{margin-top: 56px;}}
   div[data-pos="right"]{position: fixed !important;right: 0 !important;bottom: 0 !important;.fpd-uncollapsed-menu.fpd-visible-hidden.fpd-hidden{display: flex !important;visibility: visible !important;}}

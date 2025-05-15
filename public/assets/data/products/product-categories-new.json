@@ -5,11 +5,11 @@
             
             [
                 {
-                    "productThumbnail": "../../assets/images/laptop/MacBook_Laptop_Design.png",
+                    "productThumbnail": "../../assets/images/laptop/styleflipdesign.jpg",
                     "productTitle": " Apple Macbook Pro 16 2019 512GB SSD Storage ",
                     "product_id": 9,
                     "title": "Front",
-                    "thumbnail": "../../assets/images/laptop/MacBook_Laptop_Design.png",
+                    "thumbnail": "../../assets/images/laptop/styleflipdesign.jpg",
                     "mask": {},
                     "options": {
                         "stageWidth": 600,
