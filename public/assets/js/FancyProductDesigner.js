@@ -19552,7 +19552,6 @@
             customElements.define("fpd-module-text", Ye);
             class Ge extends EventTarget {
                 constructor(t, e) {
-                    alert("text module come");
                     if (
                         (super(),
                         (this.fpdInstance = t),

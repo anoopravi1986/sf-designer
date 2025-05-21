@@ -1,6 +1,6 @@
 [
     {
-        "category": "Laptop Skin Decals New",
+        "category": "Custom Laptop Skin ",
         "products": [
             
             [
@@ -197,30 +197,30 @@
         ]
     },
     {
-        "category": "Custom Headphones Skins New",
+        "category": "Custom Guitar Skins New",
         "products": [
             [
                 {
-                    "productThumbnail": "../../assets/images/custom/template1/headphone/sony-mdr-v700-headphones-skin-custom-thumbnail.png",
-                    "productTitle": "Beats By Dr. Dre Beats Pro Model",
-                    "product_id": 11,
+                    "productThumbnail": "../../assets/images/custom/template1/guitar/guitar_lion.jpg",
+                    "productTitle": " Apple Macbook Pro 16 2019 512GB SSD Storage ",
+                    "product_id": 9,
                     "title": "Front",
-                    "thumbnail": "../../assets/images/custom/template1/headphone/sony-mdr-v700-headphones-skin-custom-thumbnail.png",
+                    "thumbnail": "../../assets/images/custom/template1/guitar/guitar_lion.jpg",
                     "mask": {},
                     "options": {
                         "stageWidth": 600,
                         "stageHeight": 660,
                         "printingBox": {
-                            "left": 207,
-                            "top": 136,
-                            "width": 194,
-                            "height": 437,
+                            "left": 178,
+                            "top": 139,
+                            "width": 243,
+                            "height": 404,
                             "visibility": false
                         },
                         "usePrintingBoxAsBounding": "yes",
                         "output": {
-                            "width": 200,
-                            "height": 450,
+                            "width": 240,
+                            "height": 400,
                             "bleed": 0
                         },
                         "customAdds": {
@@ -232,7 +232,7 @@
                     "elements": [
                         {
                             "title": "Base",
-                            "source": "../../assets/images/custom/template1/headphone/SONY_MDR_V700_BOTTOM.png",
+                            "source": "../../assets/images/custom/template1/guitar/GIBSON_SG_BOTTOM.png",
                             "type": "image",
                             "parameters": {
                                 "left": 300,
@@ -240,17 +240,18 @@
                                 "originX": "center",
                                 "originY": "center",
                                 "z": -1,
-                                "fill": "#ffc3d2",
-                                "colors": 1,
-                                "colorLinkGroup": "shirt-colorlink",
+                                "fill": "#252525",
+                                "colors": "#252525",
+                                "colorLinkGroup": "color-shirt",
                                 "draggable": 0,
                                 "rotatable": 0,
                                 "resizable": 0,
                                 "removable": 0,
+                                "flipX": false,
+                                "flipY": false,
                                 "zChangeable": 0,
-                                "scaleX": 0.76704822436053,
-                                "scaleY": 0.76704822436053,
-                                "lockUniScaling": false,
+                                "scaleX": 0.7702969091194894,
+                                "scaleY": 0.7702969091194894,
                                 "uniScalingUnlockable": 0,
                                 "angle": 0,
                                 "price": 0,
@@ -264,6 +265,7 @@
                                 "locked": 0,
                                 "showInColorSelection": 0,
                                 "boundingBox": 0,
+                                "fixed": false,
                                 "resizeToW": 0,
                                 "resizeToH": 0,
                                 "filter": 0,
@@ -272,16 +274,65 @@
                                 "advancedEditing": 0,
                                 "uploadZone": 0,
                                 "uploadZoneMovable": 0,
-                                "adminLocked": 0
+                                "uploadZoneRemovable": false,
+                                "pattern": false
+                            }
+                        },
+                        {
+                            "title": "Image",
+                            "source": "../../assets/images/designs/animals/3.jpg",
+                            "type": "image",
+                            "parameters": {
+                                "left": 301,
+                                "top": 331,
+                                "originX": "center",
+                                "originY": "center",
+                                "z": -1,
+                                "fill": false,
+                                "colors": 0,
+                                "colorLinkGroup": 0,
+                                "draggable": 1,
+                                "rotatable": 1,
+                                "resizable": 1,
+                                "removable": 1,
+                                "flipX": false,
+                                "flipY": false,
+                                "zChangeable": false,
+                                "scaleX": 0.7669183445190156,
+                                "scaleY": 0.7669183445190156,
+                                "uniScalingUnlockable": 0,
+                                "angle": 0,
+                                "price": 0,
+                                "autoCenter": 1,
+                                "replaceInAllViews": 0,
+                                "autoSelect": 0,
+                                "topped": 1,
+                                "boundingBox": "Base",
+                                "boundingBoxMode": "clipping",
+                                "opacity": 1,
+                                "excludeFromExport": 1,
+                                "locked": 0,
+                                "showInColorSelection": 0,
+                                "fixed": false,
+                                "resizeToW": 0,
+                                "resizeToH": 0,
+                                "filter": 1,
+                                "scaleMode": "fit",
+                                "minScaleLimit": 0.01,
+                                "advancedEditing": 1,
+                                "uploadZone": 0,
+                                "uploadZoneMovable": 0,
+                                "uploadZoneRemovable": false,
+                                "pattern": false
                             }
                         },
                         {
                             "title": "Overlay",
-                            "source": "../../assets/images/custom/template1/headphone/SONY_MDR_V700_PREVIEW.png",
+                            "source": "../../assets/images/custom/template1/guitar/GIBSON_SG_PREVIEW.png",
                             "type": "image",
                             "parameters": {
-                                "left": 300,
-                                "top": 330,
+                                "left": 301,
+                                "top": 331,
                                 "originX": "center",
                                 "originY": "center",
                                 "z": -1,
@@ -292,10 +343,11 @@
                                 "rotatable": 0,
                                 "resizable": 0,
                                 "removable": 0,
+                                "flipX": false,
+                                "flipY": false,
                                 "zChangeable": false,
-                                "scaleX": 0.76969311962471,
-                                "scaleY": 0.76969311962471,
-                                "lockUniScaling": false,
+                                "scaleX": 0.7669183445190156,
+                                "scaleY": 0.7669183445190156,
                                 "uniScalingUnlockable": 0,
                                 "angle": 0,
                                 "price": 0,
@@ -309,6 +361,7 @@
                                 "locked": 1,
                                 "showInColorSelection": 0,
                                 "boundingBox": 0,
+                                "fixed": false,
                                 "resizeToW": 0,
                                 "resizeToH": 0,
                                 "filter": 0,
@@ -317,7 +370,8 @@
                                 "advancedEditing": 0,
                                 "uploadZone": 0,
                                 "uploadZoneMovable": 0,
-                                "adminLocked": 0
+                                "uploadZoneRemovable": false,
+                                "pattern": false
                             }
                         }
                     ]
