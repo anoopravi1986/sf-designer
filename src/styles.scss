@@ -23,6 +23,7 @@ div.fpd-container fpd-actions-bar{
 // fpd-main-bar .fpd-navigation>.fpd-nav-item.fpd-active{color:#fff;}
 // fpd-main-bar .fpd-navigation>.fpd-nav-item.fpd-active:before{background: #000;opacity: 1;}
 // fpd-main-bar .fpd-navigation>.fpd-nav-item.fpd-active .fpd-label{color: #fff;}
+ .fpd-container fpd-module-products .fpd-grid, .fpd-container fpd-module-productsnew .fpd-grid {grid-template-columns: repeat(2, 1fr);}
 .fpd-container .fpd-grid.fpd-grid-contain>.fpd-item>picture{background-position: center;}.fpd-item.fpd-itemimg{ span{display: none;}}
 div.fpd-container .fpd-text-templates #text-templates.fpd-grid{gap: 7px;}
 @media only screen and (min-width: 991px){fpd-actions-bar div[data-pos="left"]{margin-left: 341px;.fpd-btn span{display: none;}}
@@ -33,5 +34,71 @@ div.fpd-container .fpd-text-templates #text-templates.fpd-grid{gap: 7px;}
   .fpd-module-content>.fpd-active{padding-top: 18px;}.input-search-box{max-width: calc(100% - 20px);}.fpd-container fpd-module-designs{padding-right: 0;}
   .fpd-saved-designs .fpd-item.fpd-hover-thumbnail{position: relative;border: 1px solid #bdbdbd; .fa-solid.fa-trash{position: absolute;right: 0;        font-size: 15px;top:0}}
   .fpd-container .fpd-scroll-area{max-width: 350px;}
+  fpd-element-toolbar.fpd-smart.fpd-show{top: 80px !important;transform: none;max-width: calc(100% - 441px);left: 441px !important;width: max-content;max-width: calc(100% - 441px);justify-content: center;right: 0; margin: auto;
+    .fpd-scroll-area.fpd-tools-nav {max-width: 100%;flex-direction: row;
+      .fpd-primary-tools{    padding-bottom: 7px;}
+    }
+    .fpd-secondary-tools.fpd-scroll-area{max-width: 100%;.fpd-tool-duplicate, .fpd-tool-remove{display: none;}}
+    .fpd-panel-font-family{.fpd-scroll-area{height: calc( 100vh - 200px);}}
+    &.fpd-panel-visible{max-width: 350px;justify-content:flex-start;right: auto;}
+  }
+  
+}
+.fpd-container fpd-module-products .fpd-grid>.fpd-item{background: #f6f6f6;}
+// for visible three dots click of box
+.fpd-container .fpd-grid{overflow: visible;}
+// end
+.fpd-container fpd-module-products .fpd-grid>.fpd-item, .fpd-container fpd-module-designs .fpd-grid>.fpd-item,
+.fpd-container fpd-module-productsnew .fpd-grid>.fpd-item{    min-height: 150px;height: 150px;padding-top: 7px;}
+.fpd-container fpd-module-products .fpd-grid, .fpd-container fpd-module-designs .fpd-grid,
+.fpd-container fpd-module-productsnew .fpd-grid{grid-auto-rows: auto;}
+.fpd-item {position: relative;}
+
+.fpd-dot-menu {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    font-size: 20px;
+    cursor: pointer;
+    display: none;
+    z-index: 10;
+    background: rgba(255, 255, 255, 0.8);
+    padding: 2px 6px;
+    border-radius: 4px;
 }
 
+.fpd-item:hover .fpd-dot-menu {
+    display: block;
+}
+
+.fpd-popup {
+    position: fixed;
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    padding: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    display: none;
+    z-index: 999;
+    width: 224px;
+}
+
+.fpd-popup.visible {
+    display: block;padding: 0;
+}
+
+.fpd-popup .tags {
+    font-size: 12px;
+    color: #666;
+    margin-top: 5px;
+}
+
+
+ .backdrop-test::before {
+    content: "";
+    @apply fixed inset-0 bg-white bg-opacity-60 z-[1] left-[83px] top-[56px] max-w-[365px];
+  }
+
+  .backdrop-test {
+    @apply relative z-[9999]; /* Ensure popup is above the backdrop */
+  }

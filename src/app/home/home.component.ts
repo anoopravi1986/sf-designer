@@ -3,6 +3,7 @@ import { isPlatformBrowser, DOCUMENT, CommonModule } from '@angular/common';
 
 declare var FancyProductDesigner: any;
 import $ from 'jquery';
+import { filter } from 'rxjs';
 
 @Component({
   selector: 'app-home',
@@ -59,7 +60,9 @@ export class HomeComponent implements AfterViewInit {
               rotatable: true,
               colors: '#000',
               autoCenter: true,
-              boundingBox: "Base"
+              boundingBox: "Base",
+              patterns: true,
+              filters: true
           },
           actions: {
               // 'top': ['download', 'share', 'print', 'save', 'preview-lightbox', 'paste'],
@@ -67,7 +70,7 @@ export class HomeComponent implements AfterViewInit {
               // 'right': ['manage-layers', 'magnify-glass', 'zoom', 'reset-product', 'qr-code', 'ruler'],
               'right': [],
               // 'bottom': ['zoom'],
-              'left': ['undo', 'redo', 'download','zoom'],
+              'left': ['undo', 'redo', 'download','zoom', 'patterns'],
               'center': []
               // 'center': ['download','preview-lightbox','paste','zoom','reset-product','qr-code','ruler']
           },
@@ -85,23 +88,36 @@ export class HomeComponent implements AfterViewInit {
             'text-layers',
             'save-load'
           ],
+          patterns: [
+            {
+              title: 'Polka Dots',
+              url: 'https://www.toptal.com/designers/subtlepatterns/patterns/polka-dots.png'
+            },
+            {
+              title: 'Stripes',
+              url: 'https://www.toptal.com/designers/subtlepatterns/patterns/diagonal-stripes.png'
+            },
+            {
+              title: 'Wood Grain',
+              url: 'https://www.toptal.com/designers/subtlepatterns/patterns/wood-pattern.png'
+            }
+          ],
           fonts: [
-            { name: 'Roboto', url: 'google' },
-            { name: 'Open Sans', url: 'google' },
-            { name: 'Poppins', url: 'google' },
-            { name: 'Lato', url: 'google' },
-            { name: 'Oswald', url: 'google' },
-            { name: 'Raleway', url: 'google' },
-            { name: 'Montserrat', url: 'google' },
-            { name: 'Playfair Display', url: 'google' },
-            { name: 'Pacifico', url: 'google' },
-            { name: 'Lobster', url: 'google' },
-            { name: 'Bebas Neue', url: 'google' },
-            { name: 'Dancing Script', url: 'google' },
-            { name: 'Courier Prime', url: 'google' },
-            { name: 'Caveat', url: 'google' },
-            { name: 'Abril Fatface', url: 'google' },
-            { name: 'Lobster', url: 'google' },
+            { name: 'Roboto', url: 'google', variants: ['regular', 'italic', '700', '700italic'] },
+            { name: 'Open Sans', url: 'google', variants: ['regular', 'italic', '700', '700italic'] },
+            { name: 'Poppins', url: 'google', variants: ['regular', 'italic', '700', '700italic','bold', 'extrabold'] },
+            { name: 'Lato', url: 'google', variants: ['regular', 'italic', '700', '700italic'] },
+            { name: 'Oswald', url: 'google', variants: ['regular', '700'] }, // no italic available
+            { name: 'Raleway', url: 'google', variants: ['regular', 'italic', '700', '700italic'] },
+            { name: 'Montserrat', url: 'google', variants: ['regular', 'italic', '700', '700italic'] },
+            { name: 'Playfair Display', url: 'google', variants: ['regular', 'italic', '700', '700italic'] },
+            { name: 'Pacifico', url: 'google', variants: ['regular'] }, // only one style
+            { name: 'Lobster', url: 'google', variants: ['regular'] }, // only one style
+            { name: 'Bebas Neue', url: 'google', variants: ['regular'] }, // only one style
+            { name: 'Dancing Script', url: 'google', variants: ['regular', '700'] }, // no italic
+            { name: 'Courier Prime', url: 'google', variants: ['regular', 'italic', '700', '700italic'] },
+            { name: 'Caveat', url: 'google', variants: ['regular', '700'] }, // no italic
+            { name: 'Abril Fatface', url: 'google', variants: ['regular'] }
             // {
             //   name: 'Aller',
             //   url: 'assets/fpd/fonts/Aller.ttf',
@@ -127,7 +143,8 @@ export class HomeComponent implements AfterViewInit {
                 curveSpacing: 5,              // Space between letters
                 curveRadius: 180,             // Adjust radius of the curve
                 curveReverse: false,
-                curvable: 1 
+                curvable: 1 ,
+                patterns: true
               }
             },
             {
@@ -242,15 +259,16 @@ export class HomeComponent implements AfterViewInit {
         const mainBar = this.document.querySelector('fpd-main-bar') as HTMLElement;
     
         if (hideIcon && mainBar) {
-          console.log("Element found:", hideIcon);
+          console.log("Element found:", hideIcon, mainBar);
     
           // Click event — collapse
-          hideIcon.addEventListener('click', () => {
+          hideIcon.addEventListener('click', (event) => {
+            event.stopPropagation(); // Prevent event bubbling
             console.log("click happen");
             this.savedContent = mainBar.innerHTML;
             mainBar.style.maxWidth = '80px';
             mainBar.style.backgroundColor = '#f0f1f5'; 
-            mainBar.classList.add('box-white-inactive');
+            mainBar.classList.toggle('box-white-inactive');
             hideIcon.style.display = 'none'; // 👈 hide the icon
           });
     
@@ -306,8 +324,23 @@ export class HomeComponent implements AfterViewInit {
       waitForElements();
     }
     
+    setTimeout(() => {
 
-   
+      const searchInput = document.querySelector<HTMLInputElement>("fpd-module-products .fpd-input-search input");
+      const templateContainer = document.querySelector<HTMLElement>("#ProductModule");
+        console.log("searchInput", searchInput, "templateContainer", templateContainer);
+      if (!searchInput || !templateContainer) return;
+    
+      searchInput.addEventListener("keyup", () => {
+        const keyword = searchInput.value.toLowerCase();
+    
+        const items = templateContainer.querySelectorAll<HTMLElement>(".fpd-item");
+        items.forEach((item) => {
+          const title = item.dataset['title']?.toLowerCase() || "";
+          item.style.display = title.includes(keyword) ? "block" : "none";
+        });
+      });
+    }, 2000);
        
   }
   bottomMenu(){
@@ -389,7 +422,6 @@ showPreviewModal: boolean = false;
     }
   }
 
-  
   
 
 }

@@ -13,7 +13,7 @@
             {
                 "title": "Be Mine Happy",
                 "source": "assets/images/designs/editable-multitext-design.svg",
-                "parameters": {},
+                "parameters": {"z":1},
                 "thumbnail": "assets/images/designs/editable-multitext-design.svg"
             },
             {
@@ -67,7 +67,7 @@
             {
                 "title": "Swirl 1",
                 "source": "assets/images/designs/swirl.png",
-                "parameters": {},
+                "parameters": {"copyable": 1},
                 "thumbnail": "assets/images/designs/swirl.png"
             },
             {

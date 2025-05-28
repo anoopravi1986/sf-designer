@@ -118,7 +118,7 @@
                                 "showInColorSelection": false,
                                 "boundingBox": false,
                                 "fixed": false,
-                                "fontFamily": "Lobster",
+                                "fontFamily": "Roboto",
                                 "fontSize": 30,
                                 "editable": true,
                                 "lineHeight": 1,
@@ -139,7 +139,10 @@
                                 "chargeAfterEditing": false,
                                 "minFontSize": 1,
                                 "maxFontSize": 200,
-                                "textTransform": "none"
+                                "textTransform": "none",
+                                 "advancedEditing": 1,
+                                 "patterns": true,
+                                "filters": true
                             }
                         },
                         {
@@ -323,7 +326,7 @@
                                 "uploadZone": 0,
                                 "uploadZoneMovable": 0,
                                 "uploadZoneRemovable": false,
-                                "pattern": false
+                                "pattern": true
                             }
                         },
                         {

@@ -8,6 +8,7 @@
                     "productTitle": "Apple MacBook Pro 14 M1,M2,M3 (2021-2024)",
                     "product_id": 9,
                     "title": "Lid with logo cutout",
+                    "manufacturer": "Apple",
                     "thumbnail": "https://d24u86aviuwdnf.cloudfront.net/media//resized/160x160/attributes/APPLE_MACBOOK_PRO_14_2021_LID_WITH_LOGO_MASK.png",
                     "mask": {},
                     "options": {
@@ -42,7 +43,7 @@
                                 "top": 330,
                                 "originX": "center",
                                 "originY": "center",
-                                "z": -1,
+                                "z": -9999,
                                 "fill": "#fff",
                                 "colors": "#252525",
                                 "colorLinkGroup": "color-shirt",
@@ -65,10 +66,10 @@
                                 "boundingBoxMode": "none",
                                 "opacity": 1,
                                 "excludeFromExport": 0,
-                                "locked": 0,
+                                "locked": 1,
                                 "showInColorSelection": 0,
                                 "boundingBox": 0,
-                                "fixed": false,
+                                "fixed": true,
                                 "resizeToW": 0,
                                 "resizeToH": 0,
                                 "filter": 0,
@@ -139,6 +140,7 @@
                     "productTitle": " Apple Macbook Pro 16 2019 512GB SSD Storage ",
                     "product_id": 9,
                     "title": "Front",
+                    "manufacturer": "Apple",
                     "thumbnail": "../../assets/images/laptop/APPLE_MACBOOK_PRO13_INSIDE_PREVIEW.png",
                     "mask": {},
                     "options": {
@@ -330,6 +332,7 @@
                     "productTitle": "Pioneer DJ",
                     "product_id": 9,
                     "title": "Front",
+                    "manufacturer": "Pioneer",
                     "thumbnail": "../../assets/images/custom/template1/dj/pioneer-cdj-800mk2-skin-custom-thumbnail.png",
                     "mask": {},
                     "options": {
@@ -498,6 +501,7 @@
                     "productTitle": "Beats By Dr. Dre Beats Pro Model",
                     "product_id": 11,
                     "title": "Front",
+                    "manufacturer": "Sony",
                     "thumbnail": "../../assets/images/custom/template1/headphone/sony-mdr-v700-headphones-skin-custom-thumbnail.png",
                     "mask": {},
                     "options": {
@@ -622,6 +626,7 @@
                     "productTitle": "Beats By Dr. Dre Beats Pro Model",
                     "product_id": 11,
                     "title": "Front",
+                    "manufacturer": "Beats By Dr. Dre",
                     "thumbnail": "../../assets/images/custom/template1/headphone/HEADPHONES.png",
                     "mask": {},
                     "options": {
