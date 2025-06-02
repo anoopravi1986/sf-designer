@@ -295,6 +295,20 @@ export class HomeComponent implements AfterViewInit {
                 const target = mutation.target as HTMLElement;
                 if (target.classList.contains('fpd-active')) {
                   console.log("fpd-active class detected on:", target);
+                  var activeclick = localStorage.getItem('fpdMenuClicked')
+                  console.log("activeclick", activeclick);
+                  if (activeclick != 'true') {
+                    
+                    document.querySelectorAll('.fpd-popup.visible').forEach((el) => {
+                      el.classList.remove('visible');
+                    });
+
+                    // Remove "backdrop-test" from elements that have it
+                    document.querySelectorAll('.backdrop-test').forEach((el) => {
+                      el.classList.remove('backdrop-test');
+                      // localStorage.getItem('fpdMenuClicked')
+                    });
+                  }
                   mainBar.style.maxWidth = '';
                   mainBar.style.backgroundColor = '#fff';
                   mainBar.classList.remove('box-white-inactive');

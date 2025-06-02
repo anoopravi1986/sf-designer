@@ -6,54 +6,63 @@
         "designs": [
             {
                 "title": "Be Mine Happy Valentine",
+                "tags": ["valentine", "love", "heart"],
                 "source": "https://dek8oqj8xxsl6.cloudfront.net/img/love/symbols/be_mine_happy_valentine.svg",
                 "parameters": {},
                 "thumbnail": "https://dek8oqj8xxsl6.cloudfront.net/img/love/symbols/be_mine_happy_valentine.svg"
             },
             {
                 "title": "Be Mine Happy",
+                "tags": ["valentine", "love", "heart"],
                 "source": "assets/images/designs/editable-multitext-design.svg",
                 "parameters": {"z":1},
                 "thumbnail": "assets/images/designs/editable-multitext-design.svg"
             },
             {
                 "title": "Be My Valetine",
+                "tags": ["valentine", "love", "heart"],
                 "source": "https://dek8oqj8xxsl6.cloudfront.net/img/love/symbols/be_my_valetine.svg",
                 "parameters": {},
                 "thumbnail": "https://dek8oqj8xxsl6.cloudfront.net/img/love/symbols/be_my_valetine.svg"
             },
             {
                 "title": "Heart",
+                "tags": ["valentine", "love", "heart"],
                 "source": "https://dek8oqj8xxsl6.cloudfront.net/img/love/symbols/heart.svg",
                 "parameters": {},
                 "thumbnail": "https://dek8oqj8xxsl6.cloudfront.net/img/love/symbols/heart.svg"
             },
             {
                 "title": "Heart 2",
+                "tags": ["valentine", "love", "heart"],
                 "source": "https://dek8oqj8xxsl6.cloudfront.net/img/love/symbols/heart_2.svg",
                 "parameters": {},
                 "thumbnail": "https://dek8oqj8xxsl6.cloudfront.net/img/love/symbols/heart_2.svg"
             },
             {
                 "title": "Heart 3",
+                "tags": ["valentine", "love", "heart"],
                 "source": "https://dek8oqj8xxsl6.cloudfront.net/img/love/symbols/heart_3.svg",
                 "parameters": {},
                 "thumbnail": "https://dek8oqj8xxsl6.cloudfront.net/img/love/symbols/heart_3.svg"
             },
             {
                 "title": "Heart 4",
+                "tags": ["valentine", "love", "heart"],
                 "source": "https://dek8oqj8xxsl6.cloudfront.net/img/love/symbols/heart_4.svg",
                 "parameters": {},
                 "thumbnail": "https://dek8oqj8xxsl6.cloudfront.net/img/love/symbols/heart_4.svg"
             },
             {
                 "title": "Love Flowers",
+                "tags": ["valentine", "love", "flowers"],
                 "source": "https://dek8oqj8xxsl6.cloudfront.net/img/love/symbols/love_flowers.svg",
                 "parameters": {},
                 "thumbnail": "https://dek8oqj8xxsl6.cloudfront.net/img/love/symbols/love_flowers.svg"
             },
             {
                 "title": "Love Heart",
+                "tags": ["valentine", "love", "heart"],
                 "source": "https://dek8oqj8xxsl6.cloudfront.net/img/love/symbols/love_heart.svg",
                 "parameters": {},
                 "thumbnail": "https://dek8oqj8xxsl6.cloudfront.net/img/love/symbols/love_heart.svg"
@@ -66,30 +75,35 @@
         "designs":[
             {
                 "title": "Swirl 1",
+                "tags": ["swirl", "abstract"],
                 "source": "assets/images/designs/swirl.png",
                 "parameters": {"copyable": 1},
                 "thumbnail": "assets/images/designs/swirl.png"
             },
             {
                 "title": "Swirl 2",
+                "tags": ["swirl", "abstract"],
                 "source": "assets/images/designs/swirl2.png",
                 "parameters": {},
                 "thumbnail": "assets/images/designs/swirl2.png"
             },
             {
                 "title": "Swirl 3",
+                "tags": ["swirl", "abstract"],
                 "source": "assets/images/designs/swirl3.png",
                 "parameters": {},
                 "thumbnail": "assets/images/designs/swirl3.png"
             },
             {
                 "title": "Heart Blur",
+                "tags": ["swirl", "heart", "blur"],
                 "source": "assets/images/designs/heart_blur.png",
                 "parameters": {},
                 "thumbnail": "assets/images/designs/heart_blur.png"
             },
             {
                 "title": "Converse",
+                "tags": ["swirl", "converse"],
                 "source": "assets/images/designs/converse.png",
                 "parameters": {},
                 "thumbnail": "assets/images/designs/converse.png"
@@ -102,36 +116,42 @@
         "designs":[
             {
                 "title": "Retro 1",
+                "tags": ["retro", "vintage"],
                 "source": "assets/images/designs/retro_1.png",
                 "parameters": {},
                 "thumbnail": "assets/images/designs/retro_1.png"
             },
             {
                 "title": "Retro 2",
+                "tags": ["retro", "vintage"],
                 "source": "assets/images/designs/retro_2.png",
                 "parameters": {},
                 "thumbnail": "assets/images/designs/retro_2.png"
             },
             {
                 "title": "Retro 3",
+                "tags": ["retro", "vintage"],
                 "source": "assets/images/designs/retro_3.png",
                 "parameters": {},
                 "thumbnail": "assets/images/designs/retro_3.png"
             },
             {
                 "title": "Retro 3",
+                "tags": ["retro", "vintage"],
                 "source": "assets/images/designs/retro_3.png",
                 "parameters": {},
                 "thumbnail": "assets/images/designs/retro_3.png"
             },
             {
                 "title": "Crown",
+                "tags": ["retro", "crown"],
                 "source": "assets/images/designs/crown.png",
                 "parameters": {},
                 "thumbnail": "assets/images/designs/crown.png"
             },
             {
                 "title": "Men Women",
+                "tags": ["retro", "Men", "Women"],
                 "source": "assets/images/designs/men_women.png",
                 "parameters": {},
                 "thumbnail": "assets/images/designs/men_women.png"
@@ -144,24 +164,28 @@
         "designs":[
             {
                 "title": "Styleflip Logo Color",
+                "tags": ["logo", "styleflip"],
                 "source": "assets/images/designs/logos/styleFlip-color-large.png",
                 "parameters": {},
                 "thumbnail": "assets/images/designs/logos/styleFlip-color-large.png"
             },
             {
                 "title": "Styleflip Logo Black",
+                "tags": ["logo", "styleflip"],
                 "source": "assets/images/designs/logos/styleFlip-black.png",
                 "parameters": {},
                 "thumbnail": "assets/images/designs/logos/styleFlip-black.png"
             },
             {
                 "title": "Styleflip Logo White",
+                "tags": ["logo", "styleflip"],
                 "source": "assets/images/designs/logos/styleFlip-white.png",
                 "parameters": {},
                 "thumbnail": "assets/images/designs/logos/styleFlip-white.png"
             },
             {
                 "title": "Deiner",
+                "tags": ["logo", "deiner"],
                 "source": "assets/images/designs/desiner.jpg",
                 "parameters": {},
                 "thumbnail": "assets/images/designs/desiner.jpg"
@@ -174,6 +198,7 @@
         "designs":[
             {
                 "title": "Tiger",
+                "tags": ["animal", "tiger"],
                 "source": "assets/images/designs/animals/1.jpg",
                 "parameters": {
                     "zChangeable": 1
@@ -182,18 +207,21 @@
             },
             {
                 "title": "Abstract",
+                "tags": ["abstract", "design"],
                 "source": "assets/images/designs/abstract/Bionic.jpg",
                 "parameters": {},
                 "thumbnail": "assets/images/designs/abstract/Bionic.jpg"
             },
             {
                 "title": "Wolf",
+                "tags": ["animal", "wolf"],
                 "source": "assets/images/designs/animals/2.jpg",
                 "parameters": {"draggable": 1},
                 "thumbnail": "assets/images/designs/animals/2.jpg"
             },
             {
                 "title": "Tiger 2",
+                "tags": ["animal", "tiger"],
                 "source": "assets/images/designs/animals/3.jpg",
                 "parameters": {},
                 "thumbnail": "assets/images/designs/animals/3.jpg"

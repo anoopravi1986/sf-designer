@@ -9,6 +9,7 @@
                     "product_id": 9,
                     "title": "Lid with logo cutout",
                     "manufacturer": "Apple",
+                    "tags": ["Apple", "MacBook Pro", "Laptop Skin", "Decal"],
                     "thumbnail": "https://d24u86aviuwdnf.cloudfront.net/media//resized/160x160/attributes/APPLE_MACBOOK_PRO_14_2021_LID_WITH_LOGO_MASK.png",
                     "mask": {},
                     "options": {
@@ -141,6 +142,7 @@
                     "product_id": 9,
                     "title": "Front",
                     "manufacturer": "Apple",
+                    "tags": ["Apple", "MacBook Pro", "Laptop Skin", "Decal"],
                     "thumbnail": "../../assets/images/laptop/APPLE_MACBOOK_PRO13_INSIDE_PREVIEW.png",
                     "mask": {},
                     "options": {
@@ -333,6 +335,7 @@
                     "product_id": 9,
                     "title": "Front",
                     "manufacturer": "Pioneer",
+                    "tags": ["Pioneer", "DJ", "CDJ-800MK2", "Skin", "Decal"],
                     "thumbnail": "../../assets/images/custom/template1/dj/pioneer-cdj-800mk2-skin-custom-thumbnail.png",
                     "mask": {},
                     "options": {
@@ -502,6 +505,7 @@
                     "product_id": 11,
                     "title": "Front",
                     "manufacturer": "Sony",
+                    "tags": ["Sony", "MDR-V700", "Headphones", "Skin", "Decal"],
                     "thumbnail": "../../assets/images/custom/template1/headphone/sony-mdr-v700-headphones-skin-custom-thumbnail.png",
                     "mask": {},
                     "options": {
@@ -627,6 +631,7 @@
                     "product_id": 11,
                     "title": "Front",
                     "manufacturer": "Beats By Dr. Dre",
+                    "tags": ["Beats By Dr. Dre", "Beats Pro", "Headphones", "Skin", "Decal"],
                     "thumbnail": "../../assets/images/custom/template1/headphone/HEADPHONES.png",
                     "mask": {},
                     "options": {

@@ -19494,6 +19494,8 @@
             }
             function Ue(e, i) {
                 console.log("Anoop Data 3-UE", e, i);
+                let typecheck = localStorage.getItem('callModuleItem');
+                console.log("Anoop Data 3-UE typecheck", typecheck);
                 // let n = e[0].productThumbnail ? e[0].productThumbnail : e[0].thumbnail,
                 //     s = e[0].productTitle ? e[0].productTitle : e[0].title;
                 // const r = document.createElement("div");
@@ -19609,21 +19611,23 @@
 
                 // Toggle popup on dot click
                 dotMenu.addEventListener("click", (event) => {
+                    console.log("Dot menu clicked", event);
+                    const parent = event.currentTarget.closest(".fpd-active");
+                    console.log("Parent Element:", parent);
                     event.stopPropagation();
+                    localStorage.setItem('fpdMenuClicked', 'true');
                     popup.classList.toggle("visible");
-                    const fpdModuleProducts = document.querySelector("fpd-module-products");
-                    if (fpdModuleProducts) {
-                        fpdModuleProducts.classList.toggle("backdrop-test");
+                    if (parent) {
+                        parent.classList.toggle("backdrop-test");
                     }
                 });
 
                 // Hide popup on click outside
-                document.addEventListener("click", () => {
+                document.addEventListener("click", (event) => {
                     popup.classList.remove("visible");
-                    const fpdModuleProducts = document.querySelector("fpd-module-products");
-                    if (fpdModuleProducts) {
-                        fpdModuleProducts.classList.remove("backdrop-test");
-                    }
+                    document.querySelectorAll('.backdrop-test').forEach((el) => {
+                        el.classList.remove('backdrop-test');
+                    });
                 });
 
                 // ========== Main Click Logic ==========
@@ -19910,7 +19914,7 @@
                 }
                 connectedCallback() {
                     this.innerHTML =
-                        '<div data-moduleicon="component" data-defaulttext="Elements" data-title="Elements"> <div class="fpd-head"> <div class="fpd-input-back-search input-search-box !shadow-none border border-[#35475a33] border-solid !rounded-[8px] ml-[5px] w-[calc(100% - 22px)]"> <div class="fpd-back fpd-btn !bg-white"> <svg xmlns="http://www.w3.org/2000/svg" class="min-w-[24px] text-black relative top-[-2px]" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M15.2 16.34a7.5 7.5 0 1 1 1.38-1.45l4.2 4.2a1 1 0 1 1-1.42 1.41l-4.16-4.16zm-4.7.16a6 6 0 1 0 0-12 6 6 0 0 0 0 12z"></path></svg> </div> <div class="fpd-input-search"> <input type="text" class="!text-sm placeholder-gray-500 !pl-2" placeholder="Search elements" /> <span class="fpd-icon-magnify"></span> </div> </div> </div> <div class="fpd-scroll-area"> <div class="w-full overflow-auto [scrollbar-width:none] scrollbar-hide"><div class="flex gap-2 mt-2 ml-[5px]"><div class="border border-[#35475a33] border-solid pt-2 pb-2 pr-3 pl-3 rounded-[6px] text-sm text-[#0d1216] cursor-pointer hover:bg-[#40576d12] flex-none">Frame</div><div class="border border-[#35475a33] border-solid pt-2 pb-2 pr-3 pl-3 text-sm text-[#0d1216] rounded-[6px] cursor-pointer hover:bg-[#40576d12] flex-none">Arrow</div><div class="border border-[#35475a33] border-solid pt-2 pb-2 pr-3 pl-3 text-sm text-[#0d1216] rounded-[6px] cursor-pointer hover:bg-[#40576d12] flex-none">Shadows</div><div class="border border-[#35475a33] border-solid pt-2 pb-2 pr-3 pl-3 text-sm text-[#0d1216] rounded-[6px] cursor-pointer hover:bg-[#40576d12] flex-none">Logos</div><div class="border border-[#35475a33] border-solid pt-2 pb-2 pr-3 pl-3 text-sm text-[#0d1216] rounded-[6px] cursor-pointer hover:bg-[#40576d12] flex-none">Heart</div></div></div><div class="fpd-grid fpd-grid-contain fpd-padding one !flex !flex-col"> </div> </div>';
+                        '<div data-moduleicon="component" data-defaulttext="Elements" data-title="Elements"> <div class="fpd-head"> <div class="fpd-input-back-search input-search-box !shadow-none border border-[#35475a33] border-solid !rounded-[8px] ml-[5px] w-[calc(100% - 22px)]"> <div class="fpd-back fpd-btn !bg-white"> <svg xmlns="http://www.w3.org/2000/svg" class="min-w-[24px] text-black relative top-[-2px]" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M15.2 16.34a7.5 7.5 0 1 1 1.38-1.45l4.2 4.2a1 1 0 1 1-1.42 1.41l-4.16-4.16zm-4.7.16a6 6 0 1 0 0-12 6 6 0 0 0 0 12z"></path></svg> </div> <div class="fpd-input-search"> <input type="text" class="!text-sm placeholder-gray-500 !pl-2" placeholder="Search elements" /> <span class="fpd-icon-magnify"></span> </div> </div> </div> <div class="fpd-scroll-area"> <div class="relative fpd-grid fpd-grid-contain fpd-padding one !flex !flex-col"> </div> </div>';
                 }
             }
             function Xe(t, e) {
@@ -20018,6 +20022,7 @@
                         });
                     let n = !1;
                     G(t, ["designsSet"], (e) => {
+                        console.log("designsSet", e);
                         if (n) return;
                         n = !0;
                         const i = t.designs;
@@ -20078,10 +20083,105 @@
                 //         this.headElem.querySelector(".fpd-input-search input").setAttribute("placeholder", Ke(this, ei) + " " + e.dataset.search.toUpperCase());
                     // }),
                     //     this.gridElem.append(e);
+                   const tags = JSON.parse(localStorage.getItem("fpd-designs-tags") || "[]");
+
+// Track current X offset
+let currentOffset = 0;
+
+// Create outer wrapper (position relative for arrow buttons)
+const wrapper = document.createElement("div");
+wrapper.className = "relative w-full fpd-designs-tags mt-2";
+
+// Step 1: Create container with overflow hidden
+const container = document.createElement("div");
+container.className = "w-full overflow-hidden mt-2 our-elements";
+
+// Step 2: Create flex wrapper that will slide using translateX
+const flexWrapper = document.createElement("div");
+flexWrapper.className = "flex gap-2 ml-[5px] transition-transform duration-300 ease-in-out";
+flexWrapper.style.transform = `translateX(${currentOffset}px)`;
+
+// Step 3: Create tag elements
+tags.forEach(tag => {
+  const tagDiv = document.createElement("div");
+  tagDiv.className =
+    "capitalize border border-[#35475a33] border-solid pt-2 pb-2 pr-3 pl-3 text-sm text-[#0d1216] rounded-[6px] cursor-pointer hover:bg-[#40576d12] flex-none whitespace-nowrap";
+  tagDiv.innerText = tag;
+  flexWrapper.appendChild(tagDiv);
+});
+
+// Step 4: Append sliding content to container
+container.appendChild(flexWrapper);
+
+// Step 5: Create left arrow
+const leftArrow = document.createElement("button");
+leftArrow.innerHTML = `
+ <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+   <path fill="currentColor" d="m14.8 16.382-4.205-4.205a.25.25 0 0 1 0-.354L14.8 7.618a.75.75 0 0 0-1.06-1.06l-4.206 4.204a1.75 1.75 0 0 0 0 2.475l4.206 4.205a.75.75 0 0 0 1.06-1.06"></path>
+ </svg>
+`;
+leftArrow.className = "absolute left-2 -translate-y-1/2 z-[9] bg-transparent shadow p-0 rounded-full hover:bg-gray-100 disabled:hidden";
+leftArrow.disabled = true; // initially disabled
+
+// Step 6: Create right arrow
+const rightArrow = document.createElement("button");
+rightArrow.innerHTML = `
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+  <path fill="currentColor" d="m9.216 7.619 4.204 4.204a.25.25 0 0 1 0 .354l-4.204 4.204a.75.75 0 0 0 1.06 1.061l4.205-4.204a1.75 1.75 0 0 0 0-2.475l-4.204-4.205a.75.75 0 0 0-1.061 1.06"></path>
+</svg>
+`;
+rightArrow.className = "absolute right-0 z-[9] mt-[-35px] -translate-y-1/2 bg-transparent shadow p-0 rounded-full hover:bg-gray-100 disabled:hidden";
+
+// Update arrow states
+function updateArrows() {
+  const wrapperWidth = container.offsetWidth;
+  const contentWidth = flexWrapper.scrollWidth;
+
+  // Prevent scrolling beyond bounds
+  if (currentOffset > 0) currentOffset = 0;
+  if (Math.abs(currentOffset) >= contentWidth - wrapperWidth) {
+    currentOffset = -1 * (contentWidth - wrapperWidth);
+  }
+
+  // Apply transform
+  flexWrapper.style.transform = `translateX(${currentOffset}px)`;
+
+  // Enable or disable arrows
+  leftArrow.disabled = currentOffset === 0;
+  rightArrow.disabled = Math.abs(currentOffset) >= (contentWidth - wrapperWidth - 1); // Allow 1px tolerance
+}
+
+// Scroll left
+leftArrow.onclick = () => {
+  const tag = flexWrapper.querySelector("div");
+  if (tag) {
+    const scrollAmount = tag.offsetWidth * 2 + 16;
+    currentOffset += scrollAmount;
+    updateArrows();
+  }
+};
+
+// Scroll right
+rightArrow.onclick = () => {
+  const tag = flexWrapper.querySelector("div");
+  if (tag) {
+    const scrollAmount = tag.offsetWidth * 2 + 16;
+    currentOffset -= scrollAmount;
+    updateArrows();
+  }
+};
+
+                    // Step 5: Append everything
+                    container.appendChild(leftArrow);
+                    container.appendChild(flexWrapper);
+                    container.appendChild(rightArrow);
+
                     const e = document.createElement("div");
                     e.className = "fpd-category fpd-item-group relative";
                     e.dataset.title = t.title;
                     e.dataset.search = t.title.toLowerCase();
+                    
+                    
 
                     // Heading
                     const heading = document.createElement("h3");
@@ -20093,12 +20193,15 @@
                     const visibleImagesContainer = document.createElement("div");
                     visibleImagesContainer.className = "fpd-grid fpd-grid-contain fpd-padding";
 
+
                     // Hidden image container
                     const hiddenImagesContainer = document.createElement("div");
                     hiddenImagesContainer.className = "fpd-thumbnails hidden";
                     hiddenImagesContainer.style.display = "none";
 
                     // Guard: make sure t.designs or t.images exist
+                    console.log("t.designs", t);
+                    // console.log("t.designs", t.designs, "t.images", t.images, "t.category", t.category);
                     let images = [];
 
                     if (t.designs || t.images) {
@@ -20194,6 +20297,7 @@
                     const allTooltips = [];
 
                     images.forEach((imgSrc, index) => {
+                        console.log("imgSrcContent", imgSrc, "index", index);
                         const isDesign = !!imgSrc.source;
 
                         const div = document.createElement("div");
@@ -20217,11 +20321,37 @@
 
                         // Tooltip container
                         const tooltip = document.createElement("div");
-                        tooltip.className = "absolute top-[30px] right-0 bg-white text-black text-sm p-2 rounded shadow-md hidden z-20";
+                        tooltip.className = "fixed bg-white text-black text-sm ml-[80px] p-2 rounded shadow-md hidden z-[999] border border-[#ccc] border-solid rounded-[6px] shadow-custom-light";
+
+                        // Sample fallback tags if img.tags doesn't exist
+                        const tagsArray = imgSrc.tags || ["design", "button", "banner", "sign", "graphic"];
+
+                        // Generate tag HTML dynamically
+                        const tagsHtml = tagsArray.map(tag => `
+                            <div class="border border-solid border-[#ccc] px-[7px] py-[3px] bg-[#0d121600] rounded-[8px] shadow-[inset_0_0_0_1px_var(--Zya5eQ)] text-[#0d1216] capitalize">${tag}</div>
+                        `).join("");
+
                         tooltip.innerHTML = `
-                            <div class="font-bold">${imgSrc.title || t.title}</div>
-                            <div class="text-xs text-gray-600">#tag1 #tag2</div>
+                            <div class="content-section rounded-[6px] p-[10px] max-w-[224px]">
+                                <strong class="text-[1rem]">${imgSrc.title || t.title}</strong>
+                                <div class="flex items-center mt-2 mb-2">
+                                    <div><h4>Free from Styleflip</h4></div>
+                                    <div class="h-[24px] ml-[10px]">
+                                        <button>
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                                                <path fill="currentColor" d="M12 22a10 10 0 1 1 0-20 10 10 0 0 1 0 20zm0-1.5a8.5 8.5 0 1 0 0-17 8.5 8.5 0 0 0 0 17zm0-10a1 1 0 0 1 1 1V16a1 1 0 0 1-2 0v-4.5a1 1 0 0 1 1-1zm0-1.25a1.25 1.25 0 1 1 0-2.5 1.25 1.25 0 0 1 0 2.5z"></path>
+                                            </svg>
+                                        </button>
+                                    </div>     
+                                </div>
+                                <hr class="border-[1px] border-t border-solid border-gray-300 my-4">
+                                <div class="flex items-center my-2 gap-[10px] flex-wrap">
+                                    ${tagsHtml}
+                                </div>
+                                <hr class="border-t border-[1px] border-solid border-gray-300 my-4">
+                            </div>
                         `;
+
 
                         // Add tooltip to the global list
                         allTooltips.push(tooltip);
@@ -20229,13 +20359,20 @@
                         // Toggle visibility and close others
                         dots.addEventListener("click", (e) => {
                             e.stopPropagation();
-
+                            console.log("event", e)
                             // Close all other tooltips
                             allTooltips.forEach((tip) => {
                                 if (tip !== tooltip) {
                                     tip.classList.add("hidden");
                                 }
                             });
+                            const parent = e.currentTarget.closest(".fpd-active");
+                            console.log("parentContaines", parent);
+                            if (parent) {
+                                parent.classList.toggle("backdrop-test");
+                                console.log("hdhdh");
+                                localStorage.setItem('fpdMenuClicked', 'true')
+                            }
 
                             // Toggle this one
                             tooltip.classList.toggle("hidden");
@@ -20489,8 +20626,9 @@
                     
                         e.appendChild(toggleBtn);
                     }
-
+                    
                     // Append everything to the grid
+                    this.gridElem.append(container)
                     this.gridElem.appendChild(e);
 
             }
@@ -22386,12 +22524,14 @@
                 }
                 callModule(t) {
                     console.log("Call Module",t)
+                    localStorage.setItem('fpdMenuClicked', 'false')
                     let e,
                         i = arguments.length > 1 && void 0 !== arguments[1] ? arguments[1] : null;
                     if ((Z(this.navElem.querySelectorAll(".fpd-nav-item"), ["fpd-active"]), Z(Array.from(this.contentElem.children), ["fpd-active"]), i))
                         (e = X(this.navElem.querySelector('.fpd-nav-item[data-dynamic-designs-id="' + i + '"]'), ["fpd-active"])), X(this.contentElem.querySelector('[data-dynamic-designs-id="' + i + '"]'), ["fpd-active"]);
                     else {
                         console.log("Call Module else",t)
+                        localStorage.setItem('callModuleItem', t)
                         e = X(this.navElem.querySelector('.fpd-nav-item[data-module="' + t + '"]'), ["fpd-active"]);
                         console.log("Designer products else t",t);
                         const i = this.contentElem.querySelector("fpd-module-" + t);
@@ -25185,6 +25325,18 @@
                             : Vt({
                                   url: this.mainOptions.designsJSON,
                                   onSuccess: (t) => {
+                                    console.log("uuuuuuuuuuuuu",t)
+                                    // const allTags = t.forEach(categoryObj => {
+                                    //     const tags = categoryObj.designs.flatMap(d => d.tags);
+                                    //     const uniqueTags = [...new Set(tags)];
+                                    //     console.log("uniqueTags",uniqueTags)
+                                    // })
+                                    const allTags = t.flatMap(categoryObj =>
+                                        categoryObj.designs.flatMap(d => d.tags)
+                                    );
+                                    const uniqueAllTags = [...new Set(allTags)];
+                                    console.log("uniqueTags",uniqueAllTags)
+                                    localStorage.setItem("fpd-designs-tags", JSON.stringify(uniqueAllTags));
                                       this.setupDesigns(t);
                                   },
                                   onError: () => {

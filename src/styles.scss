@@ -102,3 +102,24 @@ div.fpd-container .fpd-text-templates #text-templates.fpd-grid{gap: 7px;}
   .backdrop-test {
     @apply relative z-[9999]; /* Ensure popup is above the backdrop */
   }
+
+
+  .fpd-grid.fpd-grid-contain.fpd-padding.one{
+    .w-full.our-elements{display: none;
+      &:first-child{
+        display: block;
+      }
+    }
+    .button-arrow-desi-left{display: none;
+      &:first-child{
+        display: block;z-index: 9999;
+      }
+    }
+    
+  }
+  .button-arrow-desi-right{
+    display: none;
+      &:first-child{
+        display: block;
+      }
+    }
