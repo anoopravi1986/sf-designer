@@ -1,5 +1,6 @@
 import { AfterViewInit, Component, Inject, PLATFORM_ID, ViewChild, HostListener, ElementRef } from '@angular/core';
 import { isPlatformBrowser, DOCUMENT, CommonModule } from '@angular/common';
+import { ActivatedRoute, Router } from '@angular/router';
 
 declare var FancyProductDesigner: any;
 import $ from 'jquery';
@@ -14,12 +15,13 @@ import { filter } from 'rxjs';
 })
 export class HomeComponent implements AfterViewInit {
   private savedContent: string = '';
-  constructor(@Inject(PLATFORM_ID) private platformId: any, @Inject(DOCUMENT) private document: Document) {}
+  constructor(@Inject(PLATFORM_ID) private platformId: any, @Inject(DOCUMENT) private document: Document, private router: Router, private route:ActivatedRoute) {}
   @ViewChild('previewButton') previewButton!: ElementRef;
 
   designer: any;
   appOptions: any;
   activeImageTitle: string = '';
+
 
 
   ngAfterViewInit() {
@@ -239,9 +241,17 @@ export class HomeComponent implements AfterViewInit {
            this.activeImageTitle = 'Apple Macbook Pro 16 2019 512GB SSD Storage';
          
            $(document).on('click', 'fpd-module-products .fpd-item', (event) => {
-             const clickedTitle = $(event.currentTarget).data('title');
-             this.activeImageTitle = clickedTitle;
-           });
+            const clickedTitle = $(event.currentTarget).data('title');
+            const manufacturer = $(event.currentTarget).data('manufacturer');
+
+            console.log('Clicked:', clickedTitle, 'Manufacturer:', manufacturer);
+
+            const slug = this.slugify(clickedTitle);
+            const manufacturerSlug = this.slugify(manufacturer);
+
+            this.router.navigate([manufacturerSlug, slug]);
+          });
+
            
       }, 300);
 
@@ -410,6 +420,21 @@ export class HomeComponent implements AfterViewInit {
   
   
   }
+
+slugify(title: string): string {
+  return title?.toLowerCase()
+    ?.trim()
+    ?.replace(/[^\w\s-]/g, '')       // Remove special chars
+    ?.replace(/\s+/g, '-')           // Replace spaces with -
+    ?.replace(/--+/g, '-');          // Collapse hyphens
+}
+
+
+ngOnInit() {
+  const slug = this.route.snapshot.paramMap.get('slug');
+  console.log("Selected slug:", slug);
+}
+
   bottomMenu(){
     const sourceElement = document.getElementById('content-text');
     console.log("sourceElement", sourceElement);

@@ -21586,7 +21586,6 @@ rightArrow.onclick = () => {
                                             const e = $({ url: t.imageURL ? t.imageURL : t.webformatURL, thumbnailUrl: t.webformatURL, title: t.id ? t.id : t.id_hash, price: tt(this.fpdInstance, this.container) });
                                             G(e, ["click"], (t) => {
                                                 console.log("image click on load", t, "99", this.fpdInstance)
-                                                debugger
                                                 this.fpdInstance.loadingCustomImage || this.fpdInstance._addGridItemToCanvas(t.currentTarget);
                                             }),
                                             console.log("image click on load --", e)
@@ -22147,7 +22146,6 @@ rightArrow.onclick = () => {
                         o.append(e),
                         G(e, "click", (e) => {
                             alert("PPP");
-                            debugger;
                             e.stopPropagation(), this.fpdInstance.currentViewInstance.fabricCanvas.removeElement(t);
                         });
                 }
@@ -22676,7 +22674,6 @@ rightArrow.onclick = () => {
                     else if ("productsnew" === i) n = new Wes(t, e);
                     else if ("text" === i) n = new Ge(t, e);
                     else if (i.includes("designs")) {
-                        debugger
                         let r = null;
                         if (i.includes("designs_") && !Q(t.mainOptions.dynamicDesigns)) {
                             if (((r = i.split("_").pop()), !r || !t.mainOptions.dynamicDesigns[r])) return;
@@ -23476,7 +23473,6 @@ rightArrow.onclick = () => {
                         }
                         G(s.querySelector("picture"), "click", (e) => {
                             alert("chehehehekdkkdk----kskks")
-                            debugger
                             console.log("ffffffffffffff",t)
                             console.log("ffffffffffffff",e)
                             console.log("ffffffffffffffsssss",s)
@@ -25181,7 +25177,6 @@ rightArrow.onclick = () => {
 
                                             } else {
                                                 console.log("coming to else", this.currentCategoryIndex, r.dataset.index)
-                                                debugger
                                                 localStorage.setItem("rdatasetindex",r.dataset.index)
                                                 fpdInstance.selectProduct(Number(r.dataset.index), this.currentCategoryIndex);
                                                 // const modal = t(
@@ -25691,7 +25686,6 @@ rightArrow.onclick = () => {
                     console.log("addCanvasDesign", t, e);
                     console.log("e.parameters",e.parameters)
                     let i = arguments.length > 2 && void 0 !== arguments[2] ? arguments[2] : {};
-                    debugger
                     this.currentViewInstance &&
                         (this.toggleSpinner(!0, this.translator.getTranslation("misc", "loading_image")),
                         // (i = z(this.currentViewInstance.options.customImageParameters, i)),
