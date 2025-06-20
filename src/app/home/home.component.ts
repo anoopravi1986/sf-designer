@@ -70,7 +70,7 @@ export class HomeComponent implements AfterViewInit {
               // 'right': ['manage-layers', 'magnify-glass', 'zoom', 'reset-product', 'qr-code', 'ruler'],
               'right': [],
               // 'bottom': ['zoom'],
-              'left': ['undo', 'redo', 'download','zoom', 'patterns'],
+              'left': ['undo', 'redo', 'download','zoom', 'reset-product'],
               'center': []
               // 'center': ['download','preview-lightbox','paste','zoom','reset-product','qr-code','ruler']
           },
@@ -356,6 +356,59 @@ export class HomeComponent implements AfterViewInit {
       });
     }, 2000);
        
+    setTimeout(() => {
+
+      const checkAndHideDuplicateFpdItems = () => {
+        const containers = this.document.querySelectorAll<HTMLElement>(".ProductModuleMy");
+        console.log("✅ Running deduplication check on containers:", containers);
+  
+        containers.forEach(container => {
+          const items = container.querySelectorAll<HTMLElement>(".fpd-item");
+          const seenIndexes = new Set<string>();
+  
+          items.forEach(item => {
+            const index = item.getAttribute("data-index");
+            if (!index) return;
+  
+            if (seenIndexes.has(index)) {
+              item.style.display = "none";
+            } else {
+              seenIndexes.add(index);
+              item.style.display = ""; // Ensure visible
+            }
+          });
+        });
+      };
+  
+      // Step 1: Find .ProductModuleMy and observe inner DOM changes
+      const productModule = this.document.querySelector(".ProductModuleMy");
+  
+      if (productModule) {
+        const innerHtmlObserver = new MutationObserver((mutations) => {
+          for (const mutation of mutations) {
+            if (mutation.type === 'childList') {
+              console.log("📦 Inner HTML changed: DOM children updated");
+              checkAndHideDuplicateFpdItems();
+            }
+          }
+        });
+  
+        // Step 2: Observe inner HTML (child elements) of the container
+        innerHtmlObserver.observe(productModule, {
+          childList: true,  // Watch for direct child changes
+          subtree: true     // Also look deep inside the tree
+        });
+  
+        // Step 3: Run once initially
+        checkAndHideDuplicateFpdItems();
+      }
+    },3000)
+
+
+
+
+  
+  
   }
   bottomMenu(){
     const sourceElement = document.getElementById('content-text');
@@ -365,12 +418,12 @@ export class HomeComponent implements AfterViewInit {
       localStorage.setItem('savedContentText', htmlContent);
       localStorage.setItem('parentDivId', 'ProductModule');
       console.log('Content saved to localStorage');
+      localStorage.setItem("valueofTitle", '');
     }
   }
   previewImage: string = '';
 showPreviewModal: boolean = false;
   preview(){
-    alert("check");
     if (this.designer && this.designer.getProductDataURL) {
       console.log("000", this.designer , "111", this.designer.getProductDataURL)
       this.designer.currentViewInstance.fabricCanvas.enableRuler = false;
@@ -437,5 +490,8 @@ showPreviewModal: boolean = false;
   }
 
   
+
+ 
+
 
 }
