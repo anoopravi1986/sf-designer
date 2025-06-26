@@ -309,6 +309,12 @@ export class HomeComponent implements AfterViewInit {
                       // localStorage.getItem('fpdMenuClicked')
                     });
                   }
+                  if(target.getAttribute('data-module') === 'designs'){
+                    const el = document.getElementById('icon-search-back-data');
+                    if (el) {
+                      el.classList.add('fpd-hidden');
+                    }
+                  }
                   mainBar.style.maxWidth = '';
                   mainBar.style.backgroundColor = '#fff';
                   mainBar.classList.remove('box-white-inactive');

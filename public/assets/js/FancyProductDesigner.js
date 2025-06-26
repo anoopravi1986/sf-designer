@@ -15298,6 +15298,10 @@
                         const t = document.createElement("span");
                         (t.className = "fa-solid fa-trash"), e.append(t);
                     }
+
+                    
+
+
                     return e;
                 },
                 tt = function (t, e) {
@@ -15458,7 +15462,7 @@
                     guidedTour: null,
                     replaceColorsInColorGroup: !1,
                     allowedImageTypes: ["jpeg", "png", "svg", "pdf"],
-                    pixabayApiKey: "",
+                    pixabayApiKey: "51058342-7d101f741357da817a692cac0",
                     pixabayHighResImages: !1,
                     pixabayLang: "en",
                     sizeTooltip: !1,
@@ -18866,7 +18870,7 @@
             var we = new WeakSet();
             class Ce extends EventTarget {
                 constructor(t, e) {
-                    console.log("999999999999999999",t)
+                    
                     if (
                         (super(),
                         (function (t, e) {
@@ -19314,7 +19318,7 @@
                 connectedCallback() {
                     console.log("fpd-module-products-first00000000000");
                     this.innerHTML =
-                        '<div data-moduleicon="book-copy" data-defaulttext="Products" data-title="Design"><div class="fpd-head"> <div class="fpd-input-back-search input-search-box !shadow-none border border-[#35475a33] border-solid !rounded-[8px] ml-[5px] w-[calc(100% - 22px)]"> <div class="fpd-back fpd-btn !bg-white"> <svg xmlns="http://www.w3.org/2000/svg" class="min-w-[24px] text-black relative top-[-2px]" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M15.2 16.34a7.5 7.5 0 1 1 1.38-1.45l4.2 4.2a1 1 0 1 1-1.42 1.41l-4.16-4.16zm-4.7.16a6 6 0 1 0 0-12 6 6 0 0 0 0 12z"></path></svg> </div> <div class="fpd-input-search"> <input type="text" class="!text-sm placeholder-gray-500 !pl-2" placeholder="Search" id="searchInput" /> <span class="fpd-icon-magnify"></span> </div> </div> </div><div class="icon-box"><i data-lucide="house"></i></div> <fpd-dropdown class="fpd-product-categories rounded-[8px] border border-[#35475a33] border-solid mt-[8px] bg-white p-2 dark:border-gray-800 dark:bg-white/[0.03] md:p-2 mr-[14px] pl-[6px] ml-[5px] w-[calc(100% - 22px)] mb-[5px]" searchable></fpd-dropdown> <div class="fpd-scroll-area"><div class="flex gap-2 ml-[5px] transition-transform duration-300 ease-in-out mb-2" id="data-info"></div> <div class="fpd-grid fpd-grid-contain fpd-padding one-tt ProductModule" id="ProductModule"><div class="searchox bg-white rounded-lg relative flex"><div id="search-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M15.2 16.34a7.5 7.5 0 1 1 1.38-1.45l4.2 4.2a1 1 0 1 1-1.42 1.41l-4.16-4.16zm-4.7.16a6 6 0 1 0 0-12 6 6 0 0 0 0 12z"></path></svg></div><div><input type="text" class="appearance-none bg-inherit border-0 box-border text-inherit font-normal min-w-[8px] outline-none w-full" /></div></div> </div> <div id="ProductModule" class="grid grid-cols-1 md:grid-cols-3 gap-4"></div><button id="backbuttonStoP" class="bg-[#f6f6f6] w-[30px] h-[30px] rounded-full p-[2px]"  style="display:none"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M6.9 10.996h11.596a.75.75 0 0 1 0 1.5H6.9l4.377 4.377a.75.75 0 0 1-1.061 1.06l-4.95-4.95a1.75 1.75 0 0 1 0-2.474l4.95-4.95a.75.75 0 1 1 1.06 1.06L6.9 10.996z" fill="currentColor"></path></svg></button><div id="ProductModule" class="fpd-grid fpd-grid-contain fpd-padding one-tt skins-data ProductModuleMy"></div></div> </div>';
+                        '<div data-moduleicon="book-copy" data-defaulttext="Products" data-title="Design"><div class="fpd-head"> <div class="fpd-input-back-search input-search-box !shadow-none border border-[#35475a33] border-solid !rounded-[8px] ml-[5px] w-[calc(100% - 22px)]"> <div class="fpd-back fpd-btn !bg-white"> <svg xmlns="http://www.w3.org/2000/svg" class="min-w-[24px] text-black relative top-[-2px]" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M15.2 16.34a7.5 7.5 0 1 1 1.38-1.45l4.2 4.2a1 1 0 1 1-1.42 1.41l-4.16-4.16zm-4.7.16a6 6 0 1 0 0-12 6 6 0 0 0 0 12z"></path></svg> </div> <div class="fpd-input-search"> <input type="text" class="!text-sm placeholder-gray-500 !pl-2" placeholder="Search" id="searchInput" /> <span class="fpd-icon-magnify"></span> </div> </div> </div><div class="icon-box"><i data-lucide="house"></i></div> <fpd-dropdown class="fpd-product-categories rounded-[8px] border border-[#35475a33] border-solid mt-[8px] bg-white p-2 dark:border-gray-800 dark:bg-white/[0.03] md:p-2 mr-[14px] pl-[6px] ml-[5px] w-[calc(100% - 22px)] mb-[5px]" searchable></fpd-dropdown> <div class="fpd-scroll-area"><div class="flex gap-2 ml-[5px] transition-transform duration-300 ease-in-out mb-2" id="data-info"></div> <div class="fpd-grid fpd-grid-contain fpd-padding one-tt ProductModule" id="ProductModule"><div class="searchox bg-white rounded-lg relative flex"><div id="search-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M15.2 16.34a7.5 7.5 0 1 1 1.38-1.45l4.2 4.2a1 1 0 1 1-1.42 1.41l-4.16-4.16zm-4.7.16a6 6 0 1 0 0-12 6 6 0 0 0 0 12z"></path></svg></div><div><input type="text" class="appearance-none bg-inherit border-0 box-border text-inherit font-normal min-w-[8px] outline-none w-full" /></div></div> </div> <div id="ProductModule" class="grid grid-cols-1 md:grid-cols-3 gap-4"></div><button id="backbuttonStoP" class="w-[30px] h-[30px] rounded-full p-[2px]"  style="display:none"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="text-[#0d1216] hover:text-blue-600 transition duration-200 cursor-pointer"><path d="M6.9 10.996h11.596a.75.75 0 0 1 0 1.5H6.9l4.377 4.377a.75.75 0 0 1-1.061 1.06l-4.95-4.95a1.75 1.75 0 0 1 0-2.474l4.95-4.95a.75.75 0 1 1 1.06 1.06L6.9 10.996z" fill="currentColor"></path></svg></button><div id="ProductModule" class="fpd-grid fpd-grid-contain fpd-padding one-tt skins-data ProductModuleMy"></div></div> </div>';
                 }
             }
             class jaikant extends HTMLElement {
@@ -19324,7 +19328,7 @@
                 connectedCallback() {
                     console.log("fpd-module-productsnew-first00000000000");
                     this.innerHTML =
-                        '<div data-moduleicon="layout-panel-left" data-defaulttext="Designs" data-title="Productsnew"><div class="fpd-head"> <div class="fpd-input-back-search input-search-box !shadow-none border border-[#35475a33] border-solid !rounded-[8px] ml-[5px] w-[calc(100% - 22px)]"> <div class="fpd-back fpd-btn !bg-white"> <svg xmlns="http://www.w3.org/2000/svg" class="min-w-[24px] text-black relative top-[-2px]" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M15.2 16.34a7.5 7.5 0 1 1 1.38-1.45l4.2 4.2a1 1 0 1 1-1.42 1.41l-4.16-4.16zm-4.7.16a6 6 0 1 0 0-12 6 6 0 0 0 0 12z"></path></svg> </div> <div class="fpd-input-search"> <input type="text" class="!text-sm placeholder-gray-500 !pl-2" placeholder="Search" /> <span class="fpd-icon-magnify"></span> </div> </div> </div><div class="icon-box"><i data-lucide="house"></i></div> <fpd-dropdown class="fpd-product-categories rounded-[8px] border border-[#35475a33] border-solid mt-[8px] bg-white p-2 dark:border-gray-800 dark:bg-white/[0.03] md:p-2 mr-[14px] pl-[6px] ml-[5px] w-[calc(100% - 22px)] mb-[5px]" searchable></fpd-dropdown> <div class="fpd-scroll-area"> <div class="w-full overflow-auto [scrollbar-width:none] scrollbar-hide"><div class="flex gap-2 mt-2 ml-[5px]"><div class="border border-[#35475a33] border-solid pt-2 pb-2 pr-3 pl-3 rounded-[6px] text-sm text-[#0d1216] cursor-pointer hover:bg-[#40576d12] flex-none">Food</div><div class="border border-[#35475a33] border-solid pt-2 pb-2 pr-3 pl-3 text-sm text-[#0d1216] rounded-[6px] cursor-pointer hover:bg-[#40576d12] flex-none">Collage</div><div class="border border-[#35475a33] border-solid pt-2 pb-2 pr-3 pl-3 text-sm text-[#0d1216] rounded-[6px] cursor-pointer hover:bg-[#40576d12] flex-none">Business</div><div class="border border-[#35475a33] border-solid pt-2 pb-2 pr-3 pl-3 text-sm text-[#0d1216] rounded-[6px] cursor-pointer hover:bg-[#40576d12] flex-none">Festival</div><div class="border border-[#35475a33] border-solid pt-2 pb-2 pr-3 pl-3 text-sm text-[#0d1216] rounded-[6px] cursor-pointer hover:bg-[#40576d12] flex-none">Heart</div></div></div><div class="fpd-grid fpd-grid-contain fpd-padding one-ttt" id="DesignModule"><div class="searchox bg-white rounded-lg relative flex"><div id="search-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M15.2 16.34a7.5 7.5 0 1 1 1.38-1.45l4.2 4.2a1 1 0 1 1-1.42 1.41l-4.16-4.16zm-4.7.16a6 6 0 1 0 0-12 6 6 0 0 0 0 12z"></path></svg></div><div><input type="text" class="appearance-none bg-inherit border-0 box-border text-inherit font-normal min-w-[8px] outline-none w-full" /></div></div> </div> </div> </div>';
+                        '<div data-moduleicon="layout-panel-left" data-defaulttext="Designs" data-title="Productsnew"><div class="fpd-head"> <div class="fpd-input-back-search input-search-box !shadow-none border border-[#35475a33] border-solid !rounded-[8px] ml-[5px] w-[calc(100% - 22px)]"> <div class="fpd-back fpd-btn !bg-white"> <svg xmlns="http://www.w3.org/2000/svg" class="min-w-[24px] text-black relative top-[-2px]" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M15.2 16.34a7.5 7.5 0 1 1 1.38-1.45l4.2 4.2a1 1 0 1 1-1.42 1.41l-4.16-4.16zm-4.7.16a6 6 0 1 0 0-12 6 6 0 0 0 0 12z"></path></svg> </div> <div class="fpd-input-search"> <input type="text" class="!text-sm placeholder-gray-500 !pl-2" placeholder="Search" /> <span class="fpd-icon-magnify"></span> </div> </div> </div><div class="icon-box"><i data-lucide="house"></i></div> <fpd-dropdown class="fpd-product-categories rounded-[8px] border border-[#35475a33] border-solid mt-[8px] bg-white p-2 dark:border-gray-800 dark:bg-white/[0.03] md:p-2 mr-[14px] pl-[6px] ml-[5px] w-[calc(100% - 22px)] mb-[5px]" searchable></fpd-dropdown> <div class="fpd-scroll-area"> <div class="w-full overflow-auto [scrollbar-width:none] scrollbar-hide"><div class="flex gap-2 mt-2 ml-[5px]"><div class="border border-[#35475a33] border-solid pt-2 pb-2 pr-3 pl-3 rounded-[6px] text-sm text-[#0d1216] cursor-pointer hover:bg-[#40576d12] flex-none">Foods</div><div class="border border-[#35475a33] border-solid pt-2 pb-2 pr-3 pl-3 text-sm text-[#0d1216] rounded-[6px] cursor-pointer hover:bg-[#40576d12] flex-none">Collage</div><div class="border border-[#35475a33] border-solid pt-2 pb-2 pr-3 pl-3 text-sm text-[#0d1216] rounded-[6px] cursor-pointer hover:bg-[#40576d12] flex-none">Business</div><div class="border border-[#35475a33] border-solid pt-2 pb-2 pr-3 pl-3 text-sm text-[#0d1216] rounded-[6px] cursor-pointer hover:bg-[#40576d12] flex-none">Festival</div><div class="border border-[#35475a33] border-solid pt-2 pb-2 pr-3 pl-3 text-sm text-[#0d1216] rounded-[6px] cursor-pointer hover:bg-[#40576d12] flex-none">Heart</div></div></div><div class="fpd-grid fpd-grid-contain fpd-padding one-ttt" id="DesignModule"><div class="searchox bg-white rounded-lg relative flex"><div id="search-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M15.2 16.34a7.5 7.5 0 1 1 1.38-1.45l4.2 4.2a1 1 0 1 1-1.42 1.41l-4.16-4.16zm-4.7.16a6 6 0 1 0 0-12 6 6 0 0 0 0 12z"></path></svg></div><div><input type="text" class="appearance-none bg-inherit border-0 box-border text-inherit font-normal min-w-[8px] outline-none w-full" /></div></div> </div> </div> </div>';
                 }
             }
             function Re(t, e) {
@@ -19612,14 +19616,14 @@
                             leftArrow.innerHTML = `
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"><path fill="currentColor" d="m14.8 16.382-4.205-4.205a.25.25 0 0 1 0-.354L14.8 7.618a.75.75 0 0 0-1.06-1.06l-4.206 4.204a1.75 1.75 0 0 0 0 2.475l4.206 4.205a.75.75 0 0 0 1.06-1.06"></path></svg>
                             `;
-                            leftArrow.className = "absolute left-0 top-[15px] -translate-y-1/2 z-[9] bg-transparent shadow p-1 rounded-full hover:bg-gray-100";
+                            leftArrow.className = "absolute left-0 top-[15px] -translate-y-1/2 z-[9] bg-gradient-to-r from-white/0 to-white shadow p-1 rounded-full hover:bg-gray-100";
                             leftArrow.disabled = true;
 
                             const rightArrow = document.createElement("button");
                             rightArrow.innerHTML = `
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"><path fill="currentColor" d="m9.216 7.619 4.204 4.204a.25.25 0 0 1 0 .354l-4.204 4.204a.75.75 0 0 0 1.06 1.061l4.205-4.204a1.75 1.75 0 0 0 0-2.475l-4.204-4.205a.75.75 0 0 0-1.061 1.06"></path></svg>
                             `;
-                            rightArrow.className = "absolute right-0 top-[15px] -translate-y-1/2 z-[9] bg-transparent shadow p-1 rounded-full hover:bg-gray-100";
+                            rightArrow.className = "absolute right-0 top-[15px] -translate-y-1/2 z-[9] bg-gradient-to-r from-white/0 to-white shadow p-1 rounded-full hover:bg-gray-100";
 
                             function updateArrows() {
                             const wrapperWidth = container.offsetWidth;
@@ -19845,7 +19849,7 @@
                 }
                 connectedCallback() {
                     this.innerHTML = 
-                        '<div data-moduleicon="type-outline" data-defaulttext="Add Text" data-title="modules.text"> <div class="fpd-head"> <div class="fpd-input-back-search input-search-box !shadow-none border border-[#35475a33] border-solid !rounded-[8px] ml-[5px] w-[calc(100% - 22px)]"> <div class="fpd-back fpd-btn !bg-white"> <svg xmlns="http://www.w3.org/2000/svg" class="min-w-[24px] text-black relative top-[-2px]" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M15.2 16.34a7.5 7.5 0 1 1 1.38-1.45l4.2 4.2a1 1 0 1 1-1.42 1.41l-4.16-4.16zm-4.7.16a6 6 0 1 0 0-12 6 6 0 0 0 0 12z"></path></svg> </div> <div class="fpd-input-search"> <input type="text" class="!text-sm placeholder-gray-500 !pl-2" placeholder="Search" /> <span class="fpd-icon-magnify"></span> </div> </div> </div><div class="fpd-add-text"> <textarea class="!bg-white hidden" data-defaulttext="Enter some text" placeholder="modules.text_input_placeholder"></textarea> <div class="fpd-btn-add-text fpd-btn !bg-[#f53744] w-[100%] text-center !text-sm !normal-case justify-center"> <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4.99 5.5A1.5 1.5 0 0 1 6.49 4h11a1.5 1.5 0 0 1 1.5 1.5v1.85a.75.75 0 0 1-1.5 0V6a.5.5 0 0 0-.502-.5l-4.24.008.01 11.992a1 1 0 0 0 1 1h1.407a.75.75 0 0 1 0 1.5H8.852a.75.75 0 0 1 0-1.5h1.406a1 1 0 0 0 1-1l-.01-11.992-4.258-.007a.5.5 0 0 0-.5.5v1.377a.75.75 0 1 1-1.5 0V5.5Z" fill="currentColor"></path></svg><span class="ml-[5px]" data-defaulttext="Add Text">Add Text</span> <span class="fpd-price"></span> </div> </div> <div class="w-full overflow-auto [scrollbar-width:none] scrollbar-hide" style="min-height: 57px;    max-width: 320px;"><div class="flex gap-2 mt-2 ml-[5px]"><div class="border border-[#35475a33] border-solid pt-2 pb-2 pr-3 pl-3 rounded-[6px] text-sm text-[#0d1216] cursor-pointer hover:bg-[#40576d12] flex-none">Food</div><div class="border border-[#35475a33] border-solid pt-2 pb-2 pr-3 pl-3 text-sm text-[#0d1216] rounded-[6px] cursor-pointer hover:bg-[#40576d12] flex-none">Collage</div><div class="border border-[#35475a33] border-solid pt-2 pb-2 pr-3 pl-3 text-sm text-[#0d1216] rounded-[6px] cursor-pointer hover:bg-[#40576d12] flex-none">Business</div><div class="border border-[#35475a33] border-solid pt-2 pb-2 pr-3 pl-3 text-sm text-[#0d1216] rounded-[6px] cursor-pointer hover:bg-[#40576d12] flex-none">Festival</div><div class="border border-[#35475a33] border-solid pt-2 pb-2 pr-3 pl-3 text-sm text-[#0d1216] rounded-[6px] cursor-pointer hover:bg-[#40576d12] flex-none">Heart</div></div></div><div class="fpd-text-templates fpd-container fpd-scroll-area"> <div id="text-templates" class="fpd-grid fpd-grid-contain"></div><div class="fpd-grid fpd-padding"></div> </div> </div>';
+                        '<div data-moduleicon="type-outline" class="relative p-[10px]" data-defaulttext="Add Text" data-title="modules.text"> <div class="fpd-head" style="opacity:0"> <div class="fpd-input-back-search input-search-box !shadow-none border border-[#35475a33] border-solid !rounded-[8px] ml-[5px] w-[calc(100% - 22px)]"> <div class="fpd-back fpd-btn !bg-white"> <svg xmlns="http://www.w3.org/2000/svg" class="min-w-[24px] text-black relative top-[-2px]" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M15.2 16.34a7.5 7.5 0 1 1 1.38-1.45l4.2 4.2a1 1 0 1 1-1.42 1.41l-4.16-4.16zm-4.7.16a6 6 0 1 0 0-12 6 6 0 0 0 0 12z"></path></svg> </div> <div class="fpd-input-search"> <input type="text" class="!text-sm placeholder-gray-500 !pl-2" placeholder="Search" /> <span class="fpd-icon-magnify"></span> </div> </div> </div><div class="fpd-add-text"> <textarea class="!bg-white hidden" data-defaulttext="Enter some text" placeholder="modules.text_input_placeholder"></textarea> <div class="fpd-btn-add-text fpd-btn !bg-[#f53744] w-[100%] text-center !text-sm !normal-case justify-center !mt-0"> <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4.99 5.5A1.5 1.5 0 0 1 6.49 4h11a1.5 1.5 0 0 1 1.5 1.5v1.85a.75.75 0 0 1-1.5 0V6a.5.5 0 0 0-.502-.5l-4.24.008.01 11.992a1 1 0 0 0 1 1h1.407a.75.75 0 0 1 0 1.5H8.852a.75.75 0 0 1 0-1.5h1.406a1 1 0 0 0 1-1l-.01-11.992-4.258-.007a.5.5 0 0 0-.5.5v1.377a.75.75 0 1 1-1.5 0V5.5Z" fill="currentColor"></path></svg><span class="ml-[5px]" data-defaulttext="Add Text">Add Text</span> <span class="fpd-price"></span> </div> </div> <div class="fpd-text-templates fpd-container fpd-scroll-area"> <div id="text-templates" class="fpd-grid fpd-grid-contain"></div><div class="fpd-grid fpd-padding"></div> </div> </div>';
                 }
             }
             
@@ -19926,217 +19930,260 @@
                         tempDiv.innerHTML = savedContent;
 
                         const categoryBlocks = tempDiv.querySelectorAll(".fpd-category");
+                        console.log("Anoop Data 8--1--1", categoryBlocks);
 
-                        categoryBlocks.forEach(categoryBlock => {
-                            const categoryName = categoryBlock.getAttribute("data-category") || "Uncategorized";
+                            // ✅ Add this before `categoryBlocks.forEach(...)`
+                            const allTagsSet = new Set();
 
-                            // ✅ Container for each category
-                            const categoryContainer = document.createElement("div");
-                            categoryContainer.className = "box-contain-text";
-                            // 🏷️ Category Title
-                            const categoryTitle = document.createElement("div");
-                            categoryTitle.className = "fpd-category-title text-md font-semibold mb-2 mt-4";
-                            categoryTitle.textContent = categoryName;
+                            // Gather all unique tags from all products
+                            document.querySelectorAll('.fpd-producttext').forEach(product => {
+                                console.log("products-------92929", product)
+                                const tags = product.getAttribute('data-tags')?.split(',').map(tag => tag.trim());
+                                if (tags) tags.forEach(tag => allTagsSet.add(tag));
+                            });
 
-                            categoryContainer.appendChild(categoryTitle);
+                            const searchWrappertext = document.createElement('div');
+                            searchWrappertext.className = 'flex items-center gap-0';
 
-                            // 📦 Loop through all .fpd-product items
-                            const products = categoryBlock.querySelectorAll('.fpd-product');
+                            //Search
+                            const filterContainerSearch = document.createElement('div');
+                            filterContainerSearch.className = 'filter-controls mb-4 absolute top-0 left-0 ml-[15px] right-[11px] border border-[#35475a33] border-solid !rounded-[8px] mr-[10px]';
 
-                            products.forEach(product => {
-                            const title = product.getAttribute('title') || 'Untitled';
-                            const thumbnail = product.getAttribute('data-thumbnail') || '';
-                            const spans = product.querySelectorAll('span');
+                            const searchIcon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+                            searchIcon.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+                            searchIcon.setAttribute("width", "24");
+                            searchIcon.setAttribute("height", "24");
+                            searchIcon.setAttribute("viewBox", "0 0 24 24");
+                            searchIcon.setAttribute("class", "min-w-[24px] text-black relative top-[-2px] ml-[8px]");
 
-                            if (spans.length > 0) {
-                                const newDiv = document.createElement('div');
-                                newDiv.className = 'fpd-item fpd-itemimg';
-                                newDiv.setAttribute('data-title', title);
-                                newDiv.setAttribute('data-type', 'text');
-                                newDiv.setAttribute('data-thumbnail', thumbnail);
+                            const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                            path.setAttribute("fill", "currentColor");
+                            path.setAttribute("d", "M15.2 16.34a7.5 7.5 0 1 1 1.38-1.45l4.2 4.2a1 1 0 1 1-1.42 1.41l-4.16-4.16zm-4.7.16a6 6 0 1 0 0-12 6 6 0 0 0 0 12z");
 
-                                const picture = document.createElement('picture');
-                                picture.setAttribute('data-img', title);
-                                picture.style.backgroundImage = `url('${thumbnail}')`;
-                                newDiv.appendChild(picture);
+                            searchIcon.appendChild(path);
+                            
+                            const searchInput = document.createElement('input');
+                            searchInput.type = 'text';
+                            searchInput.placeholder = 'Search by title...';
+                            searchInput.className = 'border p-1 px-3 rounded !text-sm !mb-0 placeholder-gray-500';
+                            
+                            searchWrappertext.appendChild(searchIcon);
+                            searchWrappertext.appendChild(searchInput);
+                            
+                            filterContainerSearch.appendChild(searchWrappertext);
 
-                                spans.forEach(span => {
-                                const spanTag = document.createElement('span');
-                                spanTag.className = 'pankaj design1';
-                                spanTag.innerText = span?.textContent || '';
-                                newDiv.appendChild(spanTag);
+                            // // Optional Reset Button
+                            const resetBtn = document.createElement('button');
+                            resetBtn.innerHTML = `
+                            <svg xmlns="http://www.w3.org/2000/svg" 
+                                width="24" height="24" viewBox="0 0 24 24"
+                                class="text-[#0d1216] hover:text-blue-600 transition duration-200 cursor-pointer">
+                                <path d="M6.9 10.996h11.596a.75.75 0 0 1 0 1.5H6.9l4.377 4.377a.75.75 0 0 1-1.061 1.06l-4.95-4.95a1.75 1.75 0 0 1 0-2.474l4.95-4.95a.75.75 0 1 1 1.06 1.06L6.9 10.996z" 
+                                    fill="currentColor">
+                                </path>
+                            </svg>
+                            `;
+                            resetBtn.className = 'ml-2 px-2 py-1 bg-red-200 rounded text-sm hover:bg-red-300 hidden absolute top-[8px] left-0';
+                            resetBtn.addEventListener('click', () => {
+                                
+                                document.querySelectorAll('.fpd-item.fpd-itemimg').forEach(el => {
+                                    el.style.display = 'block';
+                                });
+                                document.querySelectorAll('.fpd-tag-btn').forEach(btn => btn.classList.remove('!bg-[#40576d12]'));
+
+                                document.querySelectorAll('.box-contain-text').forEach(box => {
+                                        box.classList.remove('fpd-hidden');
+
+                                        const allItems = box.querySelectorAll('.fpd-item.fpd-itemimg');
+
+                                        allItems.forEach((item, index) => {
+                                            item.style.display = index < 3 ? 'block' : 'none'; // Show first 3
+                                        });
+
+                                        // Optional: show the box only if it contains at least 1 visible item
+                                        const visibleItems = box.querySelectorAll('.fpd-item.fpd-itemimg:not([style*="display: none"])');
+                                        box.style.display = visibleItems.length > 0 ? 'flex' : 'none';
+                                });
+                                document.querySelectorAll('.see-toggle-btn').forEach(boxbutton => {
+
+                                    boxbutton.classList.remove('fpd-hidden');
+                                    boxbutton.innerText = 'See All';
+                                })
+                                resetBtn.classList.add('hidden');
+                                    filterContainerSearch.style.width = '';
+                                    filterContainerSearch.style.marginLeft = '';
+                            });
+
+                            // Create a tag filter UI
+                            const targetContainermain = document.createElement('div');
+                            targetContainermain.className = 'w-full overflow-auto [scrollbar-width:none] scrollbar-hide';
+                            
+                            const tagContainerText = document.createElement('div');
+                            tagContainerText.className = 'fpd-tag-filter flex gap-2 mb-4 flex-nowrap overflow-x-auto';
+
+                            allTagsSet.forEach(tag => {
+                                const tagButton = document.createElement('button');
+                                tagButton.className = 'fpd-tag-btn border border-[#35475a33] border-solid pt-2 pb-2 pr-3 pl-3 rounded-[6px] text-sm text-[#0d1216] cursor-pointer hover:bg-[#40576d12] flex-none capitalize';
+                                tagButton.innerText = tag;
+                                tagButton.setAttribute('data-tag', tag);
+
+                                tagButton.addEventListener('click', () => {
+                                    const selectedTag = tagButton.getAttribute('data-tag');
+
+                                    document.querySelectorAll('.fpd-tag-btn').forEach(btn => btn.classList.remove('!bg-[#40576d12]'));
+                                    tagButton.classList.add('!bg-[#40576d12]');
+                                    console.log("selectTag", selectedTag)
+                                    document.querySelectorAll('.fpd-item.fpd-itemimg').forEach(productEl => {
+                                        console.log("tags", productEl)
+                                        const tags = productEl.getAttribute('data-tags') || '';
+                                        productEl.style.display = tags.includes(selectedTag) ? 'block' : 'none';
+                                    });
+                                    document.querySelectorAll('.box-contain-text').forEach(box => {
+                                        const visibleItems = box.querySelectorAll('.fpd-item.fpd-itemimg:not([style*="display: none"])');
+                                        box.style.display = visibleItems.length > 0 ? 'flex' : 'none';
+                                    });
+
+                                    resetBtn.classList.remove('hidden');
+                                    filterContainerSearch.style.width = 'calc(100% - 60px)';
+                                    filterContainerSearch.style.marginLeft = '40px';
                                 });
 
-                                // 👆 Optional: Click handler (unchanged)
-                                newDiv.addEventListener("click", () => {
-                                    if (!t.currentViewInstance) return;
-                                    console.log("iiiiiiiiii",t);
-                                    const viewOptions = t.currentViewInstance.options;
-                                    const innerSpans = newDiv.querySelectorAll('span');
-                                    let verticalOffset = 0;
+                                tagContainerText.appendChild(tagButton);
+                            });
 
-                                    // innerSpans.forEach((innerSpan, index) => {
-                                    //     const textContent = innerSpan.textContent || '';
-                                    //     const originalSpan = spans[index];
-                                    //     let parsedParams = {};
+                            
+                            targetContainermain.appendChild(resetBtn);
 
-                                    //     try {
-                                    //     const rawParams = originalSpan.getAttribute('data-parameters') || '{}';
-                                    //     parsedParams = JSON.parse(rawParams);
-                                    //     } catch (err) {
-                                    //     console.error("Invalid JSON in data-parameters", err);
-                                    //     }
-
-                                    //     let props = {
-                                    //         ...parsedParams,
-                                    //         isCustom: true,
-                                    //         textBox: Boolean(this.fpdInstance.mainOptions.customTextAsTextbox),
-                                    //         resizable: true,
-                                    //         _addToUZ: t.currentViewInstance.currentUploadZone,
-                                    //         _calcWidth: true,
-                                    //     };
-
-                                    //     let styledProps = typeof z === 'function'
-                                    //     ? z(viewOptions.customTextParameters, props)
-                                    //     : props;
-
-                                    //     styledProps.fill = props.colors || "#ff0000";
-                                    //     styledProps.colors = props.colors || "#ff0000";
-                                    //     styledProps.fontFamily = props.font || "Arial";
-                                    //     styledProps.fontSize = props.textSize || 24;
-
-                                    //     const baseTop = parsedParams.top || 0;
-                                    //     const lineSpacing = parsedParams.curved
-                                    //     ? parsedParams.textSize * 2
-                                    //     : parsedParams.textSize * 1.5;
-
-                                    //     styledProps.top = baseTop + verticalOffset;
-                                    //     styledProps.left = parsedParams.left || 0;
-                                    //     styledProps.autoCenter = false;
-                                    //     verticalOffset += lineSpacing;
-
-                                    //     t.currentViewInstance.fabricCanvas.addElement(
-                                    //     "text",
-                                    //     textContent,
-                                    //     textContent,
-                                    //     styledProps
-                                    //     );
-                                    // });
-                                    const insertedTextObjects = [];
-                                    const fabricCanvas = t.currentViewInstance.fabricCanvas.canvas || t.currentViewInstance.fabricCanvas;
-
-                                    innerSpans.forEach((innerSpan, index) => {
-                                    const textContent = innerSpan.textContent || '';
-                                    const originalSpan = spans[index];
-                                    let parsedParams = {};
-
-                                    try {
-                                        const rawParams = originalSpan.getAttribute('data-parameters') || '{}';
-                                        parsedParams = JSON.parse(rawParams);
-                                    } catch (err) {
-                                        console.error("Invalid JSON in data-parameters", err);
-                                    }
-
-                                    // let props = {
-                                    //     ...parsedParams,
-                                    //     isCustom: true,
-                                    //     textBox: Boolean(this.fpdInstance.mainOptions.customTextAsTextbox),
-                                    //     resizable: true,
-                                    //     _addToUZ: t.currentViewInstance.currentUploadZone,
-                                    //     _calcWidth: true,
-                                    // };
-
-                                    // console.log("props", props);
-
-                                    // // Get and validate existing localStorage data
-                                    // let existingProps;
-
-                                    // try {
-                                    //     const data = JSON.parse(localStorage.getItem('propstext'));
-                                    //     existingProps = Array.isArray(data) ? data : []; // ✅ ensure it's an array
-                                    // } catch (e) {
-                                    //     existingProps = []; // If corrupted JSON
-                                    // }
-
-                                    // // Add the new props object
-                                    // existingProps.push(props);
-
-                                    // // Keep only the last 2 props objects
-                                    // if (existingProps.length > 2) {
-                                    //     existingProps = existingProps.slice(-2);
-                                    // }
-
-                                    // // Save back to localStorage
-                                    // localStorage.setItem('propstext', JSON.stringify(existingProps));
-
-                                    // let styledProps = typeof z === 'function'
-                                    //     ? z(viewOptions.customTextParameters, props)
-                                    //     : props;
-
-                                    // styledProps.fill = props.colors || "#ff0000";
-                                    // styledProps.colors = props.colors || "#ff0000";
-                                    // styledProps.fontFamily = props.font || "Arial";
-                                    // styledProps.fontSize = props.textSize || 24;
-
-                                    // const baseTop = parsedParams.top || 0;
-                                    // const lineSpacing = parsedParams.curved
-                                    //     ? parsedParams.textSize * 2
-                                    //     : parsedParams.textSize * 1.5;
-
-                                    // styledProps.top = baseTop + verticalOffset;
-                                    // styledProps.left = parsedParams.left || 0;
-                                    // styledProps.autoCenter = false;
-                                    // verticalOffset += lineSpacing;
-
-                                    // // Create Fabric text object manually
-                                    // const fabricText = new fabric.Text(textContent, styledProps);
-                                    // insertedTextObjects.push(fabricText);
-                                    // });
-
-                                    // // Group and add to canvas
-                                    // if (insertedTextObjects.length > 0) {
-                                    //     const group = new fabric.Group(insertedTextObjects, {
-                                    //         selectable: true,
-                                    //         hasControls: true,
-                                    //         left:0,
-                                    //         top: 300,
-                                    //     });
-
-                                    //     t.currentViewInstance.fabricCanvas.add(group);
-                                    //     t.currentViewInstance.fabricCanvas.setActiveObject(group);
-                                    //     t.currentViewInstance.fabricCanvas.requestRenderAll();
-                                    // }
+                            searchInput.addEventListener('input', () => {
+                                const query = searchInput.value.toLowerCase();
+                                document.querySelectorAll('.fpd-itemimg').forEach(el => {
+                                    const title = el.getAttribute('data-title')?.toLowerCase() || '';
+                                    el.style.display = title.includes(query) ? 'block' : 'none';
+                                });
+                                document.querySelectorAll('.box-contain-text').forEach(box => {
+                                        const visibleItems = box.querySelectorAll('.fpd-item.fpd-itemimg:not([style*="display: none"])');
+                                        box.style.display = visibleItems.length > 0 ? 'flex' : 'none';
+                                });
+                            });
 
 
-                                    let props = {
-                                        ...parsedParams,
-                                        isCustom: true,
-                                        textBox: Boolean(this.fpdInstance.mainOptions.customTextAsTextbox),
-                                        resizable: true,
-                                        _addToUZ: t.currentViewInstance.currentUploadZone,
-                                        _calcWidth: true,
-                                    };
+                            // Append tag filter UI to top of your `target`
+                            targetContainermain.prepend(tagContainerText);
+                            target.appendChild(filterContainerSearch);
+                            target.appendChild(targetContainermain);
 
-                                        console.log("props", props);
+                            // ✅ Add this inside product creation loop for optional tag display under each product
+                            // const tagList = product.getAttribute('data-tags') || '';
+                            // if (tagList) {
+                            //     const tags = tagList.split(',').map(tag => tag.trim());
+                            //     const tagWrapperText = document.createElement('div');
+                            //     tagWrapperText.className = 'fpd-tags flex gap-1 mt-1 flex-wrap';
 
-                                        // Save to localStorage
+                            //     tags.forEach(tag => {
+                            //         const tagLabel = document.createElement('span');
+                            //         tagLabel.className = 'inline-block px-1.5 py-0.5 text-xs bg-gray-100 rounded border';
+                            //         tagLabel.textContent = tag;
+                            //         tagWrapperText.appendChild(tagLabel);
+                            //     });
+
+                            //     newDiv.appendChild(tagWrapperText);
+                            // }
+
+
+                            categoryBlocks.forEach(categoryBlock => {
+                                const categoryName = categoryBlock.getAttribute("data-category") || "Uncategorized";
+
+                                // ✅ Container for each category
+                                const categoryContainer = document.createElement("div");
+                                categoryContainer.className = "box-contain-text relative";
+
+                                // 🏷️ Category Title
+                                const categoryTitle = document.createElement("div");
+                                categoryTitle.className = "fpd-category-title text-md font-semibold mb-2 mt-4";
+                                categoryTitle.textContent = categoryName;
+
+                                categoryContainer.appendChild(categoryTitle);
+
+                                // 📦 Loop through all .fpd-product items
+                                const products = categoryBlock.querySelectorAll('.fpd-product');
+
+                                products.forEach(product => {
+                                    const title = product.getAttribute('title') || 'Untitled';
+                                    const thumbnail = product.getAttribute('data-thumbnail') || '';
+                                    const tags = product.getAttribute('data-tags') || '';
+                                    const spans = product.querySelectorAll('span');
+
+                                    if (spans.length > 0) {
+                                    const newDiv = document.createElement('div');
+                                    newDiv.className = 'fpd-item fpd-itemimg';
+                                    newDiv.setAttribute('data-title', title);
+                                    newDiv.setAttribute('data-type', 'text');
+                                    newDiv.setAttribute('data-thumbnail', thumbnail);
+                                    newDiv.setAttribute('data-tags', tags);
+
+                                    const picture = document.createElement('picture');
+                                    picture.setAttribute('data-img', title);
+                                    picture.style.backgroundImage = `url('${thumbnail}')`;
+                                    newDiv.appendChild(picture);
+
+                                    spans.forEach(span => {
+                                        const spanTag = document.createElement('span');
+                                        spanTag.className = 'pankaj design1';
+                                        spanTag.innerText = span?.textContent || '';
+                                        newDiv.appendChild(spanTag);
+                                    });
+
+                                    // 👆 Optional: Click handler unchanged
+                                    newDiv.addEventListener("click", () => {
+                                        document.querySelector(".fpd-ungroup")?.classList.remove("fpd-hidden");
+                                        if (!t.currentViewInstance) return;
+
+                                        const viewOptions = t.currentViewInstance.options;
+                                        const innerSpans = newDiv.querySelectorAll('span');
+                                        let verticalOffset = 0;
+
+                                        const insertedTextObjects = [];
+                                        const fabricCanvas = t.currentViewInstance.fabricCanvas.canvas || t.currentViewInstance.fabricCanvas;
+
+                                        innerSpans.forEach((innerSpan, index) => {
+                                        const textContent = innerSpan.textContent || '';
+                                        const originalSpan = spans[index];
+                                        let parsedParams = {};
+
+                                        try {
+                                            const rawParams = originalSpan.getAttribute('data-parameters') || '{}';
+                                            parsedParams = JSON.parse(rawParams);
+                                        } catch (err) {
+                                            console.error("Invalid JSON in data-parameters", err);
+                                        }
+
+                                        const props = {
+                                            ...parsedParams,
+                                            isCustom: true,
+                                            textBox: Boolean(this.fpdInstance.mainOptions.customTextAsTextbox),
+                                            resizable: true,
+                                            boundingBox: 'Base',
+                                            _addToUZ: t.currentViewInstance.currentUploadZone,
+                                            _calcWidth: true,
+                                        };
+
                                         let existingProps;
                                         try {
-                                        const data = JSON.parse(localStorage.getItem('propstext'));
-                                        existingProps = Array.isArray(data) ? data : [];
+                                            const data = JSON.parse(localStorage.getItem('propstext'));
+                                            existingProps = Array.isArray(data) ? data : [];
                                         } catch (e) {
-                                        existingProps = [];
+                                            existingProps = [];
                                         }
+
                                         existingProps.push(props);
                                         if (existingProps.length > 2) {
-                                        existingProps = existingProps.slice(-2);
+                                            existingProps = existingProps.slice(-2);
                                         }
                                         localStorage.setItem('propstext', JSON.stringify(existingProps));
 
-                                        // Styled props with all curve data preserved
                                         let styledProps = typeof z === 'function'
-                                        ? z(viewOptions.customTextParameters, props)
-                                        : props;
+                                            ? z(viewOptions.customTextParameters, props)
+                                            : props;
 
                                         styledProps.fill = props.colors || "#ff0000";
                                         styledProps.colors = props.colors || "#ff0000";
@@ -20146,58 +20193,104 @@
                                         styledProps.curveSpacing = props.curveSpacing || 5;
                                         styledProps.curveRadius = props.curveRadius || 180;
                                         styledProps.curveReverse = props.curveReverse || false;
-                                        console.log("styledProps", styledProps);    
 
                                         const baseTop = parsedParams.top || 0;
-                                        const lineSpacing = props.curved
-                                        ? props.textSize * 2
-                                        : props.textSize * 1.5;
-
+                                        const lineSpacing = props.curved ? props.textSize * 2 : props.textSize * 1.5;
                                         styledProps.top = baseTop + verticalOffset;
                                         styledProps.left = parsedParams.left || 0;
                                         styledProps.autoCenter = true;
                                         verticalOffset += lineSpacing;
 
-                                        const fabricText = props.curved
-                                        ? new fabric.CurvedText(textContent, styledProps)
-                                        : new fabric.Text(textContent, styledProps);
-                                        fabricText.set({ textAlign: 'center', originX: 'center' });
+                                        const fabricText = styledProps.curved
+                                            ? new fabric.CurvedText(textContent, styledProps)
+                                            : new fabric.Text(textContent, styledProps);
+
+                                        fabricText.set({
+                                            textAlign: 'center',
+                                            originX: 'center',
+                                            curvable: 1,
+                                            curved: props.curved || false,
+                                            curveReverse: props.curveReverse || false,
+                                            curveRadius: props.curveRadius || 0,
+                                            curveSpacing: props.curveSpacing || 0,
+                                            boundingBox: 'Base'
+                                        });
+
                                         insertedTextObjects.push(fabricText);
                                         });
 
-                                        // ✅ Group and center the text objects
                                         if (insertedTextObjects.length > 0) {
-                                            const group = new fabric.Group(insertedTextObjects, {
-                                                selectable: true,
-                                                hasControls: true,
-                                                originX: 'center',
-                                                originY: 'center',
-                                            });
+                                        const group = new fabric.Group(insertedTextObjects, {
+                                            selectable: true,
+                                            hasControls: true,
+                                            resizable: true,
+                                            removable: true,
+                                            originX: 'center',
+                                            originY: 'center',
+                                        });
 
-                                            const canvasWidth = fabricCanvas.getWidth();
-                                            const canvasHeight = fabricCanvas.getHeight();
+                                        const canvasWidth = fabricCanvas.getWidth();
+                                        const canvasHeight = fabricCanvas.getHeight();
+                                        group.set({
+                                            left: canvasWidth / 2,
+                                            top: canvasHeight / 2,
+                                            boundingBox: 'Base',
+                                        });
 
-                                            group.set({
-                                                left: canvasWidth / 2,
-                                                top: canvasHeight / 2,
-                                            });
-
-                                            fabricCanvas.add(group);
-                                            fabricCanvas.setActiveObject(group);
-                                            fabricCanvas.requestRenderAll();
+                                        fabricCanvas.add(group);
+                                        fabricCanvas.setActiveObject(group);
+                                        fabricCanvas.requestRenderAll();
                                         }
+                                    });
 
-
+                                    categoryContainer.appendChild(newDiv);
+                                    }
                                 });
 
-                                // ✅ Append product to category block
-                                categoryContainer.appendChild(newDiv);
-                            }
-                            });
+                                // ✅ Append "See All / See Less" toggle if more than 3 items
+                                const fpdItems = categoryContainer.querySelectorAll('.fpd-item');
+                                const maxVisible = 3;
 
-                            // ✅ Append full category to target
-                            target.appendChild(categoryContainer);
-                        });
+                                if (fpdItems.length > maxVisible) {
+                                    fpdItems.forEach((item, index) => {
+                                    if (index >= maxVisible) item.classList.add('fpd-hidden');
+                                    });
+
+                                    const toggleBtn = document.createElement('button');
+                                    toggleBtn.className = 'cursor-pointer see-toggle-btn text-[#0d1216db] font-bold mt-2 absolute right-0 top-[7px]';
+                                    toggleBtn.innerText = 'See All';
+
+                                    toggleBtn.addEventListener('click', () => {
+                                        toggleBtn.classList.add('fpd-hidden');
+                                        const isExpanded = toggleBtn.innerText === 'See Less';
+                                        document.querySelectorAll('.box-contain-text').forEach(box => {
+                                            box.classList.add('fpd-hidden');
+                                        });
+                                        fpdItems.forEach((item, index) => {
+                                            const parentBox = item.closest('.box-contain-text');
+                                            
+                                            if (index >= maxVisible) {
+                                                item.classList.toggle('fpd-hidden', isExpanded);
+                                                item.style.display = 'block'; // Hide/show based on toggle state
+                                                // Additionally hide/show parent `.box-contain-text` if needed
+                                                if (parentBox) {
+                                                    parentBox.classList.toggle('fpd-hidden', isExpanded);
+                                                }
+                                            }
+                                        });
+                                        resetBtn.classList.remove('hidden');
+                                        filterContainerSearch.style.width = 'calc(100% - 60px)';
+                                        filterContainerSearch.style.marginLeft = '40px';
+                                        // toggleBtn.innerText = isExpanded ? 'See All' : 'See Less';
+                                    });
+
+                                    categoryContainer.appendChild(toggleBtn);
+                                }
+
+                                // ✅ Append final category block to target
+                                target.appendChild(categoryContainer);
+                                });
+
                         }
 
 
@@ -20211,7 +20304,7 @@
                 }
                 connectedCallback() {
                     this.innerHTML =
-                        '<div data-moduleicon="component" data-defaulttext="Elements" data-title="Elements"> <div class="fpd-head"> <div class="fpd-input-back-search input-search-box !shadow-none border border-[#35475a33] border-solid !rounded-[8px] ml-[5px] w-[calc(100% - 22px)]"> <div class="fpd-back fpd-btn !bg-white"> <svg xmlns="http://www.w3.org/2000/svg" class="min-w-[24px] text-black relative top-[-2px]" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M15.2 16.34a7.5 7.5 0 1 1 1.38-1.45l4.2 4.2a1 1 0 1 1-1.42 1.41l-4.16-4.16zm-4.7.16a6 6 0 1 0 0-12 6 6 0 0 0 0 12z"></path></svg> </div> <div class="fpd-input-search"> <input type="text" class="!text-sm placeholder-gray-500 !pl-2" placeholder="Search" /> <span class="fpd-icon-magnify"></span> </div> </div> </div> <div class="fpd-scroll-area"> <div class="relative fpd-grid fpd-grid-contain fpd-padding one !flex !flex-col"> </div> </div>';
+                        '<div data-moduleicon="component" data-defaulttext="Elements" data-title="Elements"> <div class="fpd-head relative"><div id="icon-search-back-data" class="icon-search-back-data fpd-hidden absolute top-[8px] left-0"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="text-[#0d1216] hover:text-blue-600 transition duration-200 cursor-pointer"><path d="M6.9 10.996h11.596a.75.75 0 0 1 0 1.5H6.9l4.377 4.377a.75.75 0 0 1-1.061 1.06l-4.95-4.95a1.75 1.75 0 0 1 0-2.474l4.95-4.95a.75.75 0 1 1 1.06 1.06L6.9 10.996z" fill="currentColor"></path></svg></div> <div class="fpd-input-back-search input-search-box !shadow-none border border-[#35475a33] border-solid !rounded-[8px] ml-[5px] w-[calc(100% - 22px)]"> <div class="fpd-back fpd-btn !bg-white"> <svg xmlns="http://www.w3.org/2000/svg" class="min-w-[24px] text-black relative top-[-2px]" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M15.2 16.34a7.5 7.5 0 1 1 1.38-1.45l4.2 4.2a1 1 0 1 1-1.42 1.41l-4.16-4.16zm-4.7.16a6 6 0 1 0 0-12 6 6 0 0 0 0 12z"></path></svg> </div> <div class="fpd-input-search"> <input type="text" class="!text-sm placeholder-gray-500 !pl-2" placeholder="Search" /> <span class="fpd-icon-magnify"></span> </div> </div> </div> <div class="fpd-scroll-area"> <div class="relative fpd-grid fpd-grid-contain fpd-padding one !flex !flex-col"> </div> </div>';
                 }
             }
             class qet extends HTMLElement {
@@ -20445,7 +20538,7 @@ leftArrow.innerHTML = `
    <path fill="currentColor" d="m14.8 16.382-4.205-4.205a.25.25 0 0 1 0-.354L14.8 7.618a.75.75 0 0 0-1.06-1.06l-4.206 4.204a1.75 1.75 0 0 0 0 2.475l4.206 4.205a.75.75 0 0 0 1.06-1.06"></path>
  </svg>
 `;
-leftArrow.className = "absolute left-2 -translate-y-1/2 z-[9] bg-transparent shadow p-0 rounded-full hover:bg-gray-100 disabled:hidden mt-[16px]";
+leftArrow.className = "absolute left-2 -translate-y-1/2 z-[9] bg-gradient-to-r from-white/0 to-white shadow p-0 rounded-full hover:bg-gray-100 disabled:hidden mt-[16px]";
 leftArrow.disabled = true; // initially disabled
 
 // Step 6: Create right arrow
@@ -20455,7 +20548,7 @@ rightArrow.innerHTML = `
   <path fill="currentColor" d="m9.216 7.619 4.204 4.204a.25.25 0 0 1 0 .354l-4.204 4.204a.75.75 0 0 0 1.06 1.061l4.205-4.204a1.75 1.75 0 0 0 0-2.475l-4.204-4.205a.75.75 0 0 0-1.061 1.06"></path>
 </svg>
 `;
-rightArrow.className = "absolute right-0 z-[9] mt-[-20px] -translate-y-1/2 bg-transparent shadow p-0 rounded-full hover:bg-gray-100 disabled:hidden";
+rightArrow.className = "absolute right-0 z-[9] mt-[-20px] -translate-y-1/2 bg-gradient-to-r from-white/0 to-white shadow p-0 rounded-full hover:bg-gray-100 disabled:hidden";
 
 // Update arrow states
 function updateArrows() {
@@ -20523,7 +20616,7 @@ rightArrow.onclick = () => {
                     const hiddenImagesContainer = document.createElement("div");
                     hiddenImagesContainer.className = "fpd-thumbnails hidden";
                     hiddenImagesContainer.style.display = "none";
-
+                    
                     // Guard: make sure t.designs or t.images exist
                     // console.log("t.designs", t);
                     // console.log("t.designs", t.designs, "t.images", t.images, "t.category", t.category);
@@ -20738,8 +20831,7 @@ rightArrow.onclick = () => {
                                 Qe(this, li, fi).call(this, n.designs, n.parameters);
                             }
                     
-                            this.headElem.querySelector(".fpd-input-search input")
-                                .setAttribute("placeholder", Ke(this, ei) + " " + current.dataset.search.toUpperCase());
+                            //this.headElem.querySelector(".fpd-input-search input").setAttribute("placeholder", Ke(this, ei) + " " + current.dataset.search.toUpperCase());
                         });
                     });
 
@@ -20757,7 +20849,13 @@ rightArrow.onclick = () => {
                     // See All / See Less Button
                     if (images.length > 2) {
                         const toggleBtn = document.createElement("button");
+                        const iconBackData = document.querySelectorAll(".icon-search-back-data");
+                        console.log("dhhhhhhhhh",iconBackData)
+                        iconBackData.forEach((el) => {
+                            el.classList.toggle("fpd-hidden");
+                        });
                         toggleBtn.innerText = "See all";
+                        toggleBtn.classList.remove('see-less');
                         toggleBtn.className = "fpd-see-all absolute top-[10px] right-[10px] text-[#0d1216db] font-bold";
                         
                         let isExpanded = false;
@@ -20829,6 +20927,7 @@ rightArrow.onclick = () => {
                           
                                   // Subcategory See All
                                   if ((subCat.designs || []).length > 3) {
+                                    
                                     const subSeeAllBtn = document.createElement("button");
                                     subSeeAllBtn.innerText = "See all";
                                     subSeeAllBtn.className = "text-blue-600 underline ml-auto mt-2 block mr-[10px]";
@@ -20918,7 +21017,18 @@ rightArrow.onclick = () => {
                                   hiddenImagesContainer.classList.remove("hidden");
                                   hiddenImagesContainer.classList.add("!grid", "grid-cols-3", "auto-rows-[100px]", "gap-[5px]", "mb-3","fpd-grid");
                                 
-                                  toggleBtn.innerText = "See Less";
+                                  toggleBtn.innerText = "";
+                                  toggleBtn.classList.add('see-less');
+                                    toggleBtn.innerHTML = `
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="text-[#0d1216] hover:text-blue-600 transition duration-200 cursor-pointer inline-block ml-1">
+                                        <path d="M6.9 10.996h11.596a.75.75 0 0 1 0 1.5H6.9l4.377 4.377a.75.75 0 0 1-1.061 1.06l-4.95-4.95a1.75 1.75 0 0 1 0-2.474l4.95-4.95a.75.75 0 1 1 1.06 1.06L6.9 10.996z" fill="currentColor"></path>
+                                    </svg>
+                                    `;
+                                  const iconBackData = document.querySelectorAll(".icon-search-back-data");
+                                  console.log("dhhhhhhhhh",iconBackData)
+                                  iconBackData.forEach((el) => {
+                                    el.classList.toggle("fpd-hidden");
+                                  });
                               }
                             }
                           
@@ -20938,11 +21048,22 @@ rightArrow.onclick = () => {
                               
                                   hiddenImagesContainer.classList.add("hidden");
                                   hiddenImagesContainer.classList.remove("!grid", "grid-cols-3", "auto-rows-[100px]", "gap-[5px]", "mb-3");
-                              
+                                  document.getElementById("icon-search-back-data")?.classList.add('fpd-hidden');
                                   toggleBtn.innerText = "See all";
+                                  toggleBtn.classList.remove('see-less');
                                 }
                               }
-                          });
+                        });
+
+                        toggleBtn.addEventListener("click", () => {
+                            if (toggleBtn.innerText === "See all") {
+                                const iconBackData = document.querySelectorAll(".icon-search-back-data");
+                                console.log("dhhhhhhhhh",iconBackData)
+                                iconBackData.forEach((el) => {
+                                el.classList.toggle("fpd-hidden");
+                                });
+                            }
+                        });
                           
                           
                     
@@ -20985,7 +21106,7 @@ rightArrow.onclick = () => {
                 }
                 connectedCallback() {
                     this.innerHTML =
-                        '<div data-moduleicon="cloud-upload" data-defaulttext="Add Image" data-title="modules.images"><i data-lucide="camera"></i> <div class="fpd-module-tabs"> <div data-context="upload" class="fpd-active fpd-tooltip" data-defaulttext="Uploads" title="modules.uploads"> <span class="fa-solid fa-upload"></span> </div> <div data-context="facebook" class="fpd-tooltip" aria-label="Facebook"> <span class="fpd-icon-facebook"></span> </div> <div data-context="instagram" class="fpd-tooltip" aria-label="Instagram"> <span class="fpd-icon-instagram"></span> </div> <div data-context="pixabay" class="fpd-tooltip" aria-label="Pixabay"> <span class="fpd-icon-pixabay"></span> </div> <div data-context="qr-code" class="fpd-hidden fpd-tooltip" data-defaulttext="QR-Code" title="actions.qr_code"> <span class="fa-solid fa-qrcode"></span> </div> <div data-context="text2Img" class="fpd-hidden fpd-tooltip" data-defaulttext="Text to Images" title="modules.text_to_images"> <span class="fpd-icon-ai"></span> </div> </div> <div class="fpd-module-tabs-content"> <div data-context="upload" class="fpd-active"></div> <div data-context="facebook"></div> <div data-context="instagram"></div> <div data-context="pixabay"></div> <div data-context="qr-code"></div> <div data-context="text2Img"></div> </div> </div>';
+                        '<div data-moduleicon="cloud-upload" data-defaulttext="Add Image" data-title="modules.images"><i data-lucide="camera"></i> <div class="fpd-module-tabs"> <div data-context="upload" class="fpd-active fpd-tooltip" data-defaulttext="Uploads" title="modules.uploads"> <span class="fa-solid fa-upload"></span> </div>   <div data-context="pixabay" class="fpd-tooltip" aria-label="Pixabay"> <span class="fpd-icon-pixabay"></span> </div><div data-context="instagram" class="fpd-tooltip" aria-label="Instagram"> <span class="fpd-icon-instagram"></span> </div><div data-context="facebook" class="fpd-tooltip" aria-label="Facebook"> <span class="fpd-icon-facebook"></span> </div> <div data-context="qr-code" class="fpd-hidden fpd-tooltip" data-defaulttext="QR-Code" title="actions.qr_code"> <span class="fa-solid fa-qrcode"></span> </div> <div data-context="text2Img" class="fpd-hidden fpd-tooltip" data-defaulttext="Text to Images" title="modules.text_to_images"> <span class="fpd-icon-ai"></span> </div> </div> <div class="fpd-module-tabs-content"> <div data-context="upload" class="fpd-active"></div> <div data-context="facebook"></div> <div data-context="instagram"></div> <div data-context="pixabay"></div> <div data-context="qr-code"></div> <div data-context="text2Img"></div> </div> </div>';
                 }
             }
             customElements.define("fpd-module-images", gi);
@@ -20995,7 +21116,7 @@ rightArrow.onclick = () => {
                 }
                 connectedCallback() {
                     this.innerHTML =
-                        '<div class="fpd-upload-image !bg-white"> <span data-defaulttext="Drop images here">modules.upload_zone</span> <span class="fpd-btn !bg-[#f53744] w-[100%] text-center !text-sm !normal-case" data-defaulttext="Browse File">modules.browse_file</span> <span class="fpd-price"></span> </div> <input type="file" multiple="multiple" class="fpd-upload-input fpd-hidden" name="files[]" accept="image/jpeg,image/jpg,image/png,image/svg+xml,application/pdf"/> <div class="fpd-scroll-area"> <div class="fpd-grid fpd-grid-cover fpd-photo-grid"></div> </div>';
+                        '<div class="fpd-upload-image !bg-white"> <span data-defaulttext="Drop images here">modules.upload_zone</span> <span class="fpd-btn !bg-[#f53744] w-[100%] text-center !text-sm !normal-case" data-defaulttext="Browse File">modules.browse_file</span><span>Only Images(jpg, jpeg, png, gif) files are allowed.</span> <span class="fpd-price"></span> </div> <input type="file" multiple="multiple" class="fpd-upload-input fpd-hidden" name="files[]" accept="image/jpeg,image/jpg,image/png,image/svg+xml,application/pdf"/> <div class="fpd-scroll-area"> <div class="fpd-grid fpd-grid-cover fpd-photo-grid"></div> </div>';
                 }
             }
             function vi(t, e) {
@@ -21253,7 +21374,6 @@ rightArrow.onclick = () => {
                         this.fpdInstance.loadingCustomImage || this.fpdInstance._addGridItemToCanvas(t.currentTarget, {}, void 0, !1);
                     }),
                     G(i.querySelector(".fa-trash"), "click", (t) => {
-                        alert("999")
                         t.stopPropagation(), t.preventDefault();
                         const e = Array.from(this.gridElem.children).indexOf(i);
                         if (!i.classList.contains("fpd-loading")) {
@@ -21580,12 +21700,16 @@ rightArrow.onclick = () => {
                         Vt({
                             url: s,
                             onSuccess: (t) => {
+                                console.log("ttttttttttttttttttttttt",t)
                                 X(this.loader, ["fpd-hidden"]),
                                     t.hits.length > 0 &&
                                         t.hits.forEach((t) => {
                                             const e = $({ url: t.imageURL ? t.imageURL : t.webformatURL, thumbnailUrl: t.webformatURL, title: t.id ? t.id : t.id_hash, price: tt(this.fpdInstance, this.container) });
+
+                                            console.log("ttttttttttttttttttttttt1",e)
                                             G(e, ["click"], (t) => {
-                                                console.log("image click on load", t, "99", this.fpdInstance)
+                                                console.log(e, "image click on load", t, "99", this.fpdInstance, this.fpdInstance.currentViewInstance)
+                                                this.fpdInstance.addCanvasDesign(t.srcElement.dataset.source, t.srcElement.dataset.title);
                                                 debugger
                                                 this.fpdInstance.loadingCustomImage || this.fpdInstance._addGridItemToCanvas(t.currentTarget);
                                             }),
@@ -21703,7 +21827,6 @@ rightArrow.onclick = () => {
                             this.fpdInstance.loadingCustomImage || this.fpdInstance._addGridItemToCanvas(t.currentTarget);
                         }),
                         G(e.querySelector(".fa-trash"), "click", (t) => {
-                            alert("000")
                             t.stopPropagation(), t.preventDefault();
                             const i = Array.from(this.gridElem.children).indexOf(e);
                             if (!e.classList.contains("fpd-loading")) {
@@ -22146,7 +22269,6 @@ rightArrow.onclick = () => {
                         (e.innerHTML = '<span class="fa-solid fa-trash"></span>'),
                         o.append(e),
                         G(e, "click", (e) => {
-                            alert("PPP");
                             debugger;
                             e.stopPropagation(), this.fpdInstance.currentViewInstance.fabricCanvas.removeElement(t);
                         });
@@ -22583,7 +22705,6 @@ rightArrow.onclick = () => {
                     (a.innerText = this.fpdInstance.translator.getTranslation("modules", "names_numbers_remove", "Remove")),
                     r.append(a),
                     G(a, "click", (t) => {
-                        alert("hshhshsh")
                         s.remove(),
                             Ps(this, _s, Hs).call(this, this.container.querySelector(".fpd-row:first-child")),
                             (this.fpdInstance.currentViewInstance.names_numbers = this.getViewNamesNumbers()),
@@ -22689,7 +22810,6 @@ rightArrow.onclick = () => {
                         n = new hi(t, e, r);
                     }
                     else if (i.includes("designsnew")) {
-                        alert("chekc");
                         let r = null;
                         if (i.includes("designs_") && !Q(t.mainOptions.dynamicDesigns)) {
                             if (((r = i.split("_").pop()), !r || !t.mainOptions.dynamicDesigns[r])) return;
@@ -22976,7 +23096,8 @@ rightArrow.onclick = () => {
                                 console.log(this.contentElem, "000000000000000000---->if1",t, this.fpdInstance)
                             } */
                             let e = "";
-                            console.log("FpD instance", this.fpdInstance);
+                            console.log(this.fpdInstance.currentViewInstance, "FpD instance-----9w999", this.fpdInstance);
+                            
                             console.log("Content Elem", this.contentElem);
                             const n = new qs(this.fpdInstance, this.contentElem, t);
                             
@@ -23463,7 +23584,6 @@ rightArrow.onclick = () => {
                                     J(e, ["fpd-show"], !e.classList.contains("fpd-show"));
                                 }),
                                 G(r.querySelectorAll("span"), "click", (e) => {
-                                    alert("check11")
                                     const n = e.currentTarget.dataset.option;
                                     if ("edit-size" == n) X(l, ["fpd-show"]);
                                     else if ("duplicate" == n) Rr(this, Hr, Ur).call(this, i);
@@ -23475,7 +23595,6 @@ rightArrow.onclick = () => {
                                 this.fpdInstance.viewsNav.doPricing(i);
                         }
                         G(s.querySelector("picture"), "click", (e) => {
-                            alert("chehehehekdkkdk----kskks")
                             debugger
                             console.log("ffffffffffffff",t)
                             console.log("ffffffffffffff",e)
@@ -23852,69 +23971,91 @@ rightArrow.onclick = () => {
                                 t.deselectElement();
                         }),
                         G(this.navElem.querySelector(".fpd-ungroup"), "click", (e) => {
+                            e.currentTarget.classList.add("fpd-hidden");
                             const canvas = t.currentViewInstance.fabricCanvas;
-
-                            // Only proceed if the selected object is a group
+                            const initialWidth = canvas.getWidth();
+                            console.log("Ungrouping widht", canvas, canvas.getWidth());
+                            const initialHeight = canvas.getHeight();
+                            console.log("Ungrouping height", initialHeight);
+                            const initialZoom = canvas.getZoom();
                             const activeObj = canvas.getActiveObject();
                             if (!activeObj || activeObj.type !== "group") return;
 
-                            // Restore and remove group from canvas
+                            // Restore and remove the group from canvas
                             activeObj._restoreObjectsState();
                             canvas.remove(activeObj);
+
                             const savedPropsArray = JSON.parse(localStorage.getItem('propstext') || '[]');
 
-                            if (Array.isArray(savedPropsArray) && savedPropsArray.length > 0) {
-                            savedPropsArray.forEach((props, index) => {
-                                console.log(`Props ${index + 1}:`, props);
-                            });
-                            } else {
-                            console.warn("No saved props found.");
+                            if (!Array.isArray(savedPropsArray) || savedPropsArray.length === 0) {
+                                console.warn("No saved props found.");
+                                return;
                             }
 
-
+                            // Loop through each object in group
                             activeObj._objects.forEach((obj, index) => {
                                 const props = savedPropsArray[index];
-
-                                // Apply fallback if there's no props at that index
                                 if (!props) return;
 
-                                obj.set({
+                                // Remove old object from canvas
+                                canvas.remove(obj);
+
+                                const elementType = props.curved ? 'curvedText' : 'text';
+                                console.log(props,"Restoring text element of type:", elementType);
+                                const restoredText = t.currentViewInstance.fabricCanvas.addElement(
+                                elementType,
+                                obj.text,  // Title or identifier
+                                obj.text,  // Actual text content
+                                {
+                                    ...props,
+                                    left: obj.left,
+                                    top: obj.top,
+                                    originX: 'center',
+                                    originY: 'center',
+                                    textAlign: 'center',
+                                    fill: props.colors || '#252525',
+                                    fontFamily: props.font || obj.fontFamily,
+                                    fontSize: props.textSize || obj.fontSize,
                                     editable: true,
                                     selectable: true,
                                     hasControls: true,
                                     evented: true,
-                                    fontFamily: props.font || obj.fontFamily,
-                                    fontSize: props.textSize || obj.fontSize,
-                                    fill: props.colors || obj.fill,
-                                    // left: props.left || obj.left,
-                                    // top: props.top || obj.top,
+
+                                    // Curving & interaction properties
+                                    curvable: 1,
                                     curved: props.curved || false,
-                                    curveSpacing: props.curveSpacing || 5,
-                                    curveRadius: props.curveRadius || 180,
-                                    curveReverse: props.curveReverse || false
-                                });
+                                    curveSpacing: props.curveSpacing || 0,
+                                    curveRadius: props.curveRadius || 0,
+                                    curveReverse: props.curveReverse || false,
+                                    zoom: 0.3,
+                                    draggable: 1,
+                                    rotatable: 1,
+                                    resizable: 1,
+                                    removable: 1,
+                                    autoSelect: 1,
+                                    autoCenter: 0,
+                                    opacity: 1,
+                                    angle: 0,
+                                    locked: 0,
+                                    z: 1,
+                                     boundingBox: 'Base'
+                                }
+                                );
 
-                                // Update originParams for FPD (used for reset, edit, etc.)
-                                obj.originParams = {
-                                    ...obj.originParams,
-                                    ...props,
-                                    isCustom: true,
-                                    text: obj.text || "",
-                                };
+                                // Optional: set active object individually if needed
+                                // canvas.setActiveObject(restoredText);
+                            });
 
-                                // Add back to canvas
-                                canvas.add(obj);
-                                });
-
-                            // Clear selection and refresh
+                            
                             canvas.discardActiveObject();
                             canvas.requestRenderAll();
 
-                            // Also re-trigger FPD UI update if necessary
+                            // Trigger FPD's UI update if available
                             if (typeof t.deselectElement === 'function') {
-                                t.deselectElement(); // updates side panels
+                                t.deselectElement();
                             }
-                        });
+                            });
+
 
                         G(this.navElem.querySelector(".fpd-tool-duplicate"), "click", (e) => {
                             t.currentViewInstance.fabricCanvas.duplicateElement(t.currentElement);
