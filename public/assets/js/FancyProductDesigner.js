@@ -18824,7 +18824,20 @@
                 constructor(t, e) {
                     super(), (this.fpdInstance = t), (this.darkColor = "#000"), (this.lightColor = "#fff"), (this.container = document.createElement("fpd-module-qr-code")), e.append(this.container);
                     const i = this.container.querySelector(".fpd-qr-code-color-dark");
+console.log("hello there i am here")
+                                                    setTimeout(() => {
+                                                        let productIndex = window.localStorage.getItem("productIndex")
+                                                        let categoryIndex = window.localStorage.getItem("categoryIndex")
 
+                            console.log("product updated called",categoryIndex,productIndex,)
+                            if(productIndex !== null && categoryIndex !== null){
+                            console.log("product updated called....",categoryIndex,productIndex,)
+
+//  this.fpdInstance.selectProduct(Number(categoryIndex), Number(productIndex));
+ this.fpdInstance.selectProduct(1,0);
+
+                            }
+                        }, 5000);
                     (i.style.backgroundColor = "#000"),
                         new fe({
                             parent: i,
@@ -25045,8 +25058,8 @@ rightArrow.onclick = () => {
                         }),
                         console.log("setupProductsOldBefore", this.products)
                         if (typeof window !== 'undefined') {
-                      let loc =  window.localStorage.getitem('indexofProduct');
-                      console.log(loc,'locccccccc')
+                    //   let loc =  window.localStorage.getitem('indexofProduct');
+                    //   console.log(loc,'locccccccc')
                         }
                      
                         // this.mainOptions.loadFirstProductInStage && t.length > 0 ? this.selectProduct(0) : this.toggleSpinner(!1),

@@ -5,6 +5,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 declare var FancyProductDesigner: any;
 import $ from 'jquery';
 import { filter } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-home',
@@ -15,20 +16,89 @@ import { filter } from 'rxjs';
 })
 export class HomeComponent implements AfterViewInit {
   private savedContent: string = '';
-  constructor(@Inject(PLATFORM_ID) private platformId: any, @Inject(DOCUMENT) private document: Document, private router: Router, private route:ActivatedRoute) {}
+  constructor(@Inject(PLATFORM_ID) private platformId: any, @Inject(DOCUMENT) private document: Document, private router: Router, private route:ActivatedRoute,
+private http:HttpClient) {}
   @ViewChild('previewButton') previewButton!: ElementRef;
 
   designer: any;
   appOptions: any;
   activeImageTitle: string = '';
+  groupedProducts:any;
+  
+reversedManufacturerSlugMap :any= {
+  "apple": "Apple",
+  "sony": "Sony",
+  "beats-by-dr-dre": "Beats By Dr. Dre",
+  "pioneer": "Pioneer"
+};
 
+
+getCategoryAndProductIndex(
+  manufacturer: string,
+  productTitle: string
+): Promise<{ categoryIndex: number; productIndex: number }> {
+      console.log("productIndex,categoryIndex,",manufacturer,productTitle)
+
+  return new Promise((resolve, reject) => {
+    this.http.get<any[]>('/assets/data/products/product-categories.json').subscribe({
+      next: data => {
+        for (let categoryIndex = 0; categoryIndex < data.length; categoryIndex++) {
+          const categoryObj = data[categoryIndex];
+          const productGroups = categoryObj.products; // 2D array
+          let flatProductIndex = 0;
+
+          for (let group of productGroups) {
+            for (let product of group) {
+              const isMatch =
+                product.manufacturer === manufacturer &&
+                this.slugify(product.title) === productTitle;
+
+              if (isMatch) {
+                console.log('✅ Found:', {
+                  categoryIndex,
+                  productIndex: flatProductIndex,
+                  productId: product.product_id
+                });
+
+                return resolve({
+                  categoryIndex,
+                  productIndex: flatProductIndex
+                });
+              }
+
+              flatProductIndex++;
+            }
+          }
+        }
+
+        // Not found
+        resolve({ categoryIndex: -1, productIndex: -1 });
+      },
+      error: err => reject(err)
+    });
+  });
+}
 
 
   ngAfterViewInit() {
 
     
     if (isPlatformBrowser(this.platformId)) {
-      setTimeout(() => {
+      setTimeout(async() => {
+
+          const manufacturerSlug = this.route.snapshot.paramMap.get('manufacturer') || '';
+  const titleSlug = this.route.snapshot.paramMap.get('slug') || '';
+// const manufacturerSlug = params['manufacturer'];
+//       const titleSlug = params['slug'];
+      // console.log("productIndex,categoryIndex,",this.reversedManufacturerSlugMap[manufacturerSlug], titleSlug)
+
+      // let {categoryIndex, productIndex} :any=  await this.getCategoryAndProductIndex(this.reversedManufacturerSlugMap[manufacturerSlug], titleSlug);
+      // localStorage.setItem("productIndex",productIndex)
+      // localStorage.setItem("categoryIndex",categoryIndex)
+
+      // console.log(productIndex,categoryIndex,"productIndex,categoryIndex,",titleSlug,manufacturerSlug)
+
+  
 
         const fpdTarget = document.getElementById('fpd-target');
         if (!fpdTarget) return;
@@ -238,34 +308,44 @@ export class HomeComponent implements AfterViewInit {
           // });
 
            // 🔧 Get slugified brand/product name from route
-  const brandSlug = this.route.snapshot.paramMap.get('brandName')?.toLowerCase() || '';
-  const productSlug = this.route.snapshot.paramMap.get('productName')?.toLowerCase() || '';
+  // const brandSlug = this.route.snapshot.paramMap.get('manufacturer')?.toLowerCase() || '';
+  // const productSlug = this.route.snapshot.paramMap.get('slug')?.toLowerCase() || '';
+  // console.log(brandSlug,productSlug , "1234productSlug.....",this.designer.container)
 
   // 🔧 Wait until FPD products are loaded
-  const productLoadInterval = setInterval(() => {
-    const allProducts = $('.fpd-module-products .fpd-item');
+  // const productLoadInterval = setInterval(() => {
+  // $(this.designer.container).on('fpdProductCreate', () => {
+  // setTimeout(() => {
+  //       const allProducts = $('.fpd-module-products .fpd-item');
+  //   console.log("1234yes it si scaalled")
 
-    if (allProducts.length > 0) {
-      clearInterval(productLoadInterval);
+  //   // if (allProducts.length > 0) {
+  //     // clearInterval(productLoadInterval);
 
-      const matchingProduct = allProducts.filter((i, el) => {
-        const title = $(el).data('title')?.toString().toLowerCase() || '';
-        const manufacturer = $(el).data('manufacturer')?.toString().toLowerCase() || '';
+  //     const matchingProduct = allProducts.filter((i, el) => {
+  //       const title = $(el).data('title')?.toString().toLowerCase() || '';
+  //       const manufacturer = $(el).data('manufacturer')?.toString().toLowerCase() || '';
 
-        const titleSlug = this.slugify(title);
-        const manufacturerSlug = this.slugify(manufacturer);
+  //       const titleSlug = this.slugify(title);
+  //       const manufacturerSlug = this.slugify(manufacturer);
 
-        return titleSlug === productSlug && manufacturerSlug === brandSlug;
-      }).first();
+  //       return titleSlug === productSlug && manufacturerSlug === brandSlug;
+  //     }).first();
+  //     console.log(matchingProduct , "1234matchingProductmatchingProduct")
 
-      if (matchingProduct.length > 0) {
-        matchingProduct.trigger('click');
-      } else {
-        console.warn('Matching product not found in FPD. Loading first product.');
-        allProducts.first().trigger('click');
-      }
-    }
-  }, 200);
+  //     if (matchingProduct.length > 0) {
+  //       matchingProduct.trigger('click');
+  //     } else {
+  //       console.warn('Matching product not found in FPD. Loading first product.');
+  //       allProducts.first().trigger('click');
+  //     }
+  //   // }
+  //   console.log(allProducts , "1234matchingProductmatchingProduct")
+  // // })
+  // // }, 200);
+  // }, 5000);
+
+
         
            // Inside ngAfterViewInit or wherever you initialize FPD
           //  const firstItem = $('.fpd-module-products .fpd-item').first();
@@ -273,6 +353,9 @@ export class HomeComponent implements AfterViewInit {
           //  this.activeImageTitle = 'Apple Macbook Pro 16 2019 512GB SSD Storage';
          
            $(document).on('click', 'fpd-module-products .fpd-item', (event) => {
+            console.log(event , "event is here")
+                  localStorage.setItem("productIndex","")
+      localStorage.setItem("categoryIndex","")
             const clickedTitle = $(event.currentTarget).data('title');
             console.log(clickedTitle,'cllllllll', $(event.currentTarget))
             const manufacturer = $(event.currentTarget).data('manufacturer');
