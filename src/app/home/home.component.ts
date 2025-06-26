@@ -219,6 +219,8 @@ export class HomeComponent implements AfterViewInit {
 
 
 
+
+
         
           
           // ✅ Hook up buttons AFTER FPD is ready
@@ -234,23 +236,64 @@ export class HomeComponent implements AfterViewInit {
           //     console.log('Saved Design Data:', data);
           //   });
           // });
+
+           // 🔧 Get slugified brand/product name from route
+  const brandSlug = this.route.snapshot.paramMap.get('brandName')?.toLowerCase() || '';
+  const productSlug = this.route.snapshot.paramMap.get('productName')?.toLowerCase() || '';
+
+  // 🔧 Wait until FPD products are loaded
+  const productLoadInterval = setInterval(() => {
+    const allProducts = $('.fpd-module-products .fpd-item');
+
+    if (allProducts.length > 0) {
+      clearInterval(productLoadInterval);
+
+      const matchingProduct = allProducts.filter((i, el) => {
+        const title = $(el).data('title')?.toString().toLowerCase() || '';
+        const manufacturer = $(el).data('manufacturer')?.toString().toLowerCase() || '';
+
+        const titleSlug = this.slugify(title);
+        const manufacturerSlug = this.slugify(manufacturer);
+
+        return titleSlug === productSlug && manufacturerSlug === brandSlug;
+      }).first();
+
+      if (matchingProduct.length > 0) {
+        matchingProduct.trigger('click');
+      } else {
+        console.warn('Matching product not found in FPD. Loading first product.');
+        allProducts.first().trigger('click');
+      }
+    }
+  }, 200);
         
            // Inside ngAfterViewInit or wherever you initialize FPD
-           const firstItem = $('.fpd-module-products .fpd-item').first();
-           const title = firstItem.data('title');
-           this.activeImageTitle = 'Apple Macbook Pro 16 2019 512GB SSD Storage';
+          //  const firstItem = $('.fpd-module-products .fpd-item').first();
+          //  const title = firstItem.data('title');
+          //  this.activeImageTitle = 'Apple Macbook Pro 16 2019 512GB SSD Storage';
          
            $(document).on('click', 'fpd-module-products .fpd-item', (event) => {
             const clickedTitle = $(event.currentTarget).data('title');
+            console.log(clickedTitle,'cllllllll', $(event.currentTarget))
             const manufacturer = $(event.currentTarget).data('manufacturer');
+            // let updatedTarget = JSON.parse(JSON.stringify(event.target));
+                        console.log(event,);
+                  let ob: any;
 
-            console.log('Clicked:', clickedTitle, 'Manufacturer:', manufacturer);
+                  try {
+                    ob = (Object.entries(event.target)[1][1] as any)['manufacturer'];
+                  } catch (error) {
+                    ob = 'apple'; // fallback
+                  }            
+                  // console.log(event, Object.entries(event.target), 'Clicked:', ob, clickedTitle, 'Manufacturer:', manufacturer);
 
             const slug = this.slugify(clickedTitle);
-            const manufacturerSlug = this.slugify(manufacturer);
+            const manufacturerSlug = this.slugify(ob);
+            console.log(manufacturer,'mamamam')
 
-            this.router.navigate([manufacturerSlug, slug]);
+            this.router.navigate([manufacturerSlug ||'apple', slug]);
           });
+
 
            
       }, 300);

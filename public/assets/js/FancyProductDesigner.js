@@ -2,6 +2,11 @@
 (() => {
     var t = {
             106: () => {
+
+                        //          setTimeout(() => {
+                        //     console.log("product updated called")
+                        //     this.fpdInstance.selectProduct(1, 1);
+                        // }, 15000);
                 var t;
                 (fabric.Canvas.prototype.historyProcessing = !0),
                     (fabric.Canvas.prototype.initialize =
@@ -15621,6 +15626,10 @@
                         ut(this, pt),
                         (this.fpdInstance = t),
                         G(t, ["elementModify", "productCreate", "elementAdd", "elementRemove", "viewCreate", "viewRemove", "elementFillChange", "textLinkApply"], this.doPricingRules.bind(this));
+                        // setTimeout(() => {
+                        //     console.log("product updated called")
+                        //     this.fpdInstance.selectProduct(1, 1);
+                        // }, 15000);
                 }
                 doPricingRules(t) {
                     const e = this.fpdInstance.mainOptions.dynamicViewsOptions ? this.fpdInstance.mainOptions.dynamicViewsOptions.unit : "mm";
@@ -18815,6 +18824,7 @@
                 constructor(t, e) {
                     super(), (this.fpdInstance = t), (this.darkColor = "#000"), (this.lightColor = "#fff"), (this.container = document.createElement("fpd-module-qr-code")), e.append(this.container);
                     const i = this.container.querySelector(".fpd-qr-code-color-dark");
+
                     (i.style.backgroundColor = "#000"),
                         new fe({
                             parent: i,
@@ -19675,7 +19685,7 @@
                 console.log("ttttttttttttttttttttttttt",t)
                 localStorage.setItem("definet",t)
                 let n = e[0].productThumbnail ? e[0].productThumbnail : e[0].thumbnail,
-                    s = e[0].productTitle ? e[0].productTitle : e[0].title,
+                    s =  e[0].title ?  e[0].title : e[0].productTitle ,
                     th = e[0].manufacturer ? e[0].manufacturer : "Styleflip",
                     sct = e[0].subcategorytype ? e[0].subcategorytype : "General";
 
@@ -19764,6 +19774,7 @@
                 // ========== Main Click Logic ==========
                 r.addEventListener("click", (e) => {
 
+
                     console.log("check for fpdInstance", this.fpdInstance);
                     console.log("check for Updtes", this.fpdInstance.selectProduct)
                     const parentDiv = e.target.closest('div').parentElement;
@@ -19807,10 +19818,12 @@
 
                         G(eBtn, ["click"], () => {
                             console.log("Anoop Data 5", eBtn, i);
+                            console.log(i,this.currentCategoryIndex,'cucxuusid')
                             this.fpdInstance.selectProduct(i, this.currentCategoryIndex);
                             n.remove();
                         });
 
+                    
                     } else {
                         console.log("99999999",t)
                         const modal = t(
@@ -25030,8 +25043,13 @@ rightArrow.onclick = () => {
                                   })
                                 : this.addProduct(t);
                         }),
-                        console.log("setupProductsOldBefore", this.products),
-                        this.mainOptions.loadFirstProductInStage && t.length > 0 ? this.selectProduct(0) : this.toggleSpinner(!1),
+                        console.log("setupProductsOldBefore", this.products)
+                        if (typeof window !== 'undefined') {
+                      let loc =  window.localStorage.getitem('indexofProduct');
+                      console.log(loc,'locccccccc')
+                        }
+                     
+                        // this.mainOptions.loadFirstProductInStage && t.length > 0 ? this.selectProduct(0) : this.toggleSpinner(!1),
                         q(this, "productsSet", {});
                         console.log("setupProductsOld", this.products);
                 }
@@ -25072,6 +25090,7 @@ rightArrow.onclick = () => {
                 }
 
                 selectProduct(t, e) {
+
                     
                     console.log("selectProduct ye wala", t, e, this.container);
                     const fpdInstance = this.container.instance;
@@ -25121,7 +25140,7 @@ rightArrow.onclick = () => {
                                     console.log("e",e,valueofTitle)
                                     if(container){
                                         let n = e.thumbnail,
-                                        s = e.productTitle ? e.productTitle : e.title,
+                                        s = e.title ?  e.title : e.productTitle,
                                         pr = e.price ? e.price : 0,
                                         
                                         th = e.manufacturer ? e.manufacturer : "Styleflip",
@@ -25170,7 +25189,7 @@ rightArrow.onclick = () => {
                                                 eBtn.innerText = fpdInstance.translator.getTranslation("modules", "products_confirm_button");
 
                                                 G(eBtn, ["click"], () => {
-                                                    console.log("Anoop Data 5", eBtn, i);
+                                                    console.log("Anoop Data 5....", fpdInstance, i,this.currentCategoryIndex);
                                                     fpdInstance.selectProduct(i, this.currentCategoryIndex);
                                                     n.remove();
                                                 });
@@ -25345,6 +25364,8 @@ rightArrow.onclick = () => {
                     }
 
                 }
+
+
                 addView(t) {
                     console.log("addView", t);
                     let e = {};
