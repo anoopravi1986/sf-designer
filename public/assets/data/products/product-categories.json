@@ -40,6 +40,7 @@
                     "elements": [
                         {
                             "title": "Base",
+                            "manufacturer": "Apple",
                             "source": "../../assets/images/custom/template1/laptop/APPLE_MACBOOK_PRO13_UNIBODY_LID_WITHCORNERS_bottom.png",
                             "type": "image",
                             "parameters": {
@@ -85,6 +86,7 @@
                         },
                         {
                             "title": "Overlay",
+                            "manufacturer": "Apple",
                             "source": "../../assets/images/custom/template1/laptop/APPLE_MACBOOK_PRO13_UNIBODY_LID_WITHCORNERS_preview.png",
                             "type": "image",
                             "parameters": {
@@ -132,6 +134,7 @@
                 },
                 {
                     "title": "Lids 1",
+                    "manufacturer": "Apple",
                     "thumbnail": "../../assets/images/laptop/APPLE_MACBOOK_16_INCH_FULLWRAP_NO_LOGO_PREVIEW.png",
                     "mask": {},
                     "price": 100,
@@ -160,6 +163,7 @@
                     "elements": [
                         {
                             "title": "Base",
+                            "manufacturer": "Apple",
                             "source": "../../assets/images/laptop/APPLE_MACBOOK_16_INCH_FULLWRAP_NO_LOGO_grp1_OUTLINE.png",
                             "type": "image",
                             "parameters": {
@@ -204,6 +208,7 @@
                         },
                         {
                             "title": "Overlay",
+                            "manufacturer": "Apple",
                             "source": "../../assets/images/laptop/APPLE_MACBOOK_16_INCH_FULLWRAP_NO_LOGO_PREVIEW.png",
                             "type": "image",
                             "parameters": {
@@ -250,6 +255,7 @@
                 },
                 {
                     "title": "Logo without Cutout 3",
+                     "manufacturer": "Apple",
                     "thumbnail": "../../assets/images/laptop/APPLE_MACBOOK_AIR_13_M3_2025_LID_NOLOGOCUT_PREVIEW.png",
                     "mask": {},
                     "price": 15,
@@ -278,6 +284,7 @@
                     "elements": [
                         {
                             "title": "Base",
+                            "manufacturer": "Apple",
                             "source": "../../assets/images/laptop/APPLE_MACBOOK_AIR_13_M3_2025_LID_NOLOGOCUT_BACKGROUND.png",
                             "type": "image",
                             "parameters": {
@@ -322,6 +329,7 @@
                         },
                         {
                             "title": "Overlay",
+                            "manufacturer": "Apple",
                             "source": "../../assets/images/laptop/APPLE_MACBOOK_AIR_13_M3_2025_LID_NOLOGOCUT_PREVIEW.png",
                             "type": "image",
                             "parameters": {
@@ -403,6 +411,7 @@
                     "elements": [
                         {
                             "title": "Base",
+                            "manufacturer": "Apple",
                             "source": "../../assets/images/laptop/APPLE_MACBOOK_AIR_13_M3_2025_LID_NOLOGOCUT_BACKGROUND.png",
                             "type": "image",
                             "parameters": {
@@ -447,6 +456,7 @@
                         },
                         {
                             "title": "Overlay",
+                            "manufacturer": "Apple",
                             "source": "../../assets/images/laptop/APPLE_MACBOOK_AIR_13_M3_2025_LID_NOLOGOCUT_PREVIEW.png",
                             "type": "image",
                             "parameters": {
@@ -535,6 +545,7 @@
                     "elements": [
                         {
                             "title": "Base",
+                            "manufacturer": "Sony",
                             "source": "../../assets/images/custom/template1/headphone/SONY_MDR_V700_BOTTOM.png",
                             "type": "image",
                             "parameters": {
@@ -580,6 +591,7 @@
                         },
                         {
                             "title": "Overlay",
+                            "manufacturer": "Sony",
                             "source": "../../assets/images/custom/template1/headphone/SONY_MDR_V700_PREVIEW.png",
                             "type": "image",
                             "parameters": {
@@ -627,6 +639,7 @@
                 },
                 {
                     "title": "Back First",
+                    "manufacturer": "Sony",
                     "thumbnail": "../../assets/images/custom/template1/headphone/BEATS_BY_DRE_PRO_PREVIEW.png",
                     "mask": {},
                     "price": 10,
@@ -655,6 +668,7 @@
                     "elements": [
                         {
                             "title": "Base",
+                            "manufacturer": "Beats By Dr. Dre",
                             "source": "../../assets/images/custom/template1/headphone/BEATS_BY_DRE_PRO_SKIN_DECAL_MASK.png",
                             "type": "image",
                             "parameters": {
@@ -699,6 +713,7 @@
                         },
                         {
                             "title": "Overlay",
+                            "manufacturer": "Beats By Dr. Dre",
                             "source": "../../assets/images/custom/template1/headphone/BEATS_BY_DRE_PRO_PREVIEW.png",
                             "type": "image",
                             "parameters": {
@@ -780,6 +795,8 @@
                     "elements": [
                         {
                             "title": "Base",
+                    "manufacturer": "Base",
+
                             "source": "../../assets/images/custom/template1/guitar/STRATOCASTER_RIGHT_HANDED_BACKGROUND_256.png",
                             "type": "image",
                             "parameters": {
@@ -825,6 +842,7 @@
                         },
                         {
                             "title": "Overlay",
+                            "manufacturer": "Overlay",
                             "source": "../../assets/images/custom/template1/guitar/STRATOCASTER_RIGHT_HANDED_TOP_LAYER_256.png",
                             "type": "image",
                             "parameters": {
@@ -913,6 +931,8 @@
                     "elements": [
                         {
                             "title": "Base",
+                            "manufacturer": "Base",
+
                             "source": "../../assets/images/custom/template1/dj/PIONEER_CDJ_800_MK2_BACKGROUND.png",
                             "type": "image",
                             "parameters": {
@@ -962,6 +982,8 @@
                         
                         {
                             "title": "Overlay",
+                            "manufacturer": "Overlay",
+
                             "source": "../../assets/images/custom/template1/dj/PIONEER_CDJ_800_MK2_TOP_LAYER.png",
                             "type": "image",
                             "parameters": {
@@ -1012,6 +1034,8 @@
                         
                         {
                             "title": "Group 1 Outline",
+                            "manufacturer": "Pioneer",
+
                             "source": "../../assets/images/custom/template1/dj/PIONEER_CDJ_800_MK2_GROUP_1_OUTLINE.png",
                             "type": "image",
                             "parameters": {
@@ -1027,6 +1051,7 @@
                         },
                         {
                             "title": "Group 1 Text",
+                            "manufacturer": "Pioneer",
                             "source": "../../assets/images/custom/template1/dj/PIONEER_CDJ_800_MK2_GROUP_1_TEXT.png",
                             "type": "image",
                             "parameters": {
@@ -1048,7 +1073,7 @@
                     "productThumbnail": "../../assets/images/custom/template1/drum/22_INCH_PREVIEW.png",
                     "productTitle": "Drum",
                     "product_id": 21,
-                    "title": "Front",
+                    "title": "Front2",
                     "manufacturer": "Pioneer",
                     "subcategorytype": "Turntable Skins",
                     "tags": ["Pioneer", "Drum", "Skin", "Decal"],
@@ -1079,6 +1104,8 @@
                     "elements": [
                         {
                             "title": "Base",
+                            "manufacturer": "Drum Base",
+
                             "source": "../../assets/images/custom/template1/drum/22_INCH_BOTTOM.png",
                             "type": "image",
                             "parameters": {
@@ -1128,6 +1155,7 @@
                         
                         {
                             "title": "Overlay",
+                            "manufacturer": "Drum Overlay",
                             "source": "../../assets/images/custom/template1/drum/22_INCH_PREVIEW.png",
                             "type": "image",
                             "parameters": {

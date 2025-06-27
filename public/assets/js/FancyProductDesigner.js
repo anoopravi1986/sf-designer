@@ -2,6 +2,11 @@
 (() => {
     var t = {
             106: () => {
+
+                        //          setTimeout(() => {
+                        //     console.log("product updated called")
+                        //     this.fpdInstance.selectProduct(1, 1);
+                        // }, 15000);
                 var t;
                 (fabric.Canvas.prototype.historyProcessing = !0),
                     (fabric.Canvas.prototype.initialize =
@@ -1321,7 +1326,7 @@
                                     (s.onerror = function () {
                                         E.log("Error loading " + s.src), e && e.call(i, null, !0), (s = s.onload = s.onerror = null);
                                     }),
-                                    0 !== t.indexOf("data") && null != n && (s.crossOrigin = n),
+                                    0 !== t?.indexOf("data") && null != n && (s.crossOrigin = n),
                                     "data:image/svg" === t.substring(0, 14) && ((s.onload = null), E.util.loadImageInDom(s, r)),
                                     (s.src = t);
                             } else e && e.call(i, t);
@@ -15625,6 +15630,10 @@
                         ut(this, pt),
                         (this.fpdInstance = t),
                         G(t, ["elementModify", "productCreate", "elementAdd", "elementRemove", "viewCreate", "viewRemove", "elementFillChange", "textLinkApply"], this.doPricingRules.bind(this));
+                        // setTimeout(() => {
+                        //     console.log("product updated called")
+                        //     this.fpdInstance.selectProduct(1, 1);
+                        // }, 15000);
                 }
                 doPricingRules(t) {
                     const e = this.fpdInstance.mainOptions.dynamicViewsOptions ? this.fpdInstance.mainOptions.dynamicViewsOptions.unit : "mm";
@@ -18819,6 +18828,81 @@
                 constructor(t, e) {
                     super(), (this.fpdInstance = t), (this.darkColor = "#000"), (this.lightColor = "#fff"), (this.container = document.createElement("fpd-module-qr-code")), e.append(this.container);
                     const i = this.container.querySelector(".fpd-qr-code-color-dark");
+              setTimeout(() => {
+                  window.localStorage.setItem("productLoader","")
+
+                                                        let productIndex = window.localStorage.getItem("productIndex")
+                                                        let categoryIndex = window.localStorage.getItem("categoryIndex")
+                                                        let childIndex = window.localStorage.getItem("childIndex")
+
+
+                            if(productIndex !== null && categoryIndex !== null){
+
+//  this.fpdInstance.selectProduct(, );
+ // Get the FPD dropdown items
+  const categoryItems = document.querySelectorAll(".fpd-product-categories .fpd-item");
+  const dropdownInput = document.querySelector(".fpd-product-categories .fpd-dropdown-current");
+
+  if (categoryItems && dropdownInput && categoryItems[categoryIndex]) {
+    const selectedItem = categoryItems[categoryIndex];
+    const categoryText = selectedItem.textContent;
+        // 👉 Temporarily hide the dropdown UI
+    const dropdownWrapper = document.querySelector(".fpd-product-categories");
+    // dropdownWrapper?.setAttribute("hidden", "true");
+     dropdownWrapper.style.display = "none";
+
+    // Update visible input value
+    dropdownInput.value = categoryText;
+
+    // Dispatch events
+    dropdownInput.dispatchEvent(new Event("input", { bubbles: true }));
+    dropdownInput.dispatchEvent(new Event("change", { bubbles: true }));
+
+    // Simulate actual category selection logic
+    selectedItem.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+
+
+
+    setTimeout(() => {
+  const dropdownArrow = document.querySelector(".fpd-product-categories .fpd-dropdown-arrow");
+  localStorage.setItem("productLoader" , "")
+  dropdownArrow?.click(); // FPD uses this to toggle close
+  setTimeout(() => {
+  localStorage.setItem("productLoader" , "done");
+  }, 1000);
+//    dropdownWrapper?.removeAttribute("hidden");
+   dropdownWrapper.style.display = "block";
+    
+     const sidebarItems = document.querySelectorAll('.ProductModule');
+sidebarItems[0].children[Number(productIndex)]?.click(); 
+    
+    const confirmButton = document.querySelector('.fpd-confirm');
+confirmButton?.click(); 
+// setTimeout(() => {
+    
+    if(Number(childIndex)){
+    const targetItem = document.querySelector(
+`.skins-det[data-index="${childIndex}"]`
+);
+
+if (targetItem) {
+  targetItem.click();
+  console.log("✅ Clicked on:", targetItem);
+} else {
+  console.warn("❌ Item not found.");
+}
+    }
+      window.localStorage.setItem("productLoader","done")
+
+}, 100);
+  } else {
+    console.warn("❌ Could not set category - item or dropdown missing.");
+  }
+
+                            }
+
+                        }, 100);
+                        
                     (i.style.backgroundColor = "#000"),
                         new fe({
                             parent: i,
@@ -19679,7 +19763,7 @@
                 console.log("ttttttttttttttttttttttttt",t)
                 localStorage.setItem("definet",t)
                 let n = e[0].productThumbnail ? e[0].productThumbnail : e[0].thumbnail,
-                    s = e[0].productTitle ? e[0].productTitle : e[0].title,
+                    s =  e[0].title ?  e[0].title : e[0].productTitle ,
                     th = e[0].manufacturer ? e[0].manufacturer : "Styleflip",
                     sct = e[0].subcategorytype ? e[0].subcategorytype : "General";
 
@@ -19768,6 +19852,7 @@
                 // ========== Main Click Logic ==========
                 r.addEventListener("click", (e) => {
 
+
                     console.log("check for fpdInstance", this.fpdInstance);
                     console.log("check for Updtes", this.fpdInstance.selectProduct)
                     const parentDiv = e.target.closest('div').parentElement;
@@ -19811,10 +19896,12 @@
 
                         G(eBtn, ["click"], () => {
                             console.log("Anoop Data 5", eBtn, i);
+                            console.log(i,this.currentCategoryIndex,'cucxuusid')
                             this.fpdInstance.selectProduct(i, this.currentCategoryIndex);
                             n.remove();
                         });
 
+                    
                     } else {
                         console.log("99999999",t)
                         const modal = t(
@@ -21710,7 +21797,6 @@ rightArrow.onclick = () => {
                                             G(e, ["click"], (t) => {
                                                 console.log(e, "image click on load", t, "99", this.fpdInstance, this.fpdInstance.currentViewInstance)
                                                 this.fpdInstance.addCanvasDesign(t.srcElement.dataset.source, t.srcElement.dataset.title);
-                                                debugger
                                                 this.fpdInstance.loadingCustomImage || this.fpdInstance._addGridItemToCanvas(t.currentTarget);
                                             }),
                                             console.log("image click on load --", e)
@@ -22269,7 +22355,7 @@ rightArrow.onclick = () => {
                         (e.innerHTML = '<span class="fa-solid fa-trash"></span>'),
                         o.append(e),
                         G(e, "click", (e) => {
-                            debugger;
+                            alert("PPP");
                             e.stopPropagation(), this.fpdInstance.currentViewInstance.fabricCanvas.removeElement(t);
                         });
                 }
@@ -22797,7 +22883,6 @@ rightArrow.onclick = () => {
                     else if ("productsnew" === i) n = new Wes(t, e);
                     else if ("text" === i) n = new Ge(t, e);
                     else if (i.includes("designs")) {
-                        debugger
                         let r = null;
                         if (i.includes("designs_") && !Q(t.mainOptions.dynamicDesigns)) {
                             if (((r = i.split("_").pop()), !r || !t.mainOptions.dynamicDesigns[r])) return;
@@ -23595,7 +23680,6 @@ rightArrow.onclick = () => {
                                 this.fpdInstance.viewsNav.doPricing(i);
                         }
                         G(s.querySelector("picture"), "click", (e) => {
-                            debugger
                             console.log("ffffffffffffff",t)
                             console.log("ffffffffffffff",e)
                             console.log("ffffffffffffffsssss",s)
@@ -25175,8 +25259,13 @@ rightArrow.onclick = () => {
                                   })
                                 : this.addProduct(t);
                         }),
-                        console.log("setupProductsOldBefore", this.products),
-                        this.mainOptions.loadFirstProductInStage && t.length > 0 ? this.selectProduct(0) : this.toggleSpinner(!1),
+                        console.log("setupProductsOldBefore", this.products)
+                        if (typeof window !== 'undefined') {
+                    //   let loc =  window.localStorage.getitem('indexofProduct');
+                    //   console.log(loc,'locccccccc')
+                        }
+                     
+                        // this.mainOptions.loadFirstProductInStage && t.length > 0 ? this.selectProduct(0) : this.toggleSpinner(!1),
                         q(this, "productsSet", {});
                         console.log("setupProductsOld", this.products);
                 }
@@ -25217,6 +25306,7 @@ rightArrow.onclick = () => {
                 }
 
                 selectProduct(t, e) {
+
                     
                     console.log("selectProduct ye wala", t, e, this.container);
                     const fpdInstance = this.container.instance;
@@ -25266,7 +25356,7 @@ rightArrow.onclick = () => {
                                     console.log("e",e,valueofTitle)
                                     if(container){
                                         let n = e.thumbnail,
-                                        s = e.productTitle ? e.productTitle : e.title,
+                                        s = e.title ?  e.title : e.productTitle,
                                         pr = e.price ? e.price : 0,
                                         
                                         th = e.manufacturer ? e.manufacturer : "Styleflip",
@@ -25315,14 +25405,13 @@ rightArrow.onclick = () => {
                                                 eBtn.innerText = fpdInstance.translator.getTranslation("modules", "products_confirm_button");
 
                                                 G(eBtn, ["click"], () => {
-                                                    console.log("Anoop Data 5", eBtn, i);
+                                                    console.log("Anoop Data 5....", fpdInstance, i,this.currentCategoryIndex);
                                                     fpdInstance.selectProduct(i, this.currentCategoryIndex);
                                                     n.remove();
                                                 });
 
                                             } else {
                                                 console.log("coming to else", this.currentCategoryIndex, r.dataset.index)
-                                                debugger
                                                 localStorage.setItem("rdatasetindex",r.dataset.index)
                                                 fpdInstance.selectProduct(Number(r.dataset.index), this.currentCategoryIndex);
                                                 // const modal = t(
@@ -25377,7 +25466,7 @@ rightArrow.onclick = () => {
                     else{
                         To(this, Io, To(this, Oo, 0)),
                             (this.currentCategoryIndex = void 0 === e ? this.currentCategoryIndex : e),
-                            (i = this.productsnew && this.productsnew.length && this.productsnew[0].category ? this.productsnew[this.currentCategoryIndex].products : this.productsnew),
+                            (i = this.productsnew && this.productsnew.length && this.productsnew[0].category ? this.productsnew[this.currentCategoryIndex]?.products : this.productsnew),
                             (this.currentProductIndex = t),
                             t < 0 ? (this.currentProductIndex = 0) : t > i.length - 1 && (this.currentProductIndex = i.length - 1);
                         const n = i[this.currentProductIndex];
@@ -25491,6 +25580,8 @@ rightArrow.onclick = () => {
                     }
 
                 }
+
+
                 addView(t) {
                     console.log("addView", t);
                     let e = {};
@@ -25832,7 +25923,6 @@ rightArrow.onclick = () => {
                     console.log("addCanvasDesign", t, e);
                     console.log("e.parameters",e.parameters)
                     let i = arguments.length > 2 && void 0 !== arguments[2] ? arguments[2] : {};
-                    debugger
                     this.currentViewInstance &&
                         (this.toggleSpinner(!0, this.translator.getTranslation("misc", "loading_image")),
                         // (i = z(this.currentViewInstance.options.customImageParameters, i)),
