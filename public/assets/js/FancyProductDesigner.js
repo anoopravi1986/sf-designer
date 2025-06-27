@@ -19480,7 +19480,7 @@ if (targetItem) {
                                                     console.log("elementMyData",elementMyData)
                                                     if (elementMyData) {
                                                         if (elementMyData.style.display === "none") {
-                                                            elementMyData.style.display = "grid"; // or "block" depending on your layout
+                                                            elementMyData.style.display = "grid"; // or 
                                                         }
                                                     }
 
@@ -19491,12 +19491,12 @@ if (targetItem) {
                                                     backbuttonStoP.addEventListener("click", (t) => {
                                                             valueoffpdmoduleproducts.classList.removeremove("valueoffpdmoduleproducts-active")
                                                            backbuttonStoP.style.display = "none";
-                                                            elementMyDataMy.style.display = "none"; // or "block" depending on your layout
+                                                            elementMyDataMy.style.display = "none"; // or 
                                                             elementMyData.style.display = "grid";
                                                             elementMyDataMy.innerHTML = '';
                                                     });
                                                     if (elementMyDataMy) {
-                                                        elementMyDataMy.style.display = "none"; // or "block" depending on your layout
+                                                        elementMyDataMy.style.display = "none"; // or 
                                                         backbuttonStoP.style.display = "none"
                                                         valueoffpdmoduleproducts.classList.remove("valueoffpdmoduleproducts-active")
                                                         elementMyDataMy.innerHTML = '';
@@ -20142,6 +20142,7 @@ if (targetItem) {
                             targetContainermain.appendChild(resetBtn);
 
                             searchInput.addEventListener('input', () => {
+                                console.log("enter happen");
                                 const query = searchInput.value.toLowerCase();
                                 document.querySelectorAll('.fpd-itemimg').forEach(el => {
                                     const title = el.getAttribute('data-title')?.toLowerCase() || '';
@@ -20470,6 +20471,7 @@ if (targetItem) {
                         (this.headElem = this.container.querySelector(".fpd-head")),
                         (this.gridElem = this.container.querySelector(".fpd-grid")),
                         this.headElem.querySelector(".fpd-input-search input").addEventListener("keyup", (t) => {
+                            console.log("ennnnnnnnnnnn");
                             const input = t.currentTarget;
                             const items = this.gridElem.querySelectorAll(".fpd-item");
                             const categories = this.gridElem.querySelectorAll(".fpd-category");
@@ -20592,9 +20594,25 @@ flexWrapper.style.transform = `translateX(${currentOffset}px)`;
 tags.forEach(tag => {
   const tagDiv = document.createElement("div");
   tagDiv.className =
-    "capitalize border border-[#35475a33] border-solid pt-2 pb-2 pr-3 pl-3 text-sm text-[#0d1216] rounded-[6px] cursor-pointer hover:bg-[#40576d12] flex-none whitespace-nowrap";
+    "my-tag-element capitalize border border-[#35475a33] border-solid pt-2 pb-2 pr-3 pl-3 text-sm text-[#0d1216] rounded-[6px] cursor-pointer hover:bg-[#40576d12] flex-none whitespace-nowrap";
   tagDiv.innerText = tag;
   tagDiv.addEventListener("click", () => {
+    const containermodules = document.querySelector('.fpd-module-content div[data-defaulttext="Elements"]');
+    if(containermodules){
+        console.log("containermodules",containermodules)
+        const els = containermodules.querySelector('#icon-search-back-data');
+
+        if (els) {
+            // Remove hidden class
+            els.classList.remove('fpd-hidden');
+            els.style.setProperty("opacity", "1");
+        }
+    }
+    document.querySelectorAll('.my-tag-element').forEach(tag => {
+        tag.classList.remove("!bg-[#40576d12]");
+    });
+    tagDiv.classList.add("!bg-[#40576d12]");
+    console.log("cccjdjjdj jd dj")
      const matchedDesigns = [];
 
     this.fpdInstance.designs.forEach(group => {
@@ -20602,7 +20620,7 @@ tags.forEach(tag => {
         const filtered = group.designs.filter(design =>
             Array.isArray(design.tags) && design.tags.includes(tag)
         );
-        matchedDesigns.push(...filtered);
+            matchedDesigns.push(...filtered);
         }
     });
 
@@ -20610,6 +20628,80 @@ tags.forEach(tag => {
     console.log("Matched designs:", matchedDesigns);
     console.log("Tag clicked:", tag, this.fpdInstance.designs);
 
+
+    document.querySelectorAll('.fpd-category.fpd-item-group').forEach(el => {
+        el.classList.add('fpd-hidden');
+    });
+
+    document.querySelectorAll('.main-div-first').forEach(div => {
+        div.remove(); // remove from DOM
+    });
+    // Show only matched ones
+    const maindivfirst = document.createElement("div");
+    maindivfirst.className = "main-div-first";
+
+    const maindiv = document.createElement("div");
+    maindiv.className = "flex flex-wrap";
+    console.log("maindivfirst.innerHTML", maindivfirst.innerHTML);
+
+    maindivfirst.innerHTML = '';
+    matchedDesigns.forEach(design => {
+        
+
+        const div = document.createElement("div");
+        div.className = "fpd-item fpd-hover-thumbnail position-relative fpd-draggable image-element flex items-center justify-start flex-col relative mt-[5px] mb-[5px] group flex-none basis-1/2";
+        div.dataset.source = design.thumbnail;
+        div.dataset.title = design.title ;
+        div.setAttribute("aria-label", design.title);
+        div.dataset.search = (design.title).toLowerCase().replace(/\s+/g, ' ');
+
+        const picture = document.createElement("picture");
+        picture.dataset.img = design.thumbnail;
+        picture.className = "w-[100px] h-[100px] block bg-contain bg-no-repeat bg-center";
+        picture.dataset.originwidth = design.width || 127;
+        picture.dataset.originheight = design.height || 167;
+        picture.style.backgroundImage = `url("${design.thumbnail || imgSrc}")`;
+
+
+        div.appendChild(picture);
+
+        div.addEventListener("click", (event) => {
+            const current = event.currentTarget;
+            console.log("current", current, "event",event);
+            const i = Array.from(this.gridElem.querySelectorAll(".fpd-item")).indexOf(current);
+            const n = Ke(this, si)[i];
+    
+            if (current.classList.contains("image-element")) {
+                console.log("current",current.dataset);
+                const dataSource = current.dataset.source;
+                const dataTitle = current.dataset.title;
+                const parameters = current.parameters || {};
+                
+                console.log("parameters",parameters,"this.fpdInstance",this.fpdInstance, "parameter",e);
+                this.fpdInstance.addCanvasDesign(dataSource, dataTitle, parameters);
+            } else if (n.category) {
+                Ke(this, ni).push(i);
+                $e(this, si, n.category);
+                Qe(this, ai, di).call(this, Ke(this, si), n);
+            } else if (n.designs) {
+                Qe(this, li, fi).call(this, n.designs, n.parameters);
+            }
+    
+            //this.headElem.querySelector(".fpd-input-search input").setAttribute("placeholder", Ke(this, ei) + " " + current.dataset.search.toUpperCase());
+        });
+        
+        // document.querySelectorAll('.fpd-category.fpd-item-group .fpd-grid.fpd-grid-contain').forEach(box => {
+        //     const visibleItems = Array.from(
+        //         box.querySelectorAll('.fpd-item.image-element')
+        //     ).filter(item => !item.classList.contains('fpd-hidden'));
+
+        //     box.parentElement.style.display = visibleItems.length > 0 ? 'block' : 'none';
+        // });
+        
+        maindiv.appendChild(div);
+    });
+    maindivfirst.appendChild(maindiv);
+    container.appendChild(maindivfirst);
     // You can add any custom logic here
   });
   flexWrapper.appendChild(tagDiv);
@@ -20896,7 +20988,7 @@ rightArrow.onclick = () => {
                         }
 
                         // Your existing click logic unchanged...
-                         div.addEventListener("click", (event) => {
+                        div.addEventListener("click", (event) => {
                             const current = event.currentTarget;
                             console.log("current", current, "event",event);
                             const i = Array.from(this.gridElem.querySelectorAll(".fpd-item")).indexOf(current);
