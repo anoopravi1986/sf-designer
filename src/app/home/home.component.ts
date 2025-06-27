@@ -36,19 +36,21 @@ reversedManufacturerSlugMap :any= {
 getCategoryAndProductIndex(
   manufacturer: string,
   productTitle: string
-): Promise<{ categoryIndex: number; productIndex: number }> {
-      console.log("productIndex,categoryIndex,",manufacturer,productTitle)
+): Promise<{ categoryIndex: number; productIndex: number; childIndex: number }> {
+  console.log("🔍 Searching for:", manufacturer, productTitle);
 
   return new Promise((resolve, reject) => {
     this.http.get<any[]>('/assets/data/products/product-categories.json').subscribe({
       next: data => {
         for (let categoryIndex = 0; categoryIndex < data.length; categoryIndex++) {
           const categoryObj = data[categoryIndex];
-          const productGroups = categoryObj.products; // 2D array
+          const productGroups = categoryObj.products;
           let flatProductIndex = 0;
 
-          for (let group of productGroups) {
-            for (let product of group) {
+          for (const group of productGroups) {
+            for (let i = 0; i < group.length; i++) {
+              const product = group[i];
+console.log("compare" ,product.manufacturer ,manufacturer,this.slugify(product.title),productTitle)
               const isMatch =
                 product.manufacturer === manufacturer &&
                 this.slugify(product.title) === productTitle;
@@ -57,22 +59,24 @@ getCategoryAndProductIndex(
                 console.log('✅ Found:', {
                   categoryIndex,
                   productIndex: flatProductIndex,
-                  productId: product.product_id
+                  productId: product.product_id,
+                  childIndex: i
                 });
 
                 return resolve({
                   categoryIndex,
-                  productIndex: flatProductIndex
+                  productIndex: flatProductIndex,
+                  childIndex: i
                 });
               }
 
-              flatProductIndex++;
             }
+            flatProductIndex++;
           }
         }
 
         // Not found
-        resolve({ categoryIndex: -1, productIndex: -1 });
+        resolve({ categoryIndex: -1, productIndex: -1, childIndex: -1 });
       },
       error: err => reject(err)
     });
@@ -80,23 +84,29 @@ getCategoryAndProductIndex(
 }
 
 
+
   ngAfterViewInit() {
 
     
     if (isPlatformBrowser(this.platformId)) {
+      console.log("reset done")
+                  localStorage.setItem("productLoader","done")
+
       setTimeout(async() => {
 
           const manufacturerSlug = this.route.snapshot.paramMap.get('manufacturer') || '';
   const titleSlug = this.route.snapshot.paramMap.get('slug') || '';
 // const manufacturerSlug = params['manufacturer'];
 //       const titleSlug = params['slug'];
-      // console.log("productIndex,categoryIndex,",this.reversedManufacturerSlugMap[manufacturerSlug], titleSlug)
+      console.log("productIndex,categoryIndex,",this.reversedManufacturerSlugMap[manufacturerSlug], titleSlug)
 
-      // let {categoryIndex, productIndex} :any=  await this.getCategoryAndProductIndex(this.reversedManufacturerSlugMap[manufacturerSlug], titleSlug);
-      // localStorage.setItem("productIndex",productIndex)
-      // localStorage.setItem("categoryIndex",categoryIndex)
+      let {categoryIndex, productIndex , childIndex} :any=  await this.getCategoryAndProductIndex(this.reversedManufacturerSlugMap[manufacturerSlug], titleSlug);
+      localStorage.setItem("productIndex",productIndex)
+      localStorage.setItem("categoryIndex",categoryIndex)
+      localStorage.setItem("childIndex",childIndex)
 
-      // console.log(productIndex,categoryIndex,"productIndex,categoryIndex,",titleSlug,manufacturerSlug)
+
+      console.log(productIndex,categoryIndex,childIndex,"productIndex,categoryIndex,",titleSlug,manufacturerSlug)
 
   
 
@@ -353,7 +363,6 @@ getCategoryAndProductIndex(
           //  this.activeImageTitle = 'Apple Macbook Pro 16 2019 512GB SSD Storage';
          
            $(document).on('click', 'fpd-module-products .fpd-item', (event) => {
-            console.log(event , "event is here")
                   localStorage.setItem("productIndex","")
       localStorage.setItem("categoryIndex","")
             const clickedTitle = $(event.currentTarget).data('title');
@@ -372,9 +381,12 @@ getCategoryAndProductIndex(
 
             const slug = this.slugify(clickedTitle);
             const manufacturerSlug = this.slugify(ob);
-            console.log(manufacturer,'mamamam')
+            console.log(manufacturer,'mamamam',localStorage.getItem("productLoader"))
+            let productLoadervaalue = localStorage.getItem("productLoader")
+            if((!productLoadervaalue || productLoadervaalue!="")){
 
             this.router.navigate([manufacturerSlug ||'apple', slug]);
+           }
           });
 
 

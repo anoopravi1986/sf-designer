@@ -1326,7 +1326,7 @@
                                     (s.onerror = function () {
                                         E.log("Error loading " + s.src), e && e.call(i, null, !0), (s = s.onload = s.onerror = null);
                                     }),
-                                    0 !== t.indexOf("data") && null != n && (s.crossOrigin = n),
+                                    0 !== t?.indexOf("data") && null != n && (s.crossOrigin = n),
                                     "data:image/svg" === t.substring(0, 14) && ((s.onload = null), E.util.loadImageInDom(s, r)),
                                     (s.src = t);
                             } else e && e.call(i, t);
@@ -18824,20 +18824,81 @@
                 constructor(t, e) {
                     super(), (this.fpdInstance = t), (this.darkColor = "#000"), (this.lightColor = "#fff"), (this.container = document.createElement("fpd-module-qr-code")), e.append(this.container);
                     const i = this.container.querySelector(".fpd-qr-code-color-dark");
-console.log("hello there i am here")
-                                                    setTimeout(() => {
+              setTimeout(() => {
+                  window.localStorage.setItem("productLoader","")
+
                                                         let productIndex = window.localStorage.getItem("productIndex")
                                                         let categoryIndex = window.localStorage.getItem("categoryIndex")
+                                                        let childIndex = window.localStorage.getItem("childIndex")
 
-                            console.log("product updated called",categoryIndex,productIndex,)
+
                             if(productIndex !== null && categoryIndex !== null){
-                            console.log("product updated called....",categoryIndex,productIndex,)
 
-//  this.fpdInstance.selectProduct(Number(categoryIndex), Number(productIndex));
- this.fpdInstance.selectProduct(1,0);
+//  this.fpdInstance.selectProduct(, );
+ // Get the FPD dropdown items
+  const categoryItems = document.querySelectorAll(".fpd-product-categories .fpd-item");
+  const dropdownInput = document.querySelector(".fpd-product-categories .fpd-dropdown-current");
+
+  if (categoryItems && dropdownInput && categoryItems[categoryIndex]) {
+    const selectedItem = categoryItems[categoryIndex];
+    const categoryText = selectedItem.textContent;
+        // 👉 Temporarily hide the dropdown UI
+    const dropdownWrapper = document.querySelector(".fpd-product-categories");
+    // dropdownWrapper?.setAttribute("hidden", "true");
+     dropdownWrapper.style.display = "none";
+
+    // Update visible input value
+    dropdownInput.value = categoryText;
+
+    // Dispatch events
+    dropdownInput.dispatchEvent(new Event("input", { bubbles: true }));
+    dropdownInput.dispatchEvent(new Event("change", { bubbles: true }));
+
+    // Simulate actual category selection logic
+    selectedItem.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+
+
+
+    setTimeout(() => {
+  const dropdownArrow = document.querySelector(".fpd-product-categories .fpd-dropdown-arrow");
+  localStorage.setItem("productLoader" , "")
+  dropdownArrow?.click(); // FPD uses this to toggle close
+  setTimeout(() => {
+  localStorage.setItem("productLoader" , "done");
+  }, 1000);
+//    dropdownWrapper?.removeAttribute("hidden");
+   dropdownWrapper.style.display = "block";
+    
+     const sidebarItems = document.querySelectorAll('.ProductModule');
+sidebarItems[0].children[Number(productIndex)]?.click(); 
+    
+    const confirmButton = document.querySelector('.fpd-confirm');
+confirmButton?.click(); 
+// setTimeout(() => {
+    
+    if(Number(childIndex)){
+    const targetItem = document.querySelector(
+`.skins-det[data-index="${childIndex}"]`
+);
+
+if (targetItem) {
+  targetItem.click();
+  console.log("✅ Clicked on:", targetItem);
+} else {
+  console.warn("❌ Item not found.");
+}
+    }
+      window.localStorage.setItem("productLoader","done")
+
+}, 100);
+  } else {
+    console.warn("❌ Could not set category - item or dropdown missing.");
+  }
 
                             }
-                        }, 5000);
+
+                        }, 100);
+                        
                     (i.style.backgroundColor = "#000"),
                         new fe({
                             parent: i,
@@ -25263,7 +25324,7 @@ rightArrow.onclick = () => {
                     else{
                         To(this, Io, To(this, Oo, 0)),
                             (this.currentCategoryIndex = void 0 === e ? this.currentCategoryIndex : e),
-                            (i = this.productsnew && this.productsnew.length && this.productsnew[0].category ? this.productsnew[this.currentCategoryIndex].products : this.productsnew),
+                            (i = this.productsnew && this.productsnew.length && this.productsnew[0].category ? this.productsnew[this.currentCategoryIndex]?.products : this.productsnew),
                             (this.currentProductIndex = t),
                             t < 0 ? (this.currentProductIndex = 0) : t > i.length - 1 && (this.currentProductIndex = i.length - 1);
                         const n = i[this.currentProductIndex];
