@@ -116,11 +116,12 @@ console.log("compare" ,product.manufacturer ,manufacturer,this.slugify(product.t
         this.appOptions = {
           productsJSON: 'assets/data/products/product-categories.json',
           productsJSON1: 'assets/data/products/product-categories-new.json',
-          designsJSON: 'assets/data/designs/design-categories.json',
+          // designsJSON: 'assets/data/designs/design-categories.json',
+          designsJSON: 'https://styleflip-backend-jdm5.onrender.com/api/element/getAllElements',
           langJSON: 'assets/data/langs/default.json',
           // layout: 'topbar',
-          stageWidth: 1200,
-          stageHeight: 600,
+          stageWidth: 2000,
+          stageHeight: 1000,
           initialActiveModule: "products",
           // toolbarPlacement: "inside-top",
           editorMode: false,
@@ -365,6 +366,7 @@ console.log("compare" ,product.manufacturer ,manufacturer,this.slugify(product.t
            $(document).on('click', 'fpd-module-products .fpd-item', (event) => {
                   localStorage.setItem("productIndex","")
       localStorage.setItem("categoryIndex","")
+            console.log(event.currentTarget, "click happen", event);
             const clickedTitle = $(event.currentTarget).data('title');
             console.log(clickedTitle,'cllllllll', $(event.currentTarget))
             const manufacturer = $(event.currentTarget).data('manufacturer');
@@ -466,7 +468,7 @@ console.log("compare" ,product.manufacturer ,manufacturer,this.slugify(product.t
                   mainBar.style.maxWidth = '';
                   mainBar.style.backgroundColor = '#fff';
                   mainBar.classList.remove('box-white-inactive');
-                  hideIcon.style.display = 'inline-block'; // 👈 show icon again
+                  hideIcon.style.display = 'flex'; // 👈 show icon again
                 }
               }
             }
@@ -494,20 +496,42 @@ console.log("compare" ,product.manufacturer ,manufacturer,this.slugify(product.t
     
     setTimeout(() => {
 
-      const searchInput = document.querySelector<HTMLInputElement>("fpd-module-products .fpd-input-search input");
-      const templateContainer = document.querySelector<HTMLElement>("#ProductModule");
-        console.log("searchInput", searchInput, "templateContainer", templateContainer);
-      if (!searchInput || !templateContainer) return;
+      const searchInput = document.getElementById('searchInput') as HTMLInputElement;
+      
+      if (searchInput) {
+
+        searchInput.addEventListener("keyup", () => {
+          this.filterThumbnailsP(searchInput.value);
+        });
+      }
     
-      searchInput.addEventListener("keyup", () => {
-        const keyword = searchInput.value.toLowerCase();
-    
-        const items = templateContainer.querySelectorAll<HTMLElement>(".fpd-item");
-        items.forEach((item) => {
-          const title = item.dataset['title']?.toLowerCase() || "";
-          item.style.display = title.includes(keyword) ? "block" : "none";
+
+
+      const searchInputs = document.getElementById('searchInputs') as HTMLInputElement;
+      if (searchInputs) {
+        searchInputs.addEventListener('keyup', () => {
+          this.filterThumbnails(searchInputs.value);
+        });
+      }
+
+
+      
+      this.updateTagsFromDesignModule();
+      const dropdownItems = document.querySelectorAll('fpd-module-productsnew .fpd-dropdown-list .fpd-item');
+      console.log("Dropdown Items Found:", dropdownItems);
+
+      dropdownItems.forEach((item) => {
+        item.addEventListener('click', () => {
+          const tagWrappertags = document.getElementById('tag-wrapper-design-tags');
+          if (tagWrappertags) {
+            tagWrappertags.remove();
+            console.log('Removed tag-wrapper-design-tags');
+          }
+          this.updateTagsFromDesignModule();
+          console.log("Tags updated from Design Module");
         });
       });
+      
     }, 2000);
        
     setTimeout(() => {
@@ -577,6 +601,7 @@ slugify(title: string): string {
 ngOnInit() {
   const slug = this.route.snapshot.paramMap.get('slug');
   console.log("Selected slug:", slug);
+  
 }
 
   bottomMenu(){
@@ -659,8 +684,245 @@ showPreviewModal: boolean = false;
   }
 
   
+  filterThumbnails(searchTerm: string) {
+    console.log("searchTerm", searchTerm);
+    const parentDiv = document.querySelector('div[data-moduleicon="layout-panel-left"]');
+    console.log("parentDiv", parentDiv);
+    if (!parentDiv) return;
 
+    const thumbnails = parentDiv.querySelectorAll(
+      '.fpd-grid .fpd-item.fpd-hover-thumbnail'
+    );
+    console.log("parentDivdata", thumbnails);
+
+    thumbnails.forEach((thumb: Element) => {
+      const title = thumb.getAttribute('data-title')?.toLowerCase() || '';
+      console.log("title", title, "searchTerm", searchTerm);
+      const search = searchTerm.toLowerCase();
+
+      (thumb as HTMLElement).style.display = title.includes(search) ? 'flex' : 'none';
+    });
+    
+  }
+
+  filterThumbnailsP(searchTerm: string) {
+    console.log("searchTerm", searchTerm);
+    const parentDiv = document.querySelector('div[data-moduleicon="book-copy"]');
+    console.log("parentDiv", parentDiv);
+    if (!parentDiv) return;
+
+    const dataTitle = parentDiv.getAttribute('data-title');
+    console.log("dataTitle", dataTitle);
+      const thumbnails = parentDiv.querySelectorAll(
+        '.fpd-grid.skins-data .fpd-item.fpd-hover-thumbnail'
+      );
+      console.log("parentDivdataif", thumbnails.length);
+      if (!thumbnails || thumbnails.length === 0) {
+        console.log("No thumbnails found in the parent div.");
+        const thumbnails = parentDiv.querySelectorAll(
+        '.fpd-grid.ProductModule .fpd-item.fpd-hover-thumbnail'
+        );
+        thumbnails.forEach((thumb: Element) => {
+          const title = thumb.getAttribute('data-title')?.toLowerCase() || '';
+          console.log("title", title, "searchTerm", searchTerm);
+          const search = searchTerm.toLowerCase();
+  
+          (thumb as HTMLElement).style.display = title.includes(search) ? 'flex' : 'none';
+        });
+      }
+      else{
+
+        thumbnails.forEach((thumb: Element) => {
+          const title = thumb.getAttribute('data-title')?.toLowerCase() || '';
+          console.log("title", title, "searchTerm", searchTerm);
+          const search = searchTerm.toLowerCase();
+  
+          (thumb as HTMLElement).style.display = title.includes(search) ? 'flex' : 'none';
+        });
+      }
+    
+  }
  
+
+  updateTagsFromDesignModule() {
+    const allTagsSetD = new Set();
+    console.log("Anoop Data 4 allTagsSet", allTagsSetD);
+    document.querySelectorAll('#DesignModule .fpd-item').forEach(product => {
+          console.log("products-------929290000", product)
+          const tags = product.getAttribute('data-tags')?.split(',').map(tag => tag.trim());
+          if (tags) tags.forEach(tag => allTagsSetD.add(tag));
+
+
+          
+      });
+      console.log("Anoop Data 4 allTagsSet---", allTagsSetD);
+      const parentDiv = document.querySelector('div[data-title="Productsnew"]');
+      console.log("Anoop Data 4 parentDiv", parentDiv);
+      if (parentDiv) {
+        let currentOffset = 0;
+
+        // Create outer wrapper (position relative for arrow buttons)
+        const tagWrapperMain = document.createElement("div");
+        tagWrapperMain.className = "relative w-full fpd-designs-tags mt-2";
+
+        const tagWrapper = document.createElement('div');
+        tagWrapper.className = 'flex gap-2 mt-2 ml-[5px] fixed md:top-[164px]';
+        tagWrapper.id = 'tag-wrapper-design-tags';
+
+        Array.from(allTagsSetD).forEach(tag => {
+          const tagButton = document.createElement('div');
+          tagButton.className = 'fpd-tag-btn capitalize border border-[#35475a33] border-solid pt-2 pb-2 pr-3 pl-3 text-sm text-[#0d1216] rounded-[6px] cursor-pointer hover:bg-[#40576d12] flex-none whitespace-nowrap';
+          tagButton.innerText = tag as string;
+
+          tagButton.addEventListener('click', () => {
+            // Step 1: Highlight clicked tag and unhighlight others
+            document.querySelectorAll('.fpd-tag-btn').forEach(btn => btn.classList.remove('!bg-[#40576d12]'));
+            tagButton.classList.add('!bg-[#40576d12]');
+
+            // Step 2: Filter visible .fpd-item based on tag
+            const selectedTag = (tag as string).toLowerCase();
+            const items = document.querySelectorAll('#DesignModule .fpd-item');
+
+            items.forEach(item => {
+              const tagsAttr = item.getAttribute('data-tags') || '';
+              const tagList = tagsAttr.split(',').map(t => t.trim().toLowerCase());
+              (item as HTMLElement).style.display = tagList.includes(selectedTag) ? 'flex' : 'none';
+            });
+
+            // Step 3: Hide parent .box-contain-text if all children are hidden
+            document.querySelectorAll('.box-contain-text').forEach(container => {
+              const children = container.querySelectorAll('.fpd-item');
+              const anyVisible = Array.from(children).some(child => (child as HTMLElement).style.display !== 'none');
+              (container as HTMLElement).style.display = anyVisible ? 'block' : 'none';
+            });
+
+            // Step 4: Show Reset Button and shrink search box
+            const resetBtn = document.getElementById('fpd-reset-button');
+            resetBtn?.classList.remove('hidden');
+
+            const searchBox = document.querySelector('#searchbox-design') as HTMLElement;
+            if (searchBox) {
+              searchBox.style.maxWidth = 'calc(100% - 44px)';
+              searchBox.style.marginLeft = '0px';
+            }
+            const inputboxdiv = document.querySelector('#fpd-reset-button') as HTMLElement;
+            if (inputboxdiv) {
+              inputboxdiv.style.display = 'block';
+            }
+
+
+            resetBtn?.addEventListener('click', () => {
+              if (inputboxdiv) {
+                inputboxdiv.style.display = 'none';
+              }
+              // Show all fpd-item elements
+              document.querySelectorAll('.fpd-item.fpd-hover-thumbnail').forEach(item => {
+                (item as HTMLElement).style.display = 'flex'; // or 'block' depending on your layout
+              });
+
+              // Show all parent .box-contain-text containers
+              document.querySelectorAll('.box-contain-text').forEach(container => {
+                (container as HTMLElement).style.display = 'block';
+              });
+
+              // Remove active class from all tag buttons
+              document.querySelectorAll('.fpd-tag-btn').forEach(btn => {
+                btn.classList.remove('!bg-[#40576d12]');
+              });
+
+              // Hide the reset button again
+              resetBtn.classList.add('hidden');
+
+              // Reset search box width
+              const searchBox = document.querySelector('#searchbox-design') as HTMLElement;
+              if (searchBox) {
+                searchBox.style.maxWidth = 'calc(100% - 22px)';
+                searchBox.style.marginLeft = '5px';
+              }
+
+              // Clear the search input value
+              const searchInput = document.getElementById('searchInput') as HTMLInputElement;
+              if (searchInput) {
+                searchInput.value = '';
+              }
+            });
+          });
+
+
+          tagWrapper.appendChild(tagButton);
+        });
+
+        parentDiv.appendChild(tagWrapper);
+
+
+        // Step 5: Create left arrow
+        const leftArrow = document.createElement("button");
+        leftArrow.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <path fill="currentColor" d="m14.8 16.382-4.205-4.205a.25.25 0 0 1 0-.354L14.8 7.618a.75.75 0 0 0-1.06-1.06l-4.206 4.204a1.75 1.75 0 0 0 0 2.475l4.206 4.205a.75.75 0 0 0 1.06-1.06"></path>
+        </svg>
+        `;
+        leftArrow.className = "fixed md:left-[90px] md:top-[178px] z-[9] bg-gradient-to-r from-white/0 to-white shadow p-0 rounded-full hover:bg-gray-100 disabled:hidden";
+        leftArrow.disabled = true; // initially disabled
+
+        // Step 6: Create right arrow
+        const rightArrow = document.createElement("button");
+        rightArrow.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <path fill="currentColor" d="m9.216 7.619 4.204 4.204a.25.25 0 0 1 0 .354l-4.204 4.204a.75.75 0 0 0 1.06 1.061l4.205-4.204a1.75 1.75 0 0 0 0-2.475l-4.204-4.205a.75.75 0 0 0-1.061 1.06"></path>
+        </svg>
+        `;
+        rightArrow.className = "fixed md:left-[380px] md:top-[210px] z-[9] mt-[-20px] -translate-y-1/2 bg-gradient-to-r from-white/0 to-white shadow p-0 rounded-full hover:bg-gray-100 disabled:hidden";
+
+        // Update arrow states
+        function updateArrows() {
+          const wrapperWidth = tagWrapperMain.offsetWidth;
+          const contentWidth = tagWrapper.scrollWidth;
+
+          // Prevent scrolling beyond bounds
+          if (currentOffset > 0) currentOffset = 0;
+          if (Math.abs(currentOffset) >= contentWidth - wrapperWidth) {
+            currentOffset = -1 * (contentWidth - wrapperWidth);
+          }
+
+          // Apply transform
+          tagWrapper.style.transform = `translateX(${currentOffset}px)`;
+
+          // Enable or disable arrows
+          leftArrow.disabled = currentOffset === 0;
+          rightArrow.disabled = Math.abs(currentOffset) >= (contentWidth - wrapperWidth - 1); // Allow 1px tolerance
+        }
+
+        // Scroll left
+        leftArrow.onclick = () => {
+          const tag = tagWrapper.querySelector("div");
+          if (tag) {
+            const scrollAmount = tag.offsetWidth * 2 + 16;
+            currentOffset += scrollAmount;
+            updateArrows();
+          }
+        };
+
+        // Scroll right
+        rightArrow.onclick = () => {
+          const tag = tagWrapper.querySelector("div");
+          if (tag) {
+            const scrollAmount = tag.offsetWidth * 2 + 16;
+            currentOffset -= scrollAmount;
+            updateArrows();
+          }
+        };
+        
+
+        tagWrapperMain.appendChild(leftArrow);
+        tagWrapperMain.appendChild(rightArrow);
+
+        parentDiv.appendChild(tagWrapperMain)
+
+      } else {
+        console.warn('Div with data-title="Productsnew" not found.');
+      }
+  }
 
 
 }

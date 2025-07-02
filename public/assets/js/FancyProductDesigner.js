@@ -19380,7 +19380,7 @@ if (targetItem) {
                 }
                 connectedCallback() {
                     this.innerHTML =
-                        '<div class="fpd-navigation fpd-scrollbar-hidden"></div> <div class="fpd-module-content bg-[#fff]"></div> <div class="fpd-secondary-content"> <div class="fpd-upload-zone-panel"> <div class="fpd-upload-zone-content"></div> <div class="fpd-bottom-nav fpd-module-tabs"> <div class="fpd-add-image" data-module="images"> <span class="fpd-icon-photo"></span> </div> <div class="fpd-add-text" data-module="text"> <span class="fpd-icon-text-secondary"></span> </div> <div class="fpd-add-design" data-module="designs"> <span class="fpd-icon-design-library"></span> </div> </div> </div> </div> <div class="fpd-close"> <span class="fa-solid fa-close"></span> </div> <div class="fpd-draggable-dialog fpd-container fpd-shadow-2"> <div class="fpd-dialog-head"> <div class="fpd-dialog-drag-handle"> <div> <span class="fpd-icon-drag"></span><span class="fpd-dialog-title"></span> </div> </div> <div class="fpd-close-dialog"> <span class="fa-solid fa-close"></span> </div> </div> </div> ';
+                        '<div class="fpd-navigation fpd-scrollbar-hidden bg-white"></div> <div class="fpd-module-content bg-[#fff]"></div> <div class="fpd-secondary-content"> <div class="fpd-upload-zone-panel"> <div class="fpd-upload-zone-content"></div> <div class="fpd-bottom-nav fpd-module-tabs"> <div class="fpd-add-image" data-module="images"> <span class="fpd-icon-photo"></span> </div> <div class="fpd-add-text" data-module="text"> <span class="fpd-icon-text-secondary"></span> </div> <div class="fpd-add-design" data-module="designs"> <span class="fpd-icon-design-library"></span> </div> </div> </div> </div> <div class="fpd-close"> <span class="fa-solid fa-close"></span> </div> <div class="fpd-draggable-dialog fpd-container fpd-shadow-2"> <div class="fpd-dialog-head"> <div class="fpd-dialog-drag-handle"> <div> <span class="fpd-icon-drag"></span><span class="fpd-dialog-title"></span> </div> </div> <div class="fpd-close-dialog"> <span class="fa-solid fa-close"></span> </div> </div> </div> ';
                 }
             }
             class Fet extends HTMLElement {
@@ -19389,7 +19389,7 @@ if (targetItem) {
                 }
                 connectedCallback() {
                     this.innerHTML =
-                        '<div class="fpd-navigation fpd-scrollbar-hidden"></div> <div class="fpd-module-content bg-[#000]"></div> <div class="fpd-secondary-content"> <div class="fpd-upload-zone-panel"> <div class="fpd-upload-zone-content"></div> <div class="fpd-bottom-nav fpd-module-tabs"> <div class="fpd-add-image" data-module="images"> <span class="fpd-icon-photo"></span> </div> <div class="fpd-add-text" data-module="text"> <span class="fpd-icon-text-secondary"></span> </div> <div class="fpd-add-design" data-module="designsnew"> <span class="fpd-icon-design-library"></span> </div> </div> </div> </div> <div class="fpd-close"> <span class="fa-solid fa-close"></span> </div> <div class="fpd-draggable-dialog fpd-container fpd-shadow-2"> <div class="fpd-dialog-head"> <div class="fpd-dialog-drag-handle"> <div> <span class="fpd-icon-drag"></span><span class="fpd-dialog-title"></span> </div> </div> <div class="fpd-close-dialog"> <span class="fa-solid fa-close"></span> </div> </div> </div> ';
+                        '<div class="fpd-navigation fpd-scrollbar-hidden bg-white z-[9]"></div> <div class="fpd-module-content bg-[#000]"></div> <div class="fpd-secondary-content"> <div class="fpd-upload-zone-panel"> <div class="fpd-upload-zone-content"></div> <div class="fpd-bottom-nav fpd-module-tabs"> <div class="fpd-add-image" data-module="images"> <span class="fpd-icon-photo"></span> </div> <div class="fpd-add-text" data-module="text"> <span class="fpd-icon-text-secondary"></span> </div> <div class="fpd-add-design" data-module="designsnew"> <span class="fpd-icon-design-library"></span> </div> </div> </div> </div> <div class="fpd-close"> <span class="fa-solid fa-close"></span> </div> <div class="fpd-draggable-dialog fpd-container fpd-shadow-2"> <div class="fpd-dialog-head"> <div class="fpd-dialog-drag-handle"> <div> <span class="fpd-icon-drag"></span><span class="fpd-dialog-title"></span> </div> </div> <div class="fpd-close-dialog"> <span class="fa-solid fa-close"></span> </div> </div> </div> ';
                 }
             }
             customElements.define("fpd-main-bar", Fet);
@@ -19412,7 +19412,7 @@ if (targetItem) {
                 connectedCallback() {
                     console.log("fpd-module-productsnew-first00000000000");
                     this.innerHTML =
-                        '<div data-moduleicon="layout-panel-left" data-defaulttext="Designs" data-title="Productsnew"><div class="fpd-head"> <div class="fpd-input-back-search input-search-box !shadow-none border border-[#35475a33] border-solid !rounded-[8px] ml-[5px] w-[calc(100% - 22px)]"> <div class="fpd-back fpd-btn !bg-white"> <svg xmlns="http://www.w3.org/2000/svg" class="min-w-[24px] text-black relative top-[-2px]" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M15.2 16.34a7.5 7.5 0 1 1 1.38-1.45l4.2 4.2a1 1 0 1 1-1.42 1.41l-4.16-4.16zm-4.7.16a6 6 0 1 0 0-12 6 6 0 0 0 0 12z"></path></svg> </div> <div class="fpd-input-search"> <input type="text" class="!text-sm placeholder-gray-500 !pl-2" placeholder="Search" /> <span class="fpd-icon-magnify"></span> </div> </div> </div><div class="icon-box"><i data-lucide="house"></i></div> <fpd-dropdown class="fpd-product-categories rounded-[8px] border border-[#35475a33] border-solid mt-[8px] bg-white p-2 dark:border-gray-800 dark:bg-white/[0.03] md:p-2 mr-[14px] pl-[6px] ml-[5px] w-[calc(100% - 22px)] mb-[5px]" searchable></fpd-dropdown> <div class="fpd-scroll-area"> <div class="w-full overflow-auto [scrollbar-width:none] scrollbar-hide"><div class="flex gap-2 mt-2 ml-[5px]"><div class="border border-[#35475a33] border-solid pt-2 pb-2 pr-3 pl-3 rounded-[6px] text-sm text-[#0d1216] cursor-pointer hover:bg-[#40576d12] flex-none">Foods</div><div class="border border-[#35475a33] border-solid pt-2 pb-2 pr-3 pl-3 text-sm text-[#0d1216] rounded-[6px] cursor-pointer hover:bg-[#40576d12] flex-none">Collage</div><div class="border border-[#35475a33] border-solid pt-2 pb-2 pr-3 pl-3 text-sm text-[#0d1216] rounded-[6px] cursor-pointer hover:bg-[#40576d12] flex-none">Business</div><div class="border border-[#35475a33] border-solid pt-2 pb-2 pr-3 pl-3 text-sm text-[#0d1216] rounded-[6px] cursor-pointer hover:bg-[#40576d12] flex-none">Festival</div><div class="border border-[#35475a33] border-solid pt-2 pb-2 pr-3 pl-3 text-sm text-[#0d1216] rounded-[6px] cursor-pointer hover:bg-[#40576d12] flex-none">Heart</div></div></div><div class="fpd-grid fpd-grid-contain fpd-padding one-ttt" id="DesignModule"><div class="searchox bg-white rounded-lg relative flex"><div id="search-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M15.2 16.34a7.5 7.5 0 1 1 1.38-1.45l4.2 4.2a1 1 0 1 1-1.42 1.41l-4.16-4.16zm-4.7.16a6 6 0 1 0 0-12 6 6 0 0 0 0 12z"></path></svg></div><div><input type="text" class="appearance-none bg-inherit border-0 box-border text-inherit font-normal min-w-[8px] outline-none w-full" /></div></div> </div> </div> </div>';
+                        '<div data-moduleicon="layout-panel-left" data-defaulttext="Designs" data-title="Productsnew"><div class=""> <div class="fpd-head flex items-center"><div id="fpd-reset-button" style="display:none;"><button><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="text-[#0d1216] hover:text-blue-600 transition duration-200 cursor-pointer"><path d="M6.9 10.996h11.596a.75.75 0 0 1 0 1.5H6.9l4.377 4.377a.75.75 0 0 1-1.061 1.06l-4.95-4.95a1.75 1.75 0 0 1 0-2.474l4.95-4.95a.75.75 0 1 1 1.06 1.06L6.9 10.996z" fill="currentColor"></path></svg></button></div> <div id="searchbox-design" class="fpd-input-back-search input-search-box !shadow-none border border-[#35475a33] border-solid !rounded-[8px] ml-[5px] w-[calc(100% - 22px)]"><div class="fpd-back fpd-btn !bg-white"> <svg xmlns="http://www.w3.org/2000/svg" class="min-w-[24px] text-black relative top-[-2px]" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M15.2 16.34a7.5 7.5 0 1 1 1.38-1.45l4.2 4.2a1 1 0 1 1-1.42 1.41l-4.16-4.16zm-4.7.16a6 6 0 1 0 0-12 6 6 0 0 0 0 12z"></path></svg> </div> <div class="fpd-input-search"> <input type="text" id="searchInputs" class="!text-sm placeholder-gray-500 !pl-2" placeholder="Search" /> <span class="fpd-icon-magnify"></span> </div> </div></div> </div><div class="icon-box"><i data-lucide="house"></i></div> <fpd-dropdown class="fpd-product-categories rounded-[8px] border border-[#35475a33] border-solid mt-[8px] bg-white p-2 dark:border-gray-800 dark:bg-white/[0.03] md:p-2 mr-[14px] pl-[6px] ml-[5px] w-[calc(100% - 22px)] mb-[5px]" searchable></fpd-dropdown> <div class="fpd-scroll-area"> <div class="w-full overflow-auto [scrollbar-width:none] scrollbar-hide"><div class="flex gap-2 mt-2 ml-[5px] fixed opacity-0"><div class="border border-[#35475a33] border-solid pt-2 pb-2 pr-3 pl-3 rounded-[6px] text-sm text-[#0d1216] cursor-pointer hover:bg-[#40576d12] flex-none">Foods</div><div class="border border-[#35475a33] border-solid pt-2 pb-2 pr-3 pl-3 text-sm text-[#0d1216] rounded-[6px] cursor-pointer hover:bg-[#40576d12] flex-none">Collage</div><div class="border border-[#35475a33] border-solid pt-2 pb-2 pr-3 pl-3 text-sm text-[#0d1216] rounded-[6px] cursor-pointer hover:bg-[#40576d12] flex-none">Business</div><div class="border border-[#35475a33] border-solid pt-2 pb-2 pr-3 pl-3 text-sm text-[#0d1216] rounded-[6px] cursor-pointer hover:bg-[#40576d12] flex-none">Festival</div><div class="border border-[#35475a33] border-solid pt-2 pb-2 pr-3 pl-3 text-sm text-[#0d1216] rounded-[6px] cursor-pointer hover:bg-[#40576d12] flex-none">Heart</div></div></div><div class="fpd-grid fpd-grid-contain fpd-padding one-ttt mt-[50px]" id="DesignModule"><div class="searchox bg-white rounded-lg relative flex"><div id="search-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M15.2 16.34a7.5 7.5 0 1 1 1.38-1.45l4.2 4.2a1 1 0 1 1-1.42 1.41l-4.16-4.16zm-4.7.16a6 6 0 1 0 0-12 6 6 0 0 0 0 12z"></path></svg></div><div><input type="text" class="appearance-none bg-inherit border-0 box-border text-inherit font-normal min-w-[8px] outline-none w-full" /></div></div> </div> </div> </div>';
                 }
             }
             function Re(t, e) {
@@ -19508,6 +19508,7 @@ if (targetItem) {
                                                     console.log("Seeeeeeeeee")
                                                     if (input) {
                                                         input.value = '';
+                                                        console.log("search input", input);
                                                     }
                                                     this.selectCategory(t.currentTarget.dataset.index);
                                                 }),
@@ -19760,20 +19761,28 @@ if (targetItem) {
                         }
                         }
                 }
+
                 console.log("ttttttttttttttttttttttttt",t)
                 localStorage.setItem("definet",t)
                 let n = e[0].productThumbnail ? e[0].productThumbnail : e[0].thumbnail,
-                    s =  e[0].title ?  e[0].title : e[0].productTitle ,
+                    s =  e[0].productTitle ?  e[0].productTitle : e[0].title ,
                     th = e[0].manufacturer ? e[0].manufacturer : "Styleflip",
-                    sct = e[0].subcategorytype ? e[0].subcategorytype : "General";
+                    sct = e[0].subcategorytype ? e[0].subcategorytype : "General",
+                    tags = e[0].tags || "";
+                
 
                 const r = document.createElement("div");
-                r.className = "fpd-item fpd-hover-thumbnail text mt-1";
+                r.className = "fpd-item fpd-hover-thumbnail text mt-1 bg-[#f6f6f6]";
                 r.dataset.title = s;
                 r.dataset.source = n;
                 r.dataset.index = i;
                 r.dataset.manufacturer = th; // Add manufacturer data attribute
                 r.dataset.subcategorytype = sct;
+                if (Array.isArray(tags)) {
+                    r.dataset.tags = tags.join(', ');
+                } else {
+                    r.dataset.tags = tags;
+                }
 
                 // ========== Append Thumbnail Image ==========
                 const a = document.createElement("picture");
@@ -19817,11 +19826,11 @@ if (targetItem) {
                     </div>
                     <hr class="border-[1px] border-t border-solid border-gray-300 my-4" />
                     <div class="flex items-center my-2 gap-[10px] flex-wrap">
-                        <div class="border border-solid border-[#ccc] px-[7px] py-[3px] bg-[#0d121600] rounded-[8px] shadow-[inset_0_0_0_1px_var(--Zya5eQ)] text-[#0d1216]">design</div>
-                        <div class="border border-solid border-[#ccc] px-[7px] py-[3px] bg-[#0d121600] rounded-[8px] shadow-[inset_0_0_0_1px_var(--Zya5eQ)] text-[#0d1216]">button</div>
-                        <div class="border border-solid border-[#ccc] px-[7px] py-[3px] bg-[#0d121600] rounded-[8px] shadow-[inset_0_0_0_1px_var(--Zya5eQ)] text-[#0d1216]">banner</div>
-                        <div class="border border-solid border-[#ccc] px-[7px] py-[3px] bg-[#0d121600] rounded-[8px] shadow-[inset_0_0_0_1px_var(--Zya5eQ)] text-[#0d1216]">sign</div>
-                        <div class="border border-solid border-[#ccc] px-[7px] py-[3px] bg-[#0d121600] rounded-[8px] shadow-[inset_0_0_0_1px_var(--Zya5eQ)] text-[#0d1216]">graphic</div>
+                        <div class="border border-solid border-[#ccc] px-[7px] py-[3px] bg-[#0d121600] rounded-[8px] shadow-[inset_0_0_0_1px_var(--Zya5eQ)] text-[#0d1216] capitalize">design</div>
+                        <div class="border border-solid border-[#ccc] px-[7px] py-[3px] bg-[#0d121600] rounded-[8px] shadow-[inset_0_0_0_1px_var(--Zya5eQ)] text-[#0d1216] capitalize">button</div>
+                        <div class="border border-solid border-[#ccc] px-[7px] py-[3px] bg-[#0d121600] rounded-[8px] shadow-[inset_0_0_0_1px_var(--Zya5eQ)] text-[#0d1216] capitalize">banner</div>
+                        <div class="border border-solid border-[#ccc] px-[7px] py-[3px] bg-[#0d121600] rounded-[8px] shadow-[inset_0_0_0_1px_var(--Zya5eQ)] text-[#0d1216] capitalize">sign</div>
+                        <div class="border border-solid border-[#ccc] px-[7px] py-[3px] bg-[#0d121600] rounded-[8px] shadow-[inset_0_0_0_1px_var(--Zya5eQ)] text-[#0d1216] capitalize">graphic</div>
                     </div>
                     <hr class="border-t border-[1px] border-solid border-gray-300 my-4" />
                     </div>
@@ -19926,6 +19935,9 @@ if (targetItem) {
 
                 // ========== Append to Grid ==========
                 this.container.querySelector(".fpd-grid").append(r);
+
+
+
                 
             }
             window.FPDProductsModule = We;
@@ -20203,7 +20215,7 @@ if (targetItem) {
 
                                     if (spans.length > 0) {
                                     const newDiv = document.createElement('div');
-                                    newDiv.className = 'fpd-item fpd-itemimg';
+                                    newDiv.className = 'fpd-item fpd-itemimg group';
                                     newDiv.setAttribute('data-title', title);
                                     newDiv.setAttribute('data-type', 'text');
                                     newDiv.setAttribute('data-thumbnail', thumbnail);
@@ -20213,6 +20225,48 @@ if (targetItem) {
                                     picture.setAttribute('data-img', title);
                                     picture.style.backgroundImage = `url('${thumbnail}')`;
                                     newDiv.appendChild(picture);
+
+
+                                    const dotBtn = document.createElement('button');
+                                    dotBtn.innerHTML = `⋯`;
+                                    dotBtn.className = 'opacity-0 group-hover:opacity-100 text-[#485563] text-[20px] absolute top-2 right-0 p-1 bg-white bg-opacity-60 w-[18px] cursor-pointer z-20';
+                                    newDiv.appendChild(dotBtn);
+
+                                    // === Create popup & backdrop ===
+                                    dotBtn.addEventListener('click', (e) => {
+                                         e.stopPropagation();
+                                         e.stopImmediatePropagation();
+                                        e.preventDefault();
+                                        const overlay = document.createElement('div');
+                                        overlay.className = 'flex items-center fixed inset-0 bg-white bg-opacity-60 z-[99] left-[83px] top-[56px] max-w-[365px]';
+
+                                        const popup = document.createElement('div');
+                                        popup.className = 'bg-white border border-[#ccc] rounded-[6px] p-[10px] ml-[28px] shadow-custom-light max-w-[200px] text-center relative z-50';
+                                        popup.innerHTML = `
+                                            <h2 class="text-[1rem] text-left font-bold">${title}</h2>
+                                            <h4 class="text-left mt-2 mb-2">StyleFlip</h4>
+                                        `;
+                                        const tagList = tags.split(','); // assuming "tag1,tag2,tag3"
+                                        const tagContainer = document.createElement('div');
+                                        tagContainer.className = 'flex items-center my-2 gap-[10px] flex-wrap';
+
+                                        tagList.forEach(tag => {
+                                        const tagEl = document.createElement('div');
+                                        tagEl.className = 'border border-solid border-[#ccc] px-[7px] py-[3px] bg-[#0d121600] rounded-[8px] shadow-[inset_0_0_0_1px_var(--Zya5eQ)] text-[#0d1216] capitalize';
+                                        tagEl.innerText = tag.trim();
+                                        tagContainer.appendChild(tagEl);
+                                        });
+
+                                        popup.appendChild(tagContainer); 
+
+                                        // Close on outside click
+                                        overlay.addEventListener('click', (e) => {
+                                            if (e.target === overlay) overlay.remove();
+                                        });
+
+                                        overlay.appendChild(popup);
+                                        document.body.appendChild(overlay);
+                                    });
 
                                     spans.forEach(span => {
                                         const spanTag = document.createElement('span');
@@ -20470,6 +20524,7 @@ if (targetItem) {
                         i && (this.container.dataset.dynamicDesignsId = i),
                         (this.headElem = this.container.querySelector(".fpd-head")),
                         (this.gridElem = this.container.querySelector(".fpd-grid")),
+                        console.log("jddddddddddddddddddddd", this)  
                         this.headElem.querySelector(".fpd-input-search input").addEventListener("keyup", (t) => {
                             console.log("ennnnnnnnnnnn");
                             const input = t.currentTarget;
@@ -20607,6 +20662,9 @@ tags.forEach(tag => {
             els.classList.remove('fpd-hidden');
             els.style.setProperty("opacity", "1");
         }
+        els.addEventListener('click', () => {
+            console.log("Element clicked:", els);
+        });
     }
     document.querySelectorAll('.my-tag-element').forEach(tag => {
         tag.classList.remove("!bg-[#40576d12]");
@@ -20704,7 +20762,29 @@ tags.forEach(tag => {
     container.appendChild(maindivfirst);
     // You can add any custom logic here
   });
+
   flexWrapper.appendChild(tagDiv);
+
+  const containermodules = document.querySelector('.fpd-module-content div[data-defaulttext="Elements"]');
+    if(containermodules){
+        console.log("containermodules",containermodules)
+        const els = containermodules.querySelector('#icon-search-back-data');
+
+        els.addEventListener('click', () => {
+            els.style.setProperty("opacity", "0");
+            els.classList.add('fpd-hidden');
+            console.log("Element clicked:", els);
+            document.querySelectorAll('.main-div-first').forEach(divss => {
+                divss.remove();
+            })
+            document.querySelectorAll('.fpd-category.fpd-item-group').forEach(el => {
+                el.classList.remove('fpd-hidden');
+            });
+            document.querySelectorAll('.my-tag-element').forEach(tag => {
+                tag.classList.remove("!bg-[#40576d12]");
+            })
+        });
+    }
 });
 
 // Step 4: Append sliding content to container
@@ -20924,7 +21004,7 @@ rightArrow.onclick = () => {
 
                         // Generate tag HTML dynamically
                         const tagsHtml = tagsArray.map(tag => `
-                            <div class="border border-solid border-[#ccc] px-[7px] py-[3px] bg-[#0d121600] rounded-[8px] shadow-[inset_0_0_0_1px_var(--Zya5eQ)] text-[#0d1216] capitalize">${tag}</div>
+                            <div class="border border-solid border-[#ccc] px-[7px] py-[3px] bg-[#0d121600] rounded-[8px] shadow-[inset_0_0_0_1px_var(--Zya5eQ)] text-[#0d1216] capitalize capitalize">${tag}</div>
                         `).join("");
 
                         tooltip.innerHTML = `
@@ -21448,28 +21528,51 @@ rightArrow.onclick = () => {
                 const i = this.fpdInstance.mainOptions,
                     s = new FileReader();
                 (s.onload = (s) => {
+                    alert("yes upload")
+                    console.log("sssssssssssssssssssssssss",s)
                     const r = s.currentTarget.result,
                         a = xi(this, Bi, Yi).call(this, r, t.name);
+                    console.log("sssssssssssssssssssssssssrrr",r)
                     if (FancyProductDesigner.uploadsToServer) {
                         if (!i.fileServerURL) return a.remove(), void alert("You need to set the fileServerURL in the option, otherwise file uploading does not work!");
                         a.classList.add("fpd-loading"), a.insertAdjacentHTML("beforeend", '<div class="fpd-loading-bar"><div class="fpd-loading-progress"></div></div>');
                     }
+                    else {
+                        var l;
+                        console.log("r", r, "t.name", t.name,"a",a);
+                        a.classList.remove("fpd-loading");
+                        const loadingBar = a.querySelector(".fpd-loading-bar");
+                        if (loadingBar) loadingBar.remove();
+                        
+                        xi(this, Li, Ui).call(this, s, t.name);
+                        xi(this, Fi, Gi).call(this, a, e);
+                        Ci(this, Ei, ((l = wi(this, Ei)), ++l));
+                    }
                     const o = new Image();
+                    console.log("sssssssssssssssssssssssss)))))))0",o)
                     (o.onload = (i) => {
                         const s = i.currentTarget;
                         let r = s.height,
                             o = s.width;
+                        console.log("tttttttttttttttttttt1r",r)
                         if (et(this.fpdInstance, o, r))
                             if (FancyProductDesigner.uploadsToServer) {
+                                alert("Upload function");
                                 const i = new FormData();
+                                console("tttttttttttttttttttt1i",i)
                                 i.append("images[]", t);
                                 const s = new XMLHttpRequest();
+                                console("tttttttttttttttttttt1s",s)
                                 (s.responseType = "json"),
                                     (s.onreadystatechange = (t) => {
+                                        alert("check change state");
+                                        console("tttttttttttttttttttt",t)
                                         if (s.readyState === XMLHttpRequest.DONE) {
                                             const t = s.status;
+                                            console("tttttttttttttttttttt1",t)
                                             if (0 === t || (t >= 200 && t < 400)) {
                                                 const t = s.response;
+                                                console("tttttttttttttttttttt2",t)
                                                 var i;
                                                 t.image_src &&
                                                     (xi(this, Li, Ui).call(this, t.image_src, t.filename),
@@ -21484,6 +21587,8 @@ rightArrow.onclick = () => {
                                         }
                                     }),
                                     (s.upload.onprogress = (t) => {
+                                        alert("chhhhhhhhhhhhhh");
+                                        console.log("tttttttttt",t);
                                         let e = t.total,
                                             i = t.loaded,
                                             n = parseInt((100 * i) / e);
@@ -21966,11 +22071,13 @@ rightArrow.onclick = () => {
                                     })(t, Sn(t, e, "get"));
                                 })(this, Tn) ||
                                 (Cn(this, Tn, !0),
+                                console.log("jjjjjjjjjjjjjjjjjjjjjj",i),
                                 i.classList.add("fpd-loading"),
                                 Ut({
                                     url: t.mainOptions.aiService.serverURL,
                                     body: { service: "text2Img", prompt: this.inputElem.value },
                                     onSuccess: (e) => {
+                                        console.log("ddddddddddddddddddddddd",e)
                                         e && e.images
                                             ? (wn(this, An, kn).call(this, e.images),
                                               e.images.forEach((t) => {
@@ -25363,17 +25470,34 @@ rightArrow.onclick = () => {
                 }
                 setupProductsNew() {
                     let t = arguments.length > 0 && void 0 !== arguments[0] ? arguments[0] : [];
-                    console.log("setupProductsNew---", t),
-                    (this.productsnew = []),
-                        t.forEach((t) => {
-                            t.hasOwnProperty("category")
-                                ? t.products.forEach((e) => {
-                                    console.log("Middle Layer", e)
-                                      this.addProductNew(e, t.category);
-                                  })
-                                : this.addProductNew(t);
-                        }),
-                        console.log("setupProductsNewLastBefore", this.productsnew, this.container),
+                    console.log("setupProductsNew---111", t),
+                    this.productsnew = [];
+
+                    t.forEach((tItem) => {
+                    const category = tItem.category;
+
+                    if (tItem.hasOwnProperty("category")) {
+                        tItem.products.forEach((product) => {
+                        // Check if category already exists
+                        const existingCategory = this.productsnew.find(p => p.category === category);
+
+                        if (existingCategory) {
+                            existingCategory.products.push(product);
+                        } else {
+                            this.productsnew.push({
+                            category: category,
+                            products: [product]
+                            });
+                        }
+                        });
+                    } else {
+                        // Handle case where tItem is directly a product (no category)
+                        this.addProductNew(tItem);
+                    }
+                    });
+
+                    console.log("setupProductsNewLastAfter ✅", this.productsnew);
+                        console.log("setupProductsNewLastBefore000", this.productsnew, this.container),
                         this.mainOptions.loadFirstProductInStage && t.length > 0 ? this.selectProduct(0) : this.toggleSpinner(!1),
                         q(this, "productsSet", {});
 
@@ -25387,6 +25511,7 @@ rightArrow.onclick = () => {
                 addProductNew(t, e) {
                     console.log("addProductanoo1", t, e);
                     var i = Ao(this, _o, Uo).call(this, e);
+                    console.log("addProductanoo1222", i);
                     void 0 === e ? this.productsnew.push(t) : (!1 === i && ((i = this.productsnew.length), (this.productsnew[i] = { category: e, products: [] })), this.productsnew[i].products.push(t)),
                         q(this, "productAddNew", { views: t, category: e, catIndex: i });
                 }
@@ -25413,6 +25538,7 @@ rightArrow.onclick = () => {
                     const savedId = localStorage.getItem('parentDivId');
                     console.log(this.currentProductIndex, "selectProduct--1--1-", savedId);
                     if (savedId === 'ProductModule') {
+                        console.log("ciiiiiiiiiiiiiiiiiisksks-----");
                         To(this, Io, To(this, Oo, 0)),
                             (this.currentCategoryIndex = void 0 === e ? this.currentCategoryIndex : e),
                             (i = this.products && this.products.length && this.products[0].category ? this.products[this.currentCategoryIndex].products : this.products),
@@ -25459,6 +25585,152 @@ rightArrow.onclick = () => {
                                         r.dataset.index = i;
                                         r.dataset.source = n;
                                         r.dataset.index = i;
+                                        r.dataset.manufacturer = th;
+
+                                        const a = document.createElement("picture");
+                                        a.className = "flex"
+                                        a.dataset.img = n;
+                                        a.style.backgroundImage = `url("${n}")`;
+                                        r.append(a);
+
+                                        // ========== Append Product Name Label ==========
+                                        const label = document.createElement("div");
+                                        label.className = "fpd-label text-center mt-0 text-xs text-gray-700 truncate max-w-[130px] overflow-hidden whitespace-nowrap mb-1 h-[30px]";
+                                        label.title = s;
+                                        label.textContent = s;
+                                        r.append(label);
+
+                                        const manufacturer = document.createElement("div");
+                                        manufacturer.className = "fpd-label text-center mt-0 text-xs font-bold text-gray-900 truncate max-w-[130px] overflow-hidden whitespace-nowrap h-[30px] mb-2";
+                                        manufacturer.productTitle = pr;
+                                        manufacturer.textContent = '$' + pr ;
+                                        r.append(manufacturer);
+                                        
+                                        container.appendChild(r);
+
+                                        
+                                    
+                                        r.addEventListener("click", (e) => {
+
+                                            console.log("88888888",t, r)
+                                            console.log("fpdInstance", fpdInstance);
+                                            console.log("Anoop Data 4-1--", fpdInstance, e, r);
+                                            let valueofTitle = e?.srcElement.dataset.title;
+                                            console.log("valueofTitle", valueofTitle)
+                                            localStorage.setItem("valueofTitle",valueofTitle);
+                                            if ((e.preventDefault(), fpdInstance.mainOptions.swapProductConfirmation)) {
+                                                var n = t(fpdInstance.translator.getTranslation("modules", "products_confirm_replacement"), !1, "confirm", this.fpdInstance.container);
+                                                const eBtn = n.querySelector(".fpd-confirm");
+                                                eBtn.innerText = fpdInstance.translator.getTranslation("modules", "products_confirm_button");
+
+                                                G(eBtn, ["click"], () => {
+                                                    console.log("Anoop Data 5....", fpdInstance, i,this.currentCategoryIndex);
+                                                    fpdInstance.selectProduct(i, this.currentCategoryIndex);
+                                                    n.remove();
+                                                });
+
+                                            } else {
+                                                console.log("coming to else", this.currentCategoryIndex, r.dataset.index)
+                                                localStorage.setItem("rdatasetindex",r.dataset.index)
+                                                fpdInstance.selectProduct(Number(r.dataset.index), this.currentCategoryIndex);
+                                                // const modal = t(
+                                                //     fpdInstance.translator.getTranslation("modules", "products_confirm_replacement"),
+                                                //     false,
+                                                //     "confirm",
+                                                //     fpdInstance.container
+                                                // );
+                                                // const confirmBtn = modal.querySelector(".fpd-confirm");
+                                                // confirmBtn.innerText = fpdInstance.translator.getTranslation("modules", "products_confirm_button");
+
+                                                // const target = e.currentTarget;
+                                                // G(confirmBtn, ["click"], () => {
+                                                //     modal.remove();
+                                                //     console.log("Anoop Data 5-1");
+                                                //     localStorage.setItem('UE', true);
+                                                //     fpdInstance.selectProduct(Number(target.dataset.index), this.currentCategoryIndex);
+                                                // });
+                                            }
+
+                                            //  const i = Array.from(r.querySelectorAll(".fpd-item")).indexOf(s);
+                                            // fpdInstance.selectView(i), this.reset();
+                                            
+                                        });
+
+                                        // ========== Append to Grid ==========
+                                        // this.container.querySelector(".fpd-grid").append(r);
+
+                                    }
+                                
+                                });
+                            }
+                            localStorage.setItem('dataskins', JSON.stringify(n));
+                            console.log("jjjjjjjjjj", n, this.mainOptions)
+                            this.loadProduct(n, this.mainOptions.replaceInitialElements);
+                        }
+                        else{
+                            // n = i[this.currentProductIndex]
+                            console.log("coming else of value on load")
+                            const flatArray = i.flat(); // Flatten the nested structure
+                            console.log(valueofTitle,"coming else inside 1",flatArray)
+                            p = [flatArray.find(item => item.title === valueofTitle)];
+                            console.log("coming else inside",p)
+                            if(p[0] === undefined || p[0] === null){
+                                p = [flatArray.find(item => item.productTitle === valueofTitle)]
+                                console.log("coming else inside one",p)
+                            }
+                            this.loadProduct(p, this.mainOptions.replaceInitialElements);
+                        }
+                        
+                    }
+                    else if (savedId === 'DesignModule') {
+                        console.log("ciiiiiiiiiiiiiiiiiisksks-----k");
+                        To(this, Io, To(this, Oo, 0)),
+                            (this.currentCategoryIndex = void 0 === e ? this.currentCategoryIndex : e),
+                            (i = this.productsnew && this.productsnew.length && this.productsnew[0].category ? this.productsnew[this.currentCategoryIndex].products : this.products),
+                            (this.currentProductIndex = t),
+                            t < 0 ? (this.currentProductIndex = 0) : t > i.length - 1 && (this.currentProductIndex = i.length - 1);
+                        console.log("daaaaaaaaaaaaataa of i of DM", i, this.currentProductIndex, i.length)
+                         const n = i[this.currentProductIndex];
+                        // const n = i[0];
+                        let valueofTitle = localStorage.getItem("valueofTitle");
+                        console.log("valueofTitle", valueofTitle)
+                        if(valueofTitle === null || valueofTitle === "undefined" || valueofTitle === ''){
+                            console.log("coming if of value on load0000w02", this.currentProductIndex)
+                            const n = i[this.currentProductIndex]
+                            console.log("coming if inside",n, i[this.currentProductIndex])
+
+                            console.log("daaaaaaaaaaaaataa of n", n)
+                        
+                            console.log("selectProduct ye kya", n, this.mainOptions);
+                            if(n.length > 1){
+                                if(valueofTitle === null || valueofTitle === "undefined"){
+                                    console.log("coming 0")
+                                }
+                                else{
+
+                                    console.log("vjesjsj",valueofTitle)
+                                }
+                            }
+                            let valueofUE = localStorage.getItem('UE');
+                            if (valueofUE === 'true') {
+                                const container = document.querySelector(".ProductModuleMy");
+                                console.log("nnnnnnnnnnnnnnnnnnnn",n)
+                                n.forEach((e, i) => {
+                                    console.log("e",e,valueofTitle)
+                                    if(container){
+                                        let n = e.thumbnail,
+                                        s = e.title ?  e.title : e.productTitle,
+                                        pr = e.price ? e.price : 0,
+                                        
+                                        th = e.manufacturer ? e.manufacturer : "Styleflip",
+                                        sct = e.subcategorytype ? e.subcategorytype : "General";
+                                        const r = document.createElement("div");
+                                        r.className = "fpd-item fpd-hover-thumbnail text mt-1 skins-det";
+                                        r.dataset.title = s;
+                                        r.dataset.index = i;
+                                        r.dataset.source = n;
+                                        r.dataset.index = i;
+                                        r.dataset.manufacturer = th;
 
                                         const a = document.createElement("picture");
                                         a.className = "flex"
@@ -25556,6 +25828,7 @@ rightArrow.onclick = () => {
                         
                     }
                     else{
+                        console.log("ciiiiiiiiiiiiiiiiiisksks");
                         To(this, Io, To(this, Oo, 0)),
                             (this.currentCategoryIndex = void 0 === e ? this.currentCategoryIndex : e),
                             (i = this.productsnew && this.productsnew.length && this.productsnew[0].category ? this.productsnew[this.currentCategoryIndex]?.products : this.productsnew),
@@ -26307,18 +26580,59 @@ rightArrow.onclick = () => {
                                       alert("Products JSON could not be loaded. Please check that your URL is correct! URL: " + this.mainOptions.productsJSON);
                                   },
                               })),
-
+                              console.log("jjjjjjjjjjjt",this.mainOptions.productsJSON1)
                     this.mainOptions.productsJSON1 &&
                         ("object" == typeof this.mainOptions.productsJSON1
                             ? this.setupProductsNew(this.mainOptions.productsJSON1)
                             : Vt({
                                   url: this.mainOptions.productsJSON1,
                                   onSuccess: (t) => {
-                                    console.log("setupProducts1",t)
-                                    this.setupProductsNew(t);
+                                        console.log("setupProductsNew-----",t)
+                                            const processed = [];
+
+                                            t.forEach(item => {
+                                                if (item.subcategory.trim() === '') {
+                                                    processed.push({ category: item.category, subcategory: '' });
+                                                } else {
+                                                    const subcats = item.subcategory.split(',').map(s => s.trim());
+                                                    subcats.forEach(sub => {
+                                                    processed.push({ category: item.category, subcategory: sub });
+                                                    });
+                                                }
+                                            });
+
+                                            // Save to localStorage
+                                            localStorage.setItem('fpd-category-subcategories', JSON.stringify(processed));
+
+                                            console.log("Processed category-subcategory pairs:", processed);
+
+                                            const grouped = {};
+
+                                            processed.forEach(({ category, subcategory }) => {
+                                            if (!grouped[category]) {
+                                                grouped[category] = [];
+                                            }
+                                            if (subcategory.trim()) {
+                                                grouped[category].push(subcategory.trim());
+                                            }
+                                            });
+
+                                            // Convert grouped object to desired array
+                                            const result = Object.entries(grouped).map(([category, subcategories]) => ({
+                                            category,
+                                            subcategory: subcategories.join(', ')
+                                            }));
+
+                                            // Save to localStorage if needed
+                                            
+
+                                            console.log("Final grouped output:", result);
+                                            localStorage.setItem('fpd-grouped-categories', JSON.stringify(result));
+                                            localStorage.setItem('fpd-grouped-categories-number',0)
+                                      this.setupProductsNew(t);
                                   },
                                   onError: () => {
-                                      alert("Products JSON could not be loaded. Please check that your URL is correct! URL: " + this.mainOptions.productsJSON1);
+                                      alert("Products JSON could not be loaded. Please check that your URL is correct! URL: " + this.mainOptions.productsJSON);
                                   },
                               })),
                    

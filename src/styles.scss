@@ -26,12 +26,15 @@ div.fpd-container fpd-actions-bar{
  .fpd-container fpd-module-products .fpd-grid, .fpd-container fpd-module-productsnew .fpd-grid {grid-template-columns: repeat(2, 1fr);}
 .fpd-container .fpd-grid.fpd-grid-contain>.fpd-item>picture{background-position: center;max-height: 86px;}.fpd-item.fpd-itemimg{ span{display: none;}}
 div.fpd-container .fpd-text-templates #text-templates.fpd-grid{gap: 7px;}
-@media only screen and (min-width: 991px){fpd-actions-bar div[data-pos="left"]{margin-left: 341px;.fpd-btn span{display: none;}}
+@media only screen and (min-width: 991px){
+  fpd-module-text div[data-moduleicon="type-outline"]{    max-width: calc(100% - 15px)}
+  fpd-module-images div[data-moduleicon="cloud-upload"]{margin-top: -18px;}
+  fpd-actions-bar div[data-pos="left"]{margin-left: 341px;.fpd-btn span{display: none;}}
   body{overflow: hidden;.fpd-container.fpd-sidebar>fpd-main-bar .fpd-navigation,.fpd-wrapper>fpd-main-wrapper{max-height: calc(100vh - 56px);overflow: auto;}.fpd-wrapper>fpd-main-wrapper{margin-top: 56px;}}
   div[data-pos="right"]{position: fixed !important;right: 0 !important;bottom: 0 !important;.fpd-uncollapsed-menu.fpd-visible-hidden.fpd-hidden{display: flex !important;visibility: visible !important;}}
   #clothing-designer div[data-pos="left"] div[aria-label="Undo"]{position: relative;&:before{content: '';width: 1px;background: rgb(255 255 255 / 84%);height: 30px;left: -9px;position: absolute;}}
   #clothing-designer div[data-pos="left"] div[aria-label="Redo"]{position: relative;margin-right:8px;&:after{content: '';width: 1px;background: rgb(255 255 255 / 84%);height: 30px;right: -7px;position: absolute;}}
-  .fpd-module-content>.fpd-active{padding-top: 18px;}.fpd-module-content>fpd-module-images.fpd-active{padding-top: 0;}.input-search-box{max-width: calc(100% - 20px);} .valueoffpdmoduleproducts-active div[data-title="Design"] .input-search-box{max-width: calc(100% - 40px);margin-left: 25px;}.fpd-container fpd-module-designs{padding-right: 0;}
+  .fpd-module-content>.fpd-active{padding-top: 18px;padding: 0;margin: 17px 8px;}.fpd-module-content>fpd-module-images.fpd-active{padding-top: 0;}.input-search-box{max-width: calc(100% - 20px);} .valueoffpdmoduleproducts-active div[data-title="Design"] .input-search-box{max-width: calc(100% - 40px);margin-left: 25px;}.fpd-container fpd-module-designs{padding-right: 0;}
   .fpd-saved-designs .fpd-item.fpd-hover-thumbnail{position: relative;border: 1px solid #bdbdbd; .fa-solid.fa-trash{position: absolute;right: 0;        font-size: 15px;top:0}}
   .fpd-container .fpd-scroll-area{max-width: 350px;}
   fpd-element-toolbar.fpd-smart.fpd-show{top: 80px !important;transform: none;max-width: calc(100% - 441px);left: 441px !important;width: max-content;max-width: calc(100% - 441px);justify-content: center;right: 0; margin: auto;
@@ -133,7 +136,7 @@ div.fpd-container .fpd-text-templates #text-templates.fpd-grid{gap: 7px;}
       }
       #backbuttonStoP{
         position: absolute;
-        top:26px;
+        top:5px;
       }
     }
     .fpd-container fpd-module-text .fpd-add-text{
@@ -191,4 +194,7 @@ div.fpd-container .fpd-text-templates #text-templates.fpd-grid{gap: 7px;}
     .fpd-see-all.see-less{position: fixed;
 left: 84px;
 right: auto;
-top: 88px;}
+top: 82px;}
+
+
+
