@@ -3,18 +3,14 @@ import { createIcons, icons } from 'lucide';
 import { isPlatformBrowser } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
 import { HttpClientModule } from '@angular/common/http';
-
-
-
+import { FormsModule } from '@angular/forms';
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, HttpClientModule],
+  imports: [RouterOutlet, HttpClientModule, FormsModule],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.scss'
+  styleUrl: './app.component.scss',
 })
-export class AppComponent  {
-  
+export class AppComponent {
   title = 'designer-angular';
   constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
-
 }

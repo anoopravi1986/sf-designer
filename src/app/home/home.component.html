@@ -1,127 +1,220 @@
-
-  
-  <!-- <div class="p-2 bg-white header">
+<!-- <div class="p-2 bg-white header">
     <img 
       src="https://designer-b0677.firebaseapp.com/assets/images/logo.png" 
       alt="StyleflipLogo" 
       class="max-w-[240px] h-auto mx-auto"
     />
   </div> -->
-  <!-- <img 
+<!-- <img 
       src="https://designer-b0677.firebaseapp.com/assets/images/logo.png" 
       alt="StyleflipLogo" 
       class="max-w-[240px] h-auto mx-auto fixed left-0"
     /> -->
-    <div class="md:fixed top-[3px] left-0 w-[120px] bg-transparent z-50 flex items-center justify-between gap-4 px-4 md:h-[50px] text-sm">
-      <button class="fixed right-0 md:relative md:right-auto flex md:hidden items-center gap-2 text-left bg-transparent text-white px-1.5 py-1.5 text-lg text-[1rem] rounded hover:bg-white-500 transition top-[8px] z-[9]" (click)="showBox()">
-        <i data-lucide="menu" class="w-6 h-6"></i>
+<div
+  class="md:fixed top-[3px] left-0 w-[120px] bg-transparent z-50 flex items-center justify-between gap-4 px-4 md:h-[50px] text-sm">
+  <button
+    class="fixed right-0 md:relative md:right-auto flex md:hidden items-center gap-2 text-left bg-transparent text-white px-1.5 py-1.5 text-lg text-[1rem] rounded hover:bg-white-500 transition top-[8px] z-[9]"
+    (click)="showBox()">
+    <i data-lucide="menu" class="w-6 h-6"></i>
+  </button>
+  <div
+    class="md:hidden fixed z-[99] bg-transparent text-white px-5 py-2 rounded w-[300px] text-sm truncate overflow-hidden whitespace-nowrap font-semibold pr-0">
+    {{activeImageTitle}}
+  </div>
+  <!-- Profile Initial Icon -->
+  <div
+    class="md:hidden fixed z-[99] top-[7px] right-[45px] md:relative md:top-auto md:right-auto min-w-[38px] w-[38px] h-[38px] max-h-10 rounded-full bg-[#f53744] text-white flex items-center justify-center font-semibold text-lg cursor-pointer"
+    (click)="openLoginPopup()">
+    {{ initialLetter }}
+  </div>
+
+  <div
+    class="box flex gap-2 flex-col md:hidden fixed z-[99] top-0 bottom-0 mt-0 left-0 right-0 p-4 bg-gray-700 border border-gray-300 rounded shadow"
+    *ngIf="isBoxVisible">
+    <span class="close-btn absolute top-1 right-2 text-gray-500 cursor-pointer text-xl hover:text-black"
+      (click)="closeBox()">&times;</span>
+    <button class="flex text-white font-semibold pl-2 pr-2">File</button>
+    <button class="flex text-white items-center pl-2 pr-2 font-semibold" type="button"><span aria-hidden="true"
+        class="uRWxVA dkWypw w2m0dg"><svg style="color: #ffffffb3;" xmlns="http://www.w3.org/2000/svg" width="16"
+          height="16" viewBox="0 0 16 16">
+          <path fill="currentColor"
+            d="M7.51 4.87C7.01 6.27 6.45 6.95 5.94 7c-.57.07-1.07-.18-1.54-.8a.54.54 0 0 0-.1-.1 1 1 0 1 0-.8.4l.01.12.82 3.24A1.5 1.5 0 0 0 5.78 11h4.44a1.5 1.5 0 0 0 1.45-1.14l.82-3.24a.54.54 0 0 0 .01-.12 1 1 0 1 0-.8-.4.54.54 0 0 0-.1.09c-.49.62-1 .87-1.54.81-.5-.05-1.04-.74-1.57-2.13a1 1 0 1 0-.98 0zM11 11.75a.5.5 0 1 1 0 1H5a.5.5 0 1 1 0-1h6z">
+          </path>
+        </svg></span><span class="pl-[5px]">
+        <div class="BMOCzQ _6Mu4Ow FQ64gg" style="--s_rwAw: flex;">Resize</div>
+      </span></button>
+    <button class="flex text-white items-center pl-2 pr-2 font-semibold" type="button"><span aria-hidden="true"
+        class="uRWxVA dkWypw w2m0dg"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+          <path fill="currentColor"
+            d="m6.1 17.8.73.73 1.3-.49a4.5 4.5 0 0 0 1.48-.91L7.5 15.01c-.4.43-.7.94-.91 1.48L6.1 17.8zm2.46-3.85 2.12 2.12 7.39-7.4-2.12-2.11-7.4 7.4zM17 5.5l2.12 2.12.83-.83a1.5 1.5 0 0 0-2.12-2.12L17 5.5zm4.01-1.9a3 3 0 0 1 0 4.25L10.8 18.07a6 6 0 0 1-2.14 1.38l-4 1.49a.75.75 0 0 1-.97-.97l1.5-4a6 6 0 0 1 1.37-2.15L16.78 3.61a3 3 0 0 1 4.24 0z">
+          </path>
+        </svg></span><span class="pl-[8px]">
+        <div class="BMOCzQ _6Mu4Ow FQ64gg" style="--s_rwAw: flex;">Editing</div>
+      </span></button>
+    <a href="https://www.youtube.com/playlist?list=PLU0ltU4FmAbDQ5keQV8cmBmJQ2ejcH4zF" target="_blank"
+      rel="noopener noreferrer" class="cursor-pointer">
+      <button
+        class="border border-[#ffffff59] mr-[7px] rounded-[8px] font-semibold flex items-center gap-2 bg-transparent text-white pl-[0.565rem] pr-[1rem] py-2 text-sm rounded-[8px] min-w-[180px] justify-center">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M8.75 10.5a1.75 1.75 0 1 0 0-3.5 1.75 1.75 0 0 0 0 3.5Z" fill="currentColor"></path>
+          <path fill-rule="evenodd" clip-rule="evenodd"
+            d="M17 3H7a4 4 0 0 0-4 4v10a4 4 0 0 0 4 4h10a4 4 0 0 0 4-4V7a4 4 0 0 0-4-4Zm0 1.5h-2v5.182h4.5V7A2.5 2.5 0 0 0 17 4.5Zm-10 15h6.5v-15H7A2.5 2.5 0 0 0 4.5 7v10A2.5 2.5 0 0 0 7 19.5Zm10 0h-2v-8.318h4.5V17a2.5 2.5 0 0 1-2.5 2.5Z"
+            fill="currentColor"></path>
+        </svg>
+        Need Help
       </button>
-      <div class="md:hidden fixed z-[99] bg-transparent text-white px-5 py-2 rounded w-[300px] text-sm truncate overflow-hidden whitespace-nowrap font-semibold pr-0">
-        {{activeImageTitle}}
-      </div>
-      <!-- Profile Initial Icon -->
-      <div class="md:hidden fixed z-[99] top-[7px] right-[45px] md:relative md:top-auto md:right-auto min-w-[38px] w-[38px] h-[38px] max-h-10 rounded-full bg-[#f53744] text-white flex items-center justify-center font-semibold text-lg">
-        A
-      </div>
-      <div class="box flex gap-2 flex-col md:hidden fixed z-[99] top-0 bottom-0 mt-0 left-0 right-0 p-4 bg-gray-700 border border-gray-300 rounded shadow" *ngIf="isBoxVisible">
-        <span class="close-btn absolute top-1 right-2 text-gray-500 cursor-pointer text-xl hover:text-black" (click)="closeBox()">&times;</span>
-        <button class="flex text-white font-semibold pl-2 pr-2">File</button>
-        <button class="flex text-white items-center pl-2 pr-2 font-semibold" type="button" ><span aria-hidden="true" class="uRWxVA dkWypw w2m0dg"><svg style="color: #ffffffb3;" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><path fill="currentColor" d="M7.51 4.87C7.01 6.27 6.45 6.95 5.94 7c-.57.07-1.07-.18-1.54-.8a.54.54 0 0 0-.1-.1 1 1 0 1 0-.8.4l.01.12.82 3.24A1.5 1.5 0 0 0 5.78 11h4.44a1.5 1.5 0 0 0 1.45-1.14l.82-3.24a.54.54 0 0 0 .01-.12 1 1 0 1 0-.8-.4.54.54 0 0 0-.1.09c-.49.62-1 .87-1.54.81-.5-.05-1.04-.74-1.57-2.13a1 1 0 1 0-.98 0zM11 11.75a.5.5 0 1 1 0 1H5a.5.5 0 1 1 0-1h6z"></path></svg></span><span class="pl-[5px]"><div class="BMOCzQ _6Mu4Ow FQ64gg" style="--s_rwAw: flex;">Resize</div></span></button>
-        <button class="flex text-white items-center pl-2 pr-2 font-semibold" type="button" ><span aria-hidden="true" class="uRWxVA dkWypw w2m0dg"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="m6.1 17.8.73.73 1.3-.49a4.5 4.5 0 0 0 1.48-.91L7.5 15.01c-.4.43-.7.94-.91 1.48L6.1 17.8zm2.46-3.85 2.12 2.12 7.39-7.4-2.12-2.11-7.4 7.4zM17 5.5l2.12 2.12.83-.83a1.5 1.5 0 0 0-2.12-2.12L17 5.5zm4.01-1.9a3 3 0 0 1 0 4.25L10.8 18.07a6 6 0 0 1-2.14 1.38l-4 1.49a.75.75 0 0 1-.97-.97l1.5-4a6 6 0 0 1 1.37-2.15L16.78 3.61a3 3 0 0 1 4.24 0z"></path></svg></span><span class="pl-[8px]"><div class="BMOCzQ _6Mu4Ow FQ64gg" style="--s_rwAw: flex;">Editing</div></span></button>
-        <a href="https://www.youtube.com/playlist?list=PLU0ltU4FmAbDQ5keQV8cmBmJQ2ejcH4zF" target="_blank" rel="noopener noreferrer" class="cursor-pointer">
-          <button class="border border-[#ffffff59] mr-[7px] rounded-[8px] font-semibold flex items-center gap-2 bg-transparent text-white pl-[0.565rem] pr-[1rem] py-2 text-sm rounded-[8px] min-w-[180px] justify-center">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8.75 10.5a1.75 1.75 0 1 0 0-3.5 1.75 1.75 0 0 0 0 3.5Z" fill="currentColor"></path><path fill-rule="evenodd" clip-rule="evenodd" d="M17 3H7a4 4 0 0 0-4 4v10a4 4 0 0 0 4 4h10a4 4 0 0 0 4-4V7a4 4 0 0 0-4-4Zm0 1.5h-2v5.182h4.5V7A2.5 2.5 0 0 0 17 4.5Zm-10 15h6.5v-15H7A2.5 2.5 0 0 0 4.5 7v10A2.5 2.5 0 0 0 7 19.5Zm10 0h-2v-8.318h4.5V17a2.5 2.5 0 0 1-2.5 2.5Z" fill="currentColor"></path></svg>
-            Need Help
-          </button>
-        </a>
-      </div>
-      <button class="hidden md:block text-white font-semibold ml-[15px]">File</button>
-      <button class="hidden md:flex text-white items-center pl-2 pr-2 font-semibold" type="button" ><span aria-hidden="true" class="uRWxVA dkWypw w2m0dg"><svg style="color: #ffffffb3;" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><path fill="currentColor" d="M7.51 4.87C7.01 6.27 6.45 6.95 5.94 7c-.57.07-1.07-.18-1.54-.8a.54.54 0 0 0-.1-.1 1 1 0 1 0-.8.4l.01.12.82 3.24A1.5 1.5 0 0 0 5.78 11h4.44a1.5 1.5 0 0 0 1.45-1.14l.82-3.24a.54.54 0 0 0 .01-.12 1 1 0 1 0-.8-.4.54.54 0 0 0-.1.09c-.49.62-1 .87-1.54.81-.5-.05-1.04-.74-1.57-2.13a1 1 0 1 0-.98 0zM11 11.75a.5.5 0 1 1 0 1H5a.5.5 0 1 1 0-1h6z"></path></svg></span><span class="pl-[5px]"><div class="BMOCzQ _6Mu4Ow FQ64gg" style="--s_rwAw: flex;">Resize</div></span></button>
-      <button class="hidden md:flex text-white items-center pl-3 pr-3 font-semibold" type="button" ><span aria-hidden="true" class="uRWxVA dkWypw w2m0dg"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="m6.1 17.8.73.73 1.3-.49a4.5 4.5 0 0 0 1.48-.91L7.5 15.01c-.4.43-.7.94-.91 1.48L6.1 17.8zm2.46-3.85 2.12 2.12 7.39-7.4-2.12-2.11-7.4 7.4zM17 5.5l2.12 2.12.83-.83a1.5 1.5 0 0 0-2.12-2.12L17 5.5zm4.01-1.9a3 3 0 0 1 0 4.25L10.8 18.07a6 6 0 0 1-2.14 1.38l-4 1.49a.75.75 0 0 1-.97-.97l1.5-4a6 6 0 0 1 1.37-2.15L16.78 3.61a3 3 0 0 1 4.24 0z"></path></svg></span><span class="pl-[8px]"><div class="BMOCzQ _6Mu4Ow FQ64gg" style="--s_rwAw: flex;">Editing</div></span></button>
-    </div>
-    <div class="md:fixed md:top-[3px] md:right-0 w-auto md:w-[50%] bg-transparent z-50 hidden md:flex items-center justify-end gap-4 pl-4 pr-2 h-[50px] text-sm">
-      
-      <!-- Design Name Box -->
-      <div class="bg-transparent text-white px-5 py-2 rounded w-[300px] text-sm truncate overflow-hidden whitespace-nowrap font-semibold pr-0">
-        {{activeImageTitle}}
-      </div>
-      <!-- Profile Initial Icon -->
-      <div class="fixed top-[7px] right-[45px] md:relative md:top-auto md:right-auto min-w-[38px] w-[38px] h-[38px] max-h-10 rounded-full bg-[#f53744] text-white flex items-center justify-center font-semibold text-lg">
-        A
-      </div>
-      
+    </a>
+  </div>
+  <button class="hidden md:block text-white font-semibold ml-[15px]">File</button>
+  <button class="hidden md:flex text-white items-center pl-2 pr-2 font-semibold" type="button"><span aria-hidden="true"
+      class="uRWxVA dkWypw w2m0dg"><svg style="color: #ffffffb3;" xmlns="http://www.w3.org/2000/svg" width="16"
+        height="16" viewBox="0 0 16 16">
+        <path fill="currentColor"
+          d="M7.51 4.87C7.01 6.27 6.45 6.95 5.94 7c-.57.07-1.07-.18-1.54-.8a.54.54 0 0 0-.1-.1 1 1 0 1 0-.8.4l.01.12.82 3.24A1.5 1.5 0 0 0 5.78 11h4.44a1.5 1.5 0 0 0 1.45-1.14l.82-3.24a.54.54 0 0 0 .01-.12 1 1 0 1 0-.8-.4.54.54 0 0 0-.1.09c-.49.62-1 .87-1.54.81-.5-.05-1.04-.74-1.57-2.13a1 1 0 1 0-.98 0zM11 11.75a.5.5 0 1 1 0 1H5a.5.5 0 1 1 0-1h6z">
+        </path>
+      </svg></span><span class="pl-[5px]">
+      <div class="BMOCzQ _6Mu4Ow FQ64gg" style="--s_rwAw: flex;">Resize</div>
+    </span></button>
+  <button class="hidden md:flex text-white items-center pl-3 pr-3 font-semibold" type="button"><span aria-hidden="true"
+      class="uRWxVA dkWypw w2m0dg"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+        <path fill="currentColor"
+          d="m6.1 17.8.73.73 1.3-.49a4.5 4.5 0 0 0 1.48-.91L7.5 15.01c-.4.43-.7.94-.91 1.48L6.1 17.8zm2.46-3.85 2.12 2.12 7.39-7.4-2.12-2.11-7.4 7.4zM17 5.5l2.12 2.12.83-.83a1.5 1.5 0 0 0-2.12-2.12L17 5.5zm4.01-1.9a3 3 0 0 1 0 4.25L10.8 18.07a6 6 0 0 1-2.14 1.38l-4 1.49a.75.75 0 0 1-.97-.97l1.5-4a6 6 0 0 1 1.37-2.15L16.78 3.61a3 3 0 0 1 4.24 0z">
+        </path>
+      </svg></span><span class="pl-[8px]">
+      <div class="BMOCzQ _6Mu4Ow FQ64gg" style="--s_rwAw: flex;">Editing</div>
+    </span></button>
+</div>
+<div
+  class="md:fixed md:top-[3px] md:right-0 w-auto md:w-[50%] bg-transparent z-50 hidden md:flex items-center justify-end gap-4 pl-4 pr-2 h-[50px] text-sm">
 
-      <div class="relative md:min-w-[290px] hidden md:flex" #dropdownWrapper>
-        <a href="https://www.youtube.com/playlist?list=PLU0ltU4FmAbDQ5keQV8cmBmJQ2ejcH4zF" target="_blank" rel="noopener noreferrer" class="cursor-pointer">
-          <button class="border border-[#ffffff59] mr-[7px] rounded-[8px] font-semibold flex items-center gap-2 bg-transparent text-white pl-[0.565rem] pr-[1rem] py-2 text-sm rounded-[8px] min-w-[180px] justify-center">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8.75 10.5a1.75 1.75 0 1 0 0-3.5 1.75 1.75 0 0 0 0 3.5Z" fill="currentColor"></path><path fill-rule="evenodd" clip-rule="evenodd" d="M17 3H7a4 4 0 0 0-4 4v10a4 4 0 0 0 4 4h10a4 4 0 0 0 4-4V7a4 4 0 0 0-4-4Zm0 1.5h-2v5.182h4.5V7A2.5 2.5 0 0 0 17 4.5Zm-10 15h6.5v-15H7A2.5 2.5 0 0 0 4.5 7v10A2.5 2.5 0 0 0 7 19.5Zm10 0h-2v-8.318h4.5V17a2.5 2.5 0 0 1-2.5 2.5Z" fill="currentColor"></path></svg>
-            Need Help
-          </button>
-        </a>
-        <button (click)="toggleDropdown()" class="font-semibold hidden md:flex items-center gap-2 bg-[#f2eafd] text-black pl-[0.565rem] pr-[1rem] py-2 text-sm rounded-[8px] hover:bg-gray-100 transition">
-          <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M4.5 11.75V19a.5.5 0 0 0 .5.5h14a.5.5 0 0 0 .5-.5v-7.25a.75.75 0 1 1 1.5 0V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7.25a.75.75 0 1 1 1.5 0Zm8.323-6.19v9.69a.75.75 0 0 1-1.5 0l-.001-9.69-3.037 3.215a.751.751 0 0 1-1.062-1.06l4.318-4.495a.751.751 0 0 1 1.062 0l4.18 4.495a.749.749 0 1 1-1.06 1.06l-2.9-3.216Z" fill="currentColor" fill-rule="nonzero"></path></svg>
-          Share
-        </button>
-      
-        <!-- Dropdown Box -->
-        <div *ngIf="showDropdown" class="absolute right-0 mt-2 w-[300px] bg-white border border-gray-200 rounded shadow-md p-4 z-50">
-          <p>Share this design with others!</p>
+  <!-- Design Name Box -->
+  <div
+    class="bg-transparent text-white px-5 py-2 rounded w-[300px] text-sm truncate overflow-hidden whitespace-nowrap font-semibold pr-0">
+    {{activeImageTitle}}
+  </div>
+  <!-- Desktop Profile Initial Icon -->
+  <div
+    class="fixed top-[7px] right-[45px] md:relative md:top-auto md:right-auto min-w-[38px] w-[38px] h-[38px] max-h-10 rounded-full bg-[#f53744] text-white flex items-center justify-center font-semibold text-lg cursor-pointer"
+    (click)="openLoginPopup()">
+    {{initialLetter}}
+  </div>
 
-          <div class="grid grid-cols-3 gap-4 text-center bg-white p-4 rounded">
 
-            <!-- Download -->
-            <button id="download-button" class="flex flex-col items-center justify-center space-y-2 text-black">
-              <div class="bg-white border border-gray-300 rounded-full p-3">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="m11.25 15.85-4.38-4.38a.75.75 0 0 0-1.06 1.06l4.95 4.95c.69.68 1.8.68 2.48 0l4.95-4.95a.75.75 0 1 0-1.06-1.06l-4.38 4.38V4.25a.75.75 0 1 0-1.5 0v11.6zm-7.5 3.4h16.5a.75.75 0 1 1 0 1.5H3.75a.75.75 0 1 1 0-1.5z"></path></svg>
-              </div>
-              <span class="text-sm font-medium">Download</span>
-            </button>
-          
-            <!-- Preview -->
-            <button (click)="preview()" class="flex flex-col items-center justify-center space-y-2 text-black">
-              <div class="bg-white border border-gray-300 rounded-full p-3">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="eye" class="lucide lucide-eye eye"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"></path><circle cx="12" cy="12" r="3"></circle></svg>
-              </div>
-              <span class="text-sm font-medium">Preview</span>
-            </button>
-          
-            <!-- Print -->
-            <button id="print-button" class="flex flex-col items-center justify-center space-y-2 text-black">
-              <div class="bg-white border border-gray-300 rounded-full p-3">
-                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" fill="none"><path fill="currentColor" fill-rule="evenodd" d="M5.334 6.666h14A2.667 2.667 0 0 1 22 9.333h2a5.333 5.333 0 0 1 5.334 5.333v6.667a2.667 2.667 0 0 1-2.667 2.666 4 4 0 1 1-8 0H12a4 4 0 1 1-7.985-.348 2.666 2.666 0 0 1-1.348-2.318v-12a2.667 2.667 0 0 1 2.667-2.667Zm22 9.333v-1.333A3.333 3.333 0 0 0 24 11.333h-2v4.666h5.334ZM22 18h5.334v3.334a.667.667 0 0 1-.667.666h-.535A3.999 3.999 0 0 0 22 20.055v-2.056Zm-2-8.666v11.685a4.02 4.02 0 0 0-.798.981h-7.737a3.998 3.998 0 0 0-6.711-.337.663.663 0 0 1-.087-.33v-12c0-.368.298-.666.667-.666h14c.368 0 .666.298.666.667ZM10 23.999a2 2 0 1 1-4 0 2 2 0 0 1 4 0Zm12.667 2a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z" clip-rule="evenodd"></path></svg>
-              </div>
-              <span class="text-sm font-medium">Print</span>
-            </button>
-          
-            <!-- Save Design -->
-            <button id="save-button" class="flex flex-col items-center justify-center space-y-2 text-black col-span-3 sm:col-span-1">
-              <div class="bg-white border border-gray-300 rounded-full p-3">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="folder-open" class="lucide lucide-folder-open"><path d="m6 14 1.5-2.9A2 2 0 0 1 9.24 10H20a2 2 0 0 1 1.94 2.5l-1.54 6a2 2 0 0 1-1.95 1.5H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H18a2 2 0 0 1 2 2v2"></path></svg>
-              </div>
-              <span class="text-sm font-medium">Save</span>
-            </button>
-          
+
+  <div class="relative md:min-w-[290px] hidden md:flex" #dropdownWrapper>
+    <a href="https://www.youtube.com/playlist?list=PLU0ltU4FmAbDQ5keQV8cmBmJQ2ejcH4zF" target="_blank"
+      rel="noopener noreferrer" class="cursor-pointer">
+      <button
+        class="border border-[#ffffff59] mr-[7px] rounded-[8px] font-semibold flex items-center gap-2 bg-transparent text-white pl-[0.565rem] pr-[1rem] py-2 text-sm rounded-[8px] min-w-[180px] justify-center">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M8.75 10.5a1.75 1.75 0 1 0 0-3.5 1.75 1.75 0 0 0 0 3.5Z" fill="currentColor"></path>
+          <path fill-rule="evenodd" clip-rule="evenodd"
+            d="M17 3H7a4 4 0 0 0-4 4v10a4 4 0 0 0 4 4h10a4 4 0 0 0 4-4V7a4 4 0 0 0-4-4Zm0 1.5h-2v5.182h4.5V7A2.5 2.5 0 0 0 17 4.5Zm-10 15h6.5v-15H7A2.5 2.5 0 0 0 4.5 7v10A2.5 2.5 0 0 0 7 19.5Zm10 0h-2v-8.318h4.5V17a2.5 2.5 0 0 1-2.5 2.5Z"
+            fill="currentColor"></path>
+        </svg>
+        Need Help
+      </button>
+    </a>
+    <button (click)="toggleDropdown()"
+      class="font-semibold hidden md:flex items-center gap-2 bg-[#f2eafd] text-black pl-[0.565rem] pr-[1rem] py-2 text-sm rounded-[8px] hover:bg-gray-100 transition">
+      <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path
+          d="M4.5 11.75V19a.5.5 0 0 0 .5.5h14a.5.5 0 0 0 .5-.5v-7.25a.75.75 0 1 1 1.5 0V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7.25a.75.75 0 1 1 1.5 0Zm8.323-6.19v9.69a.75.75 0 0 1-1.5 0l-.001-9.69-3.037 3.215a.751.751 0 0 1-1.062-1.06l4.318-4.495a.751.751 0 0 1 1.062 0l4.18 4.495a.749.749 0 1 1-1.06 1.06l-2.9-3.216Z"
+          fill="currentColor" fill-rule="nonzero"></path>
+      </svg>
+      Share
+    </button>
+
+    <!-- Dropdown Box -->
+    <div *ngIf="showDropdown"
+      class="absolute right-0 mt-2 w-[300px] bg-white border border-gray-200 rounded shadow-md p-4 z-50">
+      <p>Share this design with others!</p>
+
+      <div class="grid grid-cols-3 gap-4 text-center bg-white p-4 rounded">
+
+        <!-- Download -->
+        <button id="download-button" class="flex flex-col items-center justify-center space-y-2 text-black">
+          <div class="bg-white border border-gray-300 rounded-full p-3">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+              <path fill="currentColor"
+                d="m11.25 15.85-4.38-4.38a.75.75 0 0 0-1.06 1.06l4.95 4.95c.69.68 1.8.68 2.48 0l4.95-4.95a.75.75 0 1 0-1.06-1.06l-4.38 4.38V4.25a.75.75 0 1 0-1.5 0v11.6zm-7.5 3.4h16.5a.75.75 0 1 1 0 1.5H3.75a.75.75 0 1 1 0-1.5z">
+              </path>
+            </svg>
           </div>
-          
-          
-        </div>
+          <span class="text-sm font-medium">Download</span>
+        </button>
+
+        <!-- Preview -->
+        <button (click)="preview()" class="flex flex-col items-center justify-center space-y-2 text-black">
+          <div class="bg-white border border-gray-300 rounded-full p-3">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="eye"
+              class="lucide lucide-eye eye">
+              <path
+                d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0">
+              </path>
+              <circle cx="12" cy="12" r="3"></circle>
+            </svg>
+          </div>
+          <span class="text-sm font-medium">Preview</span>
+        </button>
+
+        <!-- Print -->
+        <button id="print-button" class="flex flex-col items-center justify-center space-y-2 text-black">
+          <div class="bg-white border border-gray-300 rounded-full p-3">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" fill="none">
+              <path fill="currentColor" fill-rule="evenodd"
+                d="M5.334 6.666h14A2.667 2.667 0 0 1 22 9.333h2a5.333 5.333 0 0 1 5.334 5.333v6.667a2.667 2.667 0 0 1-2.667 2.666 4 4 0 1 1-8 0H12a4 4 0 1 1-7.985-.348 2.666 2.666 0 0 1-1.348-2.318v-12a2.667 2.667 0 0 1 2.667-2.667Zm22 9.333v-1.333A3.333 3.333 0 0 0 24 11.333h-2v4.666h5.334ZM22 18h5.334v3.334a.667.667 0 0 1-.667.666h-.535A3.999 3.999 0 0 0 22 20.055v-2.056Zm-2-8.666v11.685a4.02 4.02 0 0 0-.798.981h-7.737a3.998 3.998 0 0 0-6.711-.337.663.663 0 0 1-.087-.33v-12c0-.368.298-.666.667-.666h14c.368 0 .666.298.666.667ZM10 23.999a2 2 0 1 1-4 0 2 2 0 0 1 4 0Zm12.667 2a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"
+                clip-rule="evenodd"></path>
+            </svg>
+          </div>
+          <span class="text-sm font-medium">Print</span>
+        </button>
+
+        <!-- Save Design -->
+        <button id="save-button"
+          class="flex flex-col items-center justify-center space-y-2 text-black col-span-3 sm:col-span-1">
+          <div class="bg-white border border-gray-300 rounded-full p-3">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+              data-lucide="folder-open" class="lucide lucide-folder-open">
+              <path
+                d="m6 14 1.5-2.9A2 2 0 0 1 9.24 10H20a2 2 0 0 1 1.94 2.5l-1.54 6a2 2 0 0 1-1.95 1.5H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H18a2 2 0 0 1 2 2v2">
+              </path>
+            </svg>
+          </div>
+          <span class="text-sm font-medium">Save</span>
+        </button>
+
       </div>
-    
-      
-    
-      
+
+
     </div>
-    <button class="items-center justify-center hide-icon rounded-full h-10 w-6 fixed top-1/2 left-[421px] z-[99] bg-white shadow-[0px_0px_0px_1px_rgba(64,87,109,0.04),0px_6px_20px_-4px_rgba(64,87,109,0.3)]" type="button"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"><path fill="currentColor" d="M10.025 10.965 7.237 8.177a.25.25 0 0 1 0-.354l2.788-2.788a.75.75 0 0 0-1.06-1.06l-2.79 2.788a1.75 1.75 0 0 0 0 2.474l2.788 2.789a.75.75 0 1 0 1.06-1.06"></path></svg></button>
-  <div class="w-[100%] mr-[8px] flex-none w-full overflow-auto [scrollbar-width:none] scrollbar-hide hover:bg-[#40576d12] cursor-pointer pl-[6px] top-[-2px] placeholder-gray-500 w-[calc(100% - 22px)] !text-sm text-center text-[0.9rem] top-0 top-[10px] right-[10px] border-[#35475a33] border-solid font-bold p-[10px] text-[#0d1216db] !text-sm justify-center !normal-case bg-[#f7f7f7] fas !flex flex flex-col !bg-[#f53744] fa-camera bg-black text-white p-6 rounded !rounded-[8px] rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6 !bg-white hidden !hidden appearance-none bg-inherit border-0 box-border text-inherit font-normal min-w-[8px] !outline-none focus:!border-none !flex-col w-full min-w-[24px] mr-[14px] !shadow-none mb-[17px] mt-[4px] mt-[8px] ml-[2px] mr-[2px] flex items-center border border-[#f6f6f6] rounded-lg pl-[5px] !py-1 !mb-0 w-32 h-32 block
-  w-[100px] mt-[40px] w-[18px] top-[56px] bottom-0 left-0 w-[446px] bg-white bg-opacity-60 max-w-[200px] z-[99] inset-0 bg-black/40 backdrop-blur-sm md:left-[380px] mt-[50px] md:top-[210px] md:top-[178px] md:left-[90px] opacity-0 md:top-[164px] z-[9] bg-gradient-to-r from-white/0 to-white flex-none basis-1/2 capitalize absolute top-[19px] ml-[8px] ml-[28px] opacity-0 group-hover:opacity-100 p-[10px] !mt-0 ml-[15px] mr-[10px] top-[8px] left-0 text-[20px] !bg-[#40576d12] right-[11px] text-[#485563] text-blue-600 top-[7px] underline mt-2 absolute bg-[#f6f6f6] w-[30px] h-[30px] rounded-full ml-[5px] p-[2px] mt-[16px] mt-[-20px] gap-[10px] disabled:hidden translate-x-1/2 top-1/2 -translate-y-1/2 top-[15px] capitalize z-[999] z-[9] mt-[-5px] mt-[-35px] max-w-[224px] ml-[80px] px-[7px] border-[1px] my-2 h-[30px] mb-0 mt-0 py-[3px] !pl-2 h-[24px] bg-[#0d121600] rounded-[8px] shadow-[inset_0_0_0_1px_var(--Zya5eQ)] text-[#0d1216] ml-[10px] pt-2 bg-white border border-[#ccc] rounded-[6px] p-[10px] group-hover:block max-w-[130px] mb-2 truncate w-full overflow-hidden whitespace-nowrap text-[#0d1216] pb-2 pr-3 pl-3 ml-[5px] rounded-[6px] h-[100px] mt-[5px] mb-[5px] block bg-contain bg-no-repeat bg-center justify-start ml-[5px] font-bold font-semibold !grid grid-cols-2 auto-rows-[100px] gap-[5px] flex items-center justify-center flex-col relative flex-wrap">
-    Hello, Tailwind!
-  </div>
-  <div id="clothing-designer" class="fpd-wrapper fpd-container fpd-sidebar fpd-views-inside-left fpd-shadow-1 fpd-module-visible"></div>
-  <div class="fpd-canvas-container">
-    <div id="fpd-target" class="fpd-ui"></div>
   </div>
 
-  <!-- <div id="content-text">
+
+
+
+</div>
+<button
+  class="items-center justify-center hide-icon rounded-full h-10 w-6 fixed top-1/2 left-[421px] z-[99] bg-white shadow-[0px_0px_0px_1px_rgba(64,87,109,0.04),0px_6px_20px_-4px_rgba(64,87,109,0.3)]"
+  type="button"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+    <path fill="currentColor"
+      d="M10.025 10.965 7.237 8.177a.25.25 0 0 1 0-.354l2.788-2.788a.75.75 0 0 0-1.06-1.06l-2.79 2.788a1.75 1.75 0 0 0 0 2.474l2.788 2.789a.75.75 0 1 0 1.06-1.06">
+    </path>
+  </svg></button>
+<div
+  class="w-[100%] mr-[8px] flex-none w-full overflow-auto [scrollbar-width:none] scrollbar-hide hover:bg-[#40576d12] cursor-pointer pl-[6px] top-[-2px] placeholder-gray-500 w-[calc(100% - 22px)] !text-sm text-center text-[0.9rem] top-0 top-[10px] right-[10px] border-[#35475a33] border-solid font-bold p-[10px] text-[#0d1216db] !text-sm justify-center !normal-case bg-[#f7f7f7] fas !flex flex flex-col !bg-[#f53744] fa-camera bg-black text-white p-6 rounded !rounded-[8px] rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6 !bg-white hidden !hidden appearance-none bg-inherit border-0 box-border text-inherit font-normal min-w-[8px] !outline-none focus:!border-none !flex-col w-full min-w-[24px] mr-[14px] !shadow-none mb-[17px] mt-[4px] mt-[8px] ml-[2px] mr-[2px] flex items-center border border-[#f6f6f6] rounded-lg pl-[5px] !py-1 !mb-0 w-32 h-32 block
+  w-[100px] mt-[40px] w-[18px] top-[56px] bottom-0 left-0 w-[446px] bg-white bg-opacity-60 max-w-[200px] z-[99] inset-0 bg-black/40 backdrop-blur-sm md:left-[380px] mt-[50px] md:top-[210px] md:top-[178px] md:left-[90px] opacity-0 md:top-[164px] z-[9] bg-gradient-to-r from-white/0 to-white flex-none basis-1/2 capitalize absolute top-[19px] ml-[8px] ml-[28px] opacity-0 group-hover:opacity-100 p-[10px] !mt-0 ml-[15px] mr-[10px] top-[8px] left-0 text-[20px] !bg-[#40576d12] right-[11px] text-[#485563] text-blue-600 top-[7px] underline mt-2 absolute bg-[#f6f6f6] w-[30px] h-[30px] rounded-full ml-[5px] p-[2px] mt-[16px] mt-[-20px] gap-[10px] disabled:hidden translate-x-1/2 top-1/2 -translate-y-1/2 top-[15px] capitalize z-[999] z-[9] mt-[-5px] mt-[-35px] max-w-[224px] ml-[80px] px-[7px] border-[1px] my-2 h-[30px] mb-0 mt-0 py-[3px] !pl-2 h-[24px] bg-[#0d121600] rounded-[8px] shadow-[inset_0_0_0_1px_var(--Zya5eQ)] text-[#0d1216] ml-[10px] pt-2 bg-white border border-[#ccc] rounded-[6px] p-[10px] group-hover:block max-w-[130px] mb-2 truncate w-full overflow-hidden whitespace-nowrap text-[#0d1216] pb-2 pr-3 pl-3 ml-[5px] rounded-[6px] h-[100px] mt-[5px] mb-[5px] block bg-contain bg-no-repeat bg-center justify-start ml-[5px] font-bold font-semibold !grid grid-cols-2 auto-rows-[100px] gap-[5px] flex items-center justify-center flex-col relative flex-wrap">
+  Hello, Tailwind!
+</div>
+<div id="clothing-designer"
+  class="fpd-wrapper fpd-container fpd-sidebar fpd-views-inside-left fpd-shadow-1 fpd-module-visible"></div>
+<div class="fpd-canvas-container">
+  <div id="fpd-target" class="fpd-ui"></div>
+</div>
+
+<!-- <div id="content-text">
 
     <div class="fpd-product fpd-producttext" title="templates CustomsBanner" data-thumbnail="assets/images/custom/template1/img/preview.png">                              
       <span title="Spider Man" data-parameters='{"left": 780, "top": 380, "zChangeable": true, "removable": true, "draggable": true, "rotatable": true, "resizable": true, "colors": "#ba2129", "font":"Lobster", "textSize":54, "curved": true, "curveSpacing": 5, "curveRadius": 180, "curveReverse": false, "curvable": 1  }' >Spider Man</span>               
@@ -130,35 +223,68 @@
       
     </div> 
   </div> -->
-  <div id="content-text" class="hidden">
-    <div class="fpd-category" data-category="Motivational">
+<div id="content-text" class="hidden">
+  <div class="fpd-category" data-category="Motivational">
 
-      <div class="fpd-product fpd-producttext" title="Stay Powerful" data-thumbnail="assets/images/designs/staypowerful.jpg" data-tags="motivational, multi-texts, Powerful">
-        <span data-parameters='{"left": 300, "top": 280, "font": "Abril Fatface", "textSize": 120, "colors": "#010101", "curvable": 1}'>Stay</span>
-        <span data-parameters='{"left": 300, "top": 280, "font": "Abril Fatface", "textSize": 100, "colors": "#ff0000", "curvable": 1}'>Powerful</span>
-      </div>
-      <div class="fpd-product fpd-producttext" title="Content that Clicks" data-thumbnail="assets/images/designs/contentclick.jpg" data-tags="motivational, multi-texts, CLick">
-        <span data-parameters='{"left": 300, "top": 280, "font": "Caveat", "textSize": 40, "colors": "#010101", "curvable": 1}'>Content that</span>
-        <span data-parameters='{"left": 300, "top": 280, "font": "Poppins", "textSize": 100, "colors": "#ff0000", "curvable": 1}'>Clicks</span>
-      </div>
-      <div class="fpd-product fpd-producttext" title="Innovation at work" data-thumbnail="assets/images/designs/2.jpg" data-tags="motivational, multi-texts, Innovation">
-        <span data-parameters='{"left": 300, "top": 280, "font": "Dancing Script", "textSize": 50, "colors": "#010101", "curvable": 1}'>Innovation</span>
-        <span data-parameters='{"left": 300, "top": 280, "font": "Poppins", "textSize": 100, "colors": "#000000", "curvable": 1}'>At Work</span>
-      </div>
-      <div class="fpd-product fpd-producttext" title="financial strategy" data-thumbnail="assets/images/designs/3.jpg" data-tags="motivational, multi-texts, STRATEGY">
-        <span data-parameters='{"left": 300, "top": 280, "font": "Plafair display", "textSize": 40, "colors": "#162144", "curvable": 1}'>financial</span>
-        <span data-parameters='{"left": 300, "top": 280, "font": "Poppins", "textSize": 100, "colors": "#428ce2", "curvable": 1}'>STRATEGY</span>
-      </div>
+    <div class="fpd-product fpd-producttext" title="Stay Powerful"
+      data-thumbnail="assets/images/designs/staypowerful.jpg" data-tags="motivational, multi-texts, Powerful">
+      <span
+        data-parameters='{"left": 300, "top": 280, "font": "Abril Fatface", "textSize": 120, "colors": "#010101", "curvable": 1}'>Stay</span>
+      <span
+        data-parameters='{"left": 300, "top": 280, "font": "Abril Fatface", "textSize": 100, "colors": "#ff0000", "curvable": 1}'>Powerful</span>
     </div>
-    <div class="fpd-category" data-category="Inspirational">
-      
+    <div class="fpd-product fpd-producttext" title="Content that Clicks"
+      data-thumbnail="assets/images/designs/contentclick.jpg" data-tags="motivational, multi-texts, CLick">
+      <span
+        data-parameters='{"left": 300, "top": 280, "font": "Caveat", "textSize": 40, "colors": "#010101", "curvable": 1}'>Content
+        that</span>
+      <span
+        data-parameters='{"left": 300, "top": 280, "font": "Poppins", "textSize": 100, "colors": "#ff0000", "curvable": 1}'>Clicks</span>
+    </div>
+    <div class="fpd-product fpd-producttext" title="Innovation at work" data-thumbnail="assets/images/designs/2.jpg"
+      data-tags="motivational, multi-texts, Innovation">
+      <span
+        data-parameters='{"left": 300, "top": 280, "font": "Dancing Script", "textSize": 50, "colors": "#010101", "curvable": 1}'>Innovation</span>
+      <span
+        data-parameters='{"left": 300, "top": 280, "font": "Poppins", "textSize": 100, "colors": "#000000", "curvable": 1}'>At
+        Work</span>
+    </div>
+    <div class="fpd-product fpd-producttext" title="financial strategy" data-thumbnail="assets/images/designs/3.jpg"
+      data-tags="motivational, multi-texts, STRATEGY">
+      <span
+        data-parameters='{"left": 300, "top": 280, "font": "Plafair display", "textSize": 40, "colors": "#162144", "curvable": 1}'>financial</span>
+      <span
+        data-parameters='{"left": 300, "top": 280, "font": "Poppins", "textSize": 100, "colors": "#428ce2", "curvable": 1}'>STRATEGY</span>
+    </div>
+  </div>
+  <div class="fpd-category" data-category="Inspirational">
 
-      <div class="fpd-product fpd-producttext" title="Multi Texts 2" data-thumbnail="assets/images/designs/california.jpg" data-tags="Inspirational, multi-texts, Powerful">                              
-        <span data-parameters='{"left": 300, "top": 280, "font": "Abril Fatface", "textSize": 80, "colors": "#027361", "curvable": 1  }'>Goals &</span>
-        <span data-parameters='{"left": 300, "top": 280, "font": "Pacifico", "textSize": 120, "colors": "#8b61c2", "curvable": 1  }'>Objective</span>
-      </div>
+
+    <div class="fpd-product fpd-producttext" title="Multi Texts 2" data-thumbnail="assets/images/designs/california.jpg"
+      data-tags="Inspirational, multi-texts, Powerful">
+      <span
+        data-parameters='{"left": 300, "top": 280, "font": "Abril Fatface", "textSize": 80, "colors": "#027361", "curvable": 1  }'>Goals
+        &</span>
+      <span
+        data-parameters='{"left": 300, "top": 280, "font": "Pacifico", "textSize": 120, "colors": "#8b61c2", "curvable": 1  }'>Objective</span>
     </div>
-    
+  </div>
+
 </div>
 
-  <div class="fpd-ui fpd-ui-right fpd-shadow-1 fpd-module-visible" id="fpd-ui-right"></div>
+<div class="fpd-ui fpd-ui-right fpd-shadow-1 fpd-module-visible" id="fpd-ui-right"></div>
+
+<div *ngIf="showLoginPopup && !isLoggedIn"
+  class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex justify-center items-center">
+  <form (submit)="onLogin($event)" class="bg-white rounded p-6 w-[300px] shadow-lg">
+    <h2 class="text-xl font-semibold mb-4 text-center">Login</h2>
+    <input type="email" [(ngModel)]="email" name="email" required placeholder="Email"
+      class="w-full mb-3 px-4 py-2 border rounded" />
+    <input type="password" [(ngModel)]="password" name="password" required placeholder="Password"
+      class="w-full mb-4 px-4 py-2 border rounded" />
+    <button type="submit" class="w-full bg-[#f53744] text-white py-2 rounded hover:bg-[#d02e3a]">
+      Login
+    </button>
+    <button type="button" (click)="closeLoginPopup()" class="w-full mt-2 text-sm text-gray-600">Cancel</button>
+  </form>
+</div>

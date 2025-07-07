@@ -14,16 +14,23 @@ declare var FancyProductDesigner: any;
 import $ from 'jquery';
 import { filter } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss'],
 })
 export class HomeComponent implements AfterViewInit {
   isBoxVisible = false;
+  email: string = '';
+  password: string = '';
+  showLoginPopup = false;
+  isLoggedIn: boolean = false;
+  firstName: string = '';
+  initialLetter: string = 'A';
   private savedContent: string = '';
   constructor(
     @Inject(PLATFORM_ID) private platformId: any,
@@ -720,6 +727,11 @@ export class HomeComponent implements AfterViewInit {
   ngOnInit() {
     const slug = this.route.snapshot.paramMap.get('slug');
     console.log('Selected slug:', slug);
+    const token = localStorage.getItem('authToken');
+    if (token) {
+      this.isLoggedIn = true;
+      this.showLoginPopup = false;
+    }
   }
 
   bottomMenu() {
@@ -870,6 +882,114 @@ export class HomeComponent implements AfterViewInit {
           : 'none';
       });
     }
+  }
+
+  openLoginPopup() {
+    this.showLoginPopup = true;
+  }
+
+  closeLoginPopup() {
+    this.showLoginPopup = false;
+  }
+
+  onLogin(event: Event) {
+    event.preventDefault();
+
+    const query = `
+      mutation GenerateCustomerToken($email: String!, $password: String!) {
+        generateCustomerToken(email: $email, password: $password) {
+          token
+          __typename
+        }
+      }
+    `;
+
+    const variables = {
+      email: this.email,
+      password: this.password,
+    };
+
+    const payload = {
+      query,
+      variables,
+    };
+
+    this.http
+      .post<any>('https://styleflip.v2.ithemes.xyz/graphql', payload)
+      .subscribe({
+        next: (response) => {
+          const token = response?.data?.generateCustomerToken?.token;
+          if (token) {
+            console.log('Login success:', token);
+            localStorage.setItem('customerToken', token);
+            this.getCustomerDetails(token); // optional
+            this.isLoggedIn = true;
+            this.showLoginPopup = false;
+            this.closeLoginPopup();
+          } else {
+            alert('Login failed. No token returned.');
+          }
+        },
+        error: (err) => {
+          console.error('Login error:', err);
+          alert('Invalid credentials or network issue.');
+        },
+      });
+  }
+  // onLogin(event: Event) {
+  //   event.preventDefault();
+  //   // Add your login logic here
+  //   console.log('Login submitted');
+  //   this.closeLoginPopup();
+  // }
+  getCustomerDetails(token: string) {
+    const customerQuery = {
+      query: `
+      {
+        customer {
+          firstname
+          lastname
+          suffix
+          email
+          addresses {
+            id
+            firstname
+            lastname
+            street
+            city
+            region {
+              region_code
+              region
+            }
+            postcode
+            country_code
+            telephone
+            default_billing
+            default_shipping
+          }
+        }
+      }
+    `,
+    };
+
+    this.http
+      .post<any>('https://styleflip.v2.ithemes.xyz/graphql', customerQuery, {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`, // 🔐 Use token in header
+        },
+      })
+      .subscribe(
+        (res) => {
+          const customer = res.data?.customer;
+          this.firstName = res.data?.customer?.firstname || '';
+          this.initialLetter = this.firstName.charAt(0).toUpperCase();
+          console.log(this.initialLetter, 'initialLetter');
+        },
+        (err) => {
+          console.error('Customer fetch failed', err);
+        }
+      );
   }
 
   updateTagsFromDesignModule() {
@@ -1087,8 +1207,6 @@ export class HomeComponent implements AfterViewInit {
       canvas.requestRenderAll();
     }
   }
-
-
 
   showBox(): void {
     this.isBoxVisible = true;
