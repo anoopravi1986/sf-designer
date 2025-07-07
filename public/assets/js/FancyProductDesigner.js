@@ -15488,7 +15488,7 @@
                     swapProductConfirmation: !1,
                     textLinkGroupProps: [],
                     textTemplates: [],
-                    multiSelection: !1,
+                    multiSelection: 1,
                     multiSelectionColor: "#54dfe6",
                     canvasHeight: "auto",
                     maxCanvasHeight: 0.8,
@@ -15566,7 +15566,7 @@
                         curveReverse: !1,
                         maxLines: 0,
                         textBox: !1,
-                        textPlaceholder: !1,
+                        textPlaceholder: 1,
                         numberPlaceholder: !1,
                         letterSpacing: 0,
                         chargeAfterEditing: !1,
@@ -17944,6 +17944,7 @@
                             t.stopPropagation(), qt(this, Xt, Jt).call(this), this.classList.toggle("fpd-active");
                         }),
                         this.inputElem.addEventListener("keyup", (t) => {
+                            console.log("jjjjjjjjjjjjjjjjjjjj",t)
                             if (this.searchable) {
                                 const e = t.currentTarget.value;
                                 this.listElem.querySelectorAll(".fpd-item").forEach((t) => {
@@ -20063,7 +20064,7 @@ if (targetItem) {
                             
                             const searchInput = document.createElement('input');
                             searchInput.type = 'text';
-                            searchInput.placeholder = 'Search by title...';
+                            searchInput.placeholder = 'Search...';
                             searchInput.className = 'border p-1 px-3 rounded !text-sm !mb-0 placeholder-gray-500';
                             
                             searchWrappertext.appendChild(searchIcon);
@@ -20862,7 +20863,7 @@ rightArrow.onclick = () => {
 
                     // Heading
                     const heading = document.createElement("h3");
-                    heading.className = "text-[0.9rem] font-bold p-[10px] text-[#0d1216db]"
+                    heading.className = "text-[0.9rem] font-bold p-[10px] text-[#0d1216db] capitalize"
                     heading.innerText = t.title;
                     e.appendChild(heading);
 
@@ -21528,7 +21529,6 @@ rightArrow.onclick = () => {
                 const i = this.fpdInstance.mainOptions,
                     s = new FileReader();
                 (s.onload = (s) => {
-                    alert("yes upload")
                     console.log("sssssssssssssssssssssssss",s)
                     const r = s.currentTarget.result,
                         a = xi(this, Bi, Yi).call(this, r, t.name);
@@ -21549,30 +21549,29 @@ rightArrow.onclick = () => {
                         Ci(this, Ei, ((l = wi(this, Ei)), ++l));
                     }
                     const o = new Image();
-                    console.log("sssssssssssssssssssssssss)))))))0",o)
+                    console.log("sssssssssssssssssssssssss0",o);
                     (o.onload = (i) => {
                         const s = i.currentTarget;
                         let r = s.height,
                             o = s.width;
-                        console.log("tttttttttttttttttttt1r",r)
+                        console.log("tttttttttttttttttttt1r",r);
                         if (et(this.fpdInstance, o, r))
                             if (FancyProductDesigner.uploadsToServer) {
-                                alert("Upload function");
                                 const i = new FormData();
-                                console("tttttttttttttttttttt1i",i)
+                                console.log("tttttttttttttttttttt1i",i);
                                 i.append("images[]", t);
                                 const s = new XMLHttpRequest();
-                                console("tttttttttttttttttttt1s",s)
+                                console.log("tttttttttttttttttttt1s",s);
                                 (s.responseType = "json"),
                                     (s.onreadystatechange = (t) => {
-                                        alert("check change state");
-                                        console("tttttttttttttttttttt",t)
+                                        console.log("tttttttttttttttttttt",t)
                                         if (s.readyState === XMLHttpRequest.DONE) {
                                             const t = s.status;
-                                            console("tttttttttttttttttttt1",t)
+                                            console.log("tttttttttttttttttttt1",t);
                                             if (0 === t || (t >= 200 && t < 400)) {
                                                 const t = s.response;
-                                                console("tttttttttttttttttttt2",t)
+                                                console.log("tttttttttttttttttttt2",t, a);
+                                                a.classList.remove("fpd-loading");
                                                 var i;
                                                 t.image_src &&
                                                     (xi(this, Li, Ui).call(this, t.image_src, t.filename),
@@ -21587,7 +21586,6 @@ rightArrow.onclick = () => {
                                         }
                                     }),
                                     (s.upload.onprogress = (t) => {
-                                        alert("chhhhhhhhhhhhhh");
                                         console.log("tttttttttt",t);
                                         let e = t.total,
                                             i = t.loaded,
@@ -21604,7 +21602,11 @@ rightArrow.onclick = () => {
                                 var l;
                                 xi(this, Li, Ui).call(this, s, t.name), xi(this, Fi, Gi).call(this, a, e), Ci(this, Ei, ((l = wi(this, Ei)), ++l));
                             }
-                        else a.remove(), (this.fpdInstance.currentViewInstance.currentUploadZone = null);
+                        else {
+                            console.log("success",a);
+                            a.classList.remove("fpd-loading");
+                            a.remove(), (this.fpdInstance.currentViewInstance.currentUploadZone = null);
+                        }
                     }),
                         (o.src = r);
                 }),
@@ -21714,7 +21716,7 @@ rightArrow.onclick = () => {
                 }
                 connectedCallback() {
                     this.innerHTML =
-                        '<div class="fpd-head"> <div class="fpd-facebook-login"> <fb:login-button data-max-rows="1" data-show-faces="false" data-scope="user_photos" class="w-[100%]"> </fb:login-button> </div> <fpd-dropdown class="fpd-facebook-albums" placeholder="Select An Album" searchable></fpd-dropdown> </div> <div class="fpd-scroll-area"> <div class="fpd-grid fpd-grid-cover fpd-photo-grid"></div> </div>';
+                        '<div class="fpd-head"> <div class="fpd-facebook-login"> <fb:login-button data-max-rows="1" data-show-faces="false" data-scope="user_photos,instagram_basic" class="w-[100%]"> </fb:login-button> </div> <fpd-dropdown class="fpd-facebook-albums" placeholder="Select An Album" searchable></fpd-dropdown> </div> <div class="fpd-scroll-area"> <div class="fpd-grid fpd-grid-cover fpd-photo-grid"></div> </div>';
                 }
             }
             function Zi(t, e) {
@@ -21757,10 +21759,13 @@ rightArrow.onclick = () => {
                     document.body.appendChild(t);
             }
             function nn(t) {
+                console.log("ddddddddddddddddddddd",t)
                 "connected" === t.status &&
                     (X(this.container, ["fpd-facebook-logged-in"]),
                     FB.api("/me/albums?fields=name,count,id", (t) => {
+                        console.log("ddddddddddddddddddddd----1",t)
                         const e = t.data;
+                        console.log("ddddddddddddddddddddd----",e)
                         e &&
                             e.forEach((t) => {
                                 const e = document.createElement("span");
@@ -21864,9 +21869,9 @@ rightArrow.onclick = () => {
                     }
                     let e = (window.screen.width - 700) / 2,
                         i = (window.screen.height - 500) / 2,
-                        n = { app_id: t.instagramClientId, redirect_uri: t.instagramRedirectUri, scope: "user_profile,user_media", response_type: "code" },
+                        n = { app_id: t.instagramClientId, redirect_uri: t.instagramRedirectUri, scope: "user_profile,user_media,instagram_business_basic,instagram_business_manage_messages,instagram_business_manage_comments,instagram_business_content_publish,instagram_business_manage_insights", response_type: "code" },
                         s = new URLSearchParams(n).toString();
-                    var r = window.open("https://api.instagram.com/oauth/authorize?" + s, "", "width=700,height=500,left=" + e + ",top=" + i),
+                    var r = window.open("https://www.instagram.com/oauth/authorize?force_reauth=true&client_id=1097562038908175&redirect_uri=https://sfdesigner-new.firebaseapp.com/&response_type=code&scope=instagram_business_basic%2Cinstagram_business_manage_messages%2Cinstagram_business_manage_comments%2Cinstagram_business_content_publish%2Cinstagram_business_manage_insights", "width=700,height=500,left=" + e + ",top=" + i),
                         a = setInterval(() => {
                             r.closed && clearInterval(a);
                             try {
@@ -22554,7 +22559,6 @@ rightArrow.onclick = () => {
                         (e.innerHTML = '<span class="fa-solid fa-trash"></span>'),
                         o.append(e),
                         G(e, "click", (e) => {
-                            alert("PPP");
                             e.stopPropagation(), this.fpdInstance.currentViewInstance.fabricCanvas.removeElement(t);
                         });
                 }
