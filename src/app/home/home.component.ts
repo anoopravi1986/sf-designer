@@ -10,6 +10,8 @@ import {
 import { isPlatformBrowser, DOCUMENT, CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 
+import { Title } from '@angular/platform-browser';
+
 declare var FancyProductDesigner: any;
 import $ from 'jquery';
 import { filter } from 'rxjs';
@@ -37,7 +39,8 @@ export class HomeComponent implements AfterViewInit {
     @Inject(DOCUMENT) private document: Document,
     private router: Router,
     private route: ActivatedRoute,
-    private http: HttpClient
+    private http: HttpClient,
+    private titleService: Title
   ) {}
   @ViewChild('previewButton') previewButton!: ElementRef;
 
@@ -68,6 +71,7 @@ export class HomeComponent implements AfterViewInit {
         .get<any[]>('/assets/data/products/product-categories.json')
         .subscribe({
           next: (data) => {
+            console.log("dddddddddddddddddddddddd",data)
             for (
               let categoryIndex = 0;
               categoryIndex < data.length;
@@ -129,12 +133,10 @@ export class HomeComponent implements AfterViewInit {
         const titleSlug = this.route.snapshot.paramMap.get('slug') || '';
         // const manufacturerSlug = params['manufacturer'];
         //       const titleSlug = params['slug'];
-        console.log(
-          'productIndex,categoryIndex,',
-          this.reversedManufacturerSlugMap[manufacturerSlug],
-          titleSlug
-        );
+        console.log('productIndex,categoryIndex,',this.reversedManufacturerSlugMap[manufacturerSlug],titleSlug);
+        const pageTitle = `${titleSlug.replace(/-/g, ' ')} | ${manufacturerSlug.replace(/-/g, ' ')} - Design Your Product`;
 
+        this.titleService.setTitle(pageTitle);
         let { categoryIndex, productIndex, childIndex }: any =
           await this.getCategoryAndProductIndex(
             this.reversedManufacturerSlugMap[manufacturerSlug],
@@ -152,6 +154,9 @@ export class HomeComponent implements AfterViewInit {
           titleSlug,
           manufacturerSlug
         );
+
+        
+
 
         const fpdTarget = document.getElementById('fpd-target');
         if (!fpdTarget) return;
