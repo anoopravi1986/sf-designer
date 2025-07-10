@@ -155,6 +155,9 @@ export class HomeComponent implements AfterViewInit {
           manufacturerSlug
         );
 
+        'assets/data/products/product-categories.json'
+        
+
         
 
 
