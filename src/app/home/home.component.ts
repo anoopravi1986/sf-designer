@@ -137,23 +137,23 @@ export class HomeComponent implements AfterViewInit {
         const pageTitle = `${titleSlug.replace(/-/g, ' ')} | ${manufacturerSlug.replace(/-/g, ' ')} - Design Your Product`;
 
         this.titleService.setTitle(pageTitle);
-        let { categoryIndex, productIndex, childIndex }: any =
-          await this.getCategoryAndProductIndex(
-            this.reversedManufacturerSlugMap[manufacturerSlug],
-            titleSlug
-          );
-        localStorage.setItem('productIndex', productIndex);
-        localStorage.setItem('categoryIndex', categoryIndex);
-        localStorage.setItem('childIndex', childIndex);
+        // let { categoryIndex, productIndex, childIndex }: any =
+        //   await this.getCategoryAndProductIndex(
+        //     this.reversedManufacturerSlugMap[manufacturerSlug],
+        //     titleSlug
+        //   );
+        // localStorage.setItem('productIndex', productIndex);
+        // localStorage.setItem('categoryIndex', categoryIndex);
+        // localStorage.setItem('childIndex', childIndex);
 
-        console.log(
-          productIndex,
-          categoryIndex,
-          childIndex,
-          'productIndex,categoryIndex,',
-          titleSlug,
-          manufacturerSlug
-        );
+        // console.log(
+        //   productIndex,
+        //   categoryIndex,
+        //   childIndex,
+        //   'productIndex,categoryIndex,',
+        //   titleSlug,
+        //   manufacturerSlug
+        // );
 
         
 
@@ -163,6 +163,7 @@ export class HomeComponent implements AfterViewInit {
 
         this.appOptions = {
           productsJSON: 'assets/data/products/product-categories.json',
+          // productsJSON: 'https://styleflip-backend-jdm5.onrender.com/api/productmeta/getAllProductMetas',
           productsJSON1: 'assets/data/products/product-categories-new.json',
           // designsJSON: 'assets/data/designs/design-categories.json',
           designsJSON:
@@ -1205,11 +1206,14 @@ export class HomeComponent implements AfterViewInit {
     if (!canvas) return;
 
     const activeObject = canvas.getActiveObject();
-    console.log('activeObject', activeObject);
-    if (activeObject && activeObject.type === 'activeSelection') {
+    console.log(activeObject._objects.length, 'activeObject', activeObject);
+    if (activeObject._objects.length > 1 && activeObject.type === 'activeSelection') {
       // Group the selected objects
       activeObject.toGroup();
       canvas.requestRenderAll();
+    }
+    else{
+      alert('Please select at least 2 objects to group.');
     }
   }
 
