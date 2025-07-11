@@ -20977,42 +20977,51 @@
           const manufacturer = '';
           const shareUrl = `${urlBase}/savedesign?manufacturer=${manufacturer}&title=${titleSlug}`;
          
-// Copy to clipboard and call API
-shareMenu.querySelector('.fpd-share-link-btn').onclick = function(event) {
+          // Copy to clipboard and call API
+         shareMenu.querySelector('.fpd-share-link-btn').onclick = function(event) {
   event.stopPropagation();
   event.preventDefault();
-  if (navigator.clipboard) {
-    navigator.clipboard.writeText(shareUrl).then(function() {
-      // Call your API after copying
-      fetch('https://styleflip-backend-jdm5.onrender.com/api/sharedproduct/save', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          title: t.title,
-          base64save: t.url  // Replace with actual base64 if available
-        })
-      })
-      .then(response => response.json())
-      .then(data => {
-        // Optionally handle API response
-        console.log('API response:', data);
-      })
-      .catch(error => {
-        console.error('API error:', error);
-      });
 
-      shareMenu.querySelector('.fpd-share-link-btn').textContent = 'Copied!';
-      setTimeout(function() {
-        shareMenu.querySelector('.fpd-share-link-btn').textContent = 'Copy Link';
-      }, 1200);
-    });
-  } else {
-    // fallback
-    window.prompt('Copy this link:', shareUrl);
-  }
-          };
+  // Call your API first
+  fetch('https://styleflip-backend-jdm5.onrender.com/api/sharedproduct/save', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      title: t.title,
+      base64save: t.url  // Replace with actual base64 if available
+    })
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data && data.product && data.product._id) {
+      // Build the share link with the _id
+      const urlBase = window.location.origin;
+      const shareUrl = `${urlBase}/savedesign?id=${data.product._id}&title=${t.title}`;
+      shareMenu.querySelector('.fpd-share-link-url').textContent = shareUrl;
+
+      // Copy to clipboard
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(shareUrl).then(function() {
+          shareMenu.querySelector('.fpd-share-link-btn').textContent = 'Copied!';
+          setTimeout(function() {
+            shareMenu.querySelector('.fpd-share-link-btn').textContent = 'Copy Link';
+          }, 1200);
+        });
+      } else {
+        // fallback
+        window.prompt('Copy this link:', shareUrl);
+      }
+    } else {
+      alert('Failed to save product or get share link.');
+    }
+  })
+  .catch(error => {
+    console.error('API error:', error);
+    alert('Failed to save product.');
+  });
+};
 
           return e
         },
@@ -26163,12 +26172,14 @@ shareMenu.querySelector('.fpd-share-link-btn').onclick = function(event) {
 
           try {
             const titleParam = new URLSearchParams(window.location.search).get("title");
+            const idParam = new URLSearchParams(window.location.search).get("id");
+
             if (!titleParam) {
               console.log("No title provided in URL");
               return;
             }
 
-            const response = await fetch(`https://styleflip-backend-jdm5.onrender.com/api/sharedproduct/search?title=${encodeURIComponent(titleParam)}`);
+            const response = await fetch(`https://styleflip-backend-jdm5.onrender.com/api/sharedproduct/search?title=${encodeURIComponent(titleParam)}&id=${encodeURIComponent(idParam)}`, );
             const data = await response.json();
 
             const base64Image = data?.base64save;
@@ -26280,9 +26291,32 @@ shareMenu.querySelector('.fpd-share-link-btn').onclick = function(event) {
           super()
         }
         connectedCallback () {
-          this.innerHTML =
-            '<div data-moduleicon="folder-open" data-defaulttext="Saved Designs" data-title="modules.save_load"> <div class="fpd-save-design"> <input class="!bg-white" type="text" data-defaulttext="Optional: Enter a title" placeholder="modules.save_load_input_placeholder"> <div class="fpd-btn !bg-[#f53744] w-[100%] text-center !text-sm !normal-case justify-center"> <span data-defaulttext="Save Design">modules.save_load_add_btn</span> </div> </div> <div class="fpd-saved-designs fpd-scroll-area"> <div class="fpd-grid fpd-grid-contain"></div> </div> </div>'
-        }
+  this.innerHTML =
+    '<div data-moduleicon="folder-open" data-defaulttext="Saved Designs" data-title="modules.save_load"> \
+      <div class="fpd-save-design"> \
+        <input class="!bg-white" type="text" data-defaulttext="Optional: Enter a title" placeholder="modules.save_load_input_placeholder"> \
+        <div class="fpd-btn !bg-[#f53744] w-[100%] text-center !text-sm !normal-case justify-center" style="pointer-events: none; opacity: 0.5;"> \
+          <span data-defaulttext="Save Design">modules.save_load_add_btn</span> \
+        </div> \
+      </div> \
+      <div class="fpd-saved-designs fpd-scroll-area"> \
+        <div class="fpd-grid fpd-grid-contain"></div> \
+      </div> \
+    </div>';
+
+  // Enable/disable button based on input
+  const input = this.querySelector('input[type="text"]');
+  const btn = this.querySelector('.fpd-btn');
+  input.addEventListener('input', function() {
+    if (input.value.trim()) {
+      btn.style.pointerEvents = '';
+      btn.style.opacity = '';
+    } else {
+      btn.style.pointerEvents = 'none';
+      btn.style.opacity = '0.5';
+    }
+  });
+}
       }
       function xe (t, e, i) {
         if (!e.has(t))
