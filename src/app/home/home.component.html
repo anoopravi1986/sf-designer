@@ -133,7 +133,8 @@
       <div class="grid grid-cols-3 gap-4 text-center bg-white p-4 rounded">
 
         <!-- Download -->
-        <button id="download-button" class="flex flex-col items-center justify-center space-y-2 text-black">
+        <button id="download-button" (click)="dowloadButton()"
+          class="flex flex-col items-center justify-center space-y-2 text-black download-button">
           <div class="bg-white border border-gray-300 rounded-full p-3">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
               <path fill="currentColor"
@@ -160,7 +161,8 @@
         </button>
 
         <!-- Print -->
-        <button id="print-button" class="flex flex-col items-center justify-center space-y-2 text-black">
+        <button id="print-button" (click)="printDesign()"
+          class="flex flex-col items-center justify-center space-y-2 text-black">
           <div class="bg-white border border-gray-300 rounded-full p-3">
             <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" fill="none">
               <path fill="currentColor" fill-rule="evenodd"
@@ -172,8 +174,8 @@
         </button>
 
         <!-- Save Design -->
-        <button id="save-button"
-          class="flex flex-col items-center justify-center space-y-2 text-black col-span-3 sm:col-span-1">
+        <button id="save-button" (click)="saveDesign()"
+          class=" flex flex-col items-center justify-center space-y-2 text-black col-span-3 sm:col-span-1">
           <div class="bg-white border border-gray-300 rounded-full p-3">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
               stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
