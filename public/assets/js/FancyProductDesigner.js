@@ -20964,7 +20964,7 @@
         rt = (t, e) => {
           var i = []
           if ('group' == t.type) {
-            alert("jdddddddd")
+            alert('jdddddddd')
             const e = t.getObjects()
             1 === e.length
               ? (i = !0 === t.colors || 1 === t.colors ? ['#000'] : t.colors)
@@ -22498,7 +22498,7 @@
               this.canvas.renderAll(),
               (this.pattern = null)
           else if ('group' == this.type && 'object' == typeof t) {
-            alert("jdddddddda")
+            alert('jdddddddda')
             const e = this.getObjects()
             t.forEach((t, i) => {
               e[i] && e[i].set('fill', t)
@@ -26095,7 +26095,7 @@
         }
         connectedCallback () {
           this.innerHTML =
-            '<div data-moduleicon="folder-open" data-defaulttext="Saved Designs" data-title="modules.save_load"> <div class="fpd-save-design"> <input class="!bg-white" type="text" data-defaulttext="Optional: Enter a title" placeholder="modules.save_load_input_placeholder"> <div class="fpd-btn !bg-[#f53744] w-[100%] text-center !text-sm !normal-case justify-center"> <span data-defaulttext="Save Design">modules.save_load_add_btn</span> </div> </div> <div class="fpd-saved-designs fpd-scroll-area"> <div class="fpd-grid fpd-grid-contain"></div> </div> </div>'
+            '<div data-moduleicon="folder-open" data-defaulttext="Saved Designs" data-title="modules.save_load"> <div class="fpd-save-design"> <input class="!bg-white" type="text" data-defaulttext="Optional: Enter a title" placeholder="modules.save_load_input_placeholder"> <div class="fpd-btn !bg-[#f53744] w-[100%] text-center !text-sm !normal-case justify-center"> <span data-defaulttext="Save Design">modules.save_load_add_btn</span> </div> </div> <div class="fpd-saved-designs fpd-scroll-area"> <div class="fpd-grid fpd-grid-contain #savedGrid"></div> </div> </div>'
         }
       }
       function xe (t, e, i) {
@@ -26129,7 +26129,10 @@
                 300,
                 'cover'
               )
-              console.log("jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjaaa",t.viewInstances[0].fabricCanvas._objects)
+              console.log(
+                'jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjaaa',
+                t.viewInstances[0].fabricCanvas._objects
+              )
               t.viewInstances[0].toDataURL(
                 t => {
                   const e = this.fpdInstance.getProduct(),
@@ -26145,8 +26148,8 @@
                     let t = xe(this, we, Se).call(this)
                     t || (t = []),
                       this.addSavedProduct(i),
-                      console.log("jjjjjjjjjjjjjjjjjjjjjkkk1",i)
-                      t.push(i),
+                      console.log('jjjjjjjjjjjjjjjjjjjjjkkk1', i)
+                    t.push(i),
                       window.localStorage.setItem(
                         this.fpdInstance.container.id,
                         JSON.stringify(t)
@@ -26169,7 +26172,10 @@
             }),
             this.fpdInstance.mainOptions.saveActionBrowserStorage)
           ) {
-            console.log("dhhdhdhdhdh",this.fpdInstance.mainOptions.saveActionBrowserStorage)
+            console.log(
+              'dhhdhdhdhdh',
+              this.fpdInstance.mainOptions.saveActionBrowserStorage
+            )
             let t = xe(this, we, Se).call(this)
             t &&
               t.length > 0 &&
@@ -26180,7 +26186,7 @@
           var i, s
         }
         addSavedProduct (t) {
-          console.log("jjjjjjjjjjjjjjjjjjjjjk",t)
+          console.log('jjjjjjjjjjjjjjjjjjjjjk', t)
           let { thumbnail: e, product: i, title: n = '' } = t
           const s = $({
             url: e,
@@ -26190,7 +26196,7 @@
             disableDraggable: !0
           })
           return (
-            console.log("jjjjjjjjjjjjjjjjjjjjjkkk",s),
+            console.log('jjjjjjjjjjjjjjjjjjjjjkkk', s),
             this.fpdInstance.lazyBackgroundObserver.observe(
               s.querySelector('picture')
             ),
@@ -26363,6 +26369,7 @@
             }
           }
         }
+
         doAction (e) {
           if (this.fpdInstance?.currentViewInstance) {
             console.log(
@@ -27468,7 +27475,7 @@
         }
         connectedCallback () {
           this.innerHTML =
-            '<div data-moduleicon="type-outline" class="relative p-[10px]" data-defaulttext="Add Text" data-title="modules.text"> <div class="fpd-head" style="opacity:0"> <div class="fpd-input-back-search input-search-box !shadow-none border border-[#35475a33] border-solid !rounded-[8px] ml-[5px] w-[calc(100% - 22px)]"> <div class="fpd-back fpd-btn !bg-white"> <svg xmlns="http://www.w3.org/2000/svg" class="min-w-[24px] text-black relative top-[-2px]" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M15.2 16.34a7.5 7.5 0 1 1 1.38-1.45l4.2 4.2a1 1 0 1 1-1.42 1.41l-4.16-4.16zm-4.7.16a6 6 0 1 0 0-12 6 6 0 0 0 0 12z"></path></svg> </div> <div class="fpd-input-search"> <input type="text" class="!text-sm placeholder-gray-500 !pl-2" placeholder="Search" /> <span class="fpd-icon-magnify"></span> </div> </div> </div><div class="fpd-add-text"> <textarea class="!bg-white hidden" data-defaulttext="Enter some text" placeholder="modules.text_input_placeholder"></textarea> <div class="fpd-btn-add-text fpd-btn !bg-[#f53744] w-[100%] text-center !text-sm !normal-case justify-center !mt-0"> <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4.99 5.5A1.5 1.5 0 0 1 6.49 4h11a1.5 1.5 0 0 1 1.5 1.5v1.85a.75.75 0 0 1-1.5 0V6a.5.5 0 0 0-.502-.5l-4.24.008.01 11.992a1 1 0 0 0 1 1h1.407a.75.75 0 0 1 0 1.5H8.852a.75.75 0 0 1 0-1.5h1.406a1 1 0 0 0 1-1l-.01-11.992-4.258-.007a.5.5 0 0 0-.5.5v1.377a.75.75 0 1 1-1.5 0V5.5Z" fill="currentColor"></path></svg><span class="ml-[5px]" data-defaulttext="Add Text">Add Text</span> <span class="fpd-price"></span> </div> </div> <div class="fpd-text-templates fpd-container fpd-scroll-area"> <div id="text-templates" class="fpd-grid fpd-grid-contain"></div><div class="fpd-grid fpd-padding"></div> </div> </div>'
+            '<div data-moduleicon="type-outline" class="relative p-[10px]" data-defaulttext="Add Text" data-title="modules.text"> <div class="fpd-head" style="opacity:0"> <div class="fpd-input-back-search input-search-box !shadow-none border border-[#35475a33] border-solid !rounded-[8px] ml-[5px] w-[calc(100% - 22px)]"> <div class="fpd-back fpd-btn !bg-white"> <svg xmlns="http://www.w3.org/2000/svg" class="min-w-[24px] text-black relative top-[-2px]" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M15.2 16.34a7.5 7.5 0 1 1 1.38-1.45l4.2 4.2a1 1 0 1 1-1.42 1.41l-4.16-4.16zm-4.7.16a6 6 0 1 0 0-12 6 6 0 0 0 0 12z"></path></svg> </div> <div class="fpd-input-search"> <input type="text" class="!text-sm placeholder-gray-500 !pl-2" placeholder="Search" /> <span class="fpd-icon-magnify"></span> </div> </div> </div><div class="fpd-add-text"> <textarea class="!bg-white hidden" data-defaulttext="Enter some text" placeholder="modules.text_input_placeholder"></textarea> <div class="fpd-btn-add-text fpd-btn !bg-[#f53744] w-[100%] text-center !text-sm !normal-case justify-center !mt-0"> <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4.99 5.5A1.5 1.5 0 0 1 6.49 4h11a1.5 1.5 0 0 1 1.5 1.5v1.85a.75.75 0 0 1-1.5 0V6a.5.5 0 0 0-.502-.5l-4.24.008.01 11.992a1 1 0 0 0 1 1h1.407a.75.75 0 0 1 0 1.5H8.852a.75.75 0 0 1 0-1.5h1.406a1 1 0 0 0 1-1l-.01-11.992-4.258-.007a.5.5 0 0 0-.5.5v1.377a.75.75 0 1 1-1.5 0V5.5Z" fill="currentColor"></path></svg><span class="ml-[5px]" data-defaulttext="Add Text">Add Text</span> <span class="fpd-price"></span> </div> </div> <div class="fpd-text-templates fpd-container fpd-scroll-area"> <div id="text-templates" class="fpd-grid fpd-grid-contain" #savedGrid></div><div class="fpd-grid fpd-padding"></div> </div> </div>'
         }
       }
 
@@ -31256,7 +31263,7 @@
               Ps(this, Ds, zs).call(this)
             }),
             G(this.container.querySelector('.fpd-btn'), 'click', e => {
-              alert("ccccccccccccccccccccccc1")
+              alert('ccccccccccccccccccccccc1')
               const i = Ps(this, Ls, Ws).call(this)
               Ps(this, _s, Hs).call(this, i),
                 (t.currentViewInstance.names_numbers =
@@ -33392,16 +33399,22 @@
                 t.deselectElement()
             }),
             G(this.navElem.querySelector('.fpd-ungroup'), 'click', e => {
-              console.log("ddddddddddddddddddddd",this.fpdInstance)
+              console.log('ddddddddddddddddddddd', this.fpdInstance)
               // debugger
-              document.dispatchEvent(new KeyboardEvent('keydown', {
-                key: 'g',
-                code: 'KeyG',
-                ctrlKey: true,
-                bubbles: true
-              }));
-              document.querySelector('.fpd-ungroup1')?.classList.remove('fpd-hidden')
-              document.querySelector('.fpd-ungroup')?.classList.add('fpd-hidden')
+              document.dispatchEvent(
+                new KeyboardEvent('keydown', {
+                  key: 'g',
+                  code: 'KeyG',
+                  ctrlKey: true,
+                  bubbles: true
+                })
+              )
+              document
+                .querySelector('.fpd-ungroup1')
+                ?.classList.remove('fpd-hidden')
+              document
+                .querySelector('.fpd-ungroup')
+                ?.classList.add('fpd-hidden')
             })
           G(this.navElem.querySelector('.fpd-ungroup1'), 'click', e => {
             console.log('vishal')
@@ -33433,7 +33446,7 @@
 
             // Loop through each object in group
             activeObj._objects.forEach((obj, index) => {
-              console.log("obj",obj)
+              console.log('obj', obj)
               const props = savedPropsArray[index]
               if (!props) return
 
@@ -33496,7 +33509,9 @@
             }
 
             document.querySelector('.fpd-ungroup1')?.classList.add('fpd-hidden')
-            document.querySelector('.fpd-ungroup')?.classList.remove('fpd-hidden')
+            document
+              .querySelector('.fpd-ungroup')
+              ?.classList.remove('fpd-hidden')
           })
           G(this.navElem.querySelector('.fpd-tool-duplicate'), 'click', e => {
             t.currentViewInstance.fabricCanvas.duplicateElement(

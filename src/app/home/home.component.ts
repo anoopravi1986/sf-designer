@@ -43,6 +43,7 @@ export class HomeComponent implements AfterViewInit {
     private titleService: Title
   ) {}
   @ViewChild('previewButton') previewButton!: ElementRef;
+  @ViewChild('savedGrid', { static: false }) savedGrid!: ElementRef;
 
   designer: any;
   appOptions: any;
@@ -71,7 +72,7 @@ export class HomeComponent implements AfterViewInit {
         .get<any[]>('/assets/data/products/product-categories.json')
         .subscribe({
           next: (data) => {
-            console.log("dddddddddddddddddddddddd",data)
+            console.log('dddddddddddddddddddddddd', data);
             for (
               let categoryIndex = 0;
               categoryIndex < data.length;
@@ -133,8 +134,15 @@ export class HomeComponent implements AfterViewInit {
         const titleSlug = this.route.snapshot.paramMap.get('slug') || '';
         // const manufacturerSlug = params['manufacturer'];
         //       const titleSlug = params['slug'];
-        console.log('productIndex,categoryIndex,',this.reversedManufacturerSlugMap[manufacturerSlug],titleSlug);
-        const pageTitle = `${titleSlug.replace(/-/g, ' ')} | ${manufacturerSlug.replace(/-/g, ' ')} - Design Your Product`;
+        console.log(
+          'productIndex,categoryIndex,',
+          this.reversedManufacturerSlugMap[manufacturerSlug],
+          titleSlug
+        );
+        const pageTitle = `${titleSlug.replace(
+          /-/g,
+          ' '
+        )} | ${manufacturerSlug.replace(/-/g, ' ')} - Design Your Product`;
 
         this.titleService.setTitle(pageTitle);
         let { categoryIndex, productIndex, childIndex }: any =
@@ -154,9 +162,6 @@ export class HomeComponent implements AfterViewInit {
           titleSlug,
           manufacturerSlug
         );
-
-        
-
 
         const fpdTarget = document.getElementById('fpd-target');
         if (!fpdTarget) return;
@@ -429,7 +434,7 @@ export class HomeComponent implements AfterViewInit {
 
         // ✅ Hook up buttons AFTER FPD is ready
         // $('#print-button').click(() => designer.print());
-        // $('#download-button').click(() => designer.download('png'));
+
         // $('#preview-button').on('click', () => {
         //   alert('Opening preview...');
         //   console.log("jjjjj")
@@ -753,57 +758,57 @@ export class HomeComponent implements AfterViewInit {
   previewImage: string = '';
   showPreviewModal: boolean = false;
   preview() {
-    if (this.designer && this.designer.getProductDataURL) {
-      console.log('000', this.designer, '111', this.designer.getProductDataURL);
-      this.designer.currentViewInstance.fabricCanvas.enableRuler = false;
+    if (
+      this.designer &&
+      this.designer.currentViewInstance &&
+      this.designer.currentViewInstance.fabricCanvas
+    ) {
+      // Only export the current canvas (not all pages/views)
+      const canvas = this.designer.currentViewInstance.fabricCanvas;
+      const dataUrl = canvas.toDataURL({
+        format: 'png',
+        multiplier: 1,
+        enableRetinaScaling: true,
+      });
 
-      this.designer.getProductDataURL((dataUrl: string) => {
-        const image = new Image();
-        image.src = dataUrl;
+      const image = new Image();
+      image.src = dataUrl;
 
-        image.onload = () => {
-          // Create a div with background image
-          const previewDiv = document.createElement('div');
-          previewDiv.style.background = `url(${image.src})`;
-          previewDiv.style.height = '90vh';
-          previewDiv.style.width = '100%';
-          previewDiv.style.backgroundSize = 'contain';
-          previewDiv.style.backgroundRepeat = 'no-repeat';
-          previewDiv.style.backgroundPosition = 'center';
-          previewDiv.style.zIndex = '9999';
-          previewDiv.style.position = 'fixed';
-          previewDiv.style.top = '0';
-          previewDiv.style.left = '0';
-          previewDiv.style.backgroundColor = '#fff';
+      image.onload = () => {
+        // Create a div with background image
+        const previewDiv = document.createElement('div');
+        previewDiv.style.background = `url(${image.src})`;
+        previewDiv.style.height = '90vh';
+        previewDiv.style.width = '100%';
+        previewDiv.style.backgroundSize = 'contain';
+        previewDiv.style.backgroundRepeat = 'no-repeat';
+        previewDiv.style.backgroundPosition = 'center';
+        previewDiv.style.zIndex = '9999';
+        previewDiv.style.position = 'fixed';
+        previewDiv.style.top = '0';
+        previewDiv.style.left = '0';
+        previewDiv.style.backgroundColor = '#fff';
 
-          // Add close button
-          const closeButton = document.createElement('button');
-          closeButton.innerText = '✖';
-          closeButton.style.position = 'absolute';
-          closeButton.style.top = '20px';
-          closeButton.style.right = '20px';
-          closeButton.style.fontSize = '24px';
-          closeButton.style.background = 'transparent';
-          closeButton.style.border = 'none';
-          closeButton.style.cursor = 'pointer';
+        // Add close button
+        const closeButton = document.createElement('button');
+        closeButton.innerText = '✖';
+        closeButton.style.position = 'absolute';
+        closeButton.style.top = '20px';
+        closeButton.style.right = '20px';
+        closeButton.style.fontSize = '24px';
+        closeButton.style.background = 'transparent';
+        closeButton.style.border = 'none';
+        closeButton.style.cursor = 'pointer';
 
-          closeButton.onclick = () => {
-            previewDiv.remove();
-          };
-
-          previewDiv.appendChild(closeButton);
-          document.body.appendChild(previewDiv);
+        closeButton.onclick = () => {
+          previewDiv.remove();
         };
 
-        // Restore the ruler setting
-        this.designer.currentViewInstance.fabricCanvas.enableRuler =
-          this.designer.mainOptions.rulerFixed;
-        this.designer.currentViewInstance.fabricCanvas.renderAll();
-      });
+        previewDiv.appendChild(closeButton);
+        document.body.appendChild(previewDiv);
+      };
     } else {
-      console.error(
-        'Designer is not ready or getProductDataURL is not available.'
-      );
+      console.error('Designer or current canvas is not ready.');
     }
   }
   showDropdown = false;
@@ -1220,9 +1225,241 @@ export class HomeComponent implements AfterViewInit {
   closeBox(): void {
     this.isBoxVisible = false;
   }
+  downloadDesign(): void {
+    if ((window as any).fpdInstance?.doAction) {
+      (window as any).fpdInstance.doAction('download');
+    } else {
+      console.error('doAction function is not available on fpdInstance');
+    }
+  }
 
   onItemClick(item: string): void {
     console.log('Clicked:', item);
     this.closeBox(); // hide after any item is clicked
+  }
+
+  dowloadButton() {
+    console.log('Download button clicked', this.designer.actionsBar);
+    this.designer.actionsBar.doAction('download');
+  }
+  printDesign() {
+    console.log('Print Design button clicked', this.designer.actionsBar);
+    if (
+      this.designer &&
+      this.designer.currentViewInstance &&
+      this.designer.currentViewInstance.fabricCanvas
+    ) {
+      const canvas = this.designer.currentViewInstance.fabricCanvas;
+      const dataUrl = canvas.toDataURL({
+        format: 'png',
+        multiplier: 1,
+        enableRetinaScaling: true,
+      });
+
+      // Open a new window and print the image
+      const printWindow = window.open('', '_blank');
+      if (printWindow) {
+        // Create the document structure
+        const doc = printWindow.document;
+        doc.title = 'Print Design';
+
+        // Add styles
+        const style = doc.createElement('style');
+        style.textContent = `
+          body { margin: 0; text-align: center; background: #fff; }
+          img { max-width: 100vw; max-height: 100vh; }
+        `;
+        doc.head.appendChild(style);
+
+        // Add image
+        const img = doc.createElement('img');
+        img.src = dataUrl;
+        img.onload = () => {
+          printWindow.print();
+          // printWindow.close();
+        };
+        doc.body.appendChild(img);
+      }
+    } else {
+      console.error('Designer or current canvas is not ready.');
+    }
+  }
+  saveDesign() {
+    console.log('llllllllllllllllllllllllllll');
+    if (
+      this.designer &&
+      this.designer.currentViewInstance &&
+      this.designer.currentViewInstance.fabricCanvas
+    ) {
+      // Calculate multiplier for thumbnail (example: 300x300)
+      const stageWidth =
+        this.designer.currentViewInstance.options.stageWidth || 1000;
+      const stageHeight =
+        this.designer.currentViewInstance.options.stageHeight || 1000;
+      const targetWidth = 300;
+      const targetHeight = 300;
+      // 'cover' logic: scale to cover the target area
+      const scale = Math.max(
+        targetWidth / stageWidth,
+        targetHeight / stageHeight
+      );
+
+      this.designer.currentViewInstance.toDataURL(
+        (thumbnail: string) => {
+          const product = this.designer.getProduct
+            ? this.designer.getProduct()
+            : {};
+          const title = (
+            this.previewButton?.nativeElement.value || ''
+          ).toString();
+
+          const savedItem = {
+            thumbnail,
+            product,
+            title,
+          };
+
+          // Save to localStorage if enabled
+          if (product && this.designer.mainOptions?.saveActionBrowserStorage) {
+            const storageKey =
+              this.designer.container?.id || 'fpd-saved-designs';
+            let savedList: any[] = [];
+            try {
+              savedList = JSON.parse(
+                window.localStorage.getItem(storageKey) || '[]'
+              );
+            } catch {
+              savedList = [];
+            }
+            savedList.push(savedItem);
+            window.localStorage.setItem(storageKey, JSON.stringify(savedList));
+          }
+
+          // Dispatch custom event if needed
+          if (product) {
+            this.designer.dispatchEvent?.(
+              new CustomEvent('actionSave', { detail: savedItem })
+            );
+            this.designer.doUnsavedAlert = false;
+          }
+
+          // Show success message
+          this.showSuccessMessage('Design saved successfully!');
+          this.loadSavedProducts(); // <-- Add this line
+        },
+        { multiplier: scale, format: 'png', backgroundColor: 'transparent' }
+      );
+    } else {
+      console.error('Designer or current canvas is not ready.');
+    }
+  }
+
+  addSavedProduct(item: { thumbnail: string; product: any; title: string }) {
+    // Create a wrapper div for the saved product
+    const wrapper = document.createElement('div');
+    wrapper.className = 'fpd-item saved-design';
+    wrapper.style.position = 'relative';
+
+    // Thumbnail image
+    const img = document.createElement('img');
+    img.src = item.thumbnail;
+    img.alt = item.title || 'Saved Design';
+    img.style.width = '100px';
+    img.style.height = '100px';
+    img.style.objectFit = 'cover';
+    wrapper.appendChild(img);
+
+    // Title
+    const titleDiv = document.createElement('div');
+    titleDiv.innerText = item.title || '';
+    titleDiv.style.fontSize = '12px';
+    titleDiv.style.marginTop = '4px';
+    wrapper.appendChild(titleDiv);
+
+    // Remove (trash) button
+    const trashBtn = document.createElement('button');
+    trashBtn.innerHTML = '🗑️';
+    trashBtn.style.position = 'absolute';
+    trashBtn.style.top = '2px';
+    trashBtn.style.right = '2px';
+    trashBtn.style.background = 'transparent';
+    trashBtn.style.border = 'none';
+    trashBtn.style.cursor = 'pointer';
+    wrapper.appendChild(trashBtn);
+
+    // Click to load product
+    wrapper.addEventListener('click', () => {
+      if (this.designer?.loadProduct) {
+        this.designer.loadProduct(item.product);
+        this.designer.currentProductIndex = -1;
+      }
+    });
+
+    // Remove from localStorage and UI
+    trashBtn.addEventListener('click', (event) => {
+      event.stopPropagation();
+      const storageKey = this.designer?.container?.id || 'fpd-saved-designs';
+      let savedList: any[] = [];
+      try {
+        savedList = JSON.parse(window.localStorage.getItem(storageKey) || '[]');
+      } catch {
+        savedList = [];
+      }
+      const index = Array.from(this.savedGrid.nativeElement.children).indexOf(
+        wrapper
+      );
+      if (index > -1) {
+        savedList.splice(index, 1);
+        window.localStorage.setItem(storageKey, JSON.stringify(savedList));
+      }
+      wrapper.remove();
+      // Optionally dispatch event
+      this.designer?.dispatchEvent?.(
+        new CustomEvent('actionLoad:Remove', {
+          detail: { index, item: wrapper },
+        })
+      );
+    });
+
+    // Append to grid
+    this.savedGrid.nativeElement.appendChild(wrapper);
+  }
+
+  loadSavedProducts() {
+    // Clear current grid
+    if (this.savedGrid?.nativeElement) {
+      this.savedGrid.nativeElement.innerHTML = '';
+    }
+    const storageKey = this.designer?.container?.id || 'fpd-saved-designs';
+    let savedList: any[] = [];
+    try {
+      savedList = JSON.parse(window.localStorage.getItem(storageKey) || '[]');
+      console.log('Saved List:', savedList);
+    } catch {
+      savedList = [];
+    }
+    savedList.forEach((item) => this.addSavedProduct(item));
+  }
+
+  showSuccessMessage(message: string) {
+    // Simple toast message, can be replaced with Angular Material Snackbar or similar
+    const toast = document.createElement('div');
+    toast.innerText = message;
+    toast.style.position = 'fixed';
+    toast.style.bottom = '30px';
+    toast.style.left = '50%';
+    toast.style.transform = 'translateX(-50%)';
+    toast.style.background = '#4caf50';
+    toast.style.color = '#fff';
+    toast.style.padding = '12px 24px';
+    toast.style.borderRadius = '6px';
+    toast.style.fontSize = '16px';
+    toast.style.zIndex = '9999';
+    toast.style.boxShadow = '0 2px 8px rgba(0,0,0,0.15)';
+    document.body.appendChild(toast);
+
+    setTimeout(() => {
+      toast.remove();
+    }, 2000);
   }
 }
