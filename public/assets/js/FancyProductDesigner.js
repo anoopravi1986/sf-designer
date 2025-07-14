@@ -20964,7 +20964,6 @@
         rt = (t, e) => {
           var i = []
           if ('group' == t.type) {
-            alert('jdddddddd')
             const e = t.getObjects()
             1 === e.length
               ? (i = !0 === t.colors || 1 === t.colors ? ['#000'] : t.colors)
@@ -22498,7 +22497,6 @@
               this.canvas.renderAll(),
               (this.pattern = null)
           else if ('group' == this.type && 'object' == typeof t) {
-            alert('jdddddddda')
             const e = this.getObjects()
             t.forEach((t, i) => {
               e[i] && e[i].set('fill', t)
@@ -35854,6 +35852,12 @@
               console.log('elementAdd', t)
               let { element: e } = t
               if (e) {
+                console.log('elementAddsss', e)
+                const scaleX = e.canvas.width / e.width;
+                const scaleY = e.canvas.width / e.height;
+                const scale = Math.min(scaleX, scaleY);
+                e.scaleX = scale;
+                e.scaleY = scale;
                 if (
                   (this.productCreated &&
                     'image' == e.getType() &&
@@ -36027,6 +36031,8 @@
               this.calculatePrice()
             }),
             i.init()
+
+            
         }
         doAutoSelect () {
           if (this.currentViewInstance.locked) return
