@@ -27503,23 +27503,29 @@
                 }
 
                 if (t.currentViewInstance && n.length > 0) {
-                  const e = t.currentViewInstance.options
+                  const e = t.currentViewInstance.options;
+
                   let i = z(e.customTextParameters, {
-                    textBox: Boolean(
-                      this.fpdInstance.mainOptions.customTextAsTextbox
-                    ),
-                    resizable: 0,
-                    isCustom: 0,
+                    textBox: Boolean(this.fpdInstance.mainOptions.customTextAsTextbox),
+                    resizable: 1,
+                    isCustom: 1,
                     curvable: 1,
                     _addToUZ: t.currentViewInstance.currentUploadZone,
-                    _calcWidth: !0,
+                    _calcWidth: true,
                     colors: '#000',
                     fontFamily: 'Lobster',
-                    fontSize: 30,
-                    resizable: 1
-                  })
-                  t.currentViewInstance.fabricCanvas.addElement('text', n, n, i)
+                    fontSize: 50,
+                    removable: true,
+                    hasControls: true,
+                  });
+                  const text = n;
+                  const title = "MyText";
+
+                  const element = t.currentViewInstance.fabricCanvas.addElement('text', title, text, i);
+                  
                 }
+
+
 
                 // Clear the textarea
                 i.value = ''
@@ -27866,9 +27872,8 @@
 
                     // 👆 Optional: Click handler unchanged
                     newDiv.addEventListener('click', () => {
-                      document
-                        .querySelector('.fpd-ungroup1')
-                        ?.classList.remove('fpd-hidden')
+                      document.querySelector('.fpd-ungroup1')?.classList.remove('fpd-hidden')
+                      document.querySelector('.fpd-ungroup')?.classList.add('fpd-hidden')
                       if (!t.currentViewInstance) return
 
                       const viewOptions = t.currentViewInstance.options
@@ -27881,89 +27886,96 @@
                         t.currentViewInstance.fabricCanvas
 
                       innerSpans.forEach((innerSpan, index) => {
-                        const textContent = innerSpan.textContent || ''
-                        const originalSpan = spans[index]
-                        let parsedParams = {}
+                        const textContent = innerSpan.textContent?.trim() || '';
+                        const originalSpan = spans[index];
+                        let parsedParams = {};
 
                         try {
-                          const rawParams =
-                            originalSpan.getAttribute('data-parameters') || '{}'
-                          parsedParams = JSON.parse(rawParams)
+                          const rawParams = originalSpan.getAttribute('data-parameters') || '{}';
+                          console.log("ddddddddddddddddddddddRaw", rawParams)
+                          parsedParams = JSON.parse(rawParams);
                         } catch (err) {
-                          console.error('Invalid JSON in data-parameters', err)
+                          console.error('Invalid JSON in data-parameters', err);
+                        }
+
+                        // ✅ Text match check (skip if mismatch)
+                        if (parsedParams.text && parsedParams.text.trim() !== textContent) {
+                          console.warn(
+                            `Text mismatch at index ${index}: "${textContent}" !== "${parsedParams.text}". Skipping this span.`
+                          );
+                          return;
                         }
 
                         const props = {
                           ...parsedParams,
+                          text: textContent,
                           isCustom: true,
-                          textBox: Boolean(
-                            this.fpdInstance.mainOptions.customTextAsTextbox
-                          ),
+                          textBox: Boolean(this.fpdInstance.mainOptions.customTextAsTextbox),
                           resizable: true,
                           boundingBox: 'Base',
                           _addToUZ: t.currentViewInstance.currentUploadZone,
                           _calcWidth: true
-                        }
+                        };
 
-                        let existingProps
+                        console.log('props------------', props)
+                        // Save to localStorage
+                        let existingProps = [];
                         try {
-                          const data = JSON.parse(
-                            localStorage.getItem('propstext')
-                          )
-                          existingProps = Array.isArray(data) ? data : []
+                          const data = JSON.parse(localStorage.getItem('propstext') || '[]');
+                          existingProps = Array.isArray(data) ? data : [];
                         } catch (e) {
-                          existingProps = []
+                          existingProps = [];
                         }
 
-                        existingProps.push(props)
+                        existingProps.push(props);
                         if (existingProps.length > 2) {
-                          existingProps = existingProps.slice(-2)
+                          existingProps = existingProps.slice(-2);
                         }
-                        localStorage.setItem(
-                          'propstext',
-                          JSON.stringify(existingProps)
-                        )
+                        localStorage.setItem('propstext', JSON.stringify(existingProps));
 
+                        // Apply styledProps
+                        const viewOptions = t.currentViewInstance.options;
+                        console.log('props------------1', props)
                         let styledProps =
                           typeof z === 'function'
                             ? z(viewOptions.customTextParameters, props)
-                            : props
+                            : props;
 
-                        styledProps.fill = props.colors || '#ff0000'
-                        styledProps.colors = props.colors || '#ff0000'
-                        styledProps.fontFamily = props.font || 'Arial'
-                        styledProps.fontSize = props.textSize || 24
-                        styledProps.curved = props.curved || false
-                        styledProps.curveSpacing = props.curveSpacing || 5
-                        styledProps.curveRadius = props.curveRadius || 180
-                        styledProps.curveReverse = props.curveReverse || false
-
-                        const baseTop = parsedParams.top || 0
-                        const lineSpacing = props.curved
-                          ? props.textSize * 2
-                          : props.textSize * 1.5
-                        styledProps.top = baseTop + verticalOffset
-                        styledProps.left = parsedParams.left || 0
-                        styledProps.autoCenter = true
-                        verticalOffset += lineSpacing
-
+                        styledProps = {
+                          ...styledProps,
+                          autoCenter: false,
+                          fill: props.colors || '#ff0000',
+                          colors: props.colors || '#ff0000',
+                          fontFamily: props.font || 'Arial',
+                          fontSize: props.textSize || 24,
+                          curved: props.curved || false,
+                          curveSpacing: props.curveSpacing || 5,
+                          curveRadius: props.curveRadius || 180,
+                          curveReverse: props.curveReverse || false,
+                          textAlign: 'left',
+                          originX: 'left',
+                          originY: 'top',
+                          boundingBox: undefined,
+                          top: parsedParams.top || 0,
+                          left: parsedParams.left || 0
+                        };
+                        console.log('props------------2', styledProps)
                         const fabricText = styledProps.curved
                           ? new fabric.CurvedText(textContent, styledProps)
-                          : new fabric.Text(textContent, styledProps)
+                          : new fabric.Text(textContent, styledProps);
 
                         fabricText.set({
-                          textAlign: 'center',
-                          originX: 'center',
                           curvable: 1,
                           curved: props.curved || false,
                           curveReverse: props.curveReverse || false,
                           curveRadius: props.curveRadius || 0,
                           curveSpacing: props.curveSpacing || 0,
                           boundingBox: 'Base'
-                        })
+                        });
 
-                        insertedTextObjects.push(fabricText)
-                      })
+                        insertedTextObjects.push(fabricText);
+                      });
+
 
                       if (insertedTextObjects.length > 0) {
                         const group = new fabric.Group(insertedTextObjects, {
@@ -27974,7 +27986,7 @@
                           originX: 'center',
                           originY: 'center'
                         })
-
+                        console.log('group--------------', group)
                         const canvasWidth = fabricCanvas.getWidth()
                         const canvasHeight = fabricCanvas.getHeight()
                         group.set({
@@ -27982,9 +27994,12 @@
                           cornerStyle: 'circle',
                           transparentCorners: false,
                           padding: 10,
-                          left: canvasWidth / 2,
-                          top: canvasHeight / 2,
-                          boundingBox: 'Base'
+                          left: canvasWidth,
+                          top: canvasHeight,
+                          boundingBox: 'Base',
+                          padding: 0, // 🚫 avoid padding if not visually necessary
+                          scaleX: 1,  // 🔒 lock scale
+                          scaleY: 1,
                         })
 
                         fabricCanvas.add(group)
@@ -33202,7 +33217,10 @@
               'smart' == this.currentPlacement && this.toggle(!1)
             }),
             G(t, 'elementModify', t => {
+              console.log("jjjjjjjjjjjjjjjjjjjjj", t)
               const { options: e } = t.detail
+              console.log(e, 'elementModify', t.detail,  "----------",e.fontSize)
+              console.log("hdddddddddddddddddd",this.navElem.querySelector('.fpd-tool-text-size > input').value)
               void 0 !== e.fontSize &&
                 (Kr(this, pa, Pa).call(this, 'fontSize', e.fontSize),
                 (this.navElem.querySelector(
@@ -33405,26 +33423,60 @@
               
             }),
             G(this.navElem.querySelector('.fpd-ungroup'), 'click', e => {
-              console.log("ddddddddddddddddddddd",this.fpdInstance)
-              console.log("dkkkkkkkkkkkk", this.fpdInstance.currentViewInstance?.fabricCanvas.getActiveObject())
-              var lengthcheck = this.fpdInstance.currentViewInstance?.fabricCanvas.getActiveObject()?._objects?.length;
-              if (lengthcheck > 1) {
+              const fabricCanvas = this.fpdInstance.currentViewInstance?.fabricCanvas;
+              const activeObject = fabricCanvas?.getActiveObject();
 
-                document.dispatchEvent(new KeyboardEvent('keydown', {
-                  key: 'g',
-                  code: 'KeyG',
-                  ctrlKey: true,
-                  bubbles: true
-                }));
-                document.querySelector('.fpd-ungroup1')?.classList.remove('fpd-hidden')
-                document.querySelector('.fpd-ungroup')?.classList.add('fpd-hidden')
+              if (!activeObject || !Array.isArray(activeObject._objects)) {
+                alert('Please select multiple elements to group. Hold Shift and click on layers to select more than one.');
+                return;
               }
-              else {
-                alert("Please select more than one element to Group")
-              }
-              // debugger
-            })
+
+              const savedPropsArray = [];
+
+              activeObject._objects.forEach(obj => {
+                const params = {
+                  text: obj.text,
+                  left: obj.left,
+                  top: obj.top,
+                  font: obj.fontFamily,
+                  textSize: obj.fontSize,
+                  colors: obj.fill,
+                  curvable: obj.curvable ?? 1,
+                  curved: obj.curved ?? false,
+                  curveSpacing: obj.curveSpacing ?? 0,
+                  curveRadius: obj.curveRadius ?? 0,
+                  curveReverse: obj.curveReverse ?? false,
+                  textAlign: obj.textAlign,
+                  originX: obj.originX,
+                  originY: obj.originY,
+                  fontWeight: obj.fontWeight || 'normal',
+                  underline: obj.underline || false,
+                  textTransform: obj.textTransform || 'none',
+                  boundingBox: 'Base'
+                };
+
+                savedPropsArray.push(params);
+              });
+
+              localStorage.setItem('propstext', JSON.stringify(savedPropsArray));
+
+              // Group via Ctrl+G event (FPD internal handling)
+              const groupShortcut = new KeyboardEvent('keydown', {
+                key: 'g',
+                code: 'KeyG',
+                ctrlKey: true,
+                bubbles: true
+              });
+              document.dispatchEvent(groupShortcut);
+
+              // UI updates
+              document.querySelector('.fpd-ungroup1')?.classList.remove('fpd-hidden');
+              document.querySelector('.fpd-ungroup')?.classList.add('fpd-hidden');
+            });
+
+
           G(this.navElem.querySelector('.fpd-ungroup1'), 'click', e => {
+            alert("check");
             console.log('vishal')
             // e.currentTarget.classList.add('fpd-hidden')
             const canvas = t.currentViewInstance.fabricCanvas
@@ -33454,59 +33506,72 @@
 
             // Loop through each object in group
             activeObj._objects.forEach((obj, index) => {
-              console.log('obj', obj)
-              const props = savedPropsArray[index]
-              if (!props) return
+              const props = savedPropsArray[index];
+              if (!props) return;
 
-              // Remove old object from canvas
-              canvas.remove(obj)
+              // ✅ Match title before restoring
+              const objectText = obj.text?.trim() || '';
+              const savedTitle = props.title?.trim() || '';
 
-              const elementType = props.curved ? 'curvedText' : 'text'
-              console.log(props, 'Restoring text element of type:', elementType)
-              const restoredText =
-                t.currentViewInstance.fabricCanvas.addElement(
-                  elementType,
-                  obj.text, // Title or identifier
-                  obj.text, // Actual text content
-                  {
-                    ...props,
-                    left: obj.left,
-                    top: obj.top,
-                    originX: 'center',
-                    originY: 'center',
-                    textAlign: 'center',
-                    fill: obj.colors || '#252525',
-                    fontFamily: obj.font || props.fontFamily,
-                    fontSize: obj.textSize || props.fontSize,
-                    editable: true,
-                    selectable: true,
-                    hasControls: true,
-                    evented: true,
+              if (savedTitle && objectText !== savedTitle) {
+                console.warn(
+                  `Skipping restore at index ${index} due to title mismatch: "${objectText}" !== "${savedTitle}"`
+                );
+                return;
+              }
 
-                    // Curving & interaction properties
-                    curvable: 1,
-                    curved: props.curved || false,
-                    curveSpacing: props.curveSpacing || 0,
-                    curveRadius: props.curveRadius || 0,
-                    curveReverse: props.curveReverse || false,
-                    zoom: 0.3,
-                    draggable: 1,
-                    rotatable: 1,
-                    resizable: 1,
-                    removable: 1,
-                    autoSelect: 1,
-                    autoCenter: 0,
-                    opacity: 1,
-                    angle: 0,
-                    locked: 0,
-                    z: 1,
-                    boundingBox: 'Base'
-                  }
-                )
+              // ✅ Remove the grouped object from canvas
+              canvas.remove(obj);
 
-              // Optional: set active object individually if needed
+              const elementType = props.curved ? 'curvedText' : 'text';
+              console.log(props, 'Restoring element of type:', elementType);
+
+              const restoredText = t.currentViewInstance.fabricCanvas.addElement(
+                elementType,
+                savedTitle || objectText, // title (name)
+                objectText,               // actual text
+                {
+                  ...props,
+                  left: obj.left,
+                  top: obj.top,
+                  originX: 'center',
+                  originY: 'center',
+                  textAlign: 'center',
+                  fill: props.colors || obj.fill || '#252525',
+                  fontFamily: props.font || obj.fontFamily || 'Arial',
+                  fontSize: props.textSize || obj.fontSize || 120,
+                  fontWeight: props.fontWeight || obj.fontWeight || 'bold',
+                  underline: props.underline ?? obj.underline ?? false,
+                  textTransform: props.textTransform || obj.textTransform || 'capitalize',
+                  editable: true,
+                  selectable: true,
+                  hasControls: true,
+                  evented: true,
+                  removable: true,
+
+                  // FabricJS specific
+                  curvable: 1,
+                  curved: props.curved || false,
+                  curveSpacing: props.curveSpacing || 0,
+                  curveRadius: props.curveRadius || 0,
+                  curveReverse: props.curveReverse || false,
+                  draggable: 1,
+                  rotatable: 1,
+                  resizable: 1,
+                  autoSelect: 1,
+                  autoCenter: 0,
+                  opacity: 1,
+                  angle: 0,
+                  locked: 0,
+                  z: 1,
+                  boundingBox: 'Base'
+                }
+              );
+
+              // Optional: Set as active individually
               // canvas.setActiveObject(restoredText);
-            })
+            });
+            
 
             canvas.discardActiveObject()
             canvas.requestRenderAll()
@@ -35852,12 +35917,16 @@
               console.log('elementAdd', t)
               let { element: e } = t
               if (e) {
-                console.log('elementAddsss', e)
-                const scaleX = e.canvas.width / e.width;
-                const scaleY = e.canvas.width / e.height;
-                const scale = Math.min(scaleX, scaleY);
-                e.scaleX = scale;
-                e.scaleY = scale;
+                console.log(e.getType(),e.draggable, 'elementAddsss', e)
+                if(e.getType() == 'text') {e.removable = true}
+                if (e.getType() == 'image' & e.draggable == '0') {
+                  const scaleX = e.canvas.width / e.width;
+                  const scaleY = e.canvas.width / e.height;
+                  const scale = Math.min(scaleX, scaleY);
+                  e.scaleX = scale;
+                  e.scaleY = scale;
+                }
+                
                 if (
                   (this.productCreated &&
                     'image' == e.getType() &&

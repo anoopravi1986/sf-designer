@@ -18,6 +18,30 @@ import { filter } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 
+interface TextSpan {
+  text: string;
+  parameters: {
+    left: number;
+    top: number;
+    font: string;
+    textSize: number;
+    colors: string;
+    curvable: number;
+  };
+}
+
+interface Product {
+  title: string;
+  thumbnail: string;
+  tags: string[];
+  texts: TextSpan[];
+}
+
+interface Category {
+  category: string;
+  products: Product[];
+}
+
 @Component({
   selector: 'app-home',
   standalone: true,
@@ -25,6 +49,8 @@ import { FormsModule } from '@angular/forms';
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss'],
 })
+
+
 export class HomeComponent implements AfterViewInit {
   isBoxVisible = false;
   email: string = '';
@@ -34,6 +60,9 @@ export class HomeComponent implements AfterViewInit {
   firstName: string = '';
   initialLetter: string = 'A';
   private savedContent: string = '';
+
+  
+
   constructor(
     @Inject(PLATFORM_ID) private platformId: any,
     @Inject(DOCUMENT) private document: Document,
@@ -139,10 +168,9 @@ export class HomeComponent implements AfterViewInit {
           this.reversedManufacturerSlugMap[manufacturerSlug],
           titleSlug
         );
-        const pageTitle = `${titleSlug.replace(
-          /-/g,
-          ' '
-        )} | ${manufacturerSlug.replace(/-/g, ' ')} - Design Your Product`;
+       const pageTitle = `${
+          titleSlug.trim() ? titleSlug.replace(/-/g, '') : 'Styleflip'
+        } | ${manufacturerSlug.replace(/-/g, ' ')} - Design Your Product`;
 
         this.titleService.setTitle(pageTitle);
         // let { categoryIndex, productIndex, childIndex }: any =
@@ -172,7 +200,7 @@ export class HomeComponent implements AfterViewInit {
           productsJSON1: 'assets/data/products/product-categories-new.json',
           // designsJSON: 'assets/data/designs/design-categories.json',
           designsJSON:
-            'https://styleflip-backend-jdm5.onrender.com/api/element/getAllElements',
+            'https://styleflip-backend-jdm5.ithemes.xyz/api/element/getAllElements',
           langJSON: 'assets/data/langs/default.json',
           // layout: 'topbar',
           stageWidth: 2000,
@@ -522,9 +550,7 @@ export class HomeComponent implements AfterViewInit {
         });
       }, 300);
 
-      setTimeout(() => {
-        this.bottomMenu();
-      }, 10);
+      
     }
 
     if (isPlatformBrowser(this.platformId)) {
@@ -743,6 +769,8 @@ export class HomeComponent implements AfterViewInit {
       this.isLoggedIn = true;
       this.showLoginPopup = false;
     }
+    this.loadDesigns();
+
   }
 
   bottomMenu() {
@@ -1465,5 +1493,73 @@ export class HomeComponent implements AfterViewInit {
     setTimeout(() => {
       toast.remove();
     }, 2000);
+  }
+
+  
+  loadDesigns() {
+    const apiUrl = 'https://styleflip-backend-jdm5.ithemes.xyz/api/text/getAllData'; // Replace with your real API
+
+    this.http.get<Category[]>(apiUrl).subscribe({
+      next: (data) => {
+        console.log('Design data fetched:', data);
+        const html = this.generateHTML(data);
+        const container = document.getElementById('content-text');
+        if (container) {
+          container.innerHTML = html;
+          console.log('Design data loaded successfully:', html);
+          this.bottomMenu();
+        }
+      },
+      error: (err) => {
+        console.error('Failed to fetch design data:', err);
+      }
+    });
+  }
+
+  generateHTML(data: Category[]): string {
+    let html = '';
+
+    for (const cat of data) {
+      html += `<div class="fpd-category" data-category="${this.escapeHtml(cat.category)}">`;
+
+      for (const product of cat.products) {
+        const tags = product.tags.join(', ');
+        
+        const rawThumbnail = product.thumbnail?.trim();
+        const safeThumbnail = rawThumbnail && rawThumbnail !== ''
+          ? this.escapeHtml(rawThumbnail)
+          : 'assets/images/designs/styleflip-logo.jpg';
+
+        html += `<div class="fpd-product fpd-producttext" 
+                    title="${this.escapeHtml(product.title)}"
+                    data-thumbnail="${safeThumbnail}" 
+                    data-tags="${this.escapeHtml(tags)}">`;
+
+        for (const span of product.texts) {
+          console.log('Span Data:', span);
+          const paramStr = JSON.stringify(span.parameters).replace(/"/g, '&quot;');
+          html += `<span data-parameters='${paramStr}'>${this.escapeHtml(span.text)}</span>`;
+        }
+
+        html += `</div>`;
+      }
+
+
+      html += `</div>`;
+    }
+
+    return html;
+    
+  }
+
+  escapeHtml(text: string): string {
+    const map: Record<string, string> = {
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#039;'
+    };
+    return text.replace(/[&<>"']/g, (m) => map[m]);
   }
 }

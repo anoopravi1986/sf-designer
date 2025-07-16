@@ -195,6 +195,8 @@ div.fpd-container .fpd-text-templates #text-templates.fpd-grid{gap: 7px;}
 left: 84px;
 right: auto;
 top: 82px;}
+fpd-element-toolbar[data-fabric-type="image"] .fpd-ungroup1,
+fpd-element-toolbar[data-fabric-type="image"] .fpd-ungroup{display: none;}
 
 
 // .fpd-tool-remove-bg.fpd-hidden{display: flex !important;pointer-events: auto !important;}
