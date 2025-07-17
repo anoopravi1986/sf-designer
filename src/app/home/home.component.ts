@@ -173,14 +173,28 @@ export class HomeComponent implements AfterViewInit {
         } | ${manufacturerSlug.replace(/-/g, ' ')} - Design Your Product`;
 
         this.titleService.setTitle(pageTitle);
-        // let { categoryIndex, productIndex, childIndex }: any =
-        //   await this.getCategoryAndProductIndex(
-        //     this.reversedManufacturerSlugMap[manufacturerSlug],
-        //     titleSlug
-        //   );
-        // localStorage.setItem('productIndex', productIndex);
-        // localStorage.setItem('categoryIndex', categoryIndex);
-        // localStorage.setItem('childIndex', childIndex);
+        let { categoryIndex, productIndex, childIndex }: any =
+          await this.getCategoryAndProductIndex(
+            this.reversedManufacturerSlugMap[manufacturerSlug],
+            titleSlug
+          );
+        localStorage.setItem('productIndex', productIndex);
+        localStorage.setItem('categoryIndex', categoryIndex);
+        localStorage.setItem('childIndex', childIndex);
+
+        console.log(
+          productIndex,
+          categoryIndex,
+          childIndex,
+          'productIndex,categoryIndex,',
+          titleSlug,
+          manufacturerSlug
+        );
+
+        'assets/data/products/product-categories.json'
+        
+
+        
 
         // console.log(
         //   productIndex,
@@ -196,7 +210,7 @@ export class HomeComponent implements AfterViewInit {
 
         this.appOptions = {
           productsJSON: 'assets/data/products/product-categories.json',
-          // productsJSON: 'https://styleflip-backend-jdm5.onrender.com/api/productmeta/getAllProductMetas',
+          // productsJSON: 'https://styleflip-backend-jdm5.ithemes.xyz/api/productmeta/getAllProductMetas',
           productsJSON1: 'assets/data/products/product-categories-new.json',
           // designsJSON: 'assets/data/designs/design-categories.json',
           designsJSON:

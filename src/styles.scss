@@ -197,6 +197,16 @@ right: auto;
 top: 82px;}
 fpd-element-toolbar[data-fabric-type="image"] .fpd-ungroup1,
 fpd-element-toolbar[data-fabric-type="image"] .fpd-ungroup{display: none !important;}
-
-
+.fpd-container fpd-module-text .fpd-text-templates .fpd-grid .fpd-item>div{font-size: inherit !important;}
+.fpd-module-content.backdrop-test fpd-module-text.fpd-active:before{
+      content: "";
+    position: fixed;
+    inset: 0px;
+    left: 83px;
+    top: 56px;
+    z-index: 1;
+    max-width: 365px;
+    background-color: rgb(255 255 255 / var(--tw-bg-opacity, 1));
+    --tw-bg-opacity: 0.6;
+}
 // .fpd-tool-remove-bg.fpd-hidden{display: flex !important;pointer-events: auto !important;}
