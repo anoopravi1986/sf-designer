@@ -196,7 +196,7 @@ left: 84px;
 right: auto;
 top: 82px;}
 fpd-element-toolbar[data-fabric-type="image"] .fpd-ungroup1,
-fpd-element-toolbar[data-fabric-type="image"] .fpd-ungroup{display: none;}
+fpd-element-toolbar[data-fabric-type="image"] .fpd-ungroup{display: none !important;}
 
 
 // .fpd-tool-remove-bg.fpd-hidden{display: flex !important;pointer-events: auto !important;}

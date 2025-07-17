@@ -98,7 +98,7 @@ export class HomeComponent implements AfterViewInit {
 
     return new Promise((resolve, reject) => {
       this.http
-        .get<any[]>('/assets/data/products/product-categories.json')
+        .get<any[]>('https://styleflip-backend-jdm5.ithemes.xyz/api/product/getAllProducts')
         .subscribe({
           next: (data) => {
             console.log('dddddddddddddddddddddddd', data);
@@ -762,6 +762,21 @@ export class HomeComponent implements AfterViewInit {
   }
 
   ngOnInit() {
+
+    window.addEventListener('load', () => {
+      fetch('https://styleflip-backend-jdm5.ithemes.xyz/api/product/getAllProducts')
+        .then(res => res.json())
+        .then(data => {
+          console.log('Large products loaded:', data);
+          console.log('', this.designer)
+          localStorage.setItem('fpdProductsJSON', JSON.stringify(data));
+          this.designer.product = data;
+          console.log(this.designer.product, '1111111111111', this.designer)
+        })
+        .catch(err => console.error('Error loading large products:', err));
+    });   
+
+
     const slug = this.route.snapshot.paramMap.get('slug');
     console.log('Selected slug:', slug);
     const token = localStorage.getItem('authToken');

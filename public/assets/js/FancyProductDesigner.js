@@ -22836,6 +22836,13 @@
               1 == e.length ? this._onSelected(e[0]) : this._onMultiSelected(e)
             },
             'mouse:down': t => {
+              console.log('mouse down funtion', t, t.target)
+              // let lengthcheck = t.target._objects.length;
+              // if(lengthcheck > 1) {
+              //   t.target.removable = true;
+              //   t.target.cornerSize = 22;
+              //   t.target.resizable = true;
+              // }
               t.target &&
                 t.target.__corner &&
                 'function' == typeof t.target.exitEditing &&
@@ -27492,44 +27499,52 @@
             this.container
               .querySelector('.fpd-btn-add-text')
               .addEventListener('click', e => {
-                console.log('click')
-                let i = this.container.querySelector('textarea'),
-                  n = i.value.trim()
+  console.log('click')
 
-                // If empty, use demo text
-                if (!n) {
-                  n = 'this is your demo'
-                  i.value = n // Optional: show it in the textarea too
-                }
+  let i = this.container.querySelector('textarea'),
+      n = i.value.trim()
 
-                if (t.currentViewInstance && n.length > 0) {
-                  const e = t.currentViewInstance.options;
+  // If empty, use demo text
+  if (!n) {
+    n = 'this is your demo'
+    i.value = n // Optional: show in the textarea too
+  }
 
-                  let i = z(e.customTextParameters, {
-                    textBox: Boolean(this.fpdInstance.mainOptions.customTextAsTextbox),
-                    resizable: 1,
-                    isCustom: 1,
-                    curvable: 1,
-                    _addToUZ: t.currentViewInstance.currentUploadZone,
-                    _calcWidth: true,
-                    colors: '#000',
-                    fontFamily: 'Lobster',
-                    fontSize: 50,
-                    removable: true,
-                    hasControls: true,
-                  });
-                  const text = n;
-                  const title = "MyText";
+  if (t.currentViewInstance && n.length > 0) {
+    const e = t.currentViewInstance.options;
 
-                  const element = t.currentViewInstance.fabricCanvas.addElement('text', title, text, i);
-                  
-                }
+    let options = z(e.customTextParameters, {
+      textBox: Boolean(this.fpdInstance.mainOptions.customTextAsTextbox),
+      resizable: 1,
+      isCustom: 1,
+      curvable: 1,
+      _addToUZ: t.currentViewInstance.currentUploadZone,
+      _calcWidth: true,
+      colors: '#000',
+      fontFamily: 'Lobster',
+      fontSize: 50,
+      removable: true,
+      selectable: true,
+      editable: true,
+      hasControls: true,
+      evented: true,
+      objectCaching: false,
+    });
 
+    const text = n;
 
+    const element = t.currentViewInstance.fabricCanvas.addElement('text', n, text, options);
 
-                // Clear the textarea
-                i.value = ''
-              }),
+    if (element && typeof element.enterEditing === 'function') {
+      t.currentViewInstance.fabricCanvas.setActiveObject(element);
+      element.enterEditing(); // ✅ force edit mode
+      t.currentViewInstance.fabricCanvas.renderAll();
+    }
+  }
+
+  // Clear the textarea
+  i.value = ''
+}),
             G(
               this.container.querySelector('textarea'),
               ['input', 'change'],
@@ -33468,7 +33483,12 @@
                 bubbles: true
               });
               document.dispatchEvent(groupShortcut);
-
+              t.currentViewInstance.fabricCanvas.getActiveObject();
+              t.currentViewInstance.fabricCanvas.getActiveObject().removable = true;
+              t.currentViewInstance.fabricCanvas.getActiveObject().resizable = true;
+              t.currentViewInstance.fabricCanvas.getActiveObject().boundingBox = 'Base';
+              t.currentViewInstance.fabricCanvas.getActiveObject().boundingBoxMode = 'clipping';
+              console.log('grouping completed successfully.', t.currentViewInstance.fabricCanvas.getActiveObject())
               // UI updates
               document.querySelector('.fpd-ungroup1')?.classList.remove('fpd-hidden');
               document.querySelector('.fpd-ungroup')?.classList.add('fpd-hidden');
@@ -33476,7 +33496,6 @@
 
 
           G(this.navElem.querySelector('.fpd-ungroup1'), 'click', e => {
-            alert("check");
             console.log('vishal')
             // e.currentTarget.classList.add('fpd-hidden')
             const canvas = t.currentViewInstance.fabricCanvas
@@ -33580,7 +33599,7 @@
             if (typeof t.deselectElement === 'function') {
               t.deselectElement()
             }
-
+            console.log('ungrouping completed successfully.', t)
             document.querySelector('.fpd-ungroup1')?.classList.add('fpd-hidden')
             document
               .querySelector('.fpd-ungroup')
@@ -33723,6 +33742,7 @@
           )
       }
       function ya (t) {
+        console.log("hhhhhhhhhhhhhhhhhhh",t)
         let e =
           !(arguments.length > 1 && void 0 !== arguments[1]) || arguments[1]
         const i = this.navElem.querySelectorAll('.fpd-tools-nav .fpd-tool-' + t)
@@ -34826,6 +34846,7 @@
               this.fpdInstance.mainOptions.modalMode
             )
             G(n, 'click', i => {
+              alert("chchhchskk1121")
               i.preventDefault(),
                 X(document.body, [
                   'fpd-overflow-hidden',
@@ -35920,6 +35941,7 @@
                 console.log(e.getType(),e.draggable, 'elementAddsss', e)
                 if(e.getType() == 'text') {e.removable = true}
                 if (e.getType() == 'image' & e.draggable == '0') {
+                  console.log('image draggable', e.draggable);
                   const scaleX = e.canvas.width / e.width;
                   const scaleY = e.canvas.width / e.height;
                   const scale = Math.min(scaleX, scaleY);
@@ -36892,6 +36914,9 @@
         })
       }
       function Wo () {
+        //const savedJson = localStorage.getItem('fpdProductsJSON');
+        //this.mainOptions.productsJSON = JSON.parse(savedJson);
+        console.log("this.mainOptions.productsJSON",this.mainOptions.productsJSON)
         q(this, 'ready', {}),
           (this.warningsWrapper =
             this.container.querySelector('.fpd-warnings')),
