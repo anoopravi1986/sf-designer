@@ -209,4 +209,8 @@ fpd-element-toolbar[data-fabric-type="image"] .fpd-ungroup{display: none !import
     background-color: rgb(255 255 255 / var(--tw-bg-opacity, 1));
     --tw-bg-opacity: 0.6;
 }
+.fpd-tool-font-family{    border: 2px solid #000;border-radius: 20px;}
+.my-class-buttons-sub.active{background-color: #40576d12;}
+fpd-element-toolbar.fpd-smart>.fpd-tools-nav>div .fpd-tool-text-bold.bold-outside,
+#fontItalic.fpd-hidden{display: block !important;pointer-events: auto !important;align-items: center;margin: 10px;}
 // .fpd-tool-remove-bg.fpd-hidden{display: flex !important;pointer-events: auto !important;}

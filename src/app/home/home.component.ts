@@ -217,7 +217,7 @@ export class HomeComponent implements AfterViewInit {
             'https://styleflip-backend-jdm5.ithemes.xyz/api/element/getAllElements',
           langJSON: 'assets/data/langs/default.json',
           // layout: 'topbar',
-          stageWidth: 2000,
+          stageWidth: 2500,
           stageHeight: 1000,
           initialActiveModule: 'products',
           // toolbarPlacement: "inside-top",
@@ -286,12 +286,17 @@ export class HomeComponent implements AfterViewInit {
             {
               name: 'Roboto',
               url: 'google',
-              variants: ['regular', 'italic', '700', '700italic'],
+              variants: ['regular', 'bold'],
             },
+            // {
+            //   name: 'Roboto Bold',
+            //   url: 'google',
+            //   variants: ['bold'],
+            // },
             {
               name: 'Open Sans',
               url: 'google',
-              variants: ['regular', 'italic', '700', '700italic'],
+              variants: ['regular', 'italic', '700', '700italic', 'bold'],
             },
             {
               name: 'Poppins',
@@ -446,8 +451,11 @@ export class HomeComponent implements AfterViewInit {
           this.document.querySelector('#clothing-designer'),
           this.appOptions
         );
-
+        
+        const dataofproducts = localStorage.getItem('fpdProductsJSON');
+        console.log('dataofproducts', dataofproducts); 
         const canvas = this.designer?.currentViewInstance?.fabricCanvas;
+       
         if (canvas) {
           canvas.selection = true;
           canvas.selectionKey = 'shiftKey';
@@ -763,8 +771,50 @@ export class HomeComponent implements AfterViewInit {
         // Step 3: Run once initially
         checkAndHideDuplicateFpdItems();
       }
+
+      this.moveBoldToPrimaryTools()
     }, 3000);
   }
+
+  moveBoldToPrimaryTools(): void {
+  const interval = setInterval(() => {
+    const targetElement = document.getElementById('boldOutside');
+
+    if (targetElement) {
+      targetElement.addEventListener('click', (event) => {
+        
+          this.designer.currentViewInstance.fabricCanvas.setElementOptions({
+            fontWeight:
+              this.designer.currentViewInstance.fabricCanvas.getActiveObject().fontWeight === 'bold'
+                ? 'normal'
+                : 'bold',
+          });
+
+          targetElement.classList.toggle(
+            'active',
+            this.designer.currentViewInstance.fabricCanvas.getActiveObject().fontWeight === 'bold'
+          );
+      });
+    }
+
+    const targetElement2 = document.getElementById('fontItalic');
+    if (targetElement2) {
+      targetElement2.addEventListener('click', () => {
+        this.designer.currentViewInstance.fabricCanvas.setElementOptions({
+          fontStyle:
+            this.designer.currentViewInstance.fabricCanvas.getActiveObject().fontStyle === 'italic'
+              ? 'normal'
+              : 'italic',
+        });
+
+        targetElement2.classList.toggle(
+          'active',
+          this.designer.currentViewInstance.fabricCanvas.getActiveObject().fontStyle === 'italic'
+        );
+      });
+    }
+  }, 500);
+}
 
   slugify(title: string): string {
     return title
@@ -776,7 +826,7 @@ export class HomeComponent implements AfterViewInit {
   }
 
   ngOnInit() {
-
+    
     window.addEventListener('load', () => {
       fetch('https://styleflip-backend-jdm5.ithemes.xyz/api/product/getAllProducts')
         .then(res => res.json())
@@ -792,16 +842,100 @@ export class HomeComponent implements AfterViewInit {
 
 
     const slug = this.route.snapshot.paramMap.get('slug');
-    console.log('Selected slug:', slug);
+    const manufacturer = this.route.snapshot.paramMap.get('manufacturer');
+    console.log(this.route.snapshot.paramMap, 'Selected slug:', slug);
+    const currentUrl = this.router.url;
+    if (currentUrl.includes('savedesign')) {
+      this.route.queryParams.subscribe(params => {
+        const id = params['id'];
+        const title = params['title'];
+
+        console.log('Design Save Detected!');
+        console.log('ID:', id);
+        console.log('Title:', title);
+        const designTitleData = localStorage.getItem('clothing-designer');
+        let matchedDesign = null;
+        if (designTitleData) {
+          const parsedDesigns = JSON.parse(designTitleData);
+          matchedDesign = parsedDesigns.find((i: any) => i.title === title);
+        }
+
+        if (matchedDesign) {
+          setTimeout(() => {
+            console.log(matchedDesign, 'Matched Design:', this.designer?.currentViewInstance);
+            // this.designer?.currentViewInstance?.fabricCanvas?.clear();
+            // if (this.designer && matchedDesign && matchedDesign.product) {
+            //   console.log('Loading saved design:', matchedDesign.title);
+            //   const viewIndex = 0; // Or use a dynamic value from localStorage
+
+            //   const savedView = matchedDesign.product[viewIndex];
+
+            //   if (savedView && savedView.elements) {
+            //     console.log(savedView, 'Loading saved design inside:', savedView.title);
+            //     // Clear current canvas view
+            //     this.designer.currentViewInstance.fabricCanvas.clear();
+            //     // this.designer.currentViewInstance.fabricCanvas.addElements(savedView);  
+            //     // this.designer.currentViewInstance.fabricCanvas.renderAll();
+
+            //     savedView.elements.forEach((element: any) => {
+            //       this.designer.currentViewInstance.fabricCanvas.loadFromJSON(
+            //         element,
+            //         () => {
+            //           this.designer.currentViewInstance.fabricCanvas.renderAll();
+            //           console.log('Loaded element:', element);
+            //         }
+            //       );
+            //     });
+            //     // this.designer.fpdInstance.addView(JSON.parse(savedView), true)
+            //     // this.designer.mainOptions.getViewInstance().loadView(JSON.parse(savedView))
+            //     // this.designer.fpdInstance.addView({
+            //     //   title: savedView.title,
+            //     //   thumbnail: savedView.thumbnail,
+            //     //   elements: savedView.elements,
+            //     //   options: savedView.options
+            //     // })
+            //     // Load saved view into FPD
+            //     // this.designer.mainOptions.loadElementJSON(
+            //     //   savedView.elements,
+            //     //   () => {
+            //     //     console.log(`Loaded view "${savedView.title}" into canvas.`);
+            //     //     this.designer.currentViewInstance.fabricCanvas.renderAll();
+            //     //   },
+            //     //   viewIndex
+            //     // );
+            //   } else {
+            //     console.warn('No valid view data found in matchedDesign.product[0].');
+            //   }
+            // }
+            // this.designer?.currentViewInstance?.fabricCanvas?.setActiveObject(null);
+            // this.designer?.loadProduct(matchedDesign);
+            console.log('Matched Design:', matchedDesign);
+          }, 10000);
+        } else {
+          console.log('No matching title found in designTitleData.');
+        }
+        // 👉 You can now use id/title as needed
+      });
+    }
+    console.log('Current URL:', currentUrl, 'local');
+    if(slug === null){
+      localStorage.setItem('selectedSlug', ''); 
+    }
+    else if(slug && slug !== 'undefined') {
+      localStorage.setItem('selectedSlug', slug); 
+      localStorage.setItem('selectedManufacturer', manufacturer || 'apple'); 
+    }
+    else{
+      localStorage.setItem('selectedSlug', 'top-face-with-slipmat'); 
+    }
     const token = localStorage.getItem('authToken');
     if (token) {
       this.isLoggedIn = true;
       this.showLoginPopup = false;
     }
     this.loadDesigns();
-
+   
   }
-
   bottomMenu() {
     const sourceElement = document.getElementById('content-text');
     console.log('sourceElement', sourceElement);
