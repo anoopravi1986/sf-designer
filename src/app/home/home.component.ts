@@ -17,6 +17,7 @@ import $ from 'jquery';
 import { filter } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
+import { text } from 'node:stream/consumers';
 
 interface TextSpan {
   text: string;
@@ -777,12 +778,10 @@ export class HomeComponent implements AfterViewInit {
   }
 
   moveBoldToPrimaryTools(): void {
-  const interval = setInterval(() => {
     const targetElement = document.getElementById('boldOutside');
 
     if (targetElement) {
       targetElement.addEventListener('click', (event) => {
-        
           this.designer.currentViewInstance.fabricCanvas.setElementOptions({
             fontWeight:
               this.designer.currentViewInstance.fabricCanvas.getActiveObject().fontWeight === 'bold'
@@ -813,8 +812,193 @@ export class HomeComponent implements AfterViewInit {
         );
       });
     }
-  }, 500);
+
+    const targetElement3 = document.getElementById('UnderlineText');
+    if (targetElement3) {
+      targetElement3.addEventListener('click', () => {
+        this.designer.currentViewInstance.fabricCanvas.setElementOptions({
+          textDecoration:
+            this.designer.currentViewInstance.fabricCanvas.getActiveObject().textDecoration === 'underline'
+              ? 'normal'
+              : 'underline',
+        });
+
+        targetElement3.classList.toggle(
+          'active',
+          this.designer.currentViewInstance.fabricCanvas.getActiveObject().textDecoration === 'underline'
+        );
+      });
+    }
+
+      const targetElement4 = document.getElementById('TextTransform');
+
+      if (targetElement4) {
+        targetElement4.addEventListener('click', () => {
+          const obj = this.designer.currentViewInstance.fabricCanvas.getActiveObject();
+          if (!obj || !obj.text) return;
+
+          const spanIcon = targetElement4.querySelector('span');
+
+          // Cycle through transform states
+          const current = obj.textTransform || 'none';
+          const next = current === 'none' ? 'uppercase' : current === 'uppercase' ? 'lowercase' : 'none';
+
+          // Apply transform
+          this.designer.currentViewInstance.fabricCanvas.setElementOptions({
+            textTransform: next,
+          });
+
+          // Update icon
+          if (spanIcon) {
+            spanIcon.className = ''; // Remove previous icon class
+            if (next === 'uppercase') {
+              spanIcon.classList.add('fpd-icon-uppercase');
+            } else if (next === 'lowercase') {
+              spanIcon.classList.add('fpd-icon-lowercase');
+            } else {
+              spanIcon.classList.add('fpd-icon-text-transform');
+            }
+          }
+        });
+      }
+
+      const alignButton = document.getElementById('textAlignCust');
+
+      if (alignButton) {
+        alignButton.addEventListener('click', () => {
+          const span = alignButton.querySelector('span');
+          const obj = this.designer.currentViewInstance.fabricCanvas.getActiveObject();
+          if (!obj || !obj.text) return;
+
+          const current = obj.textAlign || 'left';
+
+          // Determine next alignment
+          const next = current === 'left' ? 'center' : current === 'center' ? 'right' : 'left';
+
+          // Set textAlign
+          this.designer.currentViewInstance.fabricCanvas.setElementOptions({
+            textAlign: next,
+          });
+
+          // Update icon class based on new alignment
+          if (span) {
+            span.className = ''; // Reset
+            span.setAttribute('data-option', next);
+
+            if (next === 'center') {
+              span.classList.add('fpd-icon-format-align-center');
+            } else if (next === 'right') {
+              span.classList.add('fpd-icon-format-align-right');
+            } else {
+              span.classList.add('fpd-icon-format-align-left');
+            }
+          }
+        });
+      }
+
+
+      const positionButton = document.getElementById('CenterTools');
+
+      if (positionButton) {
+        positionButton.addEventListener('click', () => {
+          const span = positionButton.querySelector('span');
+          const canvas = this.designer.currentViewInstance.fabricCanvas;
+          console.log('Position button clicked', canvas);
+          const obj = canvas.getActiveObject();
+          // canvas.width = canvas.getWidth()*2;
+          // canvas.height = canvas.getHeight()*2;
+          if (!obj) return;
+
+          // Store current icon class
+          const currentClass = span?.className || '';
+
+          // Define the order of positions
+          const positions = [
+            { top: 0, left: null, icon: 'fpd-icon-align-top' },
+            { top: (canvas.getHeight() - obj.getScaledHeight()) / 1, left: null, icon: 'fpd-icon-align-horizontal-middle' },
+            { top: canvas.getHeight() - obj.getScaledHeight(), left: null, icon: 'fpd-icon-align-bottom' },
+            { top: null, left: 0, icon: 'fpd-icon-align-left' },
+            { top: null, left: (canvas.getWidth() - obj.getScaledWidth()) / 1, icon: 'fpd-icon-align-vertical-middle' },
+            { top: null, left: canvas.getWidth() - obj.getScaledWidth(), icon: 'fpd-icon-align-right' },
+          ];
+
+          // Find current position in the list
+          let currentIndex = positions.findIndex(p => currentClass.includes(p.icon));
+          currentIndex = currentIndex === -1 ? 0 : currentIndex;
+
+          // Get next position (loop)
+          const nextIndex = (currentIndex + 1) % positions.length;
+          const nextPos = positions[nextIndex];
+
+          // Apply position to object
+          if (nextPos.left !== null) obj.left = nextPos.left;
+          if (nextPos.top !== null) obj.top = nextPos.top;
+          obj.setCoords();
+          canvas.requestRenderAll();
+
+          // Update icon class
+          if (span) {
+            span.className = nextPos.icon;
+          }
+        });
+      }
+
+
+      document.getElementById('TextMoveUp')?.addEventListener('click', () => {
+        const canvas = this.designer.currentViewInstance.fabricCanvas;
+        const obj = canvas.getActiveObject();
+        console.log('Text Move Up clicked', canvas, obj);
+        if (obj) {
+          obj.top -= 5;
+          canvas.requestRenderAll();
+        }
+      });
+      document.getElementById('TextMoveDown')?.addEventListener('click', () => {
+        const canvas = this.designer.currentViewInstance.fabricCanvas;
+        const obj = canvas.getActiveObject();
+        console.log('Text Move Up clicked', canvas, obj);
+        if (obj) {
+          obj.top += 5;
+          canvas.requestRenderAll();
+        }
+      });
+
+      const minusEl = document.getElementById('minusElement');
+const plusEl = document.getElementById('plusElement');
+
+if (minusEl) {
+  minusEl.addEventListener('click', () => {
+    const inputEl = document.querySelector('input[data-control="fontSize"]') as HTMLInputElement;
+    if (inputEl) {
+      let current = parseInt(inputEl.value) || 1;
+      current = Math.max(1, current - 1); // Prevent going below 1
+      inputEl.value = String(current);
+
+      // Update canvas font size
+      this.designer.currentViewInstance.fabricCanvas.setElementOptions({
+        fontSize: current,
+      });
+    }
+  });
 }
+
+if (plusEl) {
+  plusEl.addEventListener('click', () => {
+    const inputEl = document.querySelector('input[data-control="fontSize"]') as HTMLInputElement;
+    if (inputEl) {
+      let current = parseInt(inputEl.value) || 1;
+      current = Math.min(200, current + 1); // Prevent going above 200
+      inputEl.value = String(current);
+
+      // Update canvas font size
+      this.designer.currentViewInstance.fabricCanvas.setElementOptions({
+        fontSize: current,
+      });
+    }
+  });
+}
+    
+    }
 
   slugify(title: string): string {
     return title

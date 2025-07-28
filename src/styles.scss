@@ -38,11 +38,11 @@ div.fpd-container .fpd-text-templates #text-templates.fpd-grid{gap: 7px;}
   .fpd-saved-designs .fpd-item.fpd-hover-thumbnail{position: relative;border: 1px solid #bdbdbd; .fa-solid.fa-trash{position: absolute;right: 0;        font-size: 15px;top:0}}
   .fpd-container .fpd-scroll-area{max-width: 350px;margin-bottom: 30px;}
   fpd-element-toolbar.fpd-smart.fpd-show{top: 80px !important;transform: none;max-width: calc(100% - 441px);left: 441px !important;width: max-content;max-width: calc(100% - 441px);justify-content: center;right: 0; margin: auto;
-    .fpd-scroll-area.fpd-tools-nav {max-width: 100%;flex-direction: row;
-      .fpd-primary-tools{    padding-bottom: 7px;}
+    .fpd-scroll-area.fpd-tools-nav {max-width: 100%;flex-direction: row;margin-bottom:0;align-items:center;
+      .fpd-primary-tools{    padding-bottom: 7px;        margin-top: 6px;}
     }
     .fpd-secondary-tools.fpd-scroll-area{max-width: 100%;.fpd-tool-duplicate, .fpd-tool-remove{display: none;}}
-    .fpd-panel-font-family{.fpd-scroll-area{height: calc( 100vh - 200px);}}
+    .fpd-panel-font-family{.fpd-scroll-area{height: calc( 100vh - 225px);}}
     &.fpd-panel-visible{max-width: 350px;justify-content:flex-start;right: auto;}
   }
   
@@ -209,8 +209,92 @@ fpd-element-toolbar[data-fabric-type="image"] .fpd-ungroup{display: none !import
     background-color: rgb(255 255 255 / var(--tw-bg-opacity, 1));
     --tw-bg-opacity: 0.6;
 }
-.fpd-tool-font-family{    border: 2px solid #000;border-radius: 20px;}
+.fpd-tool-font-family{    border: 1px solid #35475a33;border-radius: 20px;}
 .my-class-buttons-sub.active{background-color: #40576d12;}
-fpd-element-toolbar.fpd-smart>.fpd-tools-nav>div .fpd-tool-text-bold.bold-outside,
-#fontItalic.fpd-hidden{display: block !important;pointer-events: auto !important;align-items: center;margin: 10px;}
+fpd-element-toolbar[data-element-type="text"] .flex-plus-minus-icon{display: flex !important;pointer-events: auto !important;}
+fpd-element-toolbar[data-element-type="text"].fpd-smart>.fpd-tools-nav>div .fpd-tool-text-bold.bold-outside,
+fpd-element-toolbar[data-element-type="text"] #textAlignCust.fpd-hidden,fpd-element-toolbar[data-element-type="text"] #CenterTools.fpd-hidden,
+fpd-element-toolbar[data-element-type="text"] #fontItalic.fpd-hidden, fpd-element-toolbar[data-element-type="text"] #UnderlineText.fpd-hidden, 
+fpd-element-toolbar[data-element-type="text"] #TextTransform.fpd-hidden{display: block !important;pointer-events: auto !important;align-items: center;margin: 0px 3px;padding: 5px 4px;
+&.active{ span{color: #f53744;}}
+}
+.fpd-primary-tools .fpd-tool-font-family{max-width: 154px;border-radius: 7px;}
+fpd-element-toolbar.fpd-show .fpd-tool-color .fpd-label{display: none !important;}
+fpd-element-toolbar.fpd-smart>.fpd-tools-nav>.fpd-primary-tools>div{padding: 0 7px;}
+fpd-element-toolbar.fpd-smart>.fpd-tools-nav>div>div{align-items: center;justify-content: center;}
+fpd-element-toolbar[data-element-type="text"] .fpd-tools-nav .fpd-label{display: none;}
+fpd-element-toolbar[data-element-type="text"] .fpd-secondary-tools.fpd-scroll-area{margin-top: 0;}
+fpd-element-toolbar[data-element-type="text"] .fpd-secondary-tools.fpd-scroll-area, fpd-element-toolbar[data-element-type="text"] div.fpd-primary-tools{margin-bottom: 0;padding-bottom: 0;}
+fpd-element-toolbar[data-element-type="text"] .fpd-tools-group.flex{div{margin: 0;span{font-size: 15px;position: relative;top: 3px;&.fpd-icon-format-underline{font-size: 17px;top: 4px;}}}}
+fpd-element-toolbar[data-element-type="text"]>.fpd-tools-nav>div>div{padding: 0 7px;}
+fpd-element-toolbar>.fpd-tools-nav>div>div>span.fpd-icon-text-format{font-size: 25px !important;}
+fpd-element-toolbar[data-element-type=text] > .fpd-tools-nav > div > div.fpd-tools-group.flex{padding: 0;}
+fpd-element-toolbar[data-element-type=text] .fpd-secondary-tools.fpd-scroll-area div{margin-left: 4px;margin-right: 4px;}
+fpd-element-toolbar>.fpd-tools-nav>div>div>.fpd-current-fill{border-radius: 7px;}
 // .fpd-tool-remove-bg.fpd-hidden{display: flex !important;pointer-events: auto !important;}
+fpd-element-toolbar.fpd-smart.fpd-panel-visible>.fpd-tools-nav {
+  display: flex !important;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+fpd-element-toolbar[data-element-type="text"] {
+  min-width: 780px;
+}
+fpd-element-toolbar.fpd-smart.fpd-panel-visible>.fpd-sub-panel .fpd-panel-tabs-content.fpd-scroll-area{max-height: 250px;}
+fpd-element-toolbar.fpd-smart.fpd-show.fpd-panel-visible{right: 0;}
+fpd-element-toolbar[data-element-type="text"] .fpd-sub-panel{max-width: 226px;}
+.fpd-sub-panel{position: absolute;left: 0;top:59px;background: #ffffff;border-radius: 7px;
+}
+
+fpd-element-toolbar.fpd-smart>.fpd-tools-nav>.fpd-primary-tools .fpd-tool-text-size.fpd-tool-text-size-customize, fpd-element-toolbar.fpd-smart > .fpd-tools-nav > div > div.flex-plus-minus-icon{
+  flex:0 0 120px;
+  flex-direction: row;
+  margin: 0 10px;
+  border: 1px solid rgba(53, 71, 90, 0.2);
+  border-radius: 7px;
+  .fpd-tool-text-size-customize-icon{
+    display: block !important;
+    font-size: 20px;
+  }
+  input{
+    box-shadow: none;
+    max-width: 60px;
+    padding-left: 0;
+    padding-right: 0;
+  }
+}
+fpd-element-toolbar.fpd-smart>.fpd-tools-nav>.fpd-primary-tools .fpd-tool-text-size.fpd-tool-text-size-customize{
+  border: none;
+  flex: 0 0 35px;    margin: 0 5px;
+}
+div#textAlignCust.fpd-hidden{    border-left: 1px solid rgba(53, 71, 90, 0.2);padding-left: 8px;margin-top: 0;margin-bottom: 0;padding-top: 5px;}
+fpd-element-toolbar.fpd-smart>.fpd-tools-nav>div.fpd-panel-text-format{position: relative;top:-1px;}
+fpd-element-toolbar[data-element-type="text"] #SecondaryIconBoxHeader {
+      overflow-y: hidden;
+  .fpd-tool-text-format, .fpd-tool-position{display: none;}
+.fpd-tool-transform{    border-left: 1px solid rgba(53, 71, 90, 0.2);}
+.fpd-tool-layer-depth.fpd-hidden{display: flex !important;flex-direction: row;    pointer-events: auto !important;
+      border-left: 1px solid rgba(53, 71, 90, 0.2);border-right: 1px solid rgba(53, 71, 90, 0.2);
+  margin: 0;gap:5px;padding-left: 6px;padding-right: 6px;position: relative;top: 2px;
+  div{
+    span{
+      font-size: 18px;
+      &:last-child{
+      display: none;
+    }
+    }
+  }
+}
+}
+
+fpd-element-toolbar.fpd-smart>.fpd-tools-nav>div>div.flex-plus-minus-icon{
+  flex-direction: row;
+  .fpd-tool-text-size-customize-icon{pointer-events: auto !important;}
+}
+
+.fpd-three-dot-menu{width: 20px;
+    height: 20px;
+    position: absolute;
+    top: 0;
+    z-index: 99;
+    right: 0;}
