@@ -913,7 +913,24 @@ export class HomeComponent implements AfterViewInit {
 
       if (positionButton) {
         positionButton.addEventListener('click', (e) => {
+          
             const target = e.currentTarget as HTMLElement;
+
+            var hasClass = target.classList.contains('letter-spac-active');
+            if(hasClass){
+              // Step 1: Remove 'letter-spac-active' class from the clicked element
+              target.classList.remove('letter-spac-active');
+              const subPanel = document.querySelector('.fpd-sub-panel');
+              if (!subPanel) return;
+
+              // Step 2: Remove 'fpd-active' from any active children in sub-panel
+              subPanel.querySelectorAll(':scope > .fpd-active').forEach(el => {
+                el.classList.remove('fpd-active');
+              });
+
+              return;
+            }
+
             target.classList.add('letter-spac-active');
             // Step 1: Find the closest `.fpd-sub-panel` parent
             const subPanel = document.querySelector('.fpd-sub-panel');
