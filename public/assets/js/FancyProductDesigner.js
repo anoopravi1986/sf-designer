@@ -34360,6 +34360,27 @@
               t => {
                 const e = t.currentTarget
                 console.log("click data", e, e.classList[0],e.classList, e.className, e.classList.value)
+                if (e.classList.contains('fpd-tool-transform')) {
+                  if (e.classList.contains('fpd-active')) {
+                   
+                      e.classList.remove('fpd-active');
+                      const subPanel = document.querySelector('.fpd-sub-panel');
+                      if (!subPanel) return;
+
+                      // Step 2: Remove 'fpd-active' from any active children in sub-panel
+                      subPanel.querySelectorAll(':scope > .fpd-active').forEach(el => {
+                        el.classList.remove('fpd-active');
+                      });
+                      
+                      const elementtoolbar = document.querySelector('fpd-element-toolbar');
+                      if(elementtoolbar){
+                        elementtoolbar.classList.remove('fpd-panel-visible')
+                      }
+
+                  return;
+                  }
+                }
+
                 if (e.classList.contains('fpd-tool-font-family') ) {
                   console.log("active calsss")
                   document.body.classList.add('fpd-font-family-active');
