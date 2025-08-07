@@ -20875,6 +20875,7 @@
           return t
         },
         $ = function () {
+          console.log("aurrrrrrrrrrrrrrrr",arguments)
           let t =
             arguments.length > 0 && void 0 !== arguments[0] ? arguments[0] : {}
             console.log(t,'tttttPPPP')
@@ -20937,13 +20938,34 @@
           shareMenu.style.borderRadius = '8px';
           shareMenu.style.zIndex = '9999';
           shareMenu.style.marginTop = '-80px';
+          console.log("tttttttttttttttttttttdata",t)
           const title = document.createElement('h4');
                 title.textContent = t.title;
                 title.className = 'font-bold mb-1 text-capitalize text-[1rem]';
+                function formatTimeAgo(uploadedAt) {
+                  if(t.uploadedAt){
+                    const now = new Date();
+                    const past = new Date(uploadedAt);
+                    const diffMs = now - past;
 
+                    const seconds = Math.floor(diffMs / 1000);
+                    const minutes = Math.floor(diffMs / (1000 * 60));
+                    const hours = Math.floor(diffMs / (1000 * 60 * 60));
+                    const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+                    if (seconds < 60) return `${seconds} sec ago`;
+                    if (minutes < 60) return `${minutes} min ago`;
+                    if (hours < 24) return `${hours} hour${hours !== 1 ? 's' : ''} ago`;
+
+                    // Format as: on 7 Aug 2025
+                    const options = { day: 'numeric', month: 'short', year: 'numeric' };
+                    return `on ${past.toLocaleDateString('en-GB', options)}`;
+                  }
+                }
                 const para = document.createElement('p');
                 para.className = 'mt-2';
-                para.textContent = 'Uploaded by Anoop 2 min ago';
+                const uploadedAt = t?.uploadedAt;
+                para.textContent = `Uploaded by Anoop ${formatTimeAgo(uploadedAt)}`;
 
           const buttonDonw = document.createElement('button');
                 buttonDonw.className = 'download-button flex items-center gap-2 w-full p-2 text-left hover:bg-gray-100 text-black text-[0.9rem]';
@@ -21107,7 +21129,7 @@
 
                 const para = document.createElement('p');
                 para.className = 'mt-2';
-                para.textContent = 'Uploaded by Anoop 2 min ago'; // replace with real content if needed
+                para.textContent = 'Uploaded by Anoop S 2 min ago'; // replace with real content if needed
 
                 const buttonDonw = document.createElement('button');
                 buttonDonw.className = 'download-button flex items-center gap-2 w-full p-2 text-left hover:bg-gray-100';
@@ -26634,7 +26656,8 @@
                     i = {
                       thumbnail: t,
                       product: e,
-                      title: this.inputElem.value || ''
+                      title: this.inputElem.value || '',
+                      uploadedAt: new Date().toISOString()
                     }
                   if (
                     e &&
@@ -26686,6 +26709,7 @@
           const s = $({
             url: e,
             title: n,
+            uploadedAt: t.uploadedAt,
             removable: !0,
             disablePrice: !0,
             disableDraggable: !0
@@ -31759,6 +31783,7 @@
               const i = $({
                 url: e.thumbnail,
                 title: e.title,
+                uploadedAt: e.uploadedAt,
                 disablePrice: !0,
                 disableDraggable: !0
               })
