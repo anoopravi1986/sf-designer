@@ -160,27 +160,26 @@ export class HomeComponent implements AfterViewInit {
       console.log('reset done');
       localStorage.setItem('productLoader', 'done');
 
-      fetch('https://styleflip-backend-jdm5.ithemes.xyz/api/font/getAll')
+      fetch('https://styleflip-backend-jdm5.ithemes.xyz/api/font/getAllFonts')
       .then(res => res.json())
       .then(data => {
-        if (Array.isArray(data.fonts)) {
-          console.log('font data is',data.fonts); // ✅ Logs just the array: []
+          console.log('font data is',data); // ✅ Logs just the array: []
           // You can use it directly
-          this.fontArrayStr = data.fonts;
+          this.fontArrayStr = data;
           localStorage.setItem('fontList', JSON.stringify(this.fontArrayStr));
-        } else {
-          console.error("No 'fonts' array found");
-        }
+        
       })
       .catch(err => {
         console.error('Error fetching fonts:', err);
       });
 
       
-      const fontDataStr = localStorage.getItem('fontList');
-      const fontData = fontDataStr ? JSON.parse(fontDataStr) : [];
+      const storedFonts = localStorage.getItem('fontList');
+      const fontData = storedFonts ? JSON.parse(storedFonts) : null;
 
-      console.log('🎯 Retrieved font data:', fontData);
+      if (fontData) {
+        console.log('Retrieved font data:', fontData);
+      }
 
       setTimeout(async () => {
         const manufacturerSlug =
