@@ -314,23 +314,23 @@ export class HomeComponent implements AfterViewInit {
             {
               name: 'Lato',
               url: 'google',
-              variants: ['regular', 'italic', '700', '700italic'],
+              variants: ['regular', 'italic'],
             },
-            { name: 'Oswald', url: 'google', variants: ['regular', '700'] }, // no italic available
+            { name: 'Oswald', url: 'google', variants: ['regular'] }, // no italic available
             {
               name: 'Raleway',
               url: 'google',
-              variants: ['regular', 'italic', '700', '700italic'],
+              variants: ['regular', 'italic'],
             },
             {
               name: 'Montserrat',
               url: 'google',
-              variants: ['regular', 'italic', '700', '700italic'],
+              variants: ['regular', 'italic'],
             },
             {
               name: 'Playfair Display',
               url: 'google',
-              variants: ['regular', 'italic', '700', '700italic'],
+              variants: ['regular', 'italic'],
             },
             { name: 'Pacifico', url: 'google', variants: ['regular'] }, // only one style
             { name: 'Lobster', url: 'google', variants: ['regular'] }, // only one style
@@ -338,30 +338,20 @@ export class HomeComponent implements AfterViewInit {
             {
               name: 'Dancing Script',
               url: 'google',
-              variants: ['regular', '700'],
+              variants: ['regular'],
             }, // no italic
             {
               name: 'Courier Prime',
               url: 'google',
-              variants: ['regular', 'italic', '700', '700italic'],
+              variants: ['regular', 'italic'],
             },
-            { name: 'Caveat', url: 'google', variants: ['regular', '700'] }, // no italic
+            { name: 'Caveat', url: 'google', variants: ['regular'] }, // no italic
             { name: 'Abril Fatface', url: 'google', variants: ['regular'] },
             {
-              name: 'Aller Bold',
-              url: 'assets/fpd/fonts/Aller__bold.ttf',
-              variants: ['assets/fpd/fonts/Aller__bold.ttf']
-            },
-            {
-              name: 'Aller',
+              name: 'Allerbold',
               url: 'assets/fpd/fonts/Aller.ttf',
-              variants: ['assets/fpd/fonts/Aller.ttf']
-            },
-            {
-              name: 'Aller Italic',
-              url: 'assets/fpd/fonts/Aller__italic.ttf',
-              variants: ['assets/fpd/fonts/Aller__italic.ttf']
-            },
+              variants: ['regular', 'bold', 'italic'],
+            }
             // { name: 'Pacifico', url: 'assets/fpd/fonts/Pacifico.ttf' }
           ],
           textTemplates: [

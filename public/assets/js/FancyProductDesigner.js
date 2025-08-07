@@ -28008,7 +28008,7 @@
                 }
 
                 if (t.currentViewInstance && n.length > 0) {
-                  debugger
+                  //debugger
                   const e = t.currentViewInstance.options;
 
                   let options = z(e.customTextParameters, {
@@ -29913,7 +29913,7 @@
 
               loadingBar.appendChild(progress);
               a.appendChild(loadingBar);
-              debugger
+              //debugger
               console.log("coming there11111111111112",a)
               // Trigger transition
               requestAnimationFrame(() => {
@@ -33736,32 +33736,100 @@
             }),
             Array.isArray(t.mainOptions.fonts) && t.mainOptions.fonts.length)
           ) {
-            const e = this.subPanel.querySelector('.fpd-fonts-list')
-            t.mainOptions.fonts.forEach(i => {
-              let n = 'object' == typeof i ? i.name : i
-              const s = document.createElement('span')
-              ;(s.className = 'fpd-item'),
-                (s.dataset.value = n),
-                (s.innerText = n),
-                (s.style.fontFamily = n),
-                e.append(s),
-                G(s, 'click', i => {
-                  let fontWeight = 'normal';
 
-                    if (/bold/i.test(n)) {
-                      fontWeight = 'bold';
-                    } else if (/medium/i.test(n)) {
-                      fontWeight = '500'; // or 'medium' if your system supports it
+            const e = this.subPanel.querySelector('.fpd-fonts-list');
+
+            t.mainOptions.fonts.forEach(i => {
+              let n = typeof i === 'object' ? i.name : i;
+              let variants = i.variants || ['regular'];
+
+              const container = document.createElement('div');
+              container.className = 'fpd-font-item-container';
+
+              // Font Label (clickable)
+              const s = document.createElement('div');
+              s.className = 'fpd-item';
+              s.dataset.value = n;
+              s.style.fontFamily = n;
+
+              const fontLabel = document.createElement('span');
+              fontLabel.className = 'fpd-font-name';
+              fontLabel.innerText = n;
+
+              const arrowIcon = document.createElement('span');
+              arrowIcon.className = 'fpd-arrow-icon';
+              arrowIcon.innerText = '▾';
+              arrowIcon.style.display = variants.length > 1 ? 'inline' : 'none';
+
+              s.appendChild(fontLabel);
+              s.appendChild(arrowIcon);
+              container.appendChild(s);
+
+              // Variant Dropdown
+              const variantContainer = document.createElement('div');
+              variantContainer.className = 'fpd-font-variant-toggle';
+              variantContainer.style.display = 'none';
+
+              variants.forEach(variant => {
+                const variantBtn = document.createElement('div');
+                variantBtn.className = 'fpd-variant-btn';
+                variantBtn.innerHTML = `<span>${variant.charAt(0).toUpperCase() + variant.slice(1)}</span><span class="fpd-check-icon" style="display:none;">✔️</span>`;
+                variantBtn.dataset.variant = variant;
+                variantBtn.style.fontFamily = n;
+
+                variantBtn.addEventListener('click', () => {
+                  let fontWeight = /bold/i.test(variant) ? 'bold' : /medium/i.test(variant) ? '500' : 'normal';
+                  let fontStyle = /italic/i.test(variant) ? 'italic' : 'normal';
+
+                  // Clear all active states
+                  document.querySelectorAll('.fpd-item').forEach(el => el.classList.remove('fpd-active'));
+                  document.querySelectorAll('.fpd-variant-btn').forEach(el => el.classList.remove('active'));
+                  document.querySelectorAll('.fpd-check-icon').forEach(el => (el.style.display = 'none'));
+
+                  // Set active states
+                  s.classList.add('fpd-active');
+                  variantBtn.classList.add('active');
+                  variantBtn.querySelector('.fpd-check-icon').style.display = 'inline';
+
+                  t.currentViewInstance.fabricCanvas.setElementOptions({
+                    fontFamily: n,
+                    fontWeight: fontWeight,
+                    fontStyle: fontStyle,
+                  });
+
+                  Kr(this, ta, va).call(this, t.currentElement);
+                });
+
+                variantContainer.appendChild(variantBtn);
+              });
+
+              container.appendChild(variantContainer);
+
+              // Font Label Click - Open/Close + Auto-Select First
+              s.addEventListener('click', () => {
+                const isVisible = variantContainer.style.display === 'block';
+
+                // Close all other dropdowns
+                document.querySelectorAll('.fpd-font-variant-toggle').forEach(el => (el.style.display = 'none'));
+                document.querySelectorAll('.fpd-arrow-icon').forEach(el => (el.innerText = '▾'));
+
+                if (variants.length > 1) {
+                  variantContainer.style.display = isVisible ? 'none' : 'block';
+                  arrowIcon.innerText = isVisible ? '▾' : '▴';
+
+                  if (!isVisible) {
+                    const firstVariantBtn = variantContainer.querySelector('.fpd-variant-btn');
+                    if (firstVariantBtn && !firstVariantBtn.classList.contains('active')) {
+                      firstVariantBtn.click(); // Auto-select first variant
                     }
-                  Z(Array.from(e.children), ['fpd-active']),
-                    X(s, ['fpd-active']),
-                    
-                    t.currentViewInstance.fabricCanvas.setElementOptions({
-                      fontFamily: n,
-                      fontWeight: fontWeight,
-                    }),
-                    Kr(this, ta, va).call(this, t.currentElement)
-                })
+                  }
+                } else {
+                  // Single variant — apply directly
+                  variantContainer.querySelector('.fpd-variant-btn')?.click();
+                }
+              });
+
+              e.appendChild(container);
             }),
               G(
                 this.subPanel.querySelector('.fpd-panel-font-family input'),

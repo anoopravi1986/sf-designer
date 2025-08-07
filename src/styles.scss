@@ -326,3 +326,59 @@ fpd-module-save-load .fpd-three-dot-menu{width: 20px;height: 20px;position: abso
 fpd-module-images .fpd-three-dot-menu{width: 20px;height: 20px;position: absolute;top: 0;z-index: 99;right: 0;svg{display: inline-block;}}
 .fpd-font-family-active fpd-element-toolbar.fpd-layout-large .fpd-close-sub-panel{    position: fixed;left: 393px;top: 99px;right: auto;box-shadow: none;z-index: 100;}
 .fpd-pos-data-sec{.fpd-panel-tabs{display: none !important;}.fpd-panel-tabs-content{div[data-id="align"]{display: block;}}}
+
+// Css added by Anoop for Font Family 
+.fpd-font-item-container {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 6px;
+  font-family: inherit;
+}
+
+.fpd-item {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 14px;
+  color: #333;
+}
+
+.fpd-item.fpd-active {
+  font-weight: bold;
+}
+
+.fpd-arrow-icon {
+  font-size: 16px;
+  margin-left: 6px;
+  color: #666;
+}
+
+.fpd-font-variant-toggle {
+  margin-left: 10px;
+  margin-top: 4px;
+  display: none;
+  flex-direction: column;
+}
+
+.fpd-variant-btn {
+  cursor: pointer;
+  padding: 2px 0;
+  font-size: 13px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.fpd-variant-btn.active {
+  font-weight: bold;
+}
+
+.fpd-check-icon {
+  font-size: 14px;
+  margin-left: 8px;
+  color: green;
+}
+
+
+// Css added by Anoop for Font Family 
