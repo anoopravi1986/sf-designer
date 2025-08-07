@@ -61,6 +61,7 @@ export class HomeComponent implements AfterViewInit {
   firstName: string = '';
   initialLetter: string = 'A';
   private savedContent: string = '';
+  fontArrayStr: any;
 
   
 
@@ -155,8 +156,31 @@ export class HomeComponent implements AfterViewInit {
 
   ngAfterViewInit() {
     if (isPlatformBrowser(this.platformId)) {
+      const fontArrayStr: any[] = [];
       console.log('reset done');
       localStorage.setItem('productLoader', 'done');
+
+      fetch('https://styleflip-backend-jdm5.ithemes.xyz/api/font/getAll')
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data.fonts)) {
+          console.log('font data is',data.fonts); // ✅ Logs just the array: []
+          // You can use it directly
+          this.fontArrayStr = data.fonts;
+          localStorage.setItem('fontList', JSON.stringify(this.fontArrayStr));
+        } else {
+          console.error("No 'fonts' array found");
+        }
+      })
+      .catch(err => {
+        console.error('Error fetching fonts:', err);
+      });
+
+      
+      const fontDataStr = localStorage.getItem('fontList');
+      const fontData = fontDataStr ? JSON.parse(fontDataStr) : [];
+
+      console.log('🎯 Retrieved font data:', fontData);
 
       setTimeout(async () => {
         const manufacturerSlug =
@@ -194,7 +218,7 @@ export class HomeComponent implements AfterViewInit {
 
         'assets/data/products/product-categories.json'
         
-
+        console.log("fontssssssssssss data is",fontData)
         
 
         // console.log(
@@ -283,77 +307,7 @@ export class HomeComponent implements AfterViewInit {
               url: 'https://www.toptal.com/designers/subtlepatterns/patterns/wood-pattern.png',
             },
           ],
-          fonts: [
-            {
-              name: 'Roboto',
-              url: 'google',
-              variants: ['regular', 'bold'],
-            },
-            // {
-            //   name: 'Roboto Bold',
-            //   url: 'google',
-            //   variants: ['bold'],
-            // },
-            {
-              name: 'Open Sans',
-              url: 'google',
-              variants: ['regular', 'italic', '700', '700italic', 'bold'],
-            },
-            {
-              name: 'Poppins',
-              url: 'google',
-              variants: [
-                'regular',
-                'italic',
-                '700',
-                '700italic',
-                'bold',
-                'extrabold',
-              ],
-            },
-            {
-              name: 'Lato',
-              url: 'google',
-              variants: ['regular', 'italic'],
-            },
-            { name: 'Oswald', url: 'google', variants: ['regular'] }, // no italic available
-            {
-              name: 'Raleway',
-              url: 'google',
-              variants: ['regular', 'italic'],
-            },
-            {
-              name: 'Montserrat',
-              url: 'google',
-              variants: ['regular', 'italic'],
-            },
-            {
-              name: 'Playfair Display',
-              url: 'google',
-              variants: ['regular', 'italic'],
-            },
-            { name: 'Pacifico', url: 'google', variants: ['regular'] }, // only one style
-            { name: 'Lobster', url: 'google', variants: ['regular'] }, // only one style
-            { name: 'Bebas Neue', url: 'google', variants: ['regular'] }, // only one style
-            {
-              name: 'Dancing Script',
-              url: 'google',
-              variants: ['regular'],
-            }, // no italic
-            {
-              name: 'Courier Prime',
-              url: 'google',
-              variants: ['regular', 'italic'],
-            },
-            { name: 'Caveat', url: 'google', variants: ['regular'] }, // no italic
-            { name: 'Abril Fatface', url: 'google', variants: ['regular'] },
-            {
-              name: 'Allerbold',
-              url: 'assets/fpd/fonts/Aller.ttf',
-              variants: ['regular', 'bold', 'italic'],
-            }
-            // { name: 'Pacifico', url: 'assets/fpd/fonts/Pacifico.ttf' }
-          ],
+          fonts: fontData,
           textTemplates: [
             {
               text: 'I love Styleflip',
