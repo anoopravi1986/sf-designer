@@ -968,7 +968,25 @@ export class HomeComponent implements AfterViewInit {
         });
       }
 
+       /* code to add and remove class on click on layer move up icon */
+      let fpdIconMoveUp = document.querySelector('.fpd-icon-move-up');
+      fpdIconMoveUp?.addEventListener('click', () => {
+        document.querySelector('.fpd-icon-move-up')?.classList.add('active-icon');
+       setTimeout(() => {
+          document.querySelector('.fpd-icon-move-up')?.classList.remove('active-icon');
+        }, 1000)
+      });
+      /* code to add and remove class on click on layer move up icon */
 
+      /* code to add and remove class on click on layer move up icon */
+      let fpdIconMoveDown = document.querySelector('.fpd-icon-move-down');
+      fpdIconMoveDown?.addEventListener('click', () => {
+        document.querySelector('.fpd-icon-move-down')?.classList.add('active-icon');
+       setTimeout(() => {
+          document.querySelector('.fpd-icon-move-down')?.classList.remove('active-icon');
+        }, 1000)
+      });
+      /* code to add and remove class on click on layer move up icon */
 
       let copiedObject: any = null;
       
