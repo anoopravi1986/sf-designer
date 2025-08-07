@@ -56,7 +56,7 @@ export class HomeComponent implements AfterViewInit {
   isBoxVisible = false;
   email: string = '';
   password: string = '';
-  showLoginPopup = false;
+  showLoginPopup = true;
   isLoggedIn: boolean = false;
   firstName: string = '';
   initialLetter: string = 'A';
@@ -347,15 +347,21 @@ export class HomeComponent implements AfterViewInit {
             },
             { name: 'Caveat', url: 'google', variants: ['regular', '700'] }, // no italic
             { name: 'Abril Fatface', url: 'google', variants: ['regular'] },
-            // {
-            //   name: 'Aller',
-            //   url: 'assets/fpd/fonts/Aller.ttf',
-            //   variants: {
-            //     'n7': 'assets/fpd/fonts/Aller__bold.ttf',
-            //     'i4': 'assets/fpd/fonts/Aller__italic.ttf',
-            //     'i7': 'assets/fpd/fonts/Aller__bolditalic.ttf'
-            //   }
-            // },
+            {
+              name: 'Aller Bold',
+              url: 'assets/fpd/fonts/Aller__bold.ttf',
+              variants: ['assets/fpd/fonts/Aller__bold.ttf']
+            },
+            {
+              name: 'Aller',
+              url: 'assets/fpd/fonts/Aller.ttf',
+              variants: ['assets/fpd/fonts/Aller.ttf']
+            },
+            {
+              name: 'Aller Italic',
+              url: 'assets/fpd/fonts/Aller__italic.ttf',
+              variants: ['assets/fpd/fonts/Aller__italic.ttf']
+            },
             // { name: 'Pacifico', url: 'assets/fpd/fonts/Pacifico.ttf' }
           ],
           textTemplates: [
@@ -859,7 +865,15 @@ export class HomeComponent implements AfterViewInit {
               spanIcon.classList.add('fpd-icon-text-transform');
             }
           }
+
+          // Toggle 'active' class based on next transform state
+          if (next === 'none') {
+            targetElement4.classList.remove('active');
+          } else {
+            targetElement4.classList.add('active');
+          }
         });
+
       }
 
       const alignButton = document.getElementById('textAlignCust');
@@ -893,6 +907,14 @@ export class HomeComponent implements AfterViewInit {
               span.classList.add('fpd-icon-format-align-left');
             }
           }
+
+
+          const allAlignButtons = document.querySelectorAll('.fpd-align-button span');
+          allAlignButtons.forEach(el => el.classList.remove('active'));
+
+          if (span) {
+            span.classList.add('active-icon');
+          }
         });
       }
 
@@ -900,103 +922,398 @@ export class HomeComponent implements AfterViewInit {
       const positionButton = document.getElementById('CenterTools');
 
       if (positionButton) {
-        positionButton.addEventListener('click', () => {
-          const span = positionButton.querySelector('span');
-          const canvas = this.designer.currentViewInstance.fabricCanvas;
-          console.log('Position button clicked', canvas);
-          const obj = canvas.getActiveObject();
-          // canvas.width = canvas.getWidth()*2;
-          // canvas.height = canvas.getHeight()*2;
-          if (!obj) return;
+        positionButton.addEventListener('click', (e) => {
+            const target = e.currentTarget as HTMLElement;
+            target.classList.add('letter-spac-active');
+            // Step 1: Find the closest `.fpd-sub-panel` parent
+            const subPanel = document.querySelector('.fpd-sub-panel');
+            console.log("subPanel data is", subPanel)
+            if (!subPanel) return;
 
-          // Store current icon class
-          const currentClass = span?.className || '';
+            // Step 2: Remove 'fpd-active' from any active children in sub-panel
+            subPanel.querySelectorAll(':scope > .fpd-active').forEach(el => {
+              el.classList.remove('fpd-active');
+            });
 
-          // Define the order of positions
-          const positions = [
-            { top: 0, left: null, icon: 'fpd-icon-align-top' },
-            { top: (canvas.getHeight() - obj.getScaledHeight()) / 1, left: null, icon: 'fpd-icon-align-horizontal-middle' },
-            { top: canvas.getHeight() - obj.getScaledHeight(), left: null, icon: 'fpd-icon-align-bottom' },
-            { top: null, left: 0, icon: 'fpd-icon-align-left' },
-            { top: null, left: (canvas.getWidth() - obj.getScaledWidth()) / 1, icon: 'fpd-icon-align-vertical-middle' },
-            { top: null, left: canvas.getWidth() - obj.getScaledWidth(), icon: 'fpd-icon-align-right' },
-          ];
+            // Step 3: Find `.fpd-panel-position` inside the same sub-panel
+            const positionPanel = subPanel.querySelector('.fpd-panel-position');
+            if (positionPanel) {
+              positionPanel.classList.add('fpd-active', 'fpd-pos-data-sec');
+            }
 
-          // Find current position in the list
-          let currentIndex = positions.findIndex(p => currentClass.includes(p.icon));
-          currentIndex = currentIndex === -1 ? 0 : currentIndex;
-
-          // Get next position (loop)
-          const nextIndex = (currentIndex + 1) % positions.length;
-          const nextPos = positions[nextIndex];
-
-          // Apply position to object
-          if (nextPos.left !== null) obj.left = nextPos.left;
-          if (nextPos.top !== null) obj.top = nextPos.top;
-          obj.setCoords();
-          canvas.requestRenderAll();
-
-          // Update icon class
-          if (span) {
-            span.className = nextPos.icon;
-          }
+            const elementtoolbar = document.querySelector('fpd-element-toolbar');
+            console.log("djjjjj",elementtoolbar)
+            if(elementtoolbar){
+              elementtoolbar.classList.add('fpd-panel-visible')
+            }
         });
       }
 
 
+      // Move layer up in stack
       document.getElementById('TextMoveUp')?.addEventListener('click', () => {
         const canvas = this.designer.currentViewInstance.fabricCanvas;
         const obj = canvas.getActiveObject();
         console.log('Text Move Up clicked', canvas, obj);
         if (obj) {
-          obj.top -= 5;
+          canvas.bringForward(obj); // Moves object one step up in layer
           canvas.requestRenderAll();
         }
       });
+
+      // Move layer down in stack
       document.getElementById('TextMoveDown')?.addEventListener('click', () => {
         const canvas = this.designer.currentViewInstance.fabricCanvas;
         const obj = canvas.getActiveObject();
-        console.log('Text Move Up clicked', canvas, obj);
+        console.log('Text Move Down clicked', canvas, obj);
         if (obj) {
-          obj.top += 5;
+          canvas.sendBackwards(obj); // Moves object one step down in layer
           canvas.requestRenderAll();
         }
       });
 
+
       const minusEl = document.getElementById('minusElement');
-const plusEl = document.getElementById('plusElement');
+      const plusEl = document.getElementById('plusElement');
 
-if (minusEl) {
-  minusEl.addEventListener('click', () => {
-    const inputEl = document.querySelector('input[data-control="fontSize"]') as HTMLInputElement;
-    if (inputEl) {
-      let current = parseInt(inputEl.value) || 1;
-      current = Math.max(1, current - 1); // Prevent going below 1
-      inputEl.value = String(current);
+      if (minusEl) {
+        minusEl.addEventListener('click', () => {
+          const inputEl = document.querySelector('input[data-control="fontSize"]') as HTMLInputElement;
+          if (inputEl) {
+            let current = parseInt(inputEl.value) || 1;
+            current = Math.max(1, current - 1); // Prevent going below 1
+            inputEl.value = String(current);
 
-      // Update canvas font size
-      this.designer.currentViewInstance.fabricCanvas.setElementOptions({
-        fontSize: current,
+            // Update canvas font size
+            this.designer.currentViewInstance.fabricCanvas.setElementOptions({
+              fontSize: current,
+            });
+          }
+        });
+      }
+
+      if (plusEl) {
+        plusEl.addEventListener('click', () => {
+          const inputEl = document.querySelector('input[data-control="fontSize"]') as HTMLInputElement;
+          if (inputEl) {
+            let current = parseInt(inputEl.value) || 1;
+            current = Math.min(200, current + 1); // Prevent going above 200
+            inputEl.value = String(current);
+
+            // Update canvas font size
+            this.designer.currentViewInstance.fabricCanvas.setElementOptions({
+              fontSize: current,
+            });
+          }
+        });
+      }
+
+
+
+      let copiedObject: any = null;
+      
+      // COPY
+      document.getElementById('copytext')?.addEventListener('click', (e) => {
+        console.log("e.currentTarget",e.currentTarget)
+        // if (e.currentTarget) {
+        //   (e.currentTarget as HTMLElement).classList.add('active');
+        // }
+        const canvas = this.designer.currentViewInstance.fabricCanvas;
+        const obj = canvas.getActiveObject();
+        if (obj) {
+          obj.clone((cloned: any) => {
+            copiedObject = cloned;
+            console.log('Copied object:', copiedObject);
+            this.showToast('Copied successfully!');
+          });
+        }
+        
       });
-    }
+
+      // PASTE
+      document.getElementById('pastetext')?.addEventListener('click', () => {
+        const canvas = this.designer.currentViewInstance.fabricCanvas;
+        if (copiedObject) {
+          // const e = this.designer.currentViewInstance.options;
+          // copiedObject.clone((cloned: any) => {
+          //   cloned.set({
+          //     left: cloned.left + 10,
+          //     top: cloned.top + 10,
+          //     evented: true,
+          //     selectable: true,
+          //     removable: true,
+          //     resizable: 1,
+          //     transformable: true,
+          //     editable: true,
+          //     hasControls: true,
+          //     textTransform: "none",
+          //     isEditable: true,
+          //     zChangeable: 1,
+          //     boundingBox: "Base",
+          //     boundingBoxMode: "clipping",
+          //     copyable: true,
+          //     draggable: true,
+          //     lockScalingX: false,
+          //     lockScalingY: false,
+          //     lockUniScaling: true,
+          //     colors: ['#000'],
+          //     cornerSize: 24,
+          //     textBox: false,
+          //     rotatable: true,
+          //     userAdded: true
+          //   });
+
+          //   const canvas = this.designer.currentViewInstance.fabricCanvas;
+
+          //   // canvas.add(cloned);
+          //   // canvas.setActiveObject(cloned);
+          //   // canvas.renderAll();
+          //   let n = 'happy text'
+          //   const text = n;
+          //   console.log("updated data", cloned  )
+          //   this.designer.currentViewInstance.fabricCanvas.addElement('text', n, text, cloned);
+
+            
+          //   const objects = this.designer.currentViewInstance.fabricCanvas.getObjects();
+          //   const element = objects[objects.length - 3]; 
+          //   console.log("jsj",this.designer.currentViewInstance.fabricCanvas.setActiveObject)
+          //   // Highlight/select the new element
+          //   if (element && typeof this.designer.currentViewInstance.fabricCanvas.setActiveObject === 'function') {
+          //       this.designer.currentViewInstance.fabricCanvas.setActiveObject(element);
+          //       this.designer.currentViewInstance.fabricCanvas.renderAll();
+          //   }
+
+          //   // ✅ Trigger Fancy Product Designer events
+          //   $(document).trigger('fpdRefreshLayers');
+          //   $(document).trigger('elementAdd', [cloned]);
+
+            
+          // });
+          this.designer.currentViewInstance.fabricCanvas.duplicateElement(
+              this.designer.currentElement
+            )
+
+             this.showToast('Paste successfully!');
+
+        }
+      });
+
+       document.getElementById('letter-spacing')?.addEventListener('click', (e) => {
+            const target = e.currentTarget as HTMLElement;
+            target.classList.add('letter-spac-active');
+           const subPanel = document.querySelector('.fpd-sub-panel');
+            console.log("subPanel data is", subPanel)
+            if (!subPanel) return;
+
+            // Step 2: Remove 'fpd-active' from any active children in sub-panel
+            subPanel.querySelectorAll(':scope > .fpd-active').forEach(el => {
+              el.classList.remove('fpd-active');
+            });
+
+            // Step 3: Find `.fpd-panel-position` inside the same sub-panel
+            const positionPanel = subPanel.querySelector('.fpd-panel-text-size');
+            if (positionPanel) {
+              positionPanel.classList.add('fpd-active', 'fpd-letter-spacing-lineheight');
+              this.document.body.classList.remove('fpd-tools-custom-data')
+            }
+
+            const elementtoolbar = document.querySelector('fpd-element-toolbar');
+            console.log("djjjjj",elementtoolbar)
+            if(elementtoolbar){
+              elementtoolbar.classList.add('fpd-panel-visible')
+            }
+       });
+       
+
+       function setupShareButtonHandlersForAllMenus() {
+  const shareMenus = document.querySelectorAll('.fpd-share-menu');
+
+  shareMenus.forEach((shareMenu) => {
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (
+          mutation.type === 'attributes' &&
+          mutation.attributeName === 'style'
+        ) {
+          const display = window.getComputedStyle(shareMenu as HTMLElement).display;
+          if (display === 'block') {
+            const shareBtn = shareMenu.querySelector('.fpd-share-link-btn');
+            if (shareBtn) {
+              // Prevent duplicate bindings
+              shareBtn.removeEventListener('click', handleShareClick);
+              shareBtn.addEventListener('click', handleShareClick, { once: true });
+            }
+          }
+        }
+      });
+    });
+
+    observer.observe(shareMenu, {
+      attributes: true,
+      attributeFilter: ['style'],
+    });
   });
 }
 
-if (plusEl) {
-  plusEl.addEventListener('click', () => {
-    const inputEl = document.querySelector('input[data-control="fontSize"]') as HTMLInputElement;
-    if (inputEl) {
-      let current = parseInt(inputEl.value) || 1;
-      current = Math.min(200, current + 1); // Prevent going above 200
-      inputEl.value = String(current);
+function handleShareClick(e: Event) {
+  alert("check");
+  e.stopPropagation();
+  e.preventDefault();
+  console.log('Share button clicked', e);
 
-      // Update canvas font size
-      this.designer.currentViewInstance.fabricCanvas.setElementOptions({
-        fontSize: current,
-      });
+  const target = e.currentTarget as HTMLElement;
+
+  // Traverse up to find closest `.fpd-item`
+  const parentItem = target.closest('.fpd-item.fpd-hover-thumbnail.ts') as HTMLElement;
+
+  if (!parentItem) {
+    alert('Design element not found.');
+    return;
+  }
+
+  const dataSource = parentItem.getAttribute('data-source');
+  const dataTitle = parentItem.getAttribute('data-title');
+
+  const storedData = localStorage.getItem('clothing-designer');
+
+    let matchedData: any[] = [];
+
+    if (storedData) {
+      try {
+        const parsedData = JSON.parse(storedData);
+
+        if (Array.isArray(parsedData)) {
+          // Step 2: Find all items that match dataTitle
+          matchedData = parsedData.filter(item => item.title === dataTitle);
+
+          console.log("Matched Data of:", matchedData);
+        } else {
+          console.error("Data is not an array:", parsedData);
+        }
+      } catch (err) {
+        console.error("Failed to parse localStorage data:", err);
+      }
+    } else {
+      console.warn("No data found in localStorage for key:");
     }
-  });
+
+  if (!dataSource || !dataTitle) {
+    alert('Missing design data.');
+    return;
+  }
+
+  // API call
+  fetch('https://styleflip-backend-jdm5.ithemes.xyz/api/sharedproduct/save', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      title: dataTitle,
+      base64save: dataSource
+    })
+  })
+    .then(response => response.json())
+    .then(data => {
+      if (data && data.product && data.product._id) {
+        const urlBase = window.location.origin;
+        const shareUrl = `${urlBase}/savedesign?id=${data.product._id}&title=${encodeURIComponent(dataTitle)}`;
+
+        const urlField = document.querySelector('.fpd-share-link-url');
+        const copyBtn = document.querySelector('.fpd-share-link-btn');
+
+        if (urlField) urlField.textContent = shareUrl;
+
+        if (navigator.clipboard && copyBtn) {
+          navigator.clipboard.writeText(shareUrl).then(() => {
+            copyBtn.textContent = 'Copied!';
+            setTimeout(() => {
+              copyBtn.textContent = 'Copy Link';
+            }, 1200);
+          });
+        } else {
+          window.prompt('Copy this link:', shareUrl);
+        }
+      } else {
+        alert('Failed to save product or get share link.');
+      }
+    })
+    .catch(err => {
+      console.error('Error saving shared product:', err);
+      alert('Error saving product.');
+    });
 }
+
+// Run after DOM is ready
+setupShareButtonHandlersForAllMenus();
+
+
+
+       const panel = document.getElementById('panel-text-size-data');
+
+      if (panel) {
+        const observer = new MutationObserver((mutationsList) => {
+          for (const mutation of mutationsList) {
+            if (
+              mutation.type === 'attributes' &&
+              mutation.attributeName === 'class'
+            ) {
+              const hasClass = panel.classList.contains('fpd-active');
+              if (!hasClass) {
+                this.document.getElementById('letter-spacing')?.classList.remove('letter-spac-active');
+                console.log('Class "fpd-active" was removed from #panel-text-size-data');
+                // ✅ Your condition logic here
+              }
+            }
+          }
+        });
+
+        observer.observe(panel, { attributes: true });
+      }
+
+
+      const paneldata = document.querySelector('.fpd-panel-position');
+
+      if (paneldata) {
+        const observer = new MutationObserver((mutationsList) => {
+          for (const mutation of mutationsList) {
+            if (
+              mutation.type === 'attributes' &&
+              mutation.attributeName === 'class'
+            ) {
+              const hasClass = paneldata.classList.contains('fpd-active');
+              if (!hasClass) {
+                this.document.getElementById('CenterTools')?.classList.remove('letter-spac-active');
+                console.log('Class "fpd-active" was removed from #panel-text-size-data');
+                // ✅ Your condition logic here
+              }
+            }
+          }
+        });
+
+        observer.observe(paneldata, { attributes: true });
+      }
+
+      document.addEventListener('click', function (event) {
+          const productStage = document.querySelector('.fpd-product-stage');
+          const viewStage = document.querySelector('.fpd-view-stage');
+          const toolbar = document.querySelector('fpd-element-toolbar');
+          
+
+          // Check if the click is inside .fpd-product-stage but NOT inside .fpd-view-stage
+          const clickedInsideProductStage = productStage?.contains(event.target as Node);
+          const clickedInsideViewStage = viewStage?.contains(event.target as Node);
+
+          if (clickedInsideProductStage && !clickedInsideViewStage) {
+            // Hide or remove toolbar
+            if (toolbar) {
+              toolbar.classList.remove('fpd-show'); // If using Tailwind
+              // toolbar.style.display = 'none'; // If not using Tailwind
+              // lettspac?.classList.remove('letter-spac-active');
+            }
+          }
+        });
+
     
     }
 
@@ -1030,6 +1347,7 @@ if (plusEl) {
     console.log(this.route.snapshot.paramMap, 'Selected slug:', slug);
     const currentUrl = this.router.url;
     if (currentUrl.includes('savedesign')) {
+      this.showFPDLoading(true);
       this.route.queryParams.subscribe(params => {
         const id = params['id'];
         const title = params['title'];
@@ -1046,7 +1364,47 @@ if (plusEl) {
 
         if (matchedDesign) {
           setTimeout(() => {
-            console.log(matchedDesign, 'Matched Design:', this.designer?.currentViewInstance);
+            console.log(matchedDesign, 'Matched Design:', this.designer);
+            this.designer.currentViewInstance.fabricCanvas.clear();
+            this.designer.loadProduct(matchedDesign.product)
+            this.showFPDLoading(false);
+            const gridContainer = document.querySelector('.fpd-saved-designs');
+            // if (gridContainer) {
+            //    this.designer.currentViewInstance.fabricCanvas.clear();
+            //   const savedDesigns = gridContainer.querySelector('.fpd-grid.fpd-grid-contain');
+            //   if (savedDesigns) {
+            //     // Step 3: Get all .fpd-item elements
+            //     const fpdItems = savedDesigns.querySelectorAll('.fpd-item');
+
+            //     fpdItems.forEach(item => {
+            //       const dataTitle = item.getAttribute('data-title');
+
+            //       if (dataTitle === matchedDesign.title) {
+            //         // Step 4: Match found, get outer HTML
+            //         const itemHTML = item.outerHTML;
+            //         console.log('Matched HTML:', itemHTML);
+            //         const s = itemHTML;
+            //         this.designer.fpdInstance.addSavedProduct(s)
+            //         // You can return or use this as needed
+            //       }
+            //     });
+            //   } else {
+            //     console.warn('.fpd-saved-designs not found inside .fpd-grid-contain');
+            //   }
+            // }
+
+            // this.designer.currentViewInstance.fabricCanvas.addElement('image', {
+            //   source: matchedDesign.thumbnail,
+            //   title: matchedDesign.title,
+            // });
+           
+            // this.designer.currentViewInstance.fabricCanvas.addElement(
+            //   'image',
+            //           matchedDesign.thumbnail,
+            //           matchedDesign.title,
+            //           matchedDesign.product
+            // )
+            // this.designer.loadProduct(matchedDesign.product)
             // this.designer?.currentViewInstance?.fabricCanvas?.clear();
             // if (this.designer && matchedDesign && matchedDesign.product) {
             //   console.log('Loading saved design:', matchedDesign.title);
@@ -1131,6 +1489,44 @@ if (plusEl) {
       localStorage.setItem('valueofTitle', '');
     }
   }
+  showToast(message: string = 'Copied successfully!') {
+  let toast = document.getElementById('custom-toast') as HTMLElement | null;
+
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'custom-toast';
+    toast.style.position = 'fixed';
+    toast.style.bottom = '30px';
+    toast.style.left = '70%';
+    toast.style.transform = 'translateX(-50%)';
+    toast.style.backgroundColor = '#333';
+    toast.style.color = '#fff';
+    toast.style.padding = '10px 16px';
+    toast.style.borderRadius = '6px';
+    toast.style.fontSize = '14px';
+    toast.style.zIndex = '9999';
+    toast.style.transition = 'opacity 0.4s ease, bottom 0.4s ease';
+    toast.style.opacity = '0';
+    toast.style.visibility = 'hidden';
+
+    document.body.appendChild(toast);
+  }
+
+  toast.textContent = message;
+  toast.style.visibility = 'visible';
+  toast.style.opacity = '1';
+  toast.style.top = '10px';
+  toast.style.bottom = 'auto';
+
+  setTimeout(() => {
+    if (toast) {
+      toast.style.opacity = '0';
+      toast.style.bottom = '30px';
+      toast.style.visibility = 'hidden';
+    }
+  }, 2000);
+}
+
   previewImage: string = '';
   showPreviewModal: boolean = false;
   preview() {
@@ -1305,6 +1701,7 @@ if (plusEl) {
       .subscribe({
         next: (response) => {
           const token = response?.data?.generateCustomerToken?.token;
+          localStorage.setItem('authToken', token)
           if (token) {
             console.log('Login success:', token);
             localStorage.setItem('customerToken', token);
@@ -1908,5 +2305,13 @@ if (plusEl) {
       "'": '&#039;'
     };
     return text.replace(/[&<>"']/g, (m) => map[m]);
+  }
+
+
+  showFPDLoading(show: boolean) {
+    const loader = document.getElementById('fpd-loader');
+    if (loader) {
+      loader.style.display = show ? 'flex' : 'none';
+    }
   }
 }
