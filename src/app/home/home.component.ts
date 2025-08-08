@@ -402,6 +402,21 @@ export class HomeComponent implements AfterViewInit {
           this.appOptions
         );
         
+        this.designer.fpdInstance.on('elementAdd', (e:any, element:any) => {
+          // Check if it's the base layer (first element in view)
+          const allElements = this.designer.fpdInstance.getElements();
+          if (element === allElements[0]) {
+            element.selectable = false;
+            element.evented = false;
+            element.lockMovementX = true;
+            element.lockMovementY = true;
+            element.lockScalingX = true;
+            element.lockScalingY = true;
+            element.lockRotation = true;
+            element.hasControls = false;
+            this.designer.fpdInstance.fabricCanvas.renderAll();
+          }
+        });
         const dataofproducts = localStorage.getItem('fpdProductsJSON');
         console.log('dataofproducts', dataofproducts); 
         const canvas = this.designer?.currentViewInstance?.fabricCanvas;
@@ -1454,7 +1469,7 @@ setupShareButtonHandlersForAllMenus();
       this.showLoginPopup = false;
     }
     this.loadDesigns();
-   
+    
   }
   bottomMenu() {
     const sourceElement = document.getElementById('content-text');
@@ -2047,7 +2062,7 @@ setupShareButtonHandlersForAllMenus();
     ) {
       // Calculate multiplier for thumbnail (example: 300x300)
       const stageWidth =
-        this.designer.currentViewInstance.options.stageWidth || 1000;
+       1800;
       const stageHeight =
         this.designer.currentViewInstance.options.stageHeight || 1000;
       const targetWidth = 300;

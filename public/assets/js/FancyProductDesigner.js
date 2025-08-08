@@ -20882,7 +20882,7 @@
             console.log('hhhhhhhhhhhhhhhhhhhhhhhhh', t.currentViewInstance)
           if (!t.url) return
           const e = document.createElement('div');
-          (e.className = 'fpd-item fpd-hover-thumbnail ts'),
+          (e.className = 'fpd-item fpd-hover-thumbnail ts mt-1 bg-[#f6f6f6]'),
             (e.dataset.source = t.url),
             t.disableDraggable || e.classList.add('fpd-draggable'),
             t.title &&
@@ -26591,7 +26591,7 @@
   this.innerHTML =
     '<div data-moduleicon="folder-open" data-defaulttext="Saved Designs" data-title="modules.save_load"> \
       <div class="fpd-save-design"> \
-        <input class="!bg-white" type="text" data-defaulttext="Optional: Enter a title" placeholder="modules.save_load_input_placeholder"> \
+        <input class="!bg-white !border !border-[#35475a33] !border-solid" type="text" data-defaulttext="Optional: Enter a title" placeholder="modules.save_load_input_placeholder"> \
         <div class="fpd-btn !bg-[#f53744] w-[100%] text-center !text-sm !normal-case justify-center" style="pointer-events: none; opacity: 0.5;"> \
           <span data-defaulttext="Save Design">modules.save_load_add_btn</span> \
         </div> \
@@ -28178,7 +28178,7 @@
 
               const searchInput = document.createElement('input')
               searchInput.type = 'text'
-              searchInput.placeholder = 'Search...'
+              searchInput.placeholder = 'Search'
               searchInput.className =
                 'border p-1 px-3 rounded !text-sm !mb-0 placeholder-gray-500'
 

@@ -5,7 +5,9 @@
 
 @font-face{font-family:'Nunito Sans';font-style:normal;font-weight:400;font-stretch:100%;font-display:swap;src:url(https://fonts.gstatic.com/s/nunitosans/v15/pe1mMImSLYBIv1o4X1M8ce2xCx3yop4tQpF_MeTm0lfGWVpNn64CL7U8upHZIbMV51Q42ptCp5F5bxqqtQ1yiU4G1ilXvlUjIfM0qh1d65g.woff) format('woff');unicode-range:U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;}@font-face{font-family:'Nunito Sans';font-style:normal;font-weight:400;font-stretch:100%;font-display:swap;src:url(https://fonts.gstatic.com/s/nunitosans/v15/pe1mMImSLYBIv1o4X1M8ce2xCx3yop4tQpF_MeTm0lfGWVpNn64CL7U8upHZIbMV51Q42ptCp5F5bxqqtQ1yiU4G1ilXt1UjIfM0qh1d65g.woff) format('woff');unicode-range:U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;}@font-face{font-family:'Nunito Sans';font-style:normal;font-weight:400;font-stretch:100%;font-display:swap;src:url(https://fonts.gstatic.com/s/nunitosans/v15/pe1mMImSLYBIv1o4X1M8ce2xCx3yop4tQpF_MeTm0lfGWVpNn64CL7U8upHZIbMV51Q42ptCp5F5bxqqtQ1yiU4G1ilXvFUjIfM0qh1d65g.woff) format('woff');unicode-range:U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;}@font-face{font-family:'Nunito Sans';font-style:normal;font-weight:400;font-stretch:100%;font-display:swap;src:url(https://fonts.gstatic.com/s/nunitosans/v15/pe1mMImSLYBIv1o4X1M8ce2xCx3yop4tQpF_MeTm0lfGWVpNn64CL7U8upHZIbMV51Q42ptCp5F5bxqqtQ1yiU4G1ilXvVUjIfM0qh1d65g.woff) format('woff');unicode-range:U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;}@font-face{font-family:'Nunito Sans';font-style:normal;font-weight:400;font-stretch:100%;font-display:swap;src:url(https://fonts.gstatic.com/s/nunitosans/v15/pe1mMImSLYBIv1o4X1M8ce2xCx3yop4tQpF_MeTm0lfGWVpNn64CL7U8upHZIbMV51Q42ptCp5F5bxqqtQ1yiU4G1ilXs1UjIfM0qh1d.woff) format('woff');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;}
 body.sfdesigner-main{font-family:'Nunito Sans';font-weight: 400;}fpd-main-bar{height: calc(100vh - 51px) !important;@media only screen and (min-width: 991px){margin-top: 56px !important;}}
-
+.fpd-container .picker_wrapper .picker_sl:before{height: 150px;}
+.fpd-saved-designs .fpd-grid{grid-template-columns: repeat(2, 1fr);
+    gap: 5px;.fpd-item{border: none;}}
 div.fpd-container fpd-actions-bar{
     background: linear-gradient(to right, #f53744, #7c2be8);
     @media only screen and (min-width: 991px){
@@ -27,7 +29,6 @@ div.fpd-container fpd-actions-bar{
 .fpd-container .fpd-grid.fpd-grid-contain>.fpd-item>picture{background-position: center;max-height: 86px;}.fpd-item.fpd-itemimg{ span{display: none;}}
 div.fpd-container .fpd-text-templates #text-templates.fpd-grid{gap: 7px;}
 .fpd-icon-bin:hover, .fpd-icon-bin:focus{color: #f53744;}
-.fpd-share-link-btn:hover{background: red !important;}
 body.fpd-tools-custom-data .fpd-container .fpd-input.fpd-tool-text-line-spacing, body.fpd-tools-custom-data .fpd-container .fpd-input.fpd-tool-text-letter-spacing{display: none;}
 div.fpd-container fpd-module-uploads .fpd-grid .fpd-loading-bar>.fpd-loading-progress{background: #010101;}
 .fpd-loading-bar{z-index: 999999 !important;}
@@ -46,7 +47,7 @@ fpd-module-uploads .fpd-item.fpd-hover-thumbnail.ts .fa-solid.fa-trash{display: 
   #clothing-designer div[data-pos="left"] div[aria-label="Undo"]{position: relative;&:before{content: '';width: 1px;background: rgb(255 255 255 / 84%);height: 30px;left: -9px;position: absolute;}}
   #clothing-designer div[data-pos="left"] div[aria-label="Redo"]{position: relative;margin-right:8px;&:after{content: '';width: 1px;background: rgb(255 255 255 / 84%);height: 30px;right: -7px;position: absolute;}}
   .fpd-module-content>.fpd-active{padding-top: 18px;padding: 0;margin: 17px 8px;}.fpd-module-content>fpd-module-images.fpd-active{padding-top: 0;}.input-search-box{max-width: calc(100% - 20px);} .valueoffpdmoduleproducts-active div[data-title="Design"] .input-search-box{max-width: calc(100% - 40px);margin-left: 25px;}.fpd-container fpd-module-designs{padding-right: 0;}
-  .fpd-saved-designs .fpd-item.fpd-hover-thumbnail{position: relative;border: 1px solid #bdbdbd; .fa-solid.fa-trash{position: absolute;right: 0;        font-size: 15px;top:0}}
+  .fpd-saved-designs .fpd-item.fpd-hover-thumbnail{position: relative; .fa-solid.fa-trash{position: absolute;right: 0;        font-size: 15px;top:0}}
   .fpd-container .fpd-scroll-area{max-width: 350px;margin-bottom: 30px;}
   fpd-element-toolbar.fpd-smart.fpd-show{top: 80px !important;transform: none;max-width: calc(100% - 441px);left: 441px !important;width: max-content;max-width: calc(100% - 441px);justify-content: center;right: 0; margin: auto;
     .fpd-scroll-area.fpd-tools-nav {flex-wrap: nowrap;max-width: 100%;flex-direction: row;margin-bottom:0;align-items:center;
@@ -322,7 +323,7 @@ fpd-element-toolbar.fpd-smart>.fpd-tools-nav>div>div.flex-plus-minus-icon{
 fpd-module-images .fpd-item{.fpd-three-dot-menu{display: none;}&:hover{.fpd-three-dot-menu{display: block;}}}
 fpd-module-save-load .fpd-item{.fpd-three-dot-menu{display: none;}&:hover{.fpd-three-dot-menu{display: block;}}.fa-solid.fa-trash{display: none;}}
 #TextTransform span{font-weight: 600;}
-fpd-module-save-load .fpd-three-dot-menu{width: 20px;height: 20px;position: absolute;top: 0;z-index: 99;right: 0;svg{display: inline-block;}}
+fpd-module-save-load .fpd-three-dot-menu{    position: absolute;top: 8px;z-index: 99;right: 8px;background: #fffc;min-width: 29px;text-align: center;height: 24px;border-radius: 4px;svg{display: inline-block;}}
 fpd-module-images .fpd-three-dot-menu{width: 20px;height: 20px;position: absolute;top: 0;z-index: 99;right: 0;svg{display: inline-block;}}
 .fpd-font-family-active fpd-element-toolbar.fpd-layout-large .fpd-close-sub-panel{    position: fixed;left: 393px;top: 99px;right: auto;box-shadow: none;z-index: 100;}
 .fpd-pos-data-sec{.fpd-panel-tabs{display: none !important;}.fpd-panel-tabs-content{div[data-id="align"]{display: block;}}}
