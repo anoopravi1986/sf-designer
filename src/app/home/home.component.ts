@@ -289,7 +289,7 @@ export class HomeComponent implements AfterViewInit {
             'text',
             'images',
             'manage-layers',
-            'text-layers',
+            // 'text-layers',
             'save-load',
           ],
           patterns: [
@@ -402,21 +402,7 @@ export class HomeComponent implements AfterViewInit {
           this.appOptions
         );
         
-        this.designer.fpdInstance.on('elementAdd', (e:any, element:any) => {
-          // Check if it's the base layer (first element in view)
-          const allElements = this.designer.fpdInstance.getElements();
-          if (element === allElements[0]) {
-            element.selectable = false;
-            element.evented = false;
-            element.lockMovementX = true;
-            element.lockMovementY = true;
-            element.lockScalingX = true;
-            element.lockScalingY = true;
-            element.lockRotation = true;
-            element.hasControls = false;
-            this.designer.fpdInstance.fabricCanvas.renderAll();
-          }
-        });
+       
         const dataofproducts = localStorage.getItem('fpdProductsJSON');
         console.log('dataofproducts', dataofproducts); 
         const canvas = this.designer?.currentViewInstance?.fabricCanvas;
@@ -1119,7 +1105,7 @@ export class HomeComponent implements AfterViewInit {
        
 
        function setupShareButtonHandlersForAllMenus() {
-  const shareMenus = document.querySelectorAll('.fpd-share-menu');
+  const shareMenus = document.querySelectorAll('.fpd-share-menussss');
 
   shareMenus.forEach((shareMenu) => {
     const observer = new MutationObserver((mutations) => {
@@ -1189,52 +1175,53 @@ function handleShareClick(e: Event) {
     } else {
       console.warn("No data found in localStorage for key:");
     }
-
+    console.log("matchedData",matchedData, matchedData[0]?.design_id)
   if (!dataSource || !dataTitle) {
     alert('Missing design data.');
     return;
   }
 
-  // API call
-  fetch('https://styleflip-backend-jdm5.ithemes.xyz/api/sharedproduct/save', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      title: dataTitle,
-      base64save: dataSource
-    })
-  })
-    .then(response => response.json())
-    .then(data => {
-      if (data && data.product && data.product._id) {
-        const urlBase = window.location.origin;
-        const shareUrl = `${urlBase}/savedesign?id=${data.product._id}&title=${encodeURIComponent(dataTitle)}`;
+  // API call to search product by title
+fetch(`https://styleflip-backend-jdm5.ithemes.xyz/api/sharedproduct/search?title=${encodeURIComponent(dataTitle)}&design_id=${matchedData[0]?.design_id}`, {
+  method: 'GET',
+  headers: {
+    'Content-Type': 'application/json'
+  }
+})
+  .then(response => response.json())
+  .then(data => {
+    console.log('Search API Response:', data);
 
-        const urlField = document.querySelector('.fpd-share-link-url');
-        const copyBtn = document.querySelector('.fpd-share-link-btn');
+    // Assuming API returns: { products: [{ _id: '...', title: '...' }, ...] }
+    if (data && data.product && data.product.length > 0) {
+      const firstProduct = data.product[0]; // Take the first matching product
+      const urlBase = window.location.origin;
+      const shareUrl = `${urlBase}/savedesign?design_id=${data.design_id}&title=${encodeURIComponent(data.title)}`;
 
-        if (urlField) urlField.textContent = shareUrl;
+      const urlField = document.querySelector('.fpd-share-link-url');
+      const copyBtn = document.querySelector('.fpd-share-link-btn');
 
-        if (navigator.clipboard && copyBtn) {
-          navigator.clipboard.writeText(shareUrl).then(() => {
-            copyBtn.textContent = 'Copied!';
-            setTimeout(() => {
-              copyBtn.textContent = 'Copy Link';
-            }, 1200);
-          });
-        } else {
-          window.prompt('Copy this link:', shareUrl);
-        }
+      if (urlField) urlField.textContent = shareUrl;
+
+      if (navigator.clipboard && copyBtn) {
+        navigator.clipboard.writeText(shareUrl).then(() => {
+          copyBtn.textContent = 'Copied!';
+          setTimeout(() => {
+            copyBtn.textContent = 'Copy Link';
+          }, 1200);
+        });
       } else {
-        alert('Failed to save product or get share link.');
+        window.prompt('Copy this link:', shareUrl);
       }
-    })
-    .catch(err => {
-      console.error('Error saving shared product:', err);
-      alert('Error saving product.');
-    });
+    } else {
+      alert('No product found with this title.');
+    }
+  })
+  .catch(err => {
+    console.error('Error searching product:', err);
+    alert('Error searching product.');
+  });
+
 }
 
 // Run after DOM is ready
@@ -1342,113 +1329,132 @@ setupShareButtonHandlersForAllMenus();
     if (currentUrl.includes('savedesign')) {
       this.showFPDLoading(true);
       this.route.queryParams.subscribe(params => {
-        const id = params['id'];
+        const id = params['design_id'];
         const title = params['title'];
 
         console.log('Design Save Detected!');
         console.log('ID:', id);
         console.log('Title:', title);
-        const designTitleData = localStorage.getItem('clothing-designer');
-        let matchedDesign = null;
-        if (designTitleData) {
-          const parsedDesigns = JSON.parse(designTitleData);
-          matchedDesign = parsedDesigns.find((i: any) => i.title === title);
-        }
+        fetch(`https://styleflip-backend-jdm5.ithemes.xyz/api/sharedproduct/search?title=${encodeURIComponent(title)}&design_id=${id}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        })
+          .then(response => response.json())
+          .then(data => {
+              console.log("data is:", data)
+              let existing = localStorage.getItem('clothing-designer');
+              let parsed = existing ? JSON.parse(existing) : [];
 
-        if (matchedDesign) {
-          setTimeout(() => {
-            console.log(matchedDesign, 'Matched Design:', this.designer);
-            this.designer.currentViewInstance.fabricCanvas.clear();
-            this.designer.loadProduct(matchedDesign.product)
-            this.showFPDLoading(false);
-            const gridContainer = document.querySelector('.fpd-saved-designs');
-            // if (gridContainer) {
-            //    this.designer.currentViewInstance.fabricCanvas.clear();
-            //   const savedDesigns = gridContainer.querySelector('.fpd-grid.fpd-grid-contain');
-            //   if (savedDesigns) {
-            //     // Step 3: Get all .fpd-item elements
-            //     const fpdItems = savedDesigns.querySelectorAll('.fpd-item');
+              // ✅ Only push if localStorage is empty
+              if (parsed.length === 0) {
+                parsed.push(data);
+                localStorage.setItem('clothing-designer', JSON.stringify(parsed));
+              }
+              const designTitleData = localStorage.getItem('clothing-designer');
+              console.log("ddddddddddddddddddAnoooooo")
+              let matchedDesign = null;
+              if (designTitleData) {
+                const parsedDesigns = JSON.parse(designTitleData);
+                matchedDesign = parsedDesigns.find((i: any) => i.title === title);
+              }
 
-            //     fpdItems.forEach(item => {
-            //       const dataTitle = item.getAttribute('data-title');
+              if (matchedDesign) {
+                setTimeout(() => {
+                  console.log(matchedDesign, 'Matched Design:', this.designer);
+                  this.designer.currentViewInstance.fabricCanvas.clear();
+                  this.designer.loadProduct(matchedDesign.product)
+                  this.showFPDLoading(false);
+                  const gridContainer = document.querySelector('.fpd-saved-designs');
+                  // if (gridContainer) {
+                  //    this.designer.currentViewInstance.fabricCanvas.clear();
+                  //   const savedDesigns = gridContainer.querySelector('.fpd-grid.fpd-grid-contain');
+                  //   if (savedDesigns) {
+                  //     // Step 3: Get all .fpd-item elements
+                  //     const fpdItems = savedDesigns.querySelectorAll('.fpd-item');
 
-            //       if (dataTitle === matchedDesign.title) {
-            //         // Step 4: Match found, get outer HTML
-            //         const itemHTML = item.outerHTML;
-            //         console.log('Matched HTML:', itemHTML);
-            //         const s = itemHTML;
-            //         this.designer.fpdInstance.addSavedProduct(s)
-            //         // You can return or use this as needed
-            //       }
-            //     });
-            //   } else {
-            //     console.warn('.fpd-saved-designs not found inside .fpd-grid-contain');
-            //   }
-            // }
+                  //     fpdItems.forEach(item => {
+                  //       const dataTitle = item.getAttribute('data-title');
 
-            // this.designer.currentViewInstance.fabricCanvas.addElement('image', {
-            //   source: matchedDesign.thumbnail,
-            //   title: matchedDesign.title,
-            // });
-           
-            // this.designer.currentViewInstance.fabricCanvas.addElement(
-            //   'image',
-            //           matchedDesign.thumbnail,
-            //           matchedDesign.title,
-            //           matchedDesign.product
-            // )
-            // this.designer.loadProduct(matchedDesign.product)
-            // this.designer?.currentViewInstance?.fabricCanvas?.clear();
-            // if (this.designer && matchedDesign && matchedDesign.product) {
-            //   console.log('Loading saved design:', matchedDesign.title);
-            //   const viewIndex = 0; // Or use a dynamic value from localStorage
+                  //       if (dataTitle === matchedDesign.title) {
+                  //         // Step 4: Match found, get outer HTML
+                  //         const itemHTML = item.outerHTML;
+                  //         console.log('Matched HTML:', itemHTML);
+                  //         const s = itemHTML;
+                  //         this.designer.fpdInstance.addSavedProduct(s)
+                  //         // You can return or use this as needed
+                  //       }
+                  //     });
+                  //   } else {
+                  //     console.warn('.fpd-saved-designs not found inside .fpd-grid-contain');
+                  //   }
+                  // }
 
-            //   const savedView = matchedDesign.product[viewIndex];
+                  // this.designer.currentViewInstance.fabricCanvas.addElement('image', {
+                  //   source: matchedDesign.thumbnail,
+                  //   title: matchedDesign.title,
+                  // });
+                
+                  // this.designer.currentViewInstance.fabricCanvas.addElement(
+                  //   'image',
+                  //           matchedDesign.thumbnail,
+                  //           matchedDesign.title,
+                  //           matchedDesign.product
+                  // )
+                  // this.designer.loadProduct(matchedDesign.product)
+                  // this.designer?.currentViewInstance?.fabricCanvas?.clear();
+                  // if (this.designer && matchedDesign && matchedDesign.product) {
+                  //   console.log('Loading saved design:', matchedDesign.title);
+                  //   const viewIndex = 0; // Or use a dynamic value from localStorage
 
-            //   if (savedView && savedView.elements) {
-            //     console.log(savedView, 'Loading saved design inside:', savedView.title);
-            //     // Clear current canvas view
-            //     this.designer.currentViewInstance.fabricCanvas.clear();
-            //     // this.designer.currentViewInstance.fabricCanvas.addElements(savedView);  
-            //     // this.designer.currentViewInstance.fabricCanvas.renderAll();
+                  //   const savedView = matchedDesign.product[viewIndex];
 
-            //     savedView.elements.forEach((element: any) => {
-            //       this.designer.currentViewInstance.fabricCanvas.loadFromJSON(
-            //         element,
-            //         () => {
-            //           this.designer.currentViewInstance.fabricCanvas.renderAll();
-            //           console.log('Loaded element:', element);
-            //         }
-            //       );
-            //     });
-            //     // this.designer.fpdInstance.addView(JSON.parse(savedView), true)
-            //     // this.designer.mainOptions.getViewInstance().loadView(JSON.parse(savedView))
-            //     // this.designer.fpdInstance.addView({
-            //     //   title: savedView.title,
-            //     //   thumbnail: savedView.thumbnail,
-            //     //   elements: savedView.elements,
-            //     //   options: savedView.options
-            //     // })
-            //     // Load saved view into FPD
-            //     // this.designer.mainOptions.loadElementJSON(
-            //     //   savedView.elements,
-            //     //   () => {
-            //     //     console.log(`Loaded view "${savedView.title}" into canvas.`);
-            //     //     this.designer.currentViewInstance.fabricCanvas.renderAll();
-            //     //   },
-            //     //   viewIndex
-            //     // );
-            //   } else {
-            //     console.warn('No valid view data found in matchedDesign.product[0].');
-            //   }
-            // }
-            // this.designer?.currentViewInstance?.fabricCanvas?.setActiveObject(null);
-            // this.designer?.loadProduct(matchedDesign);
-            console.log('Matched Design:', matchedDesign);
-          }, 10000);
-        } else {
-          console.log('No matching title found in designTitleData.');
-        }
+                  //   if (savedView && savedView.elements) {
+                  //     console.log(savedView, 'Loading saved design inside:', savedView.title);
+                  //     // Clear current canvas view
+                  //     this.designer.currentViewInstance.fabricCanvas.clear();
+                  //     // this.designer.currentViewInstance.fabricCanvas.addElements(savedView);  
+                  //     // this.designer.currentViewInstance.fabricCanvas.renderAll();
+
+                  //     savedView.elements.forEach((element: any) => {
+                  //       this.designer.currentViewInstance.fabricCanvas.loadFromJSON(
+                  //         element,
+                  //         () => {
+                  //           this.designer.currentViewInstance.fabricCanvas.renderAll();
+                  //           console.log('Loaded element:', element);
+                  //         }
+                  //       );
+                  //     });
+                  //     // this.designer.fpdInstance.addView(JSON.parse(savedView), true)
+                  //     // this.designer.mainOptions.getViewInstance().loadView(JSON.parse(savedView))
+                  //     // this.designer.fpdInstance.addView({
+                  //     //   title: savedView.title,
+                  //     //   thumbnail: savedView.thumbnail,
+                  //     //   elements: savedView.elements,
+                  //     //   options: savedView.options
+                  //     // })
+                  //     // Load saved view into FPD
+                  //     // this.designer.mainOptions.loadElementJSON(
+                  //     //   savedView.elements,
+                  //     //   () => {
+                  //     //     console.log(`Loaded view "${savedView.title}" into canvas.`);
+                  //     //     this.designer.currentViewInstance.fabricCanvas.renderAll();
+                  //     //   },
+                  //     //   viewIndex
+                  //     // );
+                  //   } else {
+                  //     console.warn('No valid view data found in matchedDesign.product[0].');
+                  //   }
+                  // }
+                  // this.designer?.currentViewInstance?.fabricCanvas?.setActiveObject(null);
+                  // this.designer?.loadProduct(matchedDesign);
+                  console.log('Matched Design:', matchedDesign);
+                }, 10000);
+              } else {
+                console.log('No matching title found in designTitleData.');
+              }
+          });
         // 👉 You can now use id/title as needed
       });
     }
