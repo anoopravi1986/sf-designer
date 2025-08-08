@@ -21021,54 +21021,62 @@
 
 
                 buttonShare.addEventListener('click', function (e) {
-  e.stopPropagation();
-  alert("check");
+                  e.stopPropagation();
 
-  fetch(`https://styleflip-backend-jdm5.ithemes.xyz/api/sharedproduct/search?title=${encodeURIComponent(t.title)}&design_id=${t?.design_id}`, {
-    method: 'GET',
-    headers: { 'Content-Type': 'application/json' }
-  })
-    .then(response => response.json())
-    .then(data => {
-      console.log('Search API Response:', data);
+                  fetch(`https://styleflip-backend-jdm5.ithemes.xyz/api/sharedproduct/search?title=${encodeURIComponent(t.title)}&design_id=${t?.design_id}`, {
+                    method: 'GET',
+                    headers: { 'Content-Type': 'application/json' }
+                  })
+                    .then(response => response.json())
+                    .then(data => {
+                      console.log('Search API Response:', data);
 
-      // Ensure valid product data
-      if (data && Array.isArray(data.product) && data.product.length > 0) {
-        const firstProduct = data.product[0];
-        const urlBase = window.location.origin;
-        const shareUrl = `${urlBase}/savedesign?design_id=${encodeURIComponent(data.design_id)}&title=${encodeURIComponent(data.title)}`;
+                      // Ensure valid product data
+                      if (data && Array.isArray(data.product) && data.product.length > 0) {
+                        const firstProduct = data.product[0];
+                        const urlBase = window.location.origin;
+                        const shareUrl = `${urlBase}/savedesign?design_id=${encodeURIComponent(data.design_id)}&title=${encodeURIComponent(data.title)}`;
 
-        // Update share link field
-        const urlField = document.querySelector('.fpd-share-link-url');
-        const copyBtn = document.querySelector('.fpd-share-link-btn');
+                        // Update share link field
+                        const urlField = document.querySelector('.fpd-share-link-url');
+                        const copyBtn = document.querySelector('.fpd-share-link-btn');
 
-        if (urlField) {
-          urlField.textContent = shareUrl;
-        }
+                        if (urlField) {
+                          urlField.textContent = shareUrl;
+                        }
 
-        // Clipboard copy logic
-        if (navigator.clipboard && copyBtn) {
-          navigator.clipboard.writeText(shareUrl).then(() => {
-            copyBtn.textContent = 'Copied!';
-            setTimeout(() => {
-              copyBtn.textContent = 'Copy Link';
-            }, 1200);
-          }).catch(err => {
-            console.error('Clipboard copy failed:', err);
-            window.prompt('Copy this link:', shareUrl);
-          });
-        } else {
-          window.prompt('Copy this link:', shareUrl);
-        }
-      } else {
-        alert('No product found with this title.');
-      }
-    })
-    .catch(err => {
-      console.error('Error searching product:', err);
-      alert('Error searching product.');
-    });
-});
+                        // Clipboard copy logic
+                        if (navigator.clipboard && copyBtn) {
+                          navigator.clipboard.writeText(shareUrl).then(() => {
+                            // copyBtn.textContent = 'Copied!';
+                            const copyEl = document.querySelector('#copyData');
+                            if (copyEl) {
+                              copyEl.style.display = 'block';
+
+                              setTimeout(() => {
+                                copyEl.style.display = 'none';
+                              }, 1000); // 10 seconds
+                            }
+                            // setTimeout(() => {
+                            //   copyBtn.textContent = 'Copy Link';
+                            // }, 1200);
+                          }).catch(err => {
+                            console.error('Clipboard copy failed:', err);
+                            window.prompt('Copy this link:', shareUrl);
+                          });
+                        } else {
+                          window.prompt('Copy this link:', shareUrl);
+                        }
+                      } else {
+                        alert('No product found with this title.');
+                      }
+                    })
+                    .catch(err => {
+                      console.error('Error searching product:', err);
+                      alert('Error searching product.');
+                    });
+
+                });
 
 
                 // Download the image from data-source
