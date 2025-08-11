@@ -21020,10 +21020,64 @@
                 });
 
 
-                // buttonShare.addEventListener('click', function (e) {
-                //   alert("check");
-                //   e.stopPropagation();
-                // })
+                buttonShare.addEventListener('click', function (e) {
+                  e.stopPropagation();
+
+                  fetch(`https://styleflip-backend-jdm5.ithemes.xyz/api/sharedproduct/search?title=${encodeURIComponent(t.title)}&design_id=${t?.design_id}`, {
+                    method: 'GET',
+                    headers: { 'Content-Type': 'application/json' }
+                  })
+                    .then(response => response.json())
+                    .then(data => {
+                      console.log('Search API Response:', data);
+
+                      // Ensure valid product data
+                      if (data && Array.isArray(data.product) && data.product.length > 0) {
+                        const firstProduct = data.product[0];
+                        const urlBase = window.location.origin;
+                        const shareUrl = `${urlBase}/savedesign?design_id=${encodeURIComponent(data.design_id)}&title=${encodeURIComponent(data.title)}`;
+
+                        // Update share link field
+                        const urlField = document.querySelector('.fpd-share-link-url');
+                        const copyBtn = document.querySelector('.fpd-share-link-btn');
+
+                        if (urlField) {
+                          urlField.textContent = shareUrl;
+                        }
+
+                        // Clipboard copy logic
+                        if (navigator.clipboard && copyBtn) {
+                          navigator.clipboard.writeText(shareUrl).then(() => {
+                            // copyBtn.textContent = 'Copied!';
+                            const copyEl = document.querySelector('#copyData');
+                            if (copyEl) {
+                              copyEl.style.display = 'block';
+
+                              setTimeout(() => {
+                                copyEl.style.display = 'none';
+                              }, 1000); // 10 seconds
+                            }
+                            // setTimeout(() => {
+                            //   copyBtn.textContent = 'Copy Link';
+                            // }, 1200);
+                          }).catch(err => {
+                            console.error('Clipboard copy failed:', err);
+                            window.prompt('Copy this link:', shareUrl);
+                          });
+                        } else {
+                          window.prompt('Copy this link:', shareUrl);
+                        }
+                      } else {
+                        alert('No product found with this title.');
+                      }
+                    })
+                    .catch(err => {
+                      console.error('Error searching product:', err);
+                      alert('Error searching product.');
+                    });
+
+                });
+
 
                 // Download the image from data-source
                 buttonDonw.addEventListener('click', function (e) {
@@ -26444,14 +26498,14 @@
 
           try {
             const titleParam = new URLSearchParams(window.location.search).get("title");
-            const idParam = new URLSearchParams(window.location.search).get("id");
+            const idParam = new URLSearchParams(window.location.search).get("design_id");
 
             if (!titleParam) {
               console.log("No title provided in URL");
               return;
             }
 
-            const response = await fetch(`https://styleflip-backend-jdm5.ithemes.xyz/api/sharedproduct/search?title=${encodeURIComponent(titleParam)}&Id=${encodeURIComponent(idParam)}`, );
+            const response = await fetch(`https://styleflip-backend-jdm5.ithemes.xyz/api/sharedproduct/search?title=${encodeURIComponent(titleParam)}&design_id=${encodeURIComponent(idParam)}`, );
             const data = await response.json();
             const encodedTitle = 'DataSave11';
             const designTitleData = localStorage.getItem('clothing-designer');
@@ -26653,11 +26707,14 @@
               t.viewInstances[0].toDataURL(
                 t => {
                   const e = this.fpdInstance.getProduct(),
+                  
                     i = {
                       thumbnail: t,
                       product: e,
                       title: this.inputElem.value || '',
-                      uploadedAt: new Date().toISOString()
+                      uploadedAt: new Date().toISOString(),
+                        design_id: Date.now().toString(36) + Math.random().toString(36).substr(2, 5)
+
                     }
                   if (
                     e &&
@@ -26667,6 +26724,33 @@
                     t || (t = []),
                       this.addSavedProduct(i),
                       console.log('jjjjjjjjjjjjjjjjjjjjjkkk1', i)
+
+                      fetch('https://styleflip-backend-jdm5.ithemes.xyz/api/sharedproduct/save', {
+                        method: 'POST',
+                        headers: {
+                          'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                          title: i.title,
+                          base64save: i.thumbnail,
+                          product: i.product, // ✅ Added here
+                          uploadedAt: i.uploadedAt,
+                          design_id: i.design_id
+                        })
+                      })
+                        .then(res => res.json())
+                        .then(response => {
+                          console.log('Saved successfully:', response);
+                          i._id = response.product._id;
+                          console.log('t data',t)
+                          
+                        })
+                        .catch(err => {
+                          console.error('Error saving shared product:', err);
+                        });
+                        console.log("data is",  this.fpdInstance.container.id, i)
+                        console.log("i:", i);  // 👈 Check if _id is still here
+console.log("t:", t);
                     t.push(i),
                       window.localStorage.setItem(
                         this.fpdInstance.container.id,
@@ -26705,11 +26789,15 @@
         }
         addSavedProduct (t) {
           console.log('jjjjjjjjjjjjjjjjjjjjjk', t)
-          let { thumbnail: e, product: i, title: n = '' } = t
+          let e = t.thumbnail || t.base64save;
+          let { product: i, title: n = '' } = t;
+          // let e = 
+          // let { thumbnail: e, product: i, title: n = '' } = t
           const s = $({
             url: e,
             title: n,
             uploadedAt: t.uploadedAt,
+            design_id: t.design_id,
             removable: !0,
             disablePrice: !0,
             disableDraggable: !0
