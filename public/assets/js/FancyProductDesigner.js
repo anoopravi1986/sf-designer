@@ -28427,6 +28427,7 @@
       });
 
       // 🔁 Render span text items
+
       spans.forEach(span => {
         const spanTag = document.createElement('span');
         spanTag.className = 'pankaj design1';
@@ -28442,14 +28443,15 @@
                       const viewOptions = t.currentViewInstance.options
                       const innerSpans = newDiv.querySelectorAll('span')
                       let verticalOffset = 0
-
+                      let renderTextContent = ""
                       const insertedTextObjects = []
                       const fabricCanvas =
                         t.currentViewInstance.fabricCanvas.canvas ||
                         t.currentViewInstance.fabricCanvas
-
+                      console.log("testing Style",innerSpans.title);
                       innerSpans.forEach((innerSpan, index) => {
                         const textContent = innerSpan.textContent?.trim() || '';
+                        renderTextContent += textContent;
                         const originalSpan = spans[index];
                         let parsedParams = {};
 
@@ -28567,6 +28569,9 @@
                           boundingBox: 'Base',
                           padding: 0, // 🚫 avoid padding if not visually necessary
                           scaleX: 1,  // 🔒 lock scale
+                          zChangeable: true,
+                          excludeFromExport: !1,
+                          title : renderTextContent,
                           scaleY: 1,
                         })
 
@@ -31217,6 +31222,7 @@
           this.fpdInstance
             .getElements(this.fpdInstance.currentViewIndex, 'all', !1)
             .forEach(t => {
+              console.log('seting up all the layers again');
               t.checkEditable() && Wn(this, Yn, Kn).call(this, t)
             }),
           Hn(this, Vn) && Hn(this, Vn).dispose(),
@@ -31259,6 +31265,7 @@
           })(t, zn(t, e, 'set'), i)
       }
       function Kn (t) {
+        console.log("setting up a layer", t,t.getType(),t.title,t.text,t.type)
         const e = document.createElement('div')
         ;(e.className = 'fpd-list-row !bg-white'), (e.id = t.id)
         let i = document.createElement('span'),
@@ -31304,6 +31311,7 @@
               '<div class="fpd-dpi">DPI: <span data-prop="dpi"></span></div>'),
             a.append(t)
         }
+        
         e.append(a)
         const o = document.createElement('div')
         if (((o.className = 'fpd-cell-2'), e.append(o), t.uploadZone)) {
