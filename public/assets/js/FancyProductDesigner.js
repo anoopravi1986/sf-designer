@@ -28247,7 +28247,17 @@ console.log("t:", t);
                   else{
                     // Get the last added object (the new text element)
                     const objects = t.currentViewInstance.fabricCanvas.getObjects();
-                    const element = objects[objects.length - 3];
+                    /*objects.forEach(obj => {
+                      console.log('Type:', obj.type, 'Title:', obj.title, obj);
+                      // You can access properties like obj.left, obj.top, obj.width, obj.height, etc.
+                    });*/
+                    console.log(objects, 'objects in canvas');
+                    let element = objects[objects.length - 3];
+                    //console.log('Newly added element:', element, element.type, element.title);
+                    if(element.type != "i-text"){
+                      element = objects[objects.length - 4];
+                      //console.log('Newly added element:', element, element.type, element.title);
+                    }
                     // Highlight/select the new element
                     if (element && typeof t.currentViewInstance.fabricCanvas.setActiveObject === 'function') {
                         t.currentViewInstance.fabricCanvas.setActiveObject(element);
@@ -28609,6 +28619,7 @@ console.log("t:", t);
       });
 
       // 🔁 Render span text items
+
       spans.forEach(span => {
         const spanTag = document.createElement('span');
         spanTag.className = 'pankaj design1';
@@ -31415,6 +31426,7 @@ console.log("t:", t);
           this.fpdInstance
             .getElements(this.fpdInstance.currentViewIndex, 'all', !1)
             .forEach(t => {
+              console.log('seting up all the layers again');
               t.checkEditable() && Wn(this, Yn, Kn).call(this, t)
             }),
           Hn(this, Vn) && Hn(this, Vn).dispose(),
@@ -31457,6 +31469,7 @@ console.log("t:", t);
           })(t, zn(t, e, 'set'), i)
       }
       function Kn (t) {
+        console.log("setting up a layer", t,t.getType(),t.title,t.text,t.type)
         const e = document.createElement('div')
         ;(e.className = 'fpd-list-row !bg-white'), (e.id = t.id)
         let i = document.createElement('span'),
@@ -31502,6 +31515,7 @@ console.log("t:", t);
               '<div class="fpd-dpi">DPI: <span data-prop="dpi"></span></div>'),
             a.append(t)
         }
+        
         e.append(a)
         const o = document.createElement('div')
         if (((o.className = 'fpd-cell-2'), e.append(o), t.uploadZone)) {
@@ -34378,33 +34392,31 @@ console.log("t:", t);
   if (group) {
     group.removable = true;
     group.resizable = true;
-    group.selectable = true;
-    group.evented = true;
     group.boundingBox = 'Base';
     group.boundingBoxMode = 'clipping';
 
     // --- CLIP TO BASE IMAGE ---
-    const baseImage = fabricCanvas.getObjects().find(o => o.title === 'Overlay');
-    if (baseImage) {
-      baseImage.set({
-        selectable: false,
-        evented: false,
-        lockMovementX: true,
-        lockMovementY: true,
-        lockRotation: true,
-        lockScalingX: true,
-        lockScalingY: true
-      });
-      baseImage.moveTo(0); // keep base at bottom
+    // const baseImage = fabricCanvas.getObjects().find(o => o.title === 'Overlay');
+    // if (baseImage) {
+    //   baseImage.set({
+    //     selectable: false,
+    //     evented: false,
+    //     lockMovementX: true,
+    //     lockMovementY: true,
+    //     lockRotation: true,
+    //     lockScalingX: true,
+    //     lockScalingY: true
+    //   });
+    //   baseImage.moveTo(0); // keep base at bottom
 
-      group.clipPath = new fabric.Rect({
-        left: baseImage.left - (baseImage.width * baseImage.scaleX) / 2,
-        top: baseImage.top - (baseImage.height * baseImage.scaleY) / 2,
-        width: baseImage.width * baseImage.scaleX,
-        height: baseImage.height * baseImage.scaleY,
-        absolutePositioned: true
-      });
-    }
+    //   group.clipPath = new fabric.Rect({
+    //     left: baseImage.left - (baseImage.width * baseImage.scaleX) / 2,
+    //     top: baseImage.top - (baseImage.height * baseImage.scaleY) / 2,
+    //     width: baseImage.width * baseImage.scaleX,
+    //     height: baseImage.height * baseImage.scaleY,
+    //     absolutePositioned: true
+    //   });
+    // }
 
     // --- COPY / PASTE SUPPORT ---
     let copiedGroup = null;
@@ -34451,42 +34463,9 @@ console.log("t:", t);
     t.deselectElement();
   }
 
+   
+
   console.log('grouping completed successfully.', group);
-});
-
-
-// Copy–Paste functionality for group
-let copiedGroup = null;
-
-// Copy group
-document.addEventListener('keydown', e => {
-  if (e.ctrlKey && e.key === 'c') {
-    const activeObject = this.fpdInstance.currentViewInstance?.fabricCanvas.getActiveObject();
-    if (activeObject && activeObject.type === 'group') {
-      activeObject.clone(cloned => {
-        copiedGroup = cloned;
-        console.log('Group copied', copiedGroup);
-      });
-    }
-  }
-});
-
-// Paste group
-document.addEventListener('keydown', e => {
-  if (e.ctrlKey && e.key === 'v') {
-    if (copiedGroup) {
-      copiedGroup.clone(cloned => {
-        cloned.set({
-          left: cloned.left + 10,
-          top: cloned.top + 10
-        });
-        this.fpdInstance.currentViewInstance.fabricCanvas.add(cloned);
-        this.fpdInstance.currentViewInstance.fabricCanvas.setActiveObject(cloned);
-        this.fpdInstance.currentViewInstance.fabricCanvas.renderAll();
-        console.log('Group pasted');
-      });
-    }
-  }
 });
 
 
