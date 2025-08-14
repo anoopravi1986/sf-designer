@@ -28153,7 +28153,17 @@ console.log("t:", t);
                   else{
                     // Get the last added object (the new text element)
                     const objects = t.currentViewInstance.fabricCanvas.getObjects();
-                    const element = objects[objects.length - 3];
+                    /*objects.forEach(obj => {
+                      console.log('Type:', obj.type, 'Title:', obj.title, obj);
+                      // You can access properties like obj.left, obj.top, obj.width, obj.height, etc.
+                    });*/
+                    //console.log(objects, 'objects in canvas');
+                    let element = objects[objects.length - 3];
+                    //console.log('Newly added element:', element, element.type, element.title);
+                    if(element.type != "i-text"){
+                      element = objects[objects.length - 4];
+                      //console.log('Newly added element:', element, element.type, element.title);
+                    }
                     // Highlight/select the new element
                     if (element && typeof t.currentViewInstance.fabricCanvas.setActiveObject === 'function') {
                         t.currentViewInstance.fabricCanvas.setActiveObject(element);
