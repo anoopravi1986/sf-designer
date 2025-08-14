@@ -27095,8 +27095,8 @@ console.log("t:", t);
               )),
                 G(e, ['click'], () => {
                   console.log("first1");
-                  document.querySelector('.fpd-ungroup1')?.classList.remove('fpd-hidden');
-                  document.querySelector('.fpd-ungroup')?.classList.add('fpd-hidden');
+                  document.querySelector('.fpd-ungroup1')?.classList.add('fpd-hidden');
+                  document.querySelector('.fpd-ungroup')?.classList.remove('fpd-hidden');
                   this.fpdInstance.loadProduct(this.fpdInstance.productViews),
                     i.remove()
                 })
@@ -34614,6 +34614,9 @@ console.log("t:", t);
             )
           }),
             G(this.navElem.querySelector('.fpd-tool-remove'), 'click', e => {
+              console.log("remove clicked", e, t)
+              document.querySelector('.fpd-ungroup1')?.classList.remove('fpd-hidden');
+              document.querySelector('.fpd-ungroup')?.classList.add('fpd-hidden');
               t.currentViewInstance.fabricCanvas.removeElement(t.currentElement)
             }),
             G(
