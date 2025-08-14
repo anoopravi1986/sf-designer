@@ -399,5 +399,9 @@ fpd-module-images .fpd-three-dot-menu{width: 20px;height: 20px;position: absolut
   color: green;
 }
 
-
-// Css added by Anoop for Font Family 
+fpd-element-toolbar[data-fabric-type="group"]{
+  min-width: auto;
+  .fpd-panel-text-format{margin-top: 0 !important;margin-bottom: 0 !important;width: 0;}
+  span.fpd-label{display: none !important;}
+}
+.fpd-group-copy-by svg, .fpd-group-paste-by svg{min-width: 32px;}
