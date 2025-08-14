@@ -8187,8 +8187,11 @@
                   E.util.makeElementUnselectable(this.wrapperEl)
               },
               _applyCanvasStyle: function (t) {
-                var e = this.width || t.width,
-                  i = this.height || t.height
+                console.log("dddddddddddddddddkakkakkak",t)
+                // var e = this.width || t.width,
+                //   i = this.height || t.height
+                var e = (this.width || t.width) + 200; // +100px wider
+                var i = this.height || t.height;
                 E.util.setStyle(t, {
                   position: 'absolute',
                   width: e + 'px',
@@ -24827,7 +24830,7 @@
               this.options.cornerIconColor),
             (s = z(
               {
-                containerClass: 'fpd-view-stage fpd-hidden',
+                containerClass: 'fpd-view-stage fpd-hidden min-w-[800px]',
                 selection: this.options.multiSelection,
                 selectionBorderColor: this.options.multiSelectionColor,
                 selectionColor: o(this.options.multiSelectionColor)
@@ -24872,41 +24875,128 @@
                 t._isPriced &&
                 (this.changePrice(t.price, '-'), (t._isPriced = !1)))
           }
+          // this.fabricCanvas.on({
+          //   'object:added': t => {
+          //     let e = t.target,
+          //         i = e.price;
+          //     console.log('object:added', e, i)
+          //     // ✅ Check if object is an image and not already scaled
+          //     if (e.type === 'image') {
+          //       console.log('object:added if', e, i)
+          //       const stageW = this.fabricCanvas.getWidth();
+          //       const stageH = this.fabricCanvas.getHeight();
+
+          //       const scaleW = stageW / e.width;
+          //       const scaleH = stageH / e.height;
+          //       const scale = Math.min(scaleW, scaleH); // proportional scaling
+
+          //       console.log('object:added scale', scale, stageW, stageH, e.width, e.height);
+                
+          //       e.scale(scale);
+          //       e.center();
+          //       e.setCoords();
+          //     }
+          //     if (e._addToUZ && '' != e._addToUZ) {
+          //       var n = this.fabricCanvas.getElementByTitle(e._addToUZ);
+          //       i = n && n.price ? n.price : i;
+          //     }
+
+          //     void 0 === i ||
+          //       0 === i ||
+          //       e.uploadZone ||
+          //       e._ignore ||
+          //       (e.chargeAfterEditing && !e._isPriced) ||
+          //       this.changePrice(i, '+');
+          //   },
+
+          //   'object:removed': t => {
+          //     const e = t.target;
+          //     void 0 === e.price ||
+          //       0 === e.price ||
+          //       e.uploadZone ||
+          //       (e.chargeAfterEditing && !e._isPriced) ||
+          //       this.changePrice(e.price, '-');
+          //   },
+
+          //   'text:changed': t => {
+          //     a(t.target);
+          //   },
+
+          //   elementModify: t => {
+          //     this.elementsAdded &&
+          //       t.options.hasOwnProperty('text') &&
+          //       a(t.element);
+          //   },
+
+          //   elementFillChange: t => {
+          //     jt(this, Nt, Wt).call(this, t.element);
+          //   }
+          // });
           this.fabricCanvas.on({
             'object:added': t => {
               let e = t.target,
-                i = e.price
-              if (e._addToUZ && '' != e._addToUZ) {
-                var n = this.fabricCanvas.getElementByTitle(e._addToUZ)
-                i = n && n.price ? n.price : i
+                i = e.price;
+
+              console.log('object:added', e, i);
+
+              // If object is an image, scale and center it proportionally
+              if (e.type === 'image') {
+                const stageW = this.fabricCanvas.getWidth();
+                const stageH = this.fabricCanvas.getHeight();
+
+                const scaleW = stageW / e.width;
+                const scaleH = stageH / e.height;
+                const scale = Math.min(scaleW, scaleH); // proportional scaling
+
+                e.scale(scale);
+                e.center();
+                e.setCoords();
               }
-              void 0 === i ||
-                0 === i ||
-                e.uploadZone ||
-                e._ignore ||
-                (e.chargeAfterEditing && !e._isPriced) ||
-                this.changePrice(i, '+')
+
+              // Handle price calculation if relevant
+              if (e._addToUZ && e._addToUZ !== '') {
+                var n = this.fabricCanvas.getElementByTitle(e._addToUZ);
+                i = n && n.price ? n.price : i;
+              }
+
+              if (i !== undefined && i !== 0 && !e.uploadZone && !e._ignore && !(e.chargeAfterEditing && !e._isPriced)) {
+                this.changePrice(i, '+');
+              }
+
+              // **Keep base locked layer always at the bottom**
+              const baseLayer = this.fabricCanvas.getObjects().find(obj => obj.adminLocked === 1);
+              if (baseLayer) {
+                this.fabricCanvas.sendToBack(baseLayer);
+                // Make sure newly added object is above the base layer
+                if (e !== baseLayer) {
+                  this.fabricCanvas.bringToFront(e);
+                }
+              }
             },
+
             'object:removed': t => {
-              const e = t.target
-              void 0 === e.price ||
-                0 === e.price ||
-                e.uploadZone ||
-                (e.chargeAfterEditing && !e._isPriced) ||
-                this.changePrice(e.price, '-')
+              const e = t.target;
+              if (e.price !== undefined && e.price !== 0 && !e.uploadZone && !(e.chargeAfterEditing && !e._isPriced)) {
+                this.changePrice(e.price, '-');
+              }
             },
+
             'text:changed': t => {
-              a(t.target)
+              a(t.target);
             },
+
             elementModify: t => {
-              this.elementsAdded &&
-                t.options.hasOwnProperty('text') &&
-                a(t.element)
+              if (this.elementsAdded && t.options.hasOwnProperty('text')) {
+                a(t.element);
+              }
             },
+
             elementFillChange: t => {
-              jt(this, Nt, Wt).call(this, t.element)
+              jt(this, Nt, Wt).call(this, t.element);
             }
-          })
+          });
+
+
         }
         init () {
           this.loadElements(this.viewData.elements, jt(this, Rt, zt).bind(this))
@@ -25449,7 +25539,7 @@
         }
         connectedCallback () {
           this.innerHTML =
-            '<div> <input class="bg-white" type="text" data-defaulttext="Enter a URL, some text..." placeholder="modules.qr_code_input"/> <div class="fpd-qr-code-colors"> <div class="fpd-qr-code-color-dark"></div> <div class="fpd-qr-code-color-light"></div> </div> <span class="fpd-add-qr-code fpd-btn !bg-[#f53744]" data-defaulttext="Add QR-Code">modules.qr_code_add_btn</span> </div> '
+            '<div> <input class="bg-white" type="text" data-defaulttext="Enter a URL, some text..." placeholder="modules.qr_code_input"/> <div class="fpd-qr-code-colors"> <div class="fpd-qr-code-color-dark"></div> <div class="fpd-qr-code-color-light"></div> </div> <span class="fpd-add-qr-code fpd-btn !bg-[var(--theme-color)]" data-defaulttext="Add QR-Code">modules.qr_code_add_btn</span> </div> '
         }
       }
       customElements.define('fpd-module-qr-code', Kt)
@@ -26646,7 +26736,7 @@
     '<div data-moduleicon="folder-open" data-defaulttext="Saved Designs" data-title="modules.save_load"> \
       <div class="fpd-save-design"> \
         <input class="!bg-white !border !border-[#35475a33] !border-solid" type="text" data-defaulttext="Optional: Enter a title" placeholder="modules.save_load_input_placeholder"> \
-        <div class="fpd-btn !bg-[#f53744] w-[100%] text-center !text-sm !normal-case justify-center" style="pointer-events: none; opacity: 0.5;"> \
+        <div class="fpd-btn !bg-[var(--theme-color)] w-[100%] text-center !text-sm !normal-case justify-center" style="pointer-events: none; opacity: 0.5;"> \
           <span data-defaulttext="Save Design">modules.save_load_add_btn</span> \
         </div> \
       </div> \
@@ -27005,6 +27095,8 @@ console.log("t:", t);
               )),
                 G(e, ['click'], () => {
                   console.log("first1");
+                  document.querySelector('.fpd-ungroup1')?.classList.remove('fpd-hidden');
+                  document.querySelector('.fpd-ungroup')?.classList.add('fpd-hidden');
                   this.fpdInstance.loadProduct(this.fpdInstance.productViews),
                     i.remove()
                 })
@@ -28089,7 +28181,7 @@ console.log("t:", t);
         }
         connectedCallback () {
           this.innerHTML =
-            '<div data-moduleicon="type-outline" class="relative p-[10px]" data-defaulttext="Add Text" data-title="modules.text"> <div class="fpd-head" style="opacity:0"> <div class="fpd-input-back-search input-search-box !shadow-none border border-[#35475a33] border-solid !rounded-[8px] ml-[5px] w-[calc(100% - 22px)]"> <div class="fpd-back fpd-btn !bg-white"> <svg xmlns="http://www.w3.org/2000/svg" class="min-w-[24px] text-black relative top-[-2px]" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M15.2 16.34a7.5 7.5 0 1 1 1.38-1.45l4.2 4.2a1 1 0 1 1-1.42 1.41l-4.16-4.16zm-4.7.16a6 6 0 1 0 0-12 6 6 0 0 0 0 12z"></path></svg> </div> <div class="fpd-input-search"> <input type="text" class="!text-sm placeholder-gray-500 !pl-2" placeholder="Search" /> <span class="fpd-icon-magnify"></span> </div> </div> </div><div class="fpd-add-text"> <textarea class="!bg-white hidden" data-defaulttext="Enter some text" placeholder="modules.text_input_placeholder"></textarea> <div class="fpd-btn-add-text fpd-btn !bg-[#f53744] w-[100%] text-center !text-sm !normal-case justify-center !mt-0"> <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4.99 5.5A1.5 1.5 0 0 1 6.49 4h11a1.5 1.5 0 0 1 1.5 1.5v1.85a.75.75 0 0 1-1.5 0V6a.5.5 0 0 0-.502-.5l-4.24.008.01 11.992a1 1 0 0 0 1 1h1.407a.75.75 0 0 1 0 1.5H8.852a.75.75 0 0 1 0-1.5h1.406a1 1 0 0 0 1-1l-.01-11.992-4.258-.007a.5.5 0 0 0-.5.5v1.377a.75.75 0 1 1-1.5 0V5.5Z" fill="currentColor"></path></svg><span class="ml-[5px]" data-defaulttext="Add Text">Add Text</span> <span class="fpd-price"></span> </div> </div> <div class="fpd-text-templates fpd-container fpd-scroll-area"> <div id="text-templates" class="fpd-grid fpd-grid-contain" #savedGrid></div><div class="fpd-grid fpd-padding"></div> </div> </div>'
+            '<div data-moduleicon="type-outline" class="relative p-[10px]" data-defaulttext="Add Text" data-title="modules.text"> <div class="fpd-head" style="opacity:0"> <div class="fpd-input-back-search input-search-box !shadow-none border border-[#35475a33] border-solid !rounded-[8px] ml-[5px] w-[calc(100% - 22px)]"> <div class="fpd-back fpd-btn !bg-white"> <svg xmlns="http://www.w3.org/2000/svg" class="min-w-[24px] text-black relative top-[-2px]" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M15.2 16.34a7.5 7.5 0 1 1 1.38-1.45l4.2 4.2a1 1 0 1 1-1.42 1.41l-4.16-4.16zm-4.7.16a6 6 0 1 0 0-12 6 6 0 0 0 0 12z"></path></svg> </div> <div class="fpd-input-search"> <input type="text" class="!text-sm placeholder-gray-500 !pl-2" placeholder="Search" /> <span class="fpd-icon-magnify"></span> </div> </div> </div><div class="fpd-add-text"> <textarea class="!bg-white hidden" data-defaulttext="Enter some text" placeholder="modules.text_input_placeholder"></textarea> <div class="fpd-btn-add-text fpd-btn !bg-[var(--theme-color)] w-[100%] text-center !text-sm !normal-case justify-center !mt-0"> <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4.99 5.5A1.5 1.5 0 0 1 6.49 4h11a1.5 1.5 0 0 1 1.5 1.5v1.85a.75.75 0 0 1-1.5 0V6a.5.5 0 0 0-.502-.5l-4.24.008.01 11.992a1 1 0 0 0 1 1h1.407a.75.75 0 0 1 0 1.5H8.852a.75.75 0 0 1 0-1.5h1.406a1 1 0 0 0 1-1l-.01-11.992-4.258-.007a.5.5 0 0 0-.5.5v1.377a.75.75 0 1 1-1.5 0V5.5Z" fill="currentColor"></path></svg><span class="ml-[5px]" data-defaulttext="Add Text">Add Text</span> <span class="fpd-price"></span> </div> </div> <div class="fpd-text-templates fpd-container fpd-scroll-area"> <div id="text-templates" class="fpd-grid fpd-grid-contain" #savedGrid></div><div class="fpd-grid fpd-padding"></div> </div> </div>'
         }
       }
 
@@ -28138,6 +28230,8 @@ console.log("t:", t);
                     editable: true,
                     hasControls: true,
                     evented: true,
+                    transformable: true,
+                    lockMovementX: true,
                     objectCaching: false,
                   });
 
@@ -28523,146 +28617,162 @@ console.log("t:", t);
       });
 
        newDiv.addEventListener('click', () => {
-                      document.querySelector('.fpd-ungroup1')?.classList.remove('fpd-hidden')
-                      document.querySelector('.fpd-ungroup')?.classList.add('fpd-hidden')
-                      if (!t.currentViewInstance) return
+  document.querySelector('.fpd-ungroup1')?.classList.remove('fpd-hidden')
+  document.querySelector('.fpd-ungroup')?.classList.add('fpd-hidden')
+  if (!t.currentViewInstance) return
 
-                      const viewOptions = t.currentViewInstance.options
-                      const innerSpans = newDiv.querySelectorAll('span')
-                      let verticalOffset = 0
+  const viewOptions = t.currentViewInstance.options
+  const innerSpans = newDiv.querySelectorAll('span')
+  const insertedTextObjects = []
 
-                      const insertedTextObjects = []
-                      const fabricCanvas =
-                        t.currentViewInstance.fabricCanvas.canvas ||
-                        t.currentViewInstance.fabricCanvas
+  const fabricCanvas =
+    t.currentViewInstance.fabricCanvas.canvas ||
+    t.currentViewInstance.fabricCanvas
 
-                      innerSpans.forEach((innerSpan, index) => {
-                        const textContent = innerSpan.textContent?.trim() || '';
-                        const originalSpan = spans[index];
-                        let parsedParams = {};
+  innerSpans.forEach((innerSpan, index) => {
+    const textContent = innerSpan.textContent?.trim() || ''
+    const originalSpan = spans[index]
+    let parsedParams = {}
 
-                        try {
-                          const rawParams = originalSpan.getAttribute('data-parameters') || '{}';
-                          console.log("ddddddddddddddddddddddRaw", rawParams)
-                          parsedParams = JSON.parse(rawParams);
-                        } catch (err) {
-                          console.error('Invalid JSON in data-parameters', err);
-                        }
+    try {
+      const rawParams = originalSpan.getAttribute('data-parameters') || '{}'
+      parsedParams = JSON.parse(rawParams)
+    } catch (err) {
+      console.error('Invalid JSON in data-parameters', err)
+    }
 
-                        // ✅ Text match check (skip if mismatch)
-                        if (parsedParams.text && parsedParams.text.trim() !== textContent) {
-                          console.warn(
-                            "Text mismatch at index ${textContent}" !== "${parsedParams.text}"
-                          );
-                          return;
-                        }
+    if (parsedParams.text && parsedParams.text.trim() !== textContent) {
+      console.warn(
+        `Text mismatch at index: ${textContent} !== ${parsedParams.text}`
+      )
+      return
+    }
 
-                        const props = {
-                          ...parsedParams,
-                          text: textContent,
-                          isCustom: true,
-                          textBox: Boolean(this.fpdInstance.mainOptions.customTextAsTextbox),
-                          resizable: true,
-                          boundingBox: 'Base',
-                          _addToUZ: t.currentViewInstance.currentUploadZone,
-                          _calcWidth: true
-                        };
+    const props = {
+      ...parsedParams,
+      text: textContent,
+      isCustom: true,
+      textBox: Boolean(this.fpdInstance.mainOptions.customTextAsTextbox),
+      resizable: true,
+      boundingBox: 'base',
+      _addToUZ: t.currentViewInstance.currentUploadZone,
+      _calcWidth: true
+    }
 
-                        console.log('props------------', props)
-                        // Save to localStorage
-                        let existingProps = [];
-                        try {
-                          const data = JSON.parse(localStorage.getItem('propstext') || '[]');
-                          existingProps = Array.isArray(data) ? data : [];
-                        } catch (e) {
-                          existingProps = [];
-                        }
+    // Save last 2 props to localStorage
+    let existingProps = []
+    try {
+      const data = JSON.parse(localStorage.getItem('propstext') || '[]')
+      existingProps = Array.isArray(data) ? data : []
+    } catch (e) {
+      existingProps = []
+    }
+    existingProps.push(props)
+    if (existingProps.length > 2) {
+      existingProps = existingProps.slice(-2)
+    }
+    localStorage.setItem('propstext', JSON.stringify(existingProps))
 
-                        existingProps.push(props);
-                        if (existingProps.length > 2) {
-                          existingProps = existingProps.slice(-2);
-                        }
-                        localStorage.setItem('propstext', JSON.stringify(existingProps));
+    let styledProps =
+      typeof z === 'function'
+        ? z(viewOptions.customTextParameters, props)
+        : props
 
-                        // Apply styledProps
-                        const viewOptions = t.currentViewInstance.options;
-                        console.log('props------------1', props)
-                        let styledProps =
-                          typeof z === 'function'
-                            ? z(viewOptions.customTextParameters, props)
-                            : props;
+    styledProps = {
+      ...styledProps,
+      autoCenter: false,
+      fill: props.colors || '#ff0000',
+      colors: props.colors || '#ff0000',
+      fontFamily: props.font || 'Arial',
+      fontSize: props.textSize || 24,
+      curved: props.curved || false,
+      curveSpacing: props.curveSpacing || 5,
+      curveRadius: props.curveRadius || 180,
+      curveReverse: props.curveReverse || false,
+      textAlign: 'left',
+      originX: 'left',
+      originY: 'top',
+      boundingBox: undefined,
+      top: parsedParams.top || 0,
+      left: parsedParams.left || 0
+    }
 
-                        styledProps = {
-                          ...styledProps,
-                          autoCenter: false,
-                          fill: props.colors || '#ff0000',
-                          colors: props.colors || '#ff0000',
-                          fontFamily: props.font || 'Arial',
-                          fontSize: props.textSize || 24,
-                          curved: props.curved || false,
-                          curveSpacing: props.curveSpacing || 5,
-                          curveRadius: props.curveRadius || 180,
-                          curveReverse: props.curveReverse || false,
-                          textAlign: 'left',
-                          originX: 'left',
-                          originY: 'top',
-                          boundingBox: undefined,
-                          top: parsedParams.top || 0,
-                          left: parsedParams.left || 0
-                        };
-                        console.log('props------------2', styledProps)
-                        const fabricText = styledProps.curved
-                          ? new fabric.CurvedText(textContent, styledProps)
-                          : new fabric.Text(textContent, styledProps);
+    const fabricText = styledProps.curved
+      ? new fabric.CurvedText(textContent, styledProps)
+      : new fabric.Text(textContent, styledProps)
 
-                        fabricText.set({
-                          curvable: 1,
-                          curved: props.curved || false,
-                          curveReverse: props.curveReverse || false,
-                          curveRadius: props.curveRadius || 0,
-                          curveSpacing: props.curveSpacing || 0,
-                          boundingBox: 'Base'
-                        });
+    fabricText.set({
+      curvable: 1,
+      curved: props.curved || false,
+      curveReverse: props.curveReverse || false,
+      curveRadius: props.curveRadius || 0,
+      curveSpacing: props.curveSpacing || 0,
+      boundingBox: 'Base'
+    })
 
-                        insertedTextObjects.push(fabricText);
-                      });
+    insertedTextObjects.push(fabricText)
+  })
 
+  if (insertedTextObjects.length > 0) {
+    const group = new fabric.Group(insertedTextObjects, {
+      selectable: true,
+      hasControls: true,
+      resizable: true,
+      removable: true,
+      originX: 'center',
+      originY: 'center'
+    })
 
-                      if (insertedTextObjects.length > 0) {
-                        const group = new fabric.Group(insertedTextObjects, {
-                          selectable: true,
-                          hasControls: true,
-                          resizable: true,
-                          removable: true,
-                          originX: 'center',
-                          originY: 'center'
-                        })
-                        const transformToolbar = document.querySelector('[data-panel="transform"]');
-                        console.log('transformToolbar', transformToolbar)
-                        if (transformToolbar) {
-                          transformToolbar.classList.add('fpd-hidden'); // or use .style.display = 'none';
-                        }
-                        console.log('group--------------', group)
-                        const canvasWidth = fabricCanvas.getWidth()
-                        const canvasHeight = fabricCanvas.getHeight()
-                        group.set({
-                          cornerSize: 22, // ⬅️ bigger icon size (default is ~12-24)
-                          cornerStyle: 'circle',
-                          transparentCorners: false,
-                          padding: 10,
-                          left: canvasWidth,
-                          top: canvasHeight,
-                          boundingBox: 'Base',
-                          padding: 0, // 🚫 avoid padding if not visually necessary
-                          scaleX: 1,  // 🔒 lock scale
-                          scaleY: 1,
-                        })
+    // Hide transform toolbar
+    const transformToolbar = document.querySelector('[data-panel="transform"]')
+    if (transformToolbar) {
+      transformToolbar.classList.add('fpd-hidden')
+    }
 
-                        fabricCanvas.add(group)
-                        fabricCanvas.setActiveObject(group)
-                        fabricCanvas.requestRenderAll()
-                      }
-                    })
+    // Fit group inside stage (max 1000×1000)
+    const stageWidth = 1000
+    const stageHeight = 1000
+    const scaleX = stageWidth / group.width
+    const scaleY = stageHeight / group.height
+    const scale = Math.min(scaleX, scaleY, 1)
+    group.set({
+      scaleX: scale,
+      scaleY: scale,
+      left: stageWidth / 2,
+      top: stageHeight / 2,
+      originX: 'center',
+      originY: 'center'
+    })
+
+    // Lock base image & set clipPath for group
+    const baseImage = fabricCanvas.getObjects().find(o => o.title === 'Overlay')
+    if (baseImage) {
+      baseImage.set({
+        selectable: false,
+        evented: false,
+        lockMovementX: true,
+        lockMovementY: true,
+        lockRotation: true,
+        lockScalingX: true,
+        lockScalingY: true
+      })
+      baseImage.moveTo(0)
+
+      group.clipPath = new fabric.Rect({
+        left: baseImage.left - (baseImage.width * baseImage.scaleX) / 2,
+        top: baseImage.top - (baseImage.height * baseImage.scaleY) / 2,
+        width: baseImage.width * baseImage.scaleX,
+        height: baseImage.height * baseImage.scaleY,
+        absolutePositioned: true
+      })
+    }
+
+    fabricCanvas.add(group)
+    fabricCanvas.setActiveObject(group)
+    fabricCanvas.requestRenderAll()
+  }
+})
+
 
       categoryContainer.appendChild(newDiv);
     }
@@ -29795,7 +29905,7 @@ console.log("t:", t);
         }
         connectedCallback () {
           this.innerHTML =
-            '<div class="fpd-upload-image !bg-white"> <span data-defaulttext="Drop images here">modules.upload_zone</span> <span class="fpd-btn !bg-[#f53744] w-[100%] text-center !text-sm !normal-case" data-defaulttext="Browse File">modules.browse_file</span><span>Only Images(jpg, jpeg, png, gif) files are allowed.</span> <span class="fpd-price"></span> </div> <input type="file" multiple="multiple" class="fpd-upload-input fpd-hidden" name="files[]" accept="image/jpeg,image/jpg,image/png,image/svg+xml,application/pdf"/> <div class="fpd-scroll-area"> <div class="fpd-grid fpd-grid-cover fpd-photo-grid"></div> </div>'
+            '<div class="fpd-upload-image !bg-white"> <span data-defaulttext="Drop images here">modules.upload_zone</span> <span class="fpd-btn !bg-[var(--theme-color)] w-[100%] text-center !text-sm !normal-case" data-defaulttext="Browse File">modules.browse_file</span><span>Only Images(jpg, jpeg, png, gif) files are allowed.</span> <span class="fpd-price"></span> </div> <input type="file" multiple="multiple" class="fpd-upload-input fpd-hidden" name="files[]" accept="image/jpeg,image/jpg,image/png,image/svg+xml,application/pdf"/> <div class="fpd-scroll-area"> <div class="fpd-grid fpd-grid-cover fpd-photo-grid"></div> </div>'
         }
       }
       function vi (t, e) {
@@ -34186,6 +34296,7 @@ console.log("t:", t);
               this.subPanel.querySelectorAll('.fpd-curved-options > span'),
               'click',
               e => {
+                
                 const i = e.currentTarget
                 let n = {}
                 'normal' == i.dataset.value
@@ -34194,6 +34305,9 @@ console.log("t:", t);
                     (n.curveReverse = 'curveReverse' == i.dataset.value)),
                   t.currentViewInstance.fabricCanvas.setElementOptions(n),
                   Kr(this, ca, Aa).call(this, n)
+                  document.querySelectorAll('fpd-element-toolbar').forEach(el => {
+                    el.classList.add('fpd-show');
+                  });
               }
             ),
             G(this.navElem.querySelector('.fpd-tool-reset'), 'click', e => {
@@ -34210,75 +34324,173 @@ console.log("t:", t);
               this.fpdInstance.actionsBar.doAction('reset-product')
               
             }),
+            
             G(this.navElem.querySelector('.fpd-ungroup'), 'click', e => {
-              const fabricCanvas = this.fpdInstance.currentViewInstance?.fabricCanvas;
-              const activeObject = fabricCanvas?.getActiveObject();
+  console.log("data group is clicked");
 
-              if (!activeObject || !Array.isArray(activeObject._objects)) {
-                alert('Please select multiple elements to group. Hold Shift and click on layers to select more than one.');
-                return;
-              }
+  const fabricCanvas = this.fpdInstance.currentViewInstance?.fabricCanvas;
+  const activeObject = fabricCanvas?.getActiveObject();
 
-              const savedPropsArray = [];
+  if (!activeObject || !Array.isArray(activeObject._objects)) {
+    alert('Please select multiple elements to group. Hold Shift and click on layers to select more than one.');
+    return;
+  }
 
-              activeObject._objects.forEach(obj => {
-                const params = {
-                  text: obj.text,
-                  left: obj.left,
-                  top: obj.top,
-                  font: obj.fontFamily,
-                  textSize: obj.fontSize,
-                  colors: obj.fill,
-                  curvable: obj.curvable ?? 1,
-                  curved: obj.curved ?? false,
-                  curveSpacing: obj.curveSpacing ?? 0,
-                  curveRadius: obj.curveRadius ?? 0,
-                  curveReverse: obj.curveReverse ?? false,
-                  textAlign: obj.textAlign,
-                  originX: obj.originX,
-                  originY: obj.originY,
-                  fontWeight: obj.fontWeight || 'normal',
-                  underline: obj.underline || false,
-                  textTransform: obj.textTransform || 'none',
-                  boundingBox: 'Base'
-                };
+  const savedPropsArray = [];
 
-                savedPropsArray.push(params);
-              });
+  activeObject._objects.forEach(obj => {
+    const params = {
+      text: obj.text,
+      left: obj.left,
+      top: obj.top,
+      font: obj.fontFamily,
+      textSize: obj.fontSize,
+      colors: obj.fill,
+      curvable: obj.curvable ?? 1,
+      curved: obj.curved ?? false,
+      curveSpacing: obj.curveSpacing ?? 0,
+      curveRadius: obj.curveRadius ?? 0,
+      curveReverse: obj.curveReverse ?? false,
+      textAlign: obj.textAlign,
+      originX: obj.originX,
+      originY: obj.originY,
+      fontWeight: obj.fontWeight || 'normal',
+      underline: obj.underline || false,
+      textTransform: obj.textTransform || 'none',
+      boundingBox: 'base'
+    };
+    savedPropsArray.push(params);
+  });
 
-              localStorage.setItem('propstext', JSON.stringify(savedPropsArray));
+  localStorage.setItem('propstext', JSON.stringify(savedPropsArray));
 
-              // Group via Ctrl+G event (FPD internal handling)
-              const groupShortcut = new KeyboardEvent('keydown', {
-                key: 'g',
-                code: 'KeyG',
-                ctrlKey: true,
-                bubbles: true
-              });
-              document.dispatchEvent(groupShortcut);
-              t.currentViewInstance.fabricCanvas.getActiveObject();
-              t.currentViewInstance.fabricCanvas.getActiveObject().removable = true;
-              t.currentViewInstance.fabricCanvas.getActiveObject().resizable = true;
-              t.currentViewInstance.fabricCanvas.getActiveObject().boundingBox = 'Base';
-              t.currentViewInstance.fabricCanvas.getActiveObject().boundingBoxMode = 'clipping';
-              console.log('grouping completed successfully.', t.currentViewInstance.fabricCanvas.getActiveObject())
-              const tagss = document.querySelector('fpd-element-toolbar')
-              console.log("ddddddddddddd",tagss)
-              if(tagss){
-                tagss.classList.remove('fpd-show')
-                const imageElements = tagss.querySelectorAll('[data-fabric-type="image"]');
+  // Trigger Group
+  const groupShortcut = new KeyboardEvent('keydown', {
+    key: 'g',
+    code: 'KeyG',
+    ctrlKey: true,
+    bubbles: true
+  });
+  document.dispatchEvent(groupShortcut);
 
-                imageElements.forEach(el => {
-                  el.setAttribute('data-fabric-type', 'group');
-                  console.log('Updated element:', el);
-                });
+  const group = t.currentViewInstance.fabricCanvas.getActiveObject();
 
-                t.deselectElement()
-              }
-              // UI updates
-              document.querySelector('.fpd-ungroup1')?.classList.remove('fpd-hidden');
-              document.querySelector('.fpd-ungroup')?.classList.add('fpd-hidden');
-            });
+  if (group) {
+    group.removable = true;
+    group.resizable = true;
+    group.selectable = true;
+    group.evented = true;
+    group.boundingBox = 'Base';
+    group.boundingBoxMode = 'clipping';
+
+    // --- CLIP TO BASE IMAGE ---
+    const baseImage = fabricCanvas.getObjects().find(o => o.title === 'Overlay');
+    if (baseImage) {
+      baseImage.set({
+        selectable: false,
+        evented: false,
+        lockMovementX: true,
+        lockMovementY: true,
+        lockRotation: true,
+        lockScalingX: true,
+        lockScalingY: true
+      });
+      baseImage.moveTo(0); // keep base at bottom
+
+      group.clipPath = new fabric.Rect({
+        left: baseImage.left - (baseImage.width * baseImage.scaleX) / 2,
+        top: baseImage.top - (baseImage.height * baseImage.scaleY) / 2,
+        width: baseImage.width * baseImage.scaleX,
+        height: baseImage.height * baseImage.scaleY,
+        absolutePositioned: true
+      });
+    }
+
+    // --- COPY / PASTE SUPPORT ---
+    let copiedGroup = null;
+
+    // Copy when Ctrl+C
+    document.addEventListener('keydown', (ev) => {
+      if (ev.ctrlKey && ev.key.toLowerCase() === 'c') {
+        const obj = fabricCanvas.getActiveObject();
+        if (obj && obj.type === 'group') {
+          obj.clone((cloned) => {
+            copiedGroup = cloned;
+          });
+        }
+      }
+    });
+
+    // Paste when Ctrl+V
+    document.addEventListener('keydown', (ev) => {
+      if (ev.ctrlKey && ev.key.toLowerCase() === 'v') {
+        if (copiedGroup) {
+          copiedGroup.clone((clonedObj) => {
+            clonedObj.left += 20;
+            clonedObj.top += 20;
+            fabricCanvas.add(clonedObj);
+            fabricCanvas.setActiveObject(clonedObj);
+            fabricCanvas.renderAll();
+          });
+        }
+      }
+    });
+  }
+
+  // Hide ungroup button / show other UI
+  document.querySelector('.fpd-ungroup1')?.classList.remove('fpd-hidden');
+  document.querySelector('.fpd-ungroup')?.classList.add('fpd-hidden');
+
+  const tagss = document.querySelector('fpd-element-toolbar');
+  if (tagss) {
+    tagss.classList.remove('fpd-show');
+    const imageElements = tagss.querySelectorAll('[data-fabric-type="image"]');
+    imageElements.forEach(el => {
+      el.setAttribute('data-fabric-type', 'group');
+    });
+    t.deselectElement();
+  }
+
+  console.log('grouping completed successfully.', group);
+});
+
+
+// Copy–Paste functionality for group
+let copiedGroup = null;
+
+// Copy group
+document.addEventListener('keydown', e => {
+  if (e.ctrlKey && e.key === 'c') {
+    const activeObject = this.fpdInstance.currentViewInstance?.fabricCanvas.getActiveObject();
+    if (activeObject && activeObject.type === 'group') {
+      activeObject.clone(cloned => {
+        copiedGroup = cloned;
+        console.log('Group copied', copiedGroup);
+      });
+    }
+  }
+});
+
+// Paste group
+document.addEventListener('keydown', e => {
+  if (e.ctrlKey && e.key === 'v') {
+    if (copiedGroup) {
+      copiedGroup.clone(cloned => {
+        cloned.set({
+          left: cloned.left + 10,
+          top: cloned.top + 10
+        });
+        this.fpdInstance.currentViewInstance.fabricCanvas.add(cloned);
+        this.fpdInstance.currentViewInstance.fabricCanvas.setActiveObject(cloned);
+        this.fpdInstance.currentViewInstance.fabricCanvas.renderAll();
+        console.log('Group pasted');
+      });
+    }
+  }
+});
+
+
+
 
 
           G(this.navElem.querySelector('.fpd-ungroup1'), 'click', e => {
@@ -34449,12 +34661,12 @@ console.log("t:", t);
                 const e = t.currentTarget
                 console.log("click data", e, e.classList[0],e.classList, e.className, e.classList.value)
                 if (e.classList.contains('fpd-tool-transform')) {
+                  document.body.classList.add('fpd-toolbar-transform-our');
                   if (e.classList.contains('fpd-active')) {
-                   
+                      document.body.classList.remove('fpd-toolbar-transform-our');
                       e.classList.remove('fpd-active');
                       const subPanel = document.querySelector('.fpd-sub-panel');
                       if (!subPanel) return;
-
                       // Step 2: Remove 'fpd-active' from any active children in sub-panel
                       subPanel.querySelectorAll(':scope > .fpd-active').forEach(el => {
                         el.classList.remove('fpd-active');
@@ -34471,12 +34683,21 @@ console.log("t:", t);
 
                 if (e.classList.contains('fpd-tool-font-family') ) {
                   console.log("active calsss")
+                  if (document.body.classList.contains('fpd-toolbar-transform-our')) {
+                        document.body.classList.remove('fpd-toolbar-transform-our');
+                    }
                   document.body.classList.add('fpd-font-family-active');
                 }
                 else if(e.classList.contains('fpd-tool-color')){
                   document.body.classList.add('fpd-font-family-active');
+                  if (document.body.classList.contains('fpd-toolbar-transform-our')) {
+                        document.body.classList.remove('fpd-toolbar-transform-our');
+                    }
                 }
                 else if(e.classList.contains('fpd-tool-text-size-customize')){
+                  if (document.body.classList.contains('fpd-toolbar-transform-our')) {
+                        document.body.classList.remove('fpd-toolbar-transform-our');
+                    }
                   document.body.classList.add('fpd-tools-custom-data')
                   const panel = document.getElementById('panel-text-size-data');
                   console.log("panel data check",panel);
@@ -34485,6 +34706,15 @@ console.log("t:", t);
                   }
                 }
                 else{ 
+                    console.log("coming to else");
+                    setTimeout(() => {
+
+                      if (document.body.classList.contains('fpd-toolbar-transform-our') && !document.querySelector('.fpd-tool-transform')?.classList.contains('fpd-active')) {
+                          console.log("coming to if",document.querySelector('.fpd-tool-transform').classList);
+                          document.body.classList.remove('fpd-toolbar-transform-our');
+                          console.log("coming to else if");
+                      }
+                    },1000)
                     document.body.classList.remove('fpd-font-family-active');
                     document.body.classList.remove('fpd-tools-custom-data')
                   }

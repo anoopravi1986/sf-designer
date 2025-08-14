@@ -116,13 +116,13 @@ export class HomeComponent implements AfterViewInit {
               for (const group of productGroups) {
                 for (let i = 0; i < group.length; i++) {
                   const product = group[i];
-                  console.log(
-                    'compare',
-                    product.manufacturer,
-                    manufacturer,
-                    this.slugify(product.title),
-                    productTitle
-                  );
+                  // console.log(
+                  //   'compare',
+                  //   product.manufacturer,
+                  //   manufacturer,
+                  //   this.slugify(product.title),
+                  //   productTitle
+                  // );
                   const isMatch =
                     product.manufacturer === manufacturer &&
                     this.slugify(product.title) === productTitle;
@@ -869,7 +869,10 @@ export class HomeComponent implements AfterViewInit {
         positionButton.addEventListener('click', (e) => {
           
             const target = e.currentTarget as HTMLElement;
-
+             if (document.body.classList.contains('fpd-toolbar-transform-our')) {
+                        document.body.classList.remove('fpd-toolbar-transform-our');
+                        document.querySelector('.fpd-tool-transform')?.classList.remove('fpd-active');
+                    }
             var hasClass = target.classList.contains('letter-spac-active');
             if(hasClass){
               // Step 1: Remove 'letter-spac-active' class from the clicked element
@@ -2249,7 +2252,7 @@ setupShareButtonHandlersForAllMenus();
         const container = document.getElementById('content-text');
         if (container) {
           container.innerHTML = html;
-          console.log('Design data loaded successfully:', html);
+          // console.log('Design data loaded successfully:', html);
           this.bottomMenu();
         }
       },
@@ -2279,7 +2282,7 @@ setupShareButtonHandlersForAllMenus();
                     data-tags="${this.escapeHtml(tags)}">`;
 
         for (const span of product.texts) {
-          console.log('Span Data:', span);
+          // console.log('Span Data:', span);
           const paramStr = JSON.stringify(span.parameters).replace(/"/g, '&quot;');
           html += `<span data-parameters='${paramStr}'>${this.escapeHtml(span.text)}</span>`;
         }

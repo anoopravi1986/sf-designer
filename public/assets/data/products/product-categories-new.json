@@ -44,7 +44,7 @@
                                 "top": 330,
                                 "originX": "center",
                                 "originY": "center",
-                                "z": -1,
+                                "z": 0,
                                 "fill": "#252525",
                                 "colors": "#252525",
                                 "colorLinkGroup": "color-shirt",
@@ -67,7 +67,7 @@
                                 "boundingBoxMode": "none",
                                 "opacity": 1,
                                 "excludeFromExport": 0,
-                                "locked": 0,
+                                "editable": 0,
                                 "showInColorSelection": 0,
                                 "boundingBox": 0,
                                 "fixed": false,
@@ -80,7 +80,11 @@
                                 "uploadZone": 0,
                                 "uploadZoneMovable": 0,
                                 "uploadZoneRemovable": false,
-                                "pattern": false
+                                "pattern": false,
+                                "adminLock": true,
+                                "locked": true,
+                                "selectable": false,
+                                "evented": false
                             }
                         },
                         {

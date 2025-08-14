@@ -717,7 +717,7 @@
     padding: 10px;
     max-height: 38px;
     text-align: center;
-    background-image: linear-gradient(to right, #f53744, #ec561d); }.fpd-manage-layers-panel .fpd-cell-2 .eye {
+    background-image: linear-gradient(to right, var(--theme-color), #ec561d); }.fpd-manage-layers-panel .fpd-cell-2 .eye {
     position: absolute;
     left: 7px;
     margin-top: -5px; }.fpd-manage-layers-panel .fpd-list-row > div.fpd-cell-1 .sp-replacer {
@@ -858,7 +858,7 @@
     background: #cce5ff; }.fpd-thumbnail-preview.fpd-designssye > picture, .fpd-thumbnail-preview.undefined > picture {
     background-size: cover;
     border-radius: 15px; }.fpd-grid-columns-2 .fpd-grid > .fpd-item span.ctclass:hover + .seeall {
-    color: #f53744; }#main-container .fpd-grid-columns-2 .fpd-grid > .fpd-item:hover {
+    color: var(--theme-color); }#main-container .fpd-grid-columns-2 .fpd-grid > .fpd-item:hover {
     box-shadow: 0 2px 6px rgba(255, 255, 255, 0.4), 0 0 7px rgba(0, 0, 0, 0.4);
     border: 1px solid #ffffff; }.fpd-container div[data-context="pixabay"] .fpd-loader-wrapper {
     background: transparent;
