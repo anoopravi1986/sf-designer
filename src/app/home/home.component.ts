@@ -1081,6 +1081,8 @@ export class HomeComponent implements AfterViewInit {
       });
 
        document.getElementById('letter-spacing')?.addEventListener('click', (e) => {
+        console.log("e.currentTarget",e.currentTarget)
+            document.body.classList.remove('fpd-toolbar-transform-our');
             const target = e.currentTarget as HTMLElement;
             target.classList.add('letter-spac-active');
            const subPanel = document.querySelector('.fpd-sub-panel');
