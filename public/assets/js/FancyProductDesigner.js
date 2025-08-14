@@ -28247,14 +28247,28 @@ console.log("t:", t);
                   else{
                     // Get the last added object (the new text element)
                     const objects = t.currentViewInstance.fabricCanvas.getObjects();
-                    /*objects.forEach(obj => {
+                    /* objects.forEach(obj => {
                       console.log('Type:', obj.type, 'Title:', obj.title, obj);
                       // You can access properties like obj.left, obj.top, obj.width, obj.height, etc.
-                    });*/
+                    }); */
+
+                    for (let i = objects.length - 1; i >= 0; i--) {
+                      const element = objects[i];
+                      console.log('Type:', element.type, 'Title:', element.title, element);
+                      if (element.type === 'i-text') {
+                        if (element && typeof t.currentViewInstance.fabricCanvas.setActiveObject === 'function') {
+                          t.currentViewInstance.fabricCanvas.setActiveObject(element);
+                          t.currentViewInstance.fabricCanvas.renderAll();
+                          break;
+                        }
+                      }
+                      // You can access properties like obj.left, obj.top, obj.width, obj.height, etc.
+                    }
+
                     console.log(objects, 'objects in canvas');
                     let element = objects[objects.length - 3];
                     //console.log('Newly added element:', element, element.type, element.title);
-                    if(element.type != "i-text"){
+                    /*if(element.type != "i-text"){
                       element = objects[objects.length - 4];
                       //console.log('Newly added element:', element, element.type, element.title);
                     }
@@ -28262,7 +28276,7 @@ console.log("t:", t);
                     if (element && typeof t.currentViewInstance.fabricCanvas.setActiveObject === 'function') {
                         t.currentViewInstance.fabricCanvas.setActiveObject(element);
                         t.currentViewInstance.fabricCanvas.renderAll();
-                    }
+                    } */
               
                   }
                 }
@@ -34464,6 +34478,20 @@ console.log("t:", t);
   }
 
    
+
+  const objects = t.currentViewInstance.fabricCanvas.getObjects();
+  for (let i = objects.length - 1; i >= 0; i--) {
+    const element = objects[i];
+    console.log('Type:', element.type, 'Title:', element.title, element);
+    if (element.type === 'group') {
+      if (element && typeof t.currentViewInstance.fabricCanvas.setActiveObject === 'function') {
+        t.currentViewInstance.fabricCanvas.setActiveObject(element);
+        t.currentViewInstance.fabricCanvas.renderAll();
+        break;
+      }
+    }
+    // You can access properties like obj.left, obj.top, obj.width, obj.height, etc.
+  }
 
   console.log('grouping completed successfully.', group);
 });
