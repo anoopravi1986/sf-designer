@@ -907,6 +907,7 @@ export class HomeComponent implements AfterViewInit {
 
             const elementtoolbar = document.querySelector('fpd-element-toolbar');
             console.log("djjjjj",elementtoolbar)
+            console.log("test test");
             if(elementtoolbar){
               elementtoolbar.classList.add('fpd-panel-visible')
             }
@@ -1084,6 +1085,17 @@ export class HomeComponent implements AfterViewInit {
         console.log("e.currentTarget",e.currentTarget)
             document.body.classList.remove('fpd-toolbar-transform-our');
             const target = e.currentTarget as HTMLElement;
+            if(document.getElementById('letter-spacing')?.classList.contains('letter-spac-active')){
+              console.log("letter-spacing is active")
+              const elementtoolbar = document.querySelector('fpd-element-toolbar');
+              if(elementtoolbar){
+                elementtoolbar.classList.remove('fpd-panel-visible')
+              }
+              document.getElementById('letter-spacing')?.classList.remove('letter-spac-active')
+              return;
+            }
+
+
             target.classList.add('letter-spac-active');
            const subPanel = document.querySelector('.fpd-sub-panel');
             console.log("subPanel data is", subPanel)
@@ -1093,7 +1105,8 @@ export class HomeComponent implements AfterViewInit {
             subPanel.querySelectorAll(':scope > .fpd-active').forEach(el => {
               el.classList.remove('fpd-active');
             });
-
+            
+            
             // Step 3: Find `.fpd-panel-position` inside the same sub-panel
             const positionPanel = subPanel.querySelector('.fpd-panel-text-size');
             if (positionPanel) {
@@ -1103,6 +1116,7 @@ export class HomeComponent implements AfterViewInit {
 
             const elementtoolbar = document.querySelector('fpd-element-toolbar');
             console.log("djjjjj",elementtoolbar)
+            console.log("test testsss");
             if(elementtoolbar){
               elementtoolbar.classList.add('fpd-panel-visible')
             }
