@@ -28157,7 +28157,7 @@ console.log("t:", t);
                       console.log('Type:', obj.type, 'Title:', obj.title, obj);
                       // You can access properties like obj.left, obj.top, obj.width, obj.height, etc.
                     });*/
-                    //console.log(objects, 'objects in canvas');
+                    console.log(objects, 'objects in canvas');
                     let element = objects[objects.length - 3];
                     //console.log('Newly added element:', element, element.type, element.title);
                     if(element.type != "i-text"){
@@ -34292,6 +34292,19 @@ console.log("t:", t);
                 });
 
                 t.deselectElement()
+              }
+
+              const objects = t.currentViewInstance.fabricCanvas.getObjects();
+              let element = objects[objects.length - 3];
+              console.log('Newly added element:', element, element.type, element.title);
+              if(element.type != "group"){
+                element = objects[objects.length - 4];
+                //console.log('Newly added element:', element, element.type, element.title);
+              }
+
+              if (element && typeof t.currentViewInstance.fabricCanvas.setActiveObject === 'function') {
+                t.currentViewInstance.fabricCanvas.setActiveObject(element);
+                t.currentViewInstance.fabricCanvas.renderAll();
               }
               // UI updates
               document.querySelector('.fpd-ungroup1')?.classList.remove('fpd-hidden');
