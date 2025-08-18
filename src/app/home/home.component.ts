@@ -728,57 +728,57 @@ export class HomeComponent implements AfterViewInit {
   }
 
   moveBoldToPrimaryTools(): void {
-    const targetElement = document.getElementById('boldOutside');
+      const targetElement = document.getElementById('boldOutside');
 
-    if (targetElement) {
-      targetElement.addEventListener('click', (event) => {
-          this.designer.currentViewInstance.fabricCanvas.setElementOptions({
-            fontWeight:
+      if (targetElement) {
+        targetElement.addEventListener('click', (event) => {
+            this.designer.currentViewInstance.fabricCanvas.setElementOptions({
+              fontWeight:
+                this.designer.currentViewInstance.fabricCanvas.getActiveObject().fontWeight === 'bold'
+                  ? 'normal'
+                  : 'bold',
+            });
+
+            targetElement.classList.toggle(
+              'active',
               this.designer.currentViewInstance.fabricCanvas.getActiveObject().fontWeight === 'bold'
+            );
+        });
+      }
+
+      const targetElement2 = document.getElementById('fontItalic');
+      if (targetElement2) {
+        targetElement2.addEventListener('click', () => {
+          this.designer.currentViewInstance.fabricCanvas.setElementOptions({
+            fontStyle:
+              this.designer.currentViewInstance.fabricCanvas.getActiveObject().fontStyle === 'italic'
                 ? 'normal'
-                : 'bold',
+                : 'italic',
           });
 
-          targetElement.classList.toggle(
+          targetElement2.classList.toggle(
             'active',
-            this.designer.currentViewInstance.fabricCanvas.getActiveObject().fontWeight === 'bold'
-          );
-      });
-    }
-
-    const targetElement2 = document.getElementById('fontItalic');
-    if (targetElement2) {
-      targetElement2.addEventListener('click', () => {
-        this.designer.currentViewInstance.fabricCanvas.setElementOptions({
-          fontStyle:
             this.designer.currentViewInstance.fabricCanvas.getActiveObject().fontStyle === 'italic'
-              ? 'normal'
-              : 'italic',
+          );
         });
+      }
 
-        targetElement2.classList.toggle(
-          'active',
-          this.designer.currentViewInstance.fabricCanvas.getActiveObject().fontStyle === 'italic'
-        );
-      });
-    }
+      const targetElement3 = document.getElementById('UnderlineText');
+      if (targetElement3) {
+        targetElement3.addEventListener('click', () => {
+          this.designer.currentViewInstance.fabricCanvas.setElementOptions({
+            textDecoration:
+              this.designer.currentViewInstance.fabricCanvas.getActiveObject().textDecoration === 'underline'
+                ? 'normal'
+                : 'underline',
+          });
 
-    const targetElement3 = document.getElementById('UnderlineText');
-    if (targetElement3) {
-      targetElement3.addEventListener('click', () => {
-        this.designer.currentViewInstance.fabricCanvas.setElementOptions({
-          textDecoration:
+          targetElement3.classList.toggle(
+            'active',
             this.designer.currentViewInstance.fabricCanvas.getActiveObject().textDecoration === 'underline'
-              ? 'normal'
-              : 'underline',
+          );
         });
-
-        targetElement3.classList.toggle(
-          'active',
-          this.designer.currentViewInstance.fabricCanvas.getActiveObject().textDecoration === 'underline'
-        );
-      });
-    }
+      }
 
       const targetElement4 = document.getElementById('TextTransform');
 
@@ -1097,7 +1097,7 @@ export class HomeComponent implements AfterViewInit {
 
 
             target.classList.add('letter-spac-active');
-           const subPanel = document.querySelector('.fpd-sub-panel');
+            const subPanel = document.querySelector('.fpd-sub-panel');
             console.log("subPanel data is", subPanel)
             if (!subPanel) return;
 
@@ -1124,127 +1124,127 @@ export class HomeComponent implements AfterViewInit {
        
 
        function setupShareButtonHandlersForAllMenus() {
-  const shareMenus = document.querySelectorAll('.fpd-share-menussss');
+          const shareMenus = document.querySelectorAll('.fpd-share-menussss');
 
-  shareMenus.forEach((shareMenu) => {
-    const observer = new MutationObserver((mutations) => {
-      mutations.forEach((mutation) => {
-        if (
-          mutation.type === 'attributes' &&
-          mutation.attributeName === 'style'
-        ) {
-          const display = window.getComputedStyle(shareMenu as HTMLElement).display;
-          if (display === 'block') {
-            const shareBtn = shareMenu.querySelector('.fpd-share-link-btn');
-            if (shareBtn) {
-              // Prevent duplicate bindings
-              shareBtn.removeEventListener('click', handleShareClick);
-              shareBtn.addEventListener('click', handleShareClick, { once: true });
-            }
+          shareMenus.forEach((shareMenu) => {
+            const observer = new MutationObserver((mutations) => {
+              mutations.forEach((mutation) => {
+                if (
+                  mutation.type === 'attributes' &&
+                  mutation.attributeName === 'style'
+                ) {
+                  const display = window.getComputedStyle(shareMenu as HTMLElement).display;
+                  if (display === 'block') {
+                    const shareBtn = shareMenu.querySelector('.fpd-share-link-btn');
+                    if (shareBtn) {
+                      // Prevent duplicate bindings
+                      shareBtn.removeEventListener('click', handleShareClick);
+                      shareBtn.addEventListener('click', handleShareClick, { once: true });
+                    }
+                  }
+                }
+              });
+            });
+
+            observer.observe(shareMenu, {
+              attributes: true,
+              attributeFilter: ['style'],
+            });
+          });
+        }
+
+        function handleShareClick(e: Event) {
+          alert("check");
+          e.stopPropagation();
+          e.preventDefault();
+          console.log('Share button clicked', e);
+
+          const target = e.currentTarget as HTMLElement;
+
+          // Traverse up to find closest `.fpd-item`
+          const parentItem = target.closest('.fpd-item.fpd-hover-thumbnail.ts') as HTMLElement;
+
+          if (!parentItem) {
+            alert('Design element not found.');
+            return;
           }
+
+          const dataSource = parentItem.getAttribute('data-source');
+          const dataTitle = parentItem.getAttribute('data-title');
+
+          const storedData = localStorage.getItem('clothing-designer');
+
+            let matchedData: any[] = [];
+
+            if (storedData) {
+              try {
+                const parsedData = JSON.parse(storedData);
+
+                if (Array.isArray(parsedData)) {
+                  // Step 2: Find all items that match dataTitle
+                  matchedData = parsedData.filter(item => item.title === dataTitle);
+
+                  console.log("Matched Data of:", matchedData);
+                } else {
+                  console.error("Data is not an array:", parsedData);
+                }
+              } catch (err) {
+                console.error("Failed to parse localStorage data:", err);
+              }
+            } else {
+              console.warn("No data found in localStorage for key:");
+            }
+            console.log("matchedData",matchedData, matchedData[0]?.design_id)
+          if (!dataSource || !dataTitle) {
+            alert('Missing design data.');
+            return;
+          }
+
+          // API call to search product by title
+        fetch(`https://styleflip-backend-jdm5.ithemes.xyz/api/sharedproduct/search?title=${encodeURIComponent(dataTitle)}&design_id=${matchedData[0]?.design_id}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        })
+          .then(response => response.json())
+          .then(data => {
+            console.log('Search API Response:', data);
+
+            // Assuming API returns: { products: [{ _id: '...', title: '...' }, ...] }
+            if (data && data.product && data.product.length > 0) {
+              const firstProduct = data.product[0]; // Take the first matching product
+              const urlBase = window.location.origin;
+              const shareUrl = `${urlBase}/savedesign?design_id=${data.design_id}&title=${encodeURIComponent(data.title)}`;
+
+              const urlField = document.querySelector('.fpd-share-link-url');
+              const copyBtn = document.querySelector('.fpd-share-link-btn');
+
+              if (urlField) urlField.textContent = shareUrl;
+
+              if (navigator.clipboard && copyBtn) {
+                navigator.clipboard.writeText(shareUrl).then(() => {
+                  copyBtn.textContent = 'Copied!';
+                  setTimeout(() => {
+                    copyBtn.textContent = 'Copy Link';
+                  }, 1200);
+                });
+              } else {
+                window.prompt('Copy this link:', shareUrl);
+              }
+            } else {
+              alert('No product found with this title.');
+            }
+          })
+          .catch(err => {
+            console.error('Error searching product:', err);
+            alert('Error searching product.');
+          });
+
         }
-      });
-    });
 
-    observer.observe(shareMenu, {
-      attributes: true,
-      attributeFilter: ['style'],
-    });
-  });
-}
-
-function handleShareClick(e: Event) {
-  alert("check");
-  e.stopPropagation();
-  e.preventDefault();
-  console.log('Share button clicked', e);
-
-  const target = e.currentTarget as HTMLElement;
-
-  // Traverse up to find closest `.fpd-item`
-  const parentItem = target.closest('.fpd-item.fpd-hover-thumbnail.ts') as HTMLElement;
-
-  if (!parentItem) {
-    alert('Design element not found.');
-    return;
-  }
-
-  const dataSource = parentItem.getAttribute('data-source');
-  const dataTitle = parentItem.getAttribute('data-title');
-
-  const storedData = localStorage.getItem('clothing-designer');
-
-    let matchedData: any[] = [];
-
-    if (storedData) {
-      try {
-        const parsedData = JSON.parse(storedData);
-
-        if (Array.isArray(parsedData)) {
-          // Step 2: Find all items that match dataTitle
-          matchedData = parsedData.filter(item => item.title === dataTitle);
-
-          console.log("Matched Data of:", matchedData);
-        } else {
-          console.error("Data is not an array:", parsedData);
-        }
-      } catch (err) {
-        console.error("Failed to parse localStorage data:", err);
-      }
-    } else {
-      console.warn("No data found in localStorage for key:");
-    }
-    console.log("matchedData",matchedData, matchedData[0]?.design_id)
-  if (!dataSource || !dataTitle) {
-    alert('Missing design data.');
-    return;
-  }
-
-  // API call to search product by title
-fetch(`https://styleflip-backend-jdm5.ithemes.xyz/api/sharedproduct/search?title=${encodeURIComponent(dataTitle)}&design_id=${matchedData[0]?.design_id}`, {
-  method: 'GET',
-  headers: {
-    'Content-Type': 'application/json'
-  }
-})
-  .then(response => response.json())
-  .then(data => {
-    console.log('Search API Response:', data);
-
-    // Assuming API returns: { products: [{ _id: '...', title: '...' }, ...] }
-    if (data && data.product && data.product.length > 0) {
-      const firstProduct = data.product[0]; // Take the first matching product
-      const urlBase = window.location.origin;
-      const shareUrl = `${urlBase}/savedesign?design_id=${data.design_id}&title=${encodeURIComponent(data.title)}`;
-
-      const urlField = document.querySelector('.fpd-share-link-url');
-      const copyBtn = document.querySelector('.fpd-share-link-btn');
-
-      if (urlField) urlField.textContent = shareUrl;
-
-      if (navigator.clipboard && copyBtn) {
-        navigator.clipboard.writeText(shareUrl).then(() => {
-          copyBtn.textContent = 'Copied!';
-          setTimeout(() => {
-            copyBtn.textContent = 'Copy Link';
-          }, 1200);
-        });
-      } else {
-        window.prompt('Copy this link:', shareUrl);
-      }
-    } else {
-      alert('No product found with this title.');
-    }
-  })
-  .catch(err => {
-    console.error('Error searching product:', err);
-    alert('Error searching product.');
-  });
-
-}
-
-// Run after DOM is ready
-setupShareButtonHandlersForAllMenus();
+        // Run after DOM is ready
+        setupShareButtonHandlersForAllMenus();
 
 
 
@@ -1313,7 +1313,44 @@ setupShareButtonHandlersForAllMenus();
           }
         });
 
-    
+
+        document.addEventListener("click", function (e:any) {
+            // Find the toolbar ancestor
+            const toolbar = e.target.closest("fpd-element-toolbar");
+            if (!toolbar) return; // click was outside
+            console.log("toolbar is", toolbar);
+            // Check if clicked element (or closest) has title or data-panel
+           
+            
+            if (toolbar.classList.contains("fpd-show")) {
+               const target = e.target.closest("[title], [data-panel]");
+                console.log("target is", target);
+                if (!target) return;
+
+              // Prefer title, fallback to data-panel
+              const value = target.getAttribute("title") || target.getAttribute("data-panel");
+              console.log("target value is", value);
+              if (!value) return;
+  
+              const newClass = "my-" + value.toLowerCase().replace(/\s+/g, '-');
+  
+              // Update class
+              toolbar.classList.forEach((c:any) => {
+                if (c.startsWith("my-")) toolbar.classList.remove(c);
+              });
+
+              toolbar.classList.add(newClass);
+            }
+            else {
+                // If fpd-show is missing → remove all my-* classes
+                toolbar.classList.forEach((c: any) => {
+                  if (c.startsWith("my-")) toolbar.classList.remove(c);
+                });
+              }
+
+            console.log("Toolbar updated with class:", toolbar.className);
+          });
+        
     }
 
   slugify(title: string): string {

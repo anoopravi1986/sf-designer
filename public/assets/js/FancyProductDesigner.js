@@ -34341,7 +34341,7 @@ console.log("t:", t);
               this.subPanel.querySelectorAll('.fpd-curved-options > span'),
               'click',
               e => {
-                
+               
                 const i = e.currentTarget
                 let n = {}
                 'normal' == i.dataset.value
@@ -34349,10 +34349,67 @@ console.log("t:", t);
                   : ((n.curved = !0),
                     (n.curveReverse = 'curveReverse' == i.dataset.value)),
                   t.currentViewInstance.fabricCanvas.setElementOptions(n),
-                  Kr(this, ca, Aa).call(this, n)
-                  document.querySelectorAll('fpd-element-toolbar').forEach(el => {
-                    el.classList.add('fpd-show');
-                  });
+                  // Kr(this, ca, Aa).call(this, n)
+                   console.log("curved text is clicked",t.currentViewInstance, "options", n);
+                  
+                  const activeElementOptions = t.currentViewInstance.fabricCanvas._objects.find(obj => obj.type === 'curved-text');
+                  console.log("activeElementOptions", activeElementOptions);
+
+                  const fabricCanvas = t.currentViewInstance.fabricCanvas;
+                  console.log("fabricCanvas", fabricCanvas);
+                  const activeObj = t.currentViewInstance.fabricCanvas.getActiveObject();
+                  console.log("activeObj", activeObj);
+                  if (activeObj) {
+                      // Change Fabric object type
+                      activeObj.type = 'curved-text';
+                      activeObj.set('fabricType', 'curved-text');
+
+                      // Update corresponding toolbar in DOM
+                      const toolbarEl = document.querySelector(`fpd-element-toolbar[data-id="${activeObj.id}"]`);
+                      if (toolbarEl) {
+                          toolbarEl.dataset.fabricType = 'curved-text';
+                          toolbarEl.classList.add('fpd-show');
+                          console.log("Toolbar updated for curved text:", toolbarEl);
+                      }
+                  }
+                  // t.currentViewInstance.fabricCanvas.addElement(
+                  //   'curved-text',
+                  //   t.currentViewInstance.fabricCanvas.textPlaceholder.text, // title
+                  //   t.currentViewInstance.fabricCanvas.textPlaceholder.text, // actual text
+                  //   activeElementOptions
+                  // );
+                  // const curvedObj = t.currentViewInstance.fabricCanvas.addElement(
+                  //     'curved-text',
+                  //     activeElementOptions.text, // title
+                  //     activeElementOptions.text,
+                  //     activeElementOptions
+                  // );
+
+                  // // Ensure Fabric object type is set
+                  // curvedObj.type = 'curved-text';
+                  // curvedObj.set('fabricType', 'curved-text');
+                  // t.currentViewInstance.fabricCanvas.setActiveObject(curvedObj);
+                  
+                  t.currentViewInstance.fabricCanvas.renderAll();
+
+                  // console.log("Converted text to curved-text with properties:", props);
+                  // const fabricCanvas = t.currentViewInstance.fabricCanvas;
+
+                  // // Find all elements in the canvas that are linked to the toolbars
+                  // fabricCanvas.getObjects().forEach(obj => {
+                  //   if (obj && obj.type) {
+                  //     // If you specifically want to change only certain elements:
+                  //     // if (obj.type === 'text' || obj.type === 'group') { ... }
+
+                  //     // Change the internal type property to curved-text
+                  //     obj.type = 'curved-text';
+
+                  //     // Optional: if using custom property for FPD
+                  //     obj.set('fabricType', 'curved-text');
+                  //   }
+                  // });
+                  // fabricCanvas.renderAll();
+
               }
             ),
             G(this.navElem.querySelector('.fpd-tool-reset'), 'click', e => {

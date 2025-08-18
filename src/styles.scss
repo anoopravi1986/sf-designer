@@ -53,10 +53,27 @@ fpd-module-uploads .fpd-item.fpd-hover-thumbnail.ts .fa-solid.fa-trash{display: 
       .fpd-panel-curved-text{display: block;}
     }
   }
+  fpd-element-toolbar[class*="my-"] {
+    .fpd-panel-color.fpd-active, .fpd-panel-font-family, .fpd-panel-text-size.fpd-active{
+      display: none !important;
+    }
+  }
+  fpd-element-toolbar.my-color {.fpd-panel-color.fpd-active{
+    display: flex !important;
+  }}
+  fpd-element-toolbar.my-text-size {.fpd-panel-text-size.fpd-active{
+    display: flex !important;
+  }}
+  .my-text-size .fpd-close-sub-panel{    position: fixed;left: 674px;right: auto;top: 153px;z-index: 9;box-shadow: none;padding: 0;max-width: 20px;width: 20px;min-width: 15px;justify-content: center;}
+  fpd-element-toolbar.my-font-family {.fpd-panel-font-family.fpd-active{
+    display: flex !important;
+  }}
   fpd-element-toolbar[data-element-type="text"] {min-width: 782px;}
   .fpd-letter-spacing-lineheight{position: fixed;background: #fff;max-width: 300px;max-height: 170px;border-radius: 7px;border: 1px solid #e5e5e5;margin-left: 220px;box-shadow:0 0 10px rgba(110,111,114,.22);}
   fpd-element-toolbar .fpd-sub-panel>div.fpd-active.fpd-panel-position{position: fixed;background: #fff;max-width: 300px;height: 90px;border-radius: 7px;border: 1px solid #e5e5e5;margin-left: 270px;box-shadow:0 0 10px rgba(110,111,114,.22);.fpd-tool-position-align{margin-bottom: 0;}}
-  .fpd-panel-font-family.fpd-padding.fpd-active, fpd-element-toolbar[data-element-type="text"] .fpd-panel-color.fpd-active{position: fixed;left:70px;top:56px;max-width: 360px;max-height: calc(100vh - 56px);overflow: auto;z-index: 99;background: #fff;}
+  .fpd-panel-font-family.fpd-padding.fpd-active, 
+  fpd-element-toolbar.my-color .fpd-panel-color.fpd-active,fpd-element-toolbar.my-font-family .fpd-panel-color.fpd-active
+  {position: fixed;left:70px;top:56px;max-width: 360px;max-height: calc(100vh - 56px);overflow: auto;z-index: 99;background: #fff;}
   fpd-module-text div[data-moduleicon="type-outline"]{    max-width: calc(100% - 15px)}
   fpd-module-images div[data-moduleicon="cloud-upload"]{margin-top: -18px;}
   fpd-actions-bar div[data-pos="left"]{margin-left: 341px;.fpd-btn span{display: none;}}
@@ -343,7 +360,7 @@ fpd-module-save-load .fpd-item{.fpd-three-dot-menu{display: none;}&:hover{.fpd-t
 #TextTransform span{font-weight: 600;}
 fpd-module-save-load .fpd-three-dot-menu{    position: absolute;top: 8px;z-index: 99;right: 8px;background: #fffc;min-width: 29px;text-align: center;height: 24px;border-radius: 4px;svg{display: inline-block;}}
 fpd-module-images .fpd-three-dot-menu{width: 20px;height: 20px;position: absolute;top: 0;z-index: 99;right: 0;svg{display: inline-block;}}
-.fpd-font-family-active fpd-element-toolbar.fpd-layout-large .fpd-close-sub-panel{    position: fixed;left: 393px;top: 99px;right: auto;box-shadow: none;z-index: 100;}
+fpd-element-toolbar.fpd-layout-large.my-font-family .fpd-close-sub-panel, fpd-element-toolbar.fpd-layout-large.my-color .fpd-close-sub-panel{    position: fixed;left: 393px;top: 99px;right: auto;box-shadow: none;z-index: 100;}
 .fpd-pos-data-sec{.fpd-panel-tabs{display: none !important;}.fpd-panel-tabs-content{div[data-id="align"]{display: block;}}}
 
 // Css added by Anoop for Font Family 
