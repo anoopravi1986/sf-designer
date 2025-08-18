@@ -875,6 +875,7 @@ export class HomeComponent implements AfterViewInit {
                     }
             var hasClass = target.classList.contains('letter-spac-active');
             if(hasClass){
+              var toolbar = e.target ? (e.target as HTMLElement).closest("fpd-element-toolbar") : null;
               // Step 1: Remove 'letter-spac-active' class from the clicked element
               target.classList.remove('letter-spac-active');
               const subPanel = document.querySelector('.fpd-sub-panel');
@@ -884,6 +885,11 @@ export class HomeComponent implements AfterViewInit {
               subPanel.querySelectorAll(':scope > .fpd-active').forEach(el => {
                 el.classList.remove('fpd-active');
               });
+              if (toolbar) {
+                toolbar.classList.forEach((c: any) => {
+                  if (toolbar && c.startsWith("my-")) toolbar.classList.remove(c);
+                });
+              }
 
               return;
             }
@@ -1335,9 +1341,11 @@ export class HomeComponent implements AfterViewInit {
               const newClass = "my-" + value.toLowerCase().replace(/\s+/g, '-');
   
               // Update class
-              toolbar.classList.forEach((c:any) => {
-                if (c.startsWith("my-")) toolbar.classList.remove(c);
-              });
+              if (toolbar) {
+                toolbar.classList.forEach((c:any) => {
+                  if (c.startsWith("my-")) toolbar.classList.remove(c);
+                });
+              }
 
               toolbar.classList.add(newClass);
             }

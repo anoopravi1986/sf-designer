@@ -64,7 +64,14 @@ fpd-module-uploads .fpd-item.fpd-hover-thumbnail.ts .fa-solid.fa-trash{display: 
   fpd-element-toolbar.my-text-size {.fpd-panel-text-size.fpd-active{
     display: flex !important;
   }}
-  .my-text-size .fpd-close-sub-panel{    position: fixed;left: 674px;right: auto;top: 153px;z-index: 9;box-shadow: none;padding: 0;max-width: 20px;width: 20px;min-width: 15px;justify-content: center;}
+  fpd-element-toolbar.my-position{
+    .fpd-close-sub-panel{top: 74px;right: auto;left: 555px;z-index: 9;padding: 0;min-width: 14px;box-shadow: none;}
+  }
+  fpd-element-toolbar.my-letter-spacing{
+    .fpd-close-sub-panel{top: 77px;right: auto;left: 503px;z-index: 9;padding: 0;min-width: 14px;box-shadow: none;}
+    .fpd-panel-text-size.fpd-letter-spacing-lineheight{display: flex !important;}
+  }
+  .my-text-size .fpd-close-sub-panel{        position: absolute;left: 206px;top: 70px;right:auto;z-index: 9;box-shadow: none;padding: 0;max-width: 20px;width: 20px;min-width: 15px;justify-content: center;}
   fpd-element-toolbar.my-font-family {.fpd-panel-font-family.fpd-active{
     display: flex !important;
   }}
