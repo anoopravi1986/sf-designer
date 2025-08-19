@@ -34823,9 +34823,17 @@ G(this.navElem.querySelector('.fpd-group-paste-by'), 'click', e => {
                   document.body.classList.add('fpd-font-family-active');
                   if (document.body.classList.contains('fpd-toolbar-transform-our')) {
                         document.body.classList.remove('fpd-toolbar-transform-our');
-                    }
+                  }
+                  if(e.classList.contains('fpd-active')){
+                    console.log("text size customize clicked inside", e.classList);
+                    document.querySelector('.fpd-tool-color')?.classList.remove('fpd-active');
+                    document.querySelector('.fpd-panel-color')?.classList.remove('fpd-active');
+                    document.querySelector('fpd-element-toolbar').classList.remove('my-color', 'fpd-panel-visible');
+                    return 0
+                  }
                 }
                 else if(e.classList.contains('fpd-tool-text-size-customize')){
+                  console.log("text size customize clicked", e.classList);
                   if (document.body.classList.contains('fpd-toolbar-transform-our')) {
                         document.body.classList.remove('fpd-toolbar-transform-our');
                     }
@@ -34834,6 +34842,13 @@ G(this.navElem.querySelector('.fpd-group-paste-by'), 'click', e => {
                   console.log("panel data check",panel);
                   if (panel?.classList.contains('fpd-letter-spacing-lineheight')) {
                     panel.classList.remove('fpd-letter-spacing-lineheight');
+                  }
+                  if(e.classList.contains('fpd-active')){
+                     console.log("text size customize clicked inside", e.classList);
+                    document.querySelector('.fpd-tool-text-size-customize')?.classList.remove('fpd-active');
+                    document.querySelector('#panel-text-size-data')?.classList.remove('fpd-active');
+                    document.querySelector('fpd-element-toolbar').classList.remove('my-text-size', 'fpd-panel-visible');
+                    return 0
                   }
                 }
                 else{ 

@@ -869,6 +869,10 @@ export class HomeComponent implements AfterViewInit {
         positionButton.addEventListener('click', (e) => {
           
             const target = e.currentTarget as HTMLElement;
+            console.log("target is aad",document.querySelector('.fpd-panel-position')?.classList);
+            if (document.querySelector('.fpd-panel-position')?.classList.contains('fpd-active')) {
+              document.querySelector('fpd-element-toolbar')?.classList.remove('fpd-panel-visible','my-position');
+            }
              if (document.body.classList.contains('fpd-toolbar-transform-our')) {
                         document.body.classList.remove('fpd-toolbar-transform-our');
                         document.querySelector('.fpd-tool-transform')?.classList.remove('fpd-active');
