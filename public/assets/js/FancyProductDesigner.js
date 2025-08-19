@@ -35217,7 +35217,9 @@ G(this.navElem.querySelector('.fpd-group-paste-by'), 'click', e => {
             'duplicate',
             t.copyable || t.__editorMode
           ),
-          Kr(this, ia, ya).call(this, 'remove', t.removable || t.__editorMode),
+          // code comment by anoop and added the static value
+          //Kr(this, ia, ya).call(this, 'remove', t.removable || t.__editorMode),
+          Kr(this, ia, ya).call(this, 'remove', 'true'),
           this.subPanel.querySelectorAll('.fpd-panel-tabs').forEach(t => {
             const e = t.querySelectorAll('[data-tab]:not(.fpd-hidden)')
             J(t, ['fpd-hidden'], e.length <= 1), e.item(0) && e.item(0).click()
