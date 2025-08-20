@@ -1296,6 +1296,12 @@ export class HomeComponent implements AfterViewInit {
                 console.log('Class "fpd-active" was removed from #panel-text-size-data');
                 // ✅ Your condition logic here
               }
+              //let lettspac = document.querySelector('.letter-spac-active');
+              /*const transformSpac = document.querySelector('.fpd-tool-transform');
+              let transformActive = transformSpac.classList.contains('fpd-active');
+              if(transformActive){
+              document.querySelector('.fpd-tool-transform')?.classList.remove('fpd-active');
+              }*/
             }
           }
         });
@@ -1325,11 +1331,21 @@ export class HomeComponent implements AfterViewInit {
 
 
         document.addEventListener("click", function (e:any) {
+         
             // Find the toolbar ancestor
             const toolbar = e.target.closest("fpd-element-toolbar");
             if (!toolbar) return; // click was outside
             console.log("toolbar is", toolbar);
             // Check if clicked element (or closest) has title or data-panel
+           
+           if(e.target.classList.contains("fa-close")) {
+            console.log("e.target is", e.target);
+              const transformSpac = document.querySelector('.fpd-tool-transform');
+              let transformActive = transformSpac?.classList.contains('fpd-active');
+              if(transformActive){
+              document.querySelector('.fpd-tool-transform')?.classList.remove('fpd-active');
+              }
+            }
            
             
             if (toolbar.classList.contains("fpd-show")) {
@@ -1356,7 +1372,10 @@ export class HomeComponent implements AfterViewInit {
             else {
                 // If fpd-show is missing → remove all my-* classes
                 toolbar.classList.forEach((c: any) => {
-                  if (c.startsWith("my-")) toolbar.classList.remove(c);
+                  if (c.startsWith("my-")) { 
+                    console.log("removing class", c);
+                    toolbar.classList.remove(c); 
+                  }
                 });
               }
 
