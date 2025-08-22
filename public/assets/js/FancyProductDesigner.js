@@ -35145,10 +35145,10 @@ G(this.navElem.querySelector('.fpd-group-paste-by'), 'click', e => {
           }),
             G(this.navElem.querySelector('.fpd-tool-remove'), 'click', e => {
               console.log("remove clicked", e, t)
-              document.querySelector('.fpd-ungroup1')?.classList.add('fpd-hidden');
-              document.querySelector('.fpd-ungroup')?.classList.remove('fpd-hidden');
-              document.querySelector('.fpd-group-copy-by')?.classList.add('fpd-hidden');
-              document.querySelector('.fpd-group-paste-by')?.classList.add('fpd-hidden');
+              //document.querySelector('.fpd-ungroup1')?.classList.add('fpd-hidden');
+              //document.querySelector('.fpd-ungroup')?.classList.remove('fpd-hidden');
+              //document.querySelector('.fpd-group-copy-by')?.classList.add('fpd-hidden');
+              //document.querySelector('.fpd-group-paste-by')?.classList.add('fpd-hidden');
               t.currentViewInstance.fabricCanvas.removeElement(t.currentElement)
             }),
             G(
