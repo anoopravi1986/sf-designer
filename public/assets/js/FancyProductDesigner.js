@@ -20996,7 +20996,6 @@
 
                 // Delete the .fpd-item element
                 buttonDel.addEventListener('click', function (e) {
-                  alert("check")
                   e.stopPropagation(); // Prevent triggering the outside click close
                    const itemEl = e.target.closest('.ts'); // Adjust selector if needed
                   const title = itemEl?.getAttribute('data-title');
@@ -21207,7 +21206,6 @@
 
                 // Delete the .fpd-item element
                 buttonDel.addEventListener('click', function (e) {
-                  alert("check")
                   e.stopPropagation(); // Prevent triggering the outside click close
                   if (parentItem) {
                     console.log("parentItem", parentItem)
@@ -27921,7 +27919,7 @@ console.log("t:", t);
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"><path fill="currentColor" d="m14.8 16.382-4.205-4.205a.25.25 0 0 1 0-.354L14.8 7.618a.75.75 0 0 0-1.06-1.06l-4.206 4.204a1.75 1.75 0 0 0 0 2.475l4.206 4.205a.75.75 0 0 0 1.06-1.06"></path></svg>
                             `
               leftArrow.className =
-                'absolute left-0 top-[15px] -translate-y-1/2 z-[9] bg-gradient-to-r from-white/0 to-white shadow p-1 rounded-full hover:bg-gray-100'
+                'absolute left-0 top-[15px] -translate-y-1/2 z-[9] bg-gradient-to-r from-white/0 to-white shadow p-1 rounded-full hover:bg-gray-100 my-bitt'
               leftArrow.disabled = true
 
               const rightArrow = document.createElement('button')
@@ -27949,6 +27947,7 @@ console.log("t:", t);
 
               leftArrow.onclick = () => {
                 const tag = flexWrapper.querySelector('div')
+                console.log('tag', tag)
                 if (tag) {
                   const scrollAmount = tag.offsetWidth * 2 + 16
                   currentOffset += scrollAmount
@@ -27958,6 +27957,7 @@ console.log("t:", t);
 
               rightArrow.onclick = () => {
                 const tag = flexWrapper.querySelector('div')
+                console.log('tag', tag)
                 if (tag) {
                   const scrollAmount = tag.offsetWidth * 2 + 16
                   currentOffset -= scrollAmount
@@ -28457,14 +28457,37 @@ console.log("t:", t);
                 filterContainerSearch.style.marginLeft = ''
               })
 
+
+              // Insert arrows
+              const leftArrow = document.createElement("button");
+              leftArrow.className =
+                "absolute left-0 z-[9] -translate-y-1/2 bg-gradient-to-l from-white/0 to-white shadow p-0 rounded-full hover:bg-gray-100 disabled:hidden top-1/2";
+              leftArrow.innerHTML = `
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none">
+                  <path fill="currentColor" d="m14.784 16.381-4.204-4.204a.25.25 0 0 1 0-.354l4.204-4.204a.75.75 0 0 0-1.06-1.061l-4.205 4.204a1.75 1.75 0 0 0 0 2.475l4.204 4.205a.75.75 0 0 0 1.061-1.06"></path>
+                </svg>
+              `;
+
+              const rightArrow = document.createElement("button");
+              rightArrow.className =
+                "absolute right-0 z-[9] -translate-y-1/2 bg-gradient-to-r from-white/0 to-white shadow p-0 rounded-full hover:bg-gray-100 disabled:hidden top-1/2";
+              rightArrow.innerHTML = `
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none">
+                  <path fill="currentColor" d="m9.216 7.619 4.204 4.204a.25.25 0 0 1 0 .354l-4.204 4.204a.75.75 0 0 0 1.06 1.061l4.205-4.204a1.75 1.75 0 0 0 0-2.475l-4.204-4.205a.75.75 0 0 0-1.061 1.06"></path>
+                </svg>
+              `;
+              const tagWrapperMain = document.createElement("div");
+              tagWrapperMain.className = "relative top-[201px] flex items-center";
               // Create a tag filter UI
               const targetContainermain = document.createElement('div')
               targetContainermain.className =
                 'w-full overflow-auto [scrollbar-width:none] scrollbar-hide'
 
+
+
               const tagContainerText = document.createElement('div')
               tagContainerText.className =
-                'fpd-tag-filter flex gap-2 mb-4 flex-nowrap overflow-x-auto'
+                'fpd-tag-filter flex gap-2 mb-0 flex-nowrap overflow-x-auto'
 
               allTagsSet.forEach(tag => {
                 const tagButton = document.createElement('button')
@@ -28508,7 +28531,55 @@ console.log("t:", t);
                 tagContainerText.appendChild(tagButton)
               })
 
+              tagWrapperMain.appendChild(leftArrow)
+              tagWrapperMain.appendChild(tagContainerText)
+              tagWrapperMain.appendChild(rightArrow)
+              
               targetContainermain.appendChild(resetBtn)
+              let currentOffset = 0
+              // Update arrow states
+              function updateArrows () {
+                const wrapperWidth = targetContainermain.offsetWidth
+                const contentWidth = tagContainerText.scrollWidth
+                console.log('wrapperWidth', wrapperWidth)
+                console.log('contentWidth', contentWidth) 
+                // Prevent scrolling beyond bounds
+                if (currentOffset > 0) currentOffset = 0
+                if (Math.abs(currentOffset) >= contentWidth - wrapperWidth) {
+                  currentOffset = -1 * (contentWidth - wrapperWidth)
+                }
+
+                // Apply transform
+                tagContainerText.style.transform = `translateX(${currentOffset}px)`
+
+                // Enable or disable arrows
+                leftArrow.disabled = currentOffset === 0
+                rightArrow.disabled =
+                  Math.abs(currentOffset) >= contentWidth - wrapperWidth - 1 // Allow 1px tolerance
+              }
+
+              // Scroll left
+              leftArrow.onclick = () => {
+                const tag = tagContainerText.querySelector('button')
+                console.log('tag', tag)
+                if (tag) {
+                  const scrollAmount = tag.offsetWidth * 2 + 16
+                  currentOffset += scrollAmount
+                  updateArrows()
+                }
+              }
+
+              // Scroll right
+              rightArrow.onclick = () => {
+                const tag = tagContainerText.querySelector('button')
+                console.log(tagContainerText, 'tag', tag)
+                if (tag) {
+                  const scrollAmount = tag.offsetWidth * 2 + 16
+                  currentOffset -= scrollAmount
+                  updateArrows()
+                }
+              }
+              
 
               searchInput.addEventListener('input', () => {
                 console.log('enter happen')
@@ -28527,7 +28598,8 @@ console.log("t:", t);
               })
 
               // Append tag filter UI to top of your `target`
-              targetContainermain.prepend(tagContainerText)
+              targetContainermain.prepend(tagWrapperMain)
+              // targetContainermain.prepend(tagContainerText)
               target.appendChild(filterContainerSearch)
               target.appendChild(targetContainermain)
 
@@ -28549,307 +28621,309 @@ console.log("t:", t);
               // }
 
               categoryBlocks.forEach(categoryBlock => {
-  const categoryName = categoryBlock.getAttribute('data-category') || 'Uncategorized';
+                const categoryName = categoryBlock.getAttribute('data-category') || 'Uncategorized';
 
-  const categoryContainer = document.createElement('div');
-  categoryContainer.className = 'box-contain-text relative';
+                const categoryContainer = document.createElement('div');
+                categoryContainer.className = 'box-contain-text relative';
 
-  const categoryTitle = document.createElement('div');
-  categoryTitle.className = 'fpd-category-title text-md font-semibold mb-2 mt-4';
-  categoryTitle.textContent = categoryName;
+                const categoryTitle = document.createElement('div');
+                categoryTitle.className = 'fpd-category-title text-md font-semibold mb-2 mt-4';
+                categoryTitle.textContent = categoryName;
 
-  categoryContainer.appendChild(categoryTitle);
+                categoryContainer.appendChild(categoryTitle);
 
-  const products = categoryBlock.querySelectorAll('.fpd-product');
+                const products = categoryBlock.querySelectorAll('.fpd-product');
 
-  products.forEach(product => {
-    const title = product.getAttribute('title') || 'Untitled';
-    const thumbnail = product.getAttribute('data-thumbnail') || '';
-    const tags = product.getAttribute('data-tags') || '';
-    const spans = product.querySelectorAll('span');
+                products.forEach(product => {
+                  const title = product.getAttribute('title') || 'Untitled';
+                  const thumbnail = product.getAttribute('data-thumbnail') || '';
+                  const tags = product.getAttribute('data-tags') || '';
+                  const spans = product.querySelectorAll('span');
 
-    if (spans.length > 0) {
-      const newDiv = document.createElement('div');
-      newDiv.className = 'fpd-item fpd-itemimg group';
-      newDiv.setAttribute('data-title', title);
-      newDiv.setAttribute('data-type', 'text');
-      newDiv.setAttribute('data-thumbnail', thumbnail);
-      newDiv.setAttribute('data-tags', tags);
+                  if (spans.length > 0) {
+                    const newDiv = document.createElement('div');
+                    newDiv.className = 'fpd-item fpd-itemimg group';
+                    newDiv.setAttribute('data-title', title);
+                    newDiv.setAttribute('data-type', 'text');
+                    newDiv.setAttribute('data-thumbnail', thumbnail);
+                    newDiv.setAttribute('data-tags', tags);
 
-      const picture = document.createElement('picture');
-      picture.setAttribute('data-img', title);
-      picture.style.backgroundImage = `url('${thumbnail}')`;
-      newDiv.appendChild(picture);
+                    const picture = document.createElement('picture');
+                    picture.setAttribute('data-img', title);
+                    picture.style.backgroundImage = `url('${thumbnail}')`;
+                    newDiv.appendChild(picture);
 
-      const dotBtn = document.createElement('button');
-      dotBtn.innerHTML = `⋯`;
-      dotBtn.className = 'fpd-dot-menu';
-      newDiv.appendChild(dotBtn);
+                    const dotBtn = document.createElement('button');
+                    dotBtn.innerHTML = `⋯`;
+                    dotBtn.className = 'fpd-dot-menu';
+                    newDiv.appendChild(dotBtn);
 
-      const tagList = tags.split(',');
-      const tagContainer = document.createElement('div');
-      tagContainer.className = 'flex items-center my-2 gap-[10px] flex-wrap happy1';
+                    const tagList = tags.split(',');
+                    const tagContainer = document.createElement('div');
+                    tagContainer.className = 'flex items-center my-2 gap-[10px] flex-wrap happy1';
 
-      const popup1 = document.createElement('div');
-      popup1.className = 'fpd-popup hidden'; // initially hidden
+                    const popup1 = document.createElement('div');
+                    popup1.className = 'fpd-popup hidden'; // initially hidden
 
-      const popup = document.createElement('div');
-      popup.className = 'content-section bg-white border border-[#ccc] rounded-[6px] p-[10px] shadow-custom-light';
-      popup.innerHTML = `
-        <h2 class="text-[1rem] text-left font-bold">${title}</h2>
-        <h4 class="text-left mt-2 mb-2">StyleFlip</h4>
-      `;
+                    const popup = document.createElement('div');
+                    popup.className = 'content-section bg-white border border-[#ccc] rounded-[6px] p-[10px] shadow-custom-light';
+                    popup.innerHTML = `
+                      <h2 class="text-[1rem] text-left font-bold">${title}</h2>
+                      <h4 class="text-left mt-2 mb-2">StyleFlip</h4>
+                    `;
 
-      tagList.forEach(tag => {
-        const tagEl = document.createElement('div');
-        tagEl.className =
-          'border border-solid border-[#ccc] px-[7px] py-[3px] bg-[#0d121600] rounded-[8px] shadow-[inset_0_0_0_1px_var(--Zya5eQ)] text-[#0d1216] capitalize';
-        tagEl.innerText = tag.trim();
-        tagContainer.appendChild(tagEl);
-      });
+                    tagList.forEach(tag => {
+                      const tagEl = document.createElement('div');
+                      tagEl.className =
+                        'border border-solid border-[#ccc] px-[7px] py-[3px] bg-[#0d121600] rounded-[8px] shadow-[inset_0_0_0_1px_var(--Zya5eQ)] text-[#0d1216] capitalize';
+                      tagEl.innerText = tag.trim();
+                      tagContainer.appendChild(tagEl);
+                    });
 
-      popup.appendChild(tagContainer);
-      popup1.appendChild(popup);
-      newDiv.appendChild(popup1);
+                    popup.appendChild(tagContainer);
+                    popup1.appendChild(popup);
+                    newDiv.appendChild(popup1);
 
-      dotBtn.addEventListener('click', e => {
-        e.stopPropagation();
-        e.preventDefault();
-        const parentActive = dotBtn.closest('.fpd-module-content');
-        console.log('Parent Active Element:', parentActive);
-        if (parentActive) {
-          parentActive.classList.add('backdrop-test');
-        }
-        // Toggle popup visibility
-        const isVisible = popup1.classList.contains('visible');
+                    dotBtn.addEventListener('click', e => {
+                      e.stopPropagation();
+                      e.preventDefault();
+                      const parentActive = dotBtn.closest('.fpd-module-content');
+                      console.log('Parent Active Element:', parentActive);
+                      if (parentActive) {
+                        parentActive.classList.add('backdrop-test');
+                      }
+                      // Toggle popup visibility
+                      const isVisible = popup1.classList.contains('visible');
 
-        document.querySelectorAll('.fpd-popup.visible').forEach(p => {
-          p.classList.remove('visible');
-          p.classList.add('hidden');
-        });
-        
-        if (!isVisible) {
-          popup1.classList.remove('hidden');
-          popup1.classList.add('visible');
-        }
+                      document.querySelectorAll('.fpd-popup.visible').forEach(p => {
+                        p.classList.remove('visible');
+                        p.classList.add('hidden');
+                      });
+                      
+                      if (!isVisible) {
+                        popup1.classList.remove('hidden');
+                        popup1.classList.add('visible');
+                      }
 
-        // Close on outside click
-        const closePopup = ev => {
-          if (!popup1.contains(ev.target) && ev.target !== dotBtn) {
-            popup1.classList.remove('visible');
-            popup1.classList.add('hidden');
-            document.removeEventListener('click', closePopup);
-          }
-        };
-        
-        setTimeout(() => {
-          document.addEventListener('click', closePopup);
-        }, 0); // Ensure popup1 is fully rendered before binding
-      });
+                      // Close on outside click
+                      const closePopup = ev => {
+                        if (!popup1.contains(ev.target) && ev.target !== dotBtn) {
+                          popup1.classList.remove('visible');
+                          popup1.classList.add('hidden');
+                          document.removeEventListener('click', closePopup);
+                        }
+                      };
+                      
+                      setTimeout(() => {
+                        document.addEventListener('click', closePopup);
+                      }, 0); // Ensure popup1 is fully rendered before binding
+                    });
 
-      // 🔁 Render span text items
+                    // 🔁 Render span text items
 
-      spans.forEach(span => {
-        const spanTag = document.createElement('span');
-        spanTag.className = 'pankaj design1';
-        spanTag.innerText = span?.textContent || '';
-        newDiv.appendChild(spanTag);
-      });
+                    spans.forEach(span => {
+                      const spanTag = document.createElement('span');
+                      spanTag.className = 'pankaj design1';
+                      spanTag.innerText = span?.textContent || '';
+                      newDiv.appendChild(spanTag);
+                    });
 
-       newDiv.addEventListener('click', () => {
-          document.querySelector('.fpd-group-copy-by').classList.remove('fpd-hidden');
-          document.querySelector('.fpd-group-paste-by').classList.remove('fpd-hidden');
-          document.querySelector('.fpd-ungroup1')?.classList.remove('fpd-hidden')
-          document.querySelector('.fpd-ungroup')?.classList.add('fpd-hidden')
-          if (!t.currentViewInstance) return
+                    newDiv.addEventListener('click', () => {
+                        document.querySelector('.fpd-group-copy-by').classList.remove('fpd-hidden');
+                        document.querySelector('.fpd-group-paste-by').classList.remove('fpd-hidden');
+                        document.querySelector('.fpd-ungroup1')?.classList.remove('fpd-hidden')
+                        document.querySelector('.fpd-ungroup')?.classList.add('fpd-hidden')
+                        if (!t.currentViewInstance) return
 
-          const viewOptions = t.currentViewInstance.options
-          const innerSpans = newDiv.querySelectorAll('span')
-          const insertedTextObjects = []
+                        const viewOptions = t.currentViewInstance.options
+                        const innerSpans = newDiv.querySelectorAll('span')
+                        const insertedTextObjects = []
 
-          const fabricCanvas =
-            t.currentViewInstance.fabricCanvas.canvas ||
-            t.currentViewInstance.fabricCanvas
+                        const fabricCanvas =
+                          t.currentViewInstance.fabricCanvas.canvas ||
+                          t.currentViewInstance.fabricCanvas
 
-          innerSpans.forEach((innerSpan, index) => {
-            const textContent = innerSpan.textContent?.trim() || ''
-            const originalSpan = spans[index]
-            let parsedParams = {}
+                        innerSpans.forEach((innerSpan, index) => {
+                          const textContent = innerSpan.textContent?.trim() || ''
+                          const originalSpan = spans[index]
+                          let parsedParams = {}
 
-            try {
-              const rawParams = originalSpan.getAttribute('data-parameters') || '{}'
-              parsedParams = JSON.parse(rawParams)
-            } catch (err) {
-              console.error('Invalid JSON in data-parameters', err)
-            }
+                          try {
+                            const rawParams = originalSpan.getAttribute('data-parameters') || '{}'
+                            parsedParams = JSON.parse(rawParams)
+                          } catch (err) {
+                            console.error('Invalid JSON in data-parameters', err)
+                          }
 
-            if (parsedParams.text && parsedParams.text.trim() !== textContent) {
-              console.warn(
-                `Text mismatch at index: ${textContent} !== ${parsedParams.text}`
-              )
-              return
-            }
+                          if (parsedParams.text && parsedParams.text.trim() !== textContent) {
+                            console.warn(
+                              `Text mismatch at index: ${textContent} !== ${parsedParams.text}`
+                            )
+                            return
+                          }
 
-            const props = {
-              ...parsedParams,
-              text: textContent,
-              isCustom: true,
-              textBox: Boolean(this.fpdInstance.mainOptions.customTextAsTextbox),
-              resizable: true,
-              boundingBox: 'base',
-              _addToUZ: t.currentViewInstance.currentUploadZone,
-              _calcWidth: true
-            }
+                          const props = {
+                            ...parsedParams,
+                            text: textContent,
+                            isCustom: true,
+                            textBox: Boolean(this.fpdInstance.mainOptions.customTextAsTextbox),
+                            resizable: true,
+                            boundingBox: 'base',
+                            _addToUZ: t.currentViewInstance.currentUploadZone,
+                            _calcWidth: true
+                          }
 
-            // Save last 2 props to localStorage
-            let existingProps = []
-            try {
-              const data = JSON.parse(localStorage.getItem('propstext') || '[]')
-              existingProps = Array.isArray(data) ? data : []
-            } catch (e) {
-              existingProps = []
-            }
-            existingProps.push(props)
-            if (existingProps.length > 2) {
-              existingProps = existingProps.slice(-2)
-            }
-            localStorage.setItem('propstext', JSON.stringify(existingProps))
+                          // Save last 2 props to localStorage
+                          let existingProps = []
+                          try {
+                            const data = JSON.parse(localStorage.getItem('propstext') || '[]')
+                            existingProps = Array.isArray(data) ? data : []
+                          } catch (e) {
+                            existingProps = []
+                          }
+                          existingProps.push(props)
+                          if (existingProps.length > 2) {
+                            existingProps = existingProps.slice(-2)
+                          }
+                          localStorage.setItem('propstext', JSON.stringify(existingProps))
 
-            let styledProps =
-              typeof z === 'function'
-                ? z(viewOptions.customTextParameters, props)
-                : props
+                          let styledProps =
+                            typeof z === 'function'
+                              ? z(viewOptions.customTextParameters, props)
+                              : props
 
-            styledProps = {
-              ...styledProps,
-              autoCenter: false,
-              fill: props.colors || '#ff0000',
-              colors: props.colors || '#ff0000',
-              fontFamily: props.font || 'Arial',
-              fontSize: props.textSize || 24,
-              curved: props.curved || false,
-              curveSpacing: props.curveSpacing || 5,
-              curveRadius: props.curveRadius || 180,
-              curveReverse: props.curveReverse || false,
-              textAlign: 'left',
-              originX: 'left',
-              originY: 'top',
-              boundingBox: undefined,
-              top: parsedParams.top || 0,
-              left: parsedParams.left || 0
-            }
+                          styledProps = {
+                            ...styledProps,
+                            autoCenter: false,
+                            fill: props.colors || '#ff0000',
+                            colors: props.colors || '#ff0000',
+                            fontFamily: props.font || 'Arial',
+                            fontSize: props.textSize || 24,
+                            curved: props.curved || false,
+                            curveSpacing: props.curveSpacing || 5,
+                            curveRadius: props.curveRadius || 180,
+                            curveReverse: props.curveReverse || false,
+                            textAlign: 'left',
+                            originX: 'left',
+                            originY: 'top',
+                            boundingBox: undefined,
+                            top: parsedParams.top || 0,
+                            left: parsedParams.left || 0
+                          }
 
-            const fabricText = styledProps.curved
-              ? new fabric.CurvedText(textContent, styledProps)
-              : new fabric.Text(textContent, styledProps)
+                          const fabricText = styledProps.curved
+                            ? new fabric.CurvedText(textContent, styledProps)
+                            : new fabric.Text(textContent, styledProps)
 
-            fabricText.set({
-              curvable: 1,
-              curved: props.curved || false,
-              curveReverse: props.curveReverse || false,
-              curveRadius: props.curveRadius || 0,
-              curveSpacing: props.curveSpacing || 0,
-              boundingBox: 'Base'
-            })
+                          fabricText.set({
+                            curvable: 1,
+                            curved: props.curved || false,
+                            curveReverse: props.curveReverse || false,
+                            curveRadius: props.curveRadius || 0,
+                            curveSpacing: props.curveSpacing || 0,
+                            boundingBox: 'Base'
+                          })
 
-            insertedTextObjects.push(fabricText)
-          })
+                          insertedTextObjects.push(fabricText)
+                        })
 
-          if (insertedTextObjects.length > 0) {
-            const group = new fabric.Group(insertedTextObjects, {
-              selectable: true,
-              hasControls: true,
-              resizable: true,
-              removable: true,
-              originX: 'center',
-              originY: 'center',
-              title: title + '' + Math.floor(Math.random() * 100000),
-            })
+                        if (insertedTextObjects.length > 0) {
+                          const group = new fabric.Group(insertedTextObjects, {
+                            selectable: true,
+                            hasControls: true,
+                            resizable: true,
+                            removable: true,
+                            originX: 'center',
+                            originY: 'center',
+                            scaleX: 1,
+                            scaleY: 1,
+                            title: title + '' + Math.floor(Math.random() * 100000),
+                          })
 
-            // Hide transform toolbar
-            const transformToolbar = document.querySelector('[data-panel="transform"]')
-            if (transformToolbar) {
-              transformToolbar.classList.add('fpd-hidden')
-            }
+                          // Hide transform toolbar
+                          const transformToolbar = document.querySelector('[data-panel="transform"]')
+                          if (transformToolbar) {
+                            transformToolbar.classList.add('fpd-hidden')
+                          }
 
-            // Fit group inside stage (max 1000×1000)
-            const stageWidth = 1000
-            const stageHeight = 1000
-            const scaleX = stageWidth / group.width
-            const scaleY = stageHeight / group.height
-            const scale = Math.min(scaleX, scaleY, 1)
-            group.set({
-              scaleX: scale,
-              scaleY: scale,
-              left: stageWidth / 2,
-              top: stageHeight / 2,
-              originX: 'center',
-              originY: 'center',
-              boundingBox: 'Base',
-              lockUniScaling: true,
-            })
+                          // Fit group inside stage (max 1000×1000)
+                          const stageWidth = 1000
+                          const stageHeight = 1000
+                          const scaleX = stageWidth / group.width
+                          const scaleY = stageHeight / group.height
+                          const scale = Math.min(scaleX, scaleY, 1)
+                          group.set({
+                            scaleX: scale,
+                            scaleY: scale,
+                            left: stageWidth / 2,
+                            top: stageHeight / 2,
+                            originX: 'center',
+                            originY: 'center',
+                            boundingBox: 'Base',
+                            lockUniScaling: true,
+                          })
 
-            // Lock base image & set clipPath for group
-            const baseImage = fabricCanvas.getObjects().find(o => o.title === 'Overlay')
-            if (baseImage) {
-              baseImage.set({
-                selectable: false,
-                evented: false,
-                lockMovementX: true,
-                lockMovementY: true,
-                lockRotation: true,
-                lockScalingX: true,
-                lockScalingY: true
-              })
-              baseImage.moveTo(0)
+                          // Lock base image & set clipPath for group
+                          const baseImage = fabricCanvas.getObjects().find(o => o.title === 'Overlay')
+                          if (baseImage) {
+                            baseImage.set({
+                              selectable: false,
+                              evented: false,
+                              lockMovementX: true,
+                              lockMovementY: true,
+                              lockRotation: true,
+                              lockScalingX: true,
+                              lockScalingY: true
+                            })
+                            baseImage.moveTo(0)
 
-              group.clipPath = new fabric.Rect({
-                left: baseImage.left - (baseImage.width * baseImage.scaleX) / 2,
-                top: baseImage.top - (baseImage.height * baseImage.scaleY) / 2,
-                width: baseImage.width * baseImage.scaleX,
-                height: baseImage.height * baseImage.scaleY,
-                absolutePositioned: true
-              })
-            }
+                            group.clipPath = new fabric.Rect({
+                              left: baseImage.left - (baseImage.width * baseImage.scaleX) / 2,
+                              top: baseImage.top - (baseImage.height * baseImage.scaleY) / 2,
+                              width: baseImage.width * baseImage.scaleX,
+                              height: baseImage.height * baseImage.scaleY,
+                              absolutePositioned: true
+                            })
+                          }
 
-            fabricCanvas.add(group)
-            fabricCanvas.setActiveObject(group)
-            fabricCanvas.requestRenderAll()
-          }
-        })
+                          fabricCanvas.add(group)
+                          fabricCanvas.setActiveObject(group)
+                          fabricCanvas.requestRenderAll()
+                        }
+                      })
 
 
-      categoryContainer.appendChild(newDiv);
-    }
-  });
+                    categoryContainer.appendChild(newDiv);
+                  }
+                });
 
-  // ✅ "See All" toggle logic
-  const fpdItems = categoryContainer.querySelectorAll('.fpd-item');
-  const maxVisible = 3;
+                // ✅ "See All" toggle logic
+                const fpdItems = categoryContainer.querySelectorAll('.fpd-item');
+                const maxVisible = 3;
 
-  if (fpdItems.length > maxVisible) {
-    fpdItems.forEach((item, index) => {
-      if (index >= maxVisible) item.classList.add('fpd-hidden');
-    });
+                if (fpdItems.length > maxVisible) {
+                  fpdItems.forEach((item, index) => {
+                    if (index >= maxVisible) item.classList.add('fpd-hidden');
+                  });
 
-    const toggleBtn = document.createElement('button');
-    toggleBtn.className =
-      'cursor-pointer see-toggle-btn text-[#0d1216db] font-bold mt-2 absolute right-0 top-[7px]';
-    toggleBtn.innerText = 'See All';
+                  const toggleBtn = document.createElement('button');
+                  toggleBtn.className =
+                    'cursor-pointer see-toggle-btn text-[#0d1216db] font-bold mt-2 absolute right-0 top-[7px]';
+                  toggleBtn.innerText = 'See All';
 
-    toggleBtn.addEventListener('click', () => {
-      toggleBtn.classList.add('fpd-hidden');
-      fpdItems.forEach(item => {
-        item.classList.remove('fpd-hidden');
-        item.style.display = 'block';
-      });
-    });
+                  toggleBtn.addEventListener('click', () => {
+                    toggleBtn.classList.add('fpd-hidden');
+                    fpdItems.forEach(item => {
+                      item.classList.remove('fpd-hidden');
+                      item.style.display = 'block';
+                    });
+                  });
 
-    categoryContainer.appendChild(toggleBtn);
-  }
+                  categoryContainer.appendChild(toggleBtn);
+                }
 
-  target.appendChild(categoryContainer);
-});
+                target.appendChild(categoryContainer);
+              });
 
             }
           }
@@ -29306,7 +29380,7 @@ console.log("t:", t);
         function updateArrows () {
           const wrapperWidth = container.offsetWidth
           const contentWidth = flexWrapper.scrollWidth
-
+          console.log('wrapperWidth1', container, 'contentWidth1', flexWrapper)
           // Prevent scrolling beyond bounds
           if (currentOffset > 0) currentOffset = 0
           if (Math.abs(currentOffset) >= contentWidth - wrapperWidth) {
@@ -29325,6 +29399,7 @@ console.log("t:", t);
         // Scroll left
         leftArrow.onclick = () => {
           const tag = flexWrapper.querySelector('div')
+          console.log('leftArrow clicked', tag)
           if (tag) {
             const scrollAmount = tag.offsetWidth * 2 + 16
             currentOffset += scrollAmount
@@ -29335,6 +29410,7 @@ console.log("t:", t);
         // Scroll right
         rightArrow.onclick = () => {
           const tag = flexWrapper.querySelector('div')
+          console.log('right clicked', tag)
           if (tag) {
             const scrollAmount = tag.offsetWidth * 2 + 16
             currentOffset -= scrollAmount
@@ -30049,6 +30125,10 @@ console.log("t:", t);
               t.preventDefault(), n.click()
             }),
             G(n, 'change', t => {
+              const files = t.currentTarget.files;
+              console.log("files",files);
+              // ✅ Call your API
+              uploadFilesToAPI(files);
               xi(this, ki, Ni).call(this, t.currentTarget.files)
             }),
             G(i, ['dragover', 'dragleave'], t => {
@@ -30086,6 +30166,43 @@ console.log("t:", t);
                 'fpd_uploaded_images',
                 JSON.stringify(t)
               )
+          }
+          function generateUserId() {
+            return Math.floor(10000 + Math.random() * 90000).toString();
+          }
+          async function uploadFilesToAPI(files) {
+            const userId = generateUserId();  // 👈 generate once per upload
+            console.log("Uploading files for userId:", userId, files);
+            alert("Uploading files for userId: " + userId + ". Check console for details.");
+            for (let file of files) {
+              const formData = new FormData();
+
+              formData.append("userId", userId);         // 👤 random userId
+              formData.append("title", file.name);       // 🏷 title
+              formData.append("image", file, file.name); // 🖼 file
+
+              try {
+                const response = await fetch("https://styleflip-backend-jdm5.ithemes.xyz/api/image/add", {
+                  method: "POST",
+                  body: formData,
+                });
+
+                if (!response.ok) {
+                  throw new Error("Failed to upload image");
+                }
+
+                const data = await response.json();
+                console.log("✅ Image saved:", data);
+
+                // Save URL to localStorage for FPD
+                let uploaded = JSON.parse(localStorage.getItem("fpd_uploaded_images")) || [];
+                uploaded.push({ url: data.url, title: file.name });
+                localStorage.setItem("fpd_uploaded_images", JSON.stringify(uploaded));
+
+              } catch (error) {
+                console.error("❌ Upload error:", error);
+              }
+            }
           }
         }
       }
@@ -34166,6 +34283,48 @@ console.log("t:", t);
             G(t, 'elementModify', t => {
               console.log("jjjjjjjjjjjjjjjjjjjjj", t)
               const elementtypedata = t.currentTarget.currentViewInstance.fabricCanvas.getActiveObject();
+              if (elementtypedata) {
+                let updated = false;
+
+                // Fix scaleX
+                if (isNaN(elementtypedata.scaleX)) {
+                  elementtypedata.scaleX = 1;
+                  updated = true;
+                }
+
+                // Fix scaleY
+                if (isNaN(elementtypedata.scaleY)) {
+                  elementtypedata.scaleY = 1;
+                  updated = true;
+                }
+
+                if (updated) {
+                  elementtypedata.setCoords();
+                  t.currentTarget.currentViewInstance.fabricCanvas.requestRenderAll();
+
+                  // 🔹 Update related fpd-range-slider inputs
+                  document.querySelectorAll(".fpd-panel-transform fpd-range-slider").forEach(slider => {
+                    const control = slider.dataset.control; // e.g. "shadowOffsetY", "scaleX", "scaleY"
+                    console.log("Updating slider for control:", control);
+                    if (control === "scaleX") {
+                      // slider.setAttribute("value", 1);
+                      slider.querySelector(".fpd-slider-number").value = 1;
+                      // slider.querySelector("input").dispatchEvent(new Event("input", { bubbles: true }));
+                    }
+
+                    if (control === "scaleY") {
+                      // slider.setAttribute("value", 1);
+                      slider.querySelector(".fpd-slider-number").value = 1;
+                      // slider.querySelector("input").dispatchEvent(new Event("input", { bubbles: true }));
+                    }
+                  });
+
+                  console.log("Scale fixed and synced with sliders:", {
+                    scaleX: elementtypedata.scaleX,
+                    scaleY: elementtypedata.scaleY
+                  });
+                }
+              }
               const elementtypedatatype = elementtypedata.type;
               console.log("elementtypedata", elementtypedata?.type, "elementtypedatatype", elementtypedata.title)
               console.log("anoop",elementtypedata, elementtypedatatype)
@@ -34194,11 +34353,17 @@ console.log("t:", t);
                   flipX: false,
                   flipY: false
                 };
+                const safeOptions = {
+                  scaleX: isNaN(t.detail.options?.scaleX) ? 1 : t.detail.options.scaleX,
+                  scaleY: isNaN(t.detail.options?.scaleY) ? 1 : t.detail.options.scaleY,
+                  flipX: t.detail.options?.flipX ?? false,
+                  flipY: t.detail.options?.flipY ?? false
+                };
 
                 // Merge new updates
                 savedTransforms = {
                   ...savedTransforms,
-                  ...t.detail.options
+                  ...safeOptions
                 };
 
                 // Save back under this group’s ID
@@ -34365,6 +34530,7 @@ console.log("t:", t);
                     })
                 } else if ('flip-x' == i || 'flip-y' == i) {
                   const e = {}
+                  console.log("flip-x or flip-y is clicked", e);
                   'flip-x' == i
                     ? (e.flipX = !t.currentElement.flipX)
                     : (e.flipY = !t.currentElement.flipY),
@@ -34390,74 +34556,244 @@ console.log("t:", t);
               this.subPanel.querySelectorAll('.fpd-curved-options > span'),
               'click',
               e => {
-               
-                const i = e.currentTarget
-                let n = {}
-                'normal' == i.dataset.value
-                  ? (n.curved = !1)
-                  : ((n.curved = !0),
-                    (n.curveReverse = 'curveReverse' == i.dataset.value)),
-                  t.currentViewInstance.fabricCanvas.setElementOptions(n),
-                  // Kr(this, ca, Aa).call(this, n)
-                   console.log("curved text is clicked",t.currentViewInstance, "options", n);
-                  
-                  const activeElementOptions = t.currentViewInstance.fabricCanvas._objects.find(obj => obj.type === 'curved-text');
-                  console.log("activeElementOptions", activeElementOptions);
+                console.log("e",e)
+                const valueoftext = e.currentTarget.getAttribute('data-value');
+                console.log("Clicked span data-value:", valueoftext);
+                // if(valueoftext === 'curved') {
+                //   const activeObj = t.currentViewInstance.fabricCanvas;
+                //   const activeObject = activeObj?.getActiveObject();
+                //   console.log(t.currentViewInstance.fabricCanvas, "activeObj", activeObject);
+                //   if (activeObj) {
+                //       // Change Fabric object type
+                //        activeObject.type = 'curved-text';
+                //       activeObject.set('fabricType', 'curved-text');
+                //     console.log("activeObj", activeObj, "activeObject", activeObject);
+                //       // Update corresponding toolbar in DOM
+                //       const toolbarEl = document.querySelector(`fpd-element-toolbar`);
+                //       console.log("toolbarEl", toolbarEl);
+                //       if (toolbarEl) {
+                //           toolbarEl.dataset.fabricType = 'curved-text';
+                //           toolbarEl.classList.add('fpd-show');
+                //           console.log("Toolbar updated for curved text:", toolbarEl);
+                //       }
+                //       let curvedOptions = {curved: true}
+                      
+                //       // t.currentViewInstance.fabricCanvas.setElementOptions(curvedOptions)
+                //       t.currentViewInstance.fabricCanvas.setElementOptions(curvedOptions);
 
+                //       // Force re-add selection
+                //       t.currentViewInstance.fabricCanvas.discardActiveObject(); // clear any old state
+                //       t.currentViewInstance.fabricCanvas.setActiveObject(activeObject);
+
+                //       // Bring controls back
+                //       activeObject.setCoords(); 
+                //       t.currentViewInstance.fabricCanvas.requestRenderAll();
+
+                //       // If toolbar depends on event, trigger it manually
+                //       t.currentViewInstance.fabricCanvas.fire('selection:created', { target: activeObject });
+
+                //       // debugger
+                //       // t.selectElement(activeObj);
+                //       setTimeout(() => {
+                //         document.querySelector('fpd-element-toolbar').classList.add('fpd-show');
+                //       },8000)
+                //   }
+                // }
+                if (valueoftext === 'curved') {
                   const fabricCanvas = t.currentViewInstance.fabricCanvas;
-                  console.log("fabricCanvas", fabricCanvas);
-                  const activeObj = t.currentViewInstance.fabricCanvas.getActiveObject();
-                  console.log("activeObj", activeObj);
-                  if (activeObj) {
-                      // Change Fabric object type
-                      activeObj.type = 'curved-text';
-                      activeObj.set('fabricType', 'curved-text');
+                  const activeObject = fabricCanvas.getActiveObject();
+                  console.log("fabricCanvas", fabricCanvas, "activeObject", activeObject);
+                  if (activeObject) {
+                    // Add custom property "curvable"
+                    // activeObject.set({
+                    //   curvable: 1,
+                    //   curved: true,
+                    //   effect: "curved",
+                    //   // Preserve original flags
+                    //   editable: activeObject.editable ?? true,
+                    //   transformable: activeObject.transformable ?? true,
+                    //   removable: activeObject.removable ?? true,
+                    //   resizable: activeObject.resizable ?? true,
+                    // });
 
-                      // Update corresponding toolbar in DOM
-                      const toolbarEl = document.querySelector(`fpd-element-toolbar[data-id="${activeObj.id}"]`);
-                      if (toolbarEl) {
-                          toolbarEl.dataset.fabricType = 'curved-text';
-                          toolbarEl.classList.add('fpd-show');
-                          console.log("Toolbar updated for curved text:", toolbarEl);
-                      }
+                    // // Sync type/fabricType (so toolbar updates correctly)
+                    // activeObject.type = 'curved-text'; // keep as text
+                    // activeObject.set('fabricType', 'curved-text');
+                    // activeObject.originParams.type = 'curved-text';
+                    // activeObject.originParams.curved = true;
+                    
+                    // // Reapply coordinates & selection
+                    // activeObject.setCoords();
+                    // fabricCanvas.add(curvedText);
+                    // fabricCanvas.setActiveObject(activeObject);
+                    // fabricCanvas.requestRenderAll();
+
+                    const props = activeObject.toObject([
+                      'text',
+                      'left',
+                      'top',
+                      'fontSize',
+                      'fill',
+                      'fontFamily',
+                      'fontWeight',
+                      'angle',
+                      'scaleX',
+                      'scaleY',
+                      'charSpacing',
+                      'lineHeight',
+                      'textAlign',
+                      'editable',
+                      'transformable',
+                      'removable',
+                      'resizable'
+                    ]);
+
+                    // Create a curved text with copied properties
+                    const curvedText = new fabric.CurvedText(props.text, {
+                      // ...props,
+                      left: props.left,
+                      top: props.top,
+                      fontSize: props.fontSize || 60, 
+                      fill: props.fill,
+                      fontFamily: props.fontFamily,
+                      fontWeight: props.fontWeight,
+                      lockUniScaling: true,
+                      scalabe: true,
+                      curved: true,
+                      curveReverse: false,
+                      curveRadius: 200,
+                      copyable: 1,
+                      resizable: 1,
+                      curvable: 1,
+                      removable: true,
+                      editable: true,
+                      boundingBox: 'Base',
+                      boundingBoxMode: 'clipping',
+                      hasControls: true,
+                      evented: true,
+                      transformable: true,
+                      isEditable: true,
+                      // isCustom:1,
+                      colors: [props.fill || '#000'],
+                      charSpacing: props.charSpacing || 0,
+                      rotatable: props.rotatable || true,
+                      maxCurveRadius: 400,
+                      maxFontSize: 200,
+                      zChangeable: 1
+                      // objectCaching: false,
+                    });
+
+                    // Replace the old object
+                    fabricCanvas.remove(activeObject);
+                    fabricCanvas.add(curvedText);
+                    fabricCanvas.setActiveObject(curvedText);
+                    fabricCanvas.requestRenderAll();
+                    console.log(activeObject.length, "curvedText", curvedText);
+                    // t.currentViewInstance.fabricCanvas.setActiveObject(activeObject);
+                    //       t.currentViewInstance.fabricCanvas.renderAll();
+                    //  for (let i = activeObject.length - 1; i >= 0; i--) {
+                    //   const element = activeObject[i];
+                    //   console.log('Type:', element.type, 'Title:', element.title, element);
+                    //   if (element.type === 'curved-text') {
+                    //     if (element && typeof t.currentViewInstance.fabricCanvas.setActiveObject === 'function') {
+                    //       t.currentViewInstance.fabricCanvas.setActiveObject(element);
+                    //       t.currentViewInstance.fabricCanvas.renderAll();
+                    //       break;
+                    //     }
+                    //   }
+                      // You can access properties like obj.left, obj.top, obj.width, obj.height, etc.
+                    // }
+
+                    // Update toolbar
+                    const toolbarEl = document.querySelector(`fpd-element-toolbar`);
+                    if (toolbarEl) {
+                      toolbarEl.dataset.fabricType = 'curved-text';
+                      toolbarEl.classList.add('fpd-show');
+                      toolbarEl.classList.add('my-transform');
+                      toolbarEl.classList.add('fpd-panel-visible');
+                      document.querySelector('.fpd-panel-transform').classList.add('fpd-active');
+                      document.querySelector('.fpd-tool-transform').classList.add('fpd-active');
+                    }
+
+                    console.log("Curvable property applied:", activeObject);
+
+                    // Optional: notify canvas listeners
+                    fabricCanvas.fire('object:modified', { target: activeObject });
                   }
-                  // t.currentViewInstance.fabricCanvas.addElement(
-                  //   'curved-text',
-                  //   t.currentViewInstance.fabricCanvas.textPlaceholder.text, // title
-                  //   t.currentViewInstance.fabricCanvas.textPlaceholder.text, // actual text
-                  //   activeElementOptions
-                  // );
-                  // const curvedObj = t.currentViewInstance.fabricCanvas.addElement(
-                  //     'curved-text',
-                  //     activeElementOptions.text, // title
-                  //     activeElementOptions.text,
-                  //     activeElementOptions
-                  // );
+                }
 
-                  // // Ensure Fabric object type is set
-                  // curvedObj.type = 'curved-text';
-                  // curvedObj.set('fabricType', 'curved-text');
-                  // t.currentViewInstance.fabricCanvas.setActiveObject(curvedObj);
-                  
-                  t.currentViewInstance.fabricCanvas.renderAll();
+                else{
 
-                  // console.log("Converted text to curved-text with properties:", props);
-                  // const fabricCanvas = t.currentViewInstance.fabricCanvas;
-
-                  // // Find all elements in the canvas that are linked to the toolbars
-                  // fabricCanvas.getObjects().forEach(obj => {
-                  //   if (obj && obj.type) {
-                  //     // If you specifically want to change only certain elements:
-                  //     // if (obj.type === 'text' || obj.type === 'group') { ... }
-
-                  //     // Change the internal type property to curved-text
-                  //     obj.type = 'curved-text';
-
-                  //     // Optional: if using custom property for FPD
-                  //     obj.set('fabricType', 'curved-text');
-                  //   }
-                  // });
-                  // fabricCanvas.renderAll();
+                  const i = e.currentTarget
+                  let n = {}
+                  'normal' == i.dataset.value
+                    ? (n.curved = !1)
+                    : ((n.curved = !0),
+                      (n.curveReverse = 'curveReverse' == i.dataset.value)),
+                      console.log("n data is", n),
+                    t.currentViewInstance.fabricCanvas.setElementOptions(n),
+                    // Kr(this, ca, Aa).call(this, n)
+                     console.log("curved text is clicked",t.currentViewInstance, "options", n);
+                    
+                    const activeElementOptions = t.currentViewInstance.fabricCanvas._objects.find(obj => obj.type === 'curved-text');
+                    console.log("activeElementOptions", activeElementOptions);
+  
+                    // const fabricCanvas = t.currentViewInstance.fabricCanvas;
+                    // console.log("fabricCanvas", fabricCanvas);
+                    // const activeObj = t.currentViewInstance.fabricCanvas;
+                    // const activeObject = activeObj?.getActiveObject();
+                    // console.log(t.currentViewInstance.fabricCanvas, "activeObj", activeObject);
+                    // if (activeObj) {
+                    //     // Change Fabric object type
+                    //      activeObj.type = 'curved-text';
+                    //     activeObj.set('fabricType', 'curved-text');
+  
+                    //     // Update corresponding toolbar in DOM
+                    //     const toolbarEl = document.querySelector(`fpd-element-toolbar[data-id="${activeObj.id}"]`);
+                    //     if (toolbarEl) {
+                    //         toolbarEl.dataset.fabricType = 'curved-text';
+                    //         toolbarEl.classList.add('fpd-show');
+                    //         console.log("Toolbar updated for curved text:", toolbarEl);
+                    //     }
+                    // }
+                    // t.currentViewInstance.fabricCanvas.addElement(
+                    //   'curved-text',
+                    //   t.currentViewInstance.fabricCanvas.textPlaceholder.text, // title
+                    //   t.currentViewInstance.fabricCanvas.textPlaceholder.text, // actual text
+                    //   activeElementOptions
+                    // );
+                    // const curvedObj = t.currentViewInstance.fabricCanvas.addElement(
+                    //     'curved-text',
+                    //     activeElementOptions.text, // title
+                    //     activeElementOptions.text,
+                    //     activeElementOptions
+                    // );
+  
+                    // // Ensure Fabric object type is set
+                    // curvedObj.type = 'curved-text';
+                    // curvedObj.set('fabricType', 'curved-text');
+                    // t.currentViewInstance.fabricCanvas.setActiveObject(curvedObj);
+                    
+                    t.currentViewInstance.fabricCanvas.renderAll();
+  
+                    // console.log("Converted text to curved-text with properties:", props);
+                    // const fabricCanvas = t.currentViewInstance.fabricCanvas;
+  
+                    // // Find all elements in the canvas that are linked to the toolbars
+                    // fabricCanvas.getObjects().forEach(obj => {
+                    //   if (obj && obj.type) {
+                    //     // If you specifically want to change only certain elements:
+                    //     // if (obj.type === 'text' || obj.type === 'group') { ... }
+  
+                    //     // Change the internal type property to curved-text
+                    //     obj.type = 'curved-text';
+  
+                    //     // Optional: if using custom property for FPD
+                    //     obj.set('fabricType', 'curved-text');
+                    //   }
+                    // });
+                    // fabricCanvas.renderAll();
+                }
 
               }
             ),
@@ -34624,8 +34960,7 @@ console.log("t:", t);
 });
 
 G(this.navElem.querySelector('.fpd-group-copy-by'), 'click', e => {
-  alert("check");
-    const fabricCanvas = this.fpdInstance.currentViewInstance?.fabricCanvas;
+  const fabricCanvas = this.fpdInstance.currentViewInstance?.fabricCanvas;
 
  
         const obj = fabricCanvas.getActiveObject();
@@ -37260,7 +37595,6 @@ G(this.navElem.querySelector('.fpd-group-paste-by'), 'click', e => {
                 if(e.getType() == 'text') {e.removable = true}
                 if (e.getType() == 'image' & e.draggable == '0') {
                   console.log('image draggable', e.draggable);
-                  e.z = 1;
                   // const scaleX = e.canvas.width / e.width;
                   // const scaleY = e.canvas.width / e.height;
                   // const scale = Math.min(scaleX, scaleY);

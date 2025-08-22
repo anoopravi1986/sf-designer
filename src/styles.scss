@@ -47,6 +47,9 @@ fpd-module-uploads .fpd-item.fpd-hover-thumbnail.ts .fa-solid.fa-trash{display: 
 .fpd-icon-format-align-center.fpd-active:before,.fpd-icon-format-align-center.active-icon:before{background-image: url('/assets/icon/center-align-01-active.svg');}
 .fpd-icon-format-align-right.fpd-active:before,.fpd-icon-format-align-right.active-icon:before{background-image: url('/assets/icon/right-align-01-active.svg');}
 @media only screen and (min-width: 991px){
+  .wrapper-main-div-slider{
+    width: 301px;top:201px;
+  }
   fpd-element-toolbar[data-fabric-type="group"].my-transform{
     .fpd-close-sub-panel{right: -82px;top:112px}
     .fpd-sub-panel{left: 0;top: 82px;

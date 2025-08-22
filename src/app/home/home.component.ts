@@ -728,6 +728,7 @@ export class HomeComponent implements AfterViewInit {
   }
 
   moveBoldToPrimaryTools(): void {
+    console.log('Moving Bold to Primary Tools');
       const targetElement = document.getElementById('boldOutside');
 
       if (targetElement) {
@@ -1381,6 +1382,8 @@ export class HomeComponent implements AfterViewInit {
 
             console.log("Toolbar updated with class:", toolbar.className);
           });
+
+
         
     }
 
