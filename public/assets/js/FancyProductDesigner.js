@@ -34973,7 +34973,7 @@ G(this.navElem.querySelector('.fpd-group-copy-by'), 'click', e => {
   // document.querySelector('.fpd-group-paste-by')?.classList.remove('fpd-hidden');
 })
 G(this.navElem.querySelector('.fpd-group-paste-by'), 'click', e => {
-  alert("check paste");
+  //alert("check paste");
   const fabricCanvas = this.fpdInstance.currentViewInstance?.fabricCanvas;
         if (copiedGroup) {
           copiedGroup.clone((clonedObj) => {
