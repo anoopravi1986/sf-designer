@@ -21402,12 +21402,11 @@
             const item = ev.target.closest(".item-data-click");
                   if(item) {
                     ev.stopPropagation(); // stop bubbling up
-                    alert("Item clicked");
                     const current = ev.currentTarget
                     console.log('current', current, 'event', ev.srcElement.getAttribute("data-source"))
                     const fpdvalue = document.querySelector('#clothing-designer').instance; 
                     const viewvalue = ev.srcElement.getAttribute("data-source");
-                    const parameter = {removable:true, draggable: true, boundingBox: 'Base', boundingBoxMode: 'clipping', z: -1};
+                    const parameter = {removable: true,positioned: true, autoSelect: true,uniScalingUnlockable: true};
                     // console.log(view,'fpdvalue', fpdvalue, t.url)
                     console.log("t data",t, t.url, t.title)
 
@@ -21417,7 +21416,7 @@
                       parameter
                     )
                   }
-          }, { once: true })
+          })
 
           // Call it on page load
           loadItems();
@@ -34802,8 +34801,8 @@ console.log("t:", t);
                   });
                 }
               }
-              const elementtypedatatype = elementtypedata.type;
-              console.log("elementtypedata", elementtypedata?.type, "elementtypedatatype", elementtypedata.title)
+              const elementtypedatatype = elementtypedata?.type;
+              console.log("elementtypedata", elementtypedata?.type, "elementtypedatatype", elementtypedata?.title)
               console.log("anoop",elementtypedata, elementtypedatatype)
               const { options: e } = t.detail
               console.log(e, 'elementModify', t.detail,  "----------",e.fontSize)

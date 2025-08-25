@@ -62,7 +62,11 @@ fpd-module-uploads .fpd-item.fpd-hover-thumbnail.ts .fa-solid.fa-trash{display: 
   fpd-element-toolbar.my-font-family .fpd-panel-font-family .fpd-fonts-list{height: auto;gap:10px;}
   fpd-element-toolbar.fpd-smart>.fpd-tools-nav>.fpd-primary-tools .fpd-tool-font-family {flex: 1 180px;min-width: 108px;}
   .fpd-toolbar-transform-our{
-    .fpd-sub-panel{flex-direction: column-reverse;        position: absolute;
+    .fpd-type-image{
+      .fpd-sub-panel{left: 0;}
+    }
+    .fpd-sub-panel{
+      flex-direction: column-reverse;        position: absolute;
         left: 370px;min-width: 300px;
         .fpd-panel-transform.fpd-active{.fpd-tool-scaleX,.fpd-tool-flip{display: flex !important;pointer-events: auto !important;}}
       .fpd-panel-curved-text{display: block;}
