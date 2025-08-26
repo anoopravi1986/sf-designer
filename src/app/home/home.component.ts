@@ -521,6 +521,45 @@ export class HomeComponent implements AfterViewInit {
             this.router.navigate([manufacturerSlug || 'apple', slug]);
           }
         });
+
+        $(document).on('click', '.item-data-click', (event) => {
+          event.stopPropagation(); // Prevent event bubbling
+          // this is the actual element you clicked
+          const clickedDiv = event.currentTarget;
+
+          console.log('You clicked:', clickedDiv);
+          console.log("djjd",this.designer.currentViewInstance);
+          const clothingDesignerElem = document.querySelector('#clothing-designer');
+          if (!clothingDesignerElem) {
+            console.error('Element #clothing-designer not found.');
+            return;
+          }
+          const fpdvalue = (clothingDesignerElem as any).instance;
+          const viewvalue = clickedDiv.getAttribute("data-source");
+          const viewtitle = clickedDiv.getAttribute("data-title");
+          console.log("viewvalue",viewvalue, viewtitle)
+          const parameter = {removable: true,positioned: true, autoSelect: true,uniScalingUnlockable: true};
+          // console.log(view,'fpdvalue', fpdvalue, t.url)
+          console.log("t data",event)
+
+          fpdvalue.addCanvasDesign(
+            viewvalue,
+            viewtitle,
+            parameter
+          )
+        });
+
+         $(document).on('click', '.item-data-click .fpd-three-dot-menu', (event) => {
+            event.stopPropagation(); // Prevent event bubbling
+            
+         })
+         $(document).on('click', '.item-data-click .delete-button', (event) => {
+            event.stopPropagation(); // Prevent event bubbling
+            
+         })
+
+
+       
       }, 300);
 
       
@@ -2403,4 +2442,7 @@ export class HomeComponent implements AfterViewInit {
       loader.style.display = show ? 'flex' : 'none';
     }
   }
+
+
+  
 }

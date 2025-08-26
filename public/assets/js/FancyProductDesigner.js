@@ -6,6 +6,7 @@
         //     console.log("product updated called")
         //     this.fpdInstance.selectProduct(1, 1);
         // }, 15000);
+        
         var t
         ;(fabric.Canvas.prototype.historyProcessing = !0),
           (fabric.Canvas.prototype.initialize =
@@ -20711,6 +20712,8 @@
       function R (t) {
         return !!j.CSS_UNIT.exec(t)
       }
+      let itemsLoaded = false;
+      localStorage.setItem('fpd-upload-image',false)
       const N = t => '[object Object]' === Object.prototype.toString.call(t),
         H = (t, e) => {
           if (t && 'object' == typeof t) {
@@ -20883,7 +20886,11 @@
             arguments.length > 0 && void 0 !== arguments[0] ? arguments[0] : {}
             console.log(t,'tttttPPPP');
             var uploadCheck = localStorage.getItem('fpd-upload-image')
-            if(uploadCheck === true){
+            console.log('uploadCheck', uploadCheck)
+            alert(uploadCheck)
+            if(uploadCheck === true || uploadCheck === 'true'){
+              alert("Uploading files to API. Check console for details.");
+              console.log('uploadCheck inside if', uploadCheck)
               uploadFilesToAPI(t);
             }
             console.log('hhhhhhhhhhhhhhhhhhhhhhhhh', t.currentViewInstance)
@@ -20918,7 +20925,7 @@
             trash.className = 'fa-solid fa-trash';
             e.append(trash);
           }
-          async function uploadFilesToAPI(files) {
+          function uploadFilesToAPI(files) {
              // 👈 generate once per upload
             console.log("Uploading files for userId:", files);
             alert("Uploading files for userId Check console for details.");
@@ -20933,32 +20940,40 @@
 
 
               try {
-                const response = await fetch("https://styleflip-backend-jdm5.ithemes.xyz/api/image/add", {
-                  method: "POST",
-                  headers: {
-                    "Content-Type": "application/json",  // 👈 must include
-                  },
-                  body: JSON.stringify(reqBody),
-                });
+                  fetch("https://styleflip-backend-jdm5.ithemes.xyz/api/image/add", {
+                    method: "POST",
+                    headers: {
+                      "Content-Type": "application/json", // 👈 must include
+                    },
+                    body: JSON.stringify(reqBody),
+                  })
+                  .then((response) => {
+                    if (!response.ok) {
+                      throw new Error("Failed to upload image");
+                    }
+                    return response.json();
+                  })
+                  .then((data) => {
+                    console.log("✅ Image saved:", data);
 
-                if (!response.ok) {
-                  throw new Error("Failed to upload image");
+                    // Save URL to localStorage for FPD
+                    let uploaded = JSON.parse(localStorage.getItem("fpd_uploaded_images")) || [];
+                    uploaded.push({ url: data.url, title: file.name });
+                    localStorage.setItem("fpd_uploaded_images", JSON.stringify(uploaded));
+                  })
+                  .catch((error) => {
+                    console.error("❌ Upload error:", error);
+                  });
+                } catch (error) {
+                  console.error("❌ Unexpected error:", error);
                 }
 
-                const data = await response.json();
-                console.log("✅ Image saved:", data);
-
-                // Save URL to localStorage for FPD
-                let uploaded = JSON.parse(localStorage.getItem("fpd_uploaded_images")) || [];
-                uploaded.push({ url: data.url, title: file.name });
-                localStorage.setItem("fpd_uploaded_images", JSON.stringify(uploaded));
-
-              } catch (error) {
-                console.error("❌ Upload error:", error);
-              }
             }
           }
+          
           async function loadItems() {
+            if (itemsLoaded) return; // prevent double calls
+            itemsLoaded = true;
             try {
               // 👇 Call your API (replace with your real endpoint)
               const response = await fetch("https://styleflip-backend-jdm5.ithemes.xyz/api/image/getByUserId/70011");
@@ -20975,6 +20990,7 @@
                   e.className = "fpd-item fpd-hover-thumbnail ts mt-1 bg-[#f6f6f6] item-data-click";
                   e.dataset.source = t.image;
                   e.dataset.time = t.createdAt;
+                  e.dataset.imageId = t._id;
   
                   if (!t.disableDraggable) e.classList.add("fpd-draggable");
   
@@ -21110,7 +21126,7 @@
                   e.stopPropagation(); // Prevent triggering the outside click close
                    const itemEl = e.target.closest('.ts'); // Adjust selector if needed
                   const title = itemEl?.getAttribute('data-title');
-
+                  console.log("item id",itemEl?.getAttribute('data-image-id'))
                   if (!title) {
                     alert('Title not found!');
                     return;
@@ -21210,7 +21226,7 @@
                     shareMenu.style.display = 'none';
                   }
                 });
-
+                
                 document.addEventListener("click", function(ev) {
                   if (ev.target.closest(".fpd-three-dot-menu")) {
                     
@@ -21288,9 +21304,28 @@
                           e.stopPropagation(); // Prevent triggering the outside click close
                           if (parentItem) {
                             console.log("parentItem", parentItem)
+                            console.log("item id",parentItem?.getAttribute('data-image-id'))
                             parentItem.remove();
                             titleInformation.remove();
                             document.body.classList.remove('photo-box-open');
+                            let imageId = parentItem?.getAttribute('data-image-id');
+
+                             fetch(`https://styleflip-backend-jdm5.ithemes.xyz/api/image/deleteByUserId/${imageId}`, {
+                                method: "DELETE", // or DELETE if backend expects delete
+                                headers: {
+                                  "Content-Type": "application/json",
+                                },
+                              })
+                                .then((response) => {
+                                  if (!response.ok) throw new Error("Failed to delete");
+                                  return response.json();
+                                })
+                                .then((data) => {
+                                  console.log("✅ Deleted:", data);
+                                })
+                                .catch((error) => {
+                                  console.error("❌ API Error:", error);
+                                });
                           }
                         });
 
@@ -21398,25 +21433,7 @@
             }
           }
 
-          document.addEventListener("click", function(ev) {
-            const item = ev.target.closest(".item-data-click");
-                  if(item) {
-                    ev.stopPropagation(); // stop bubbling up
-                    const current = ev.currentTarget
-                    console.log('current', current, 'event', ev.srcElement.getAttribute("data-source"))
-                    const fpdvalue = document.querySelector('#clothing-designer').instance; 
-                    const viewvalue = ev.srcElement.getAttribute("data-source");
-                    const parameter = {removable: true,positioned: true, autoSelect: true,uniScalingUnlockable: true};
-                    // console.log(view,'fpdvalue', fpdvalue, t.url)
-                    console.log("t data",t, t.url, t.title)
-
-                    fpdvalue.addCanvasDesign(
-                      viewvalue,
-                      t.title,
-                      parameter
-                    )
-                  }
-          })
+          
 
           // Call it on page load
           loadItems();
@@ -32948,6 +32965,7 @@ console.log("t:", t);
       class qs extends EventTarget {
         constructor (t, e, i) {
           console.log('jjjjjjjjjjjjjjjjjjjjs', i)
+          
           let n
           if ((super(), 'products' === i)) n = new We(t, e)
           else if ('productsnew' === i) n = new Wes(t, e)
@@ -35623,6 +35641,7 @@ G(this.navElem.querySelector('.fpd-group-paste-by'), 'click', e => {
           }),
             G(this.navElem.querySelector('.fpd-tool-remove'), 'click', e => {
               console.log("remove clicked", e, t)
+               localStorage.setItem('fpd-upload-image-going-to', false);
               //document.querySelector('.fpd-ungroup1')?.classList.add('fpd-hidden');
               //document.querySelector('.fpd-ungroup')?.classList.remove('fpd-hidden');
               //document.querySelector('.fpd-group-copy-by')?.classList.add('fpd-hidden');
