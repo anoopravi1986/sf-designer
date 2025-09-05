@@ -20887,9 +20887,7 @@
             console.log(t,'tttttPPPP');
             var uploadCheck = localStorage.getItem('fpd-upload-image')
             console.log('uploadCheck', uploadCheck)
-            alert(uploadCheck)
             if(uploadCheck === true || uploadCheck === 'true'){
-              alert("Uploading files to API. Check console for details.");
               console.log('uploadCheck inside if', uploadCheck)
               uploadFilesToAPI(t);
             }
@@ -20928,7 +20926,6 @@
           function uploadFilesToAPI(files) {
              // 👈 generate once per upload
             console.log("Uploading files for userId:", files);
-            alert("Uploading files for userId Check console for details.");
             if(files.url){
               const userId = 70011; 
               const formData = new FormData();
@@ -21128,7 +21125,7 @@
                   const title = itemEl?.getAttribute('data-title');
                   console.log("item id",itemEl?.getAttribute('data-image-id'))
                   if (!title) {
-                    alert('Title not found!');
+                    console.log('Title not found')
                     return;
                   }
 
@@ -21524,7 +21521,7 @@
                   const title = itemEl?.getAttribute('data-title');
 
                   if (!title) {
-                    alert('Title not found!');
+                    console.log('Title not found!');
                     return;
                   }
 
@@ -25463,6 +25460,7 @@
           // });
           this.fabricCanvas.on({
             'object:added': t => {
+              console.log("t value is in",t)
               let e = t.target,
                 i = e.price;
 
@@ -25474,13 +25472,15 @@
 
               // If object is an image, scale and center it proportionally
               if (e.type === 'image') {
+                console.log("e.title", e.title,e.width,e.height)
                 const stageW = this.fabricCanvas.getWidth();
                 const stageH = this.fabricCanvas.getHeight();
 
                 const scaleW = stageW / e.width;
                 const scaleH = stageH / e.height;
                 const scale = Math.min(scaleW, scaleH); // proportional scaling
-
+                // const scale = 0.4;
+                console.log("e.title-1", stageW,stageH,scale)
                 e.scale(scale);
                 e.center();
                 e.setCoords();
@@ -28200,7 +28200,8 @@ console.log("t:", t);
             })
         }
         removeAddBack () {
-          alert('Check')
+          console.log('Remove Add Back')
+          // alert('Check')
         }
         selectCategory () {
           let t =
@@ -28400,7 +28401,7 @@ console.log("t:", t);
                   allSubcategoryButtons.forEach(btn => btn.classList.remove('active'));
 
                   div.classList.add('active');
-                  alert(`You clicked on: ${sub}`)
+                  // alert(`You clicked on: ${sub}`)
                   console.log('Anoop Data 7', e, event, sub)
                   // const filteredData = e.filter(item => item.subcategorytype === sub);
 
@@ -28778,11 +28779,13 @@ console.log("t:", t);
                   const element = t.currentViewInstance.fabricCanvas.addElement('text', n, text, options);
 
                   if (element && typeof element.enterEditing === 'function') {
+                    console.log("if condition")
                     t.currentViewInstance.fabricCanvas.setActiveObject(element);
                     element.enterEditing(); // ✅ force edit mode
                     t.currentViewInstance.fabricCanvas.renderAll();
                   }
                   else{
+                    console.log("else condition")
                     // Get the last added object (the new text element)
                     const objects = t.currentViewInstance.fabricCanvas.getObjects();
                     /* objects.forEach(obj => {
@@ -29364,6 +29367,7 @@ console.log("t:", t);
                             originY: 'center',
                             scaleX: 1,
                             scaleY: 1,
+                            rotatable:1,
                             title: title + '' + Math.floor(Math.random() * 100000),
                           })
 
@@ -29416,8 +29420,110 @@ console.log("t:", t);
                           fabricCanvas.add(group)
                           fabricCanvas.setActiveObject(group)
                           fabricCanvas.requestRenderAll()
+                          console.log("fffffff", this.fpdInstance)
+                          const elements = this.fpdInstance.getElements(this.fpdInstance.currentViewIndex, 'all', false)
+                          console.log("All elements in current view:", elements);
+
+                          // loop through and check
+                          elements.forEach(el => {
+                            console.log("Element:", el.title, el.fpdType, el, el._objects);
+                            if(el._objects){
+                              console.log("el._objects",el._objects.length)
+                              // Find the layers list container
+                              const layersList = document.querySelector('fpd-module-manage-layers .fpd-list');
+
+                              if (layersList) {
+                                // Create row element
+                                const newRow = document.createElement('div');
+                                newRow.className = "fpd-list-row !bg-white fpd-locked";
+                                newRow.id = "layer-" + el.title.replace(/\s+/g, '-');  // use unique id if needed
+
+                                // Inner HTML structure
+                                newRow.innerHTML = `
+                                <div class="fpd-cell-0"><span></span></div>
+                                <div class="fpd-cell-1">${el.title}</div>
+                                <div class="fpd-cell-2">
+                                  <span class="fpd-lock-element"><span class="fpd-icon-unlocked"></span></span>
+                                  <span class="fpd-visible-element"><span class="fa-solid fa-eye"></span></span>
+                                  <span class="fpd-remove-element" style="cursor:pointer;">
+                                    <span class="fa-solid fa-trash"></span>
+                                  </span>
+                                </div>
+                              `;
+
+                                // Append to the layers list
+                                // layersList.appendChild(newRow);
+                                // Insert at the top (before first child if exists)
+                                if (layersList.firstChild) {
+                                  layersList.insertBefore(newRow, layersList.firstChild);
+                                } else {
+                                  layersList.appendChild(newRow);
+                                }
+
+                                const removeBtn = newRow.querySelector(".fpd-remove-element");
+                                if (removeBtn) {
+                                  removeBtn.addEventListener("click", () => {
+                                    const canvas = this.fpdInstance.currentViewInstance.fabricCanvas;
+
+                                    // Remove element from Fabric.js canvas
+                                    canvas.remove(el);
+                                    canvas.requestRenderAll();
+
+                                    // Remove the row from the panel
+                                    newRow.remove();
+
+                                    console.log(`Removed element & row for: ${el.title}`);
+                                  });
+                                }
+                                // 🔹 Lock button
+                                const lockBtn = newRow.querySelector(".fpd-lock-element");
+                                if (lockBtn) {
+                                  lockBtn.addEventListener("click", () => {
+                                    el.selectable = !el.selectable; // toggle lock
+                                    if (el.selectable) {
+                                      lockBtn.innerHTML = `<span class="fpd-icon-unlocked"></span>`;
+                                      console.log(`${el.title} unlocked`);
+                                    } else {
+                                      lockBtn.innerHTML = `<span class="fpd-icon-locked"></span>`;
+                                      console.log(`${el.title} locked`);
+                                    }
+                                    canvas.requestRenderAll();
+                                  });
+                                }
+                                const visibleBtn = newRow.querySelector(".fpd-visible-element");
+                                if (visibleBtn) {
+                                  visibleBtn.addEventListener("click", () => {
+                                    const canvas = this.fpdInstance.currentViewInstance.fabricCanvas;
+                                    el.visible = !el.visible; // toggle visibility
+                                    if (el.visible) {
+                                      visibleBtn.innerHTML = `<span class="fa-solid fa-eye"></span>`;
+                                      console.log(`${el.title} is visible`);
+                                    } else {
+                                      visibleBtn.innerHTML = `<span class="fa-solid fa-eye-slash"></span>`;
+                                      console.log(`${el.title} is hidden`);
+                                    }
+                                    canvas.requestRenderAll();
+                                  });
+                                }
+
+                                console.log("Custom row added to layers panel ✅");
+                              } else {
+                                console.warn("Layers list not found in DOM ❌");
+                              }
+
+                            }
+                            if (el.title === "Base") {
+                              console.log("This is the Base element", el);
+                            }
+                          });
+                          console.log("djjjjjjjjj", this.fpdInstance.modules)
+                          
+                        //  this.fpdInstance.currentViewInstance.fabricCanvas.fire('elementAdd', { element: group });
+
                         }
                       })
+
+                      
 
 
                     categoryContainer.appendChild(newDiv);
@@ -30985,7 +31091,6 @@ console.log("t:", t);
           s.send(i)
       }
       function Ui (t, e) {
-        alert("chhhhhecksksks")
         if (K()) {
           var i = window.localStorage.getItem('fpd_uploaded_images')
               ? JSON.parse(window.localStorage.getItem('fpd_uploaded_images'))
@@ -32070,8 +32175,14 @@ console.log("t:", t);
           this.fpdInstance
             .getElements(this.fpdInstance.currentViewIndex, 'all', !1)
             .forEach(t => {
-              console.log('seting up all the layers again');
-              t.checkEditable() && Wn(this, Yn, Kn).call(this, t)
+              console.log('seting up all the layers again', t, t.checkEditable());
+              if(t && t.title != 'Overlay'){
+                Wn(this, Yn, Kn).call(this, t)
+              }
+              else{
+                t.checkEditable() && Wn(this, Yn, Kn).call(this, t)
+              }
+              // t.checkEditable() && Wn(this, Yn, Kn).call(this, t)
             }),
           Hn(this, Vn) && Hn(this, Vn).dispose(),
           (t = this),
@@ -32758,7 +32869,6 @@ console.log("t:", t);
               Ps(this, Ds, zs).call(this)
             }),
             G(this.container.querySelector('.fpd-btn'), 'click', e => {
-              alert('ccccccccccccccccccccccc1')
               const i = Ps(this, Ls, Ws).call(this)
               Ps(this, _s, Hs).call(this, i),
                 (t.currentViewInstance.names_numbers =
@@ -34793,6 +34903,7 @@ console.log("t:", t);
                 }
 
                 if (updated) {
+                  console.log("updated",updated)
                   elementtypedata.setCoords();
                   t.currentTarget.currentViewInstance.fabricCanvas.requestRenderAll();
 
@@ -35362,8 +35473,20 @@ console.log("t:", t);
   if (group) {
     group.removable = true;
     group.resizable = true;
+    group.positioned = true;
     group.boundingBox = 'Base';
-    group.boundingBoxMode = 'clipping';
+    // group.boundingBoxMode = 'clipping';
+
+    group.selectable = true;
+    group.hasControls = true;
+    group.draggable = true;
+    group.textAlign = 'center';
+    group.autoCenter = true;
+    group.originX = 'center';
+    group.originY = 'center';
+    group.scaleX = 1;
+    group.scaleY = 1;
+    group.rotatable = 1;
 
     // --- CLIP TO BASE IMAGE ---
     // const baseImage = fabricCanvas.getObjects().find(o => o.title === 'Overlay');
@@ -35473,8 +35596,22 @@ G(this.navElem.querySelector('.fpd-group-paste-by'), 'click', e => {
           copiedGroup.clone((clonedObj) => {
             clonedObj.left += 20;
             clonedObj.top += 20;
-            clonedObj.removable = true;
+            // clonedObj.uniformScaling = true;
+            clonedObj.selectable = true;
+            clonedObj.hasControls = true;
             clonedObj.resizable = true;
+            clonedObj.draggable = true;
+            clonedObj.removable = true;
+            clonedObj.positioned = true;
+            clonedObj.textAlign = 'center';
+            clonedObj.autoCenter = true;
+            clonedObj.originX = 'center';
+            clonedObj.originY = 'center';
+            clonedObj.scaleX = 1;
+            clonedObj.scaleY = 1;
+            clonedObj.rotatable = true;
+            clonedObj.lockUniScaling = true;  
+            clonedObj.uniformScaling = true;
             fabricCanvas.add(clonedObj);
             fabricCanvas.setActiveObject(clonedObj);
             fabricCanvas.renderAll();
@@ -35539,6 +35676,7 @@ G(this.navElem.querySelector('.fpd-group-paste-by'), 'click', e => {
               let scaleX, scaleY, flipX, flipY, left, top;
 
               if (savedGroupTransform) {
+                console.log("data of ungroup text",savedGroupTransform);
                 left = savedGroupTransform.left ?? 500;
                 top = savedGroupTransform.top ?? 500;
                 scaleX = savedGroupTransform.scaleX ??  1;
@@ -35546,14 +35684,16 @@ G(this.navElem.querySelector('.fpd-group-paste-by'), 'click', e => {
                 flipX  = savedGroupTransform.flipX ?? obj.flipX ?? props.flipX ?? false;
                 flipY  = savedGroupTransform.flipY ?? obj.flipY ?? props.flipY ?? false;
               } else {
+                console.log("coming to else of obj", obj)
                 top = 500;
                 left = 500;
-                scaleX = obj.scaleX * initialZoom;
-                scaleY = obj.scaleY * initialZoom;
+                scaleX = obj.scaleX  || 1;
+                scaleY = obj.scaleY || 1;
                 flipX  = obj.flipX || props.flipX || false;
                 flipY  = obj.flipY || props.flipY || false;
+                console.log("coming to else of obj 1", obj, obj.scaleX * initialZoom)
               }
-
+              console.log(scaleX, scaleY, "value of scaleX and scaleY 1")
               // 👉 If not the first object, adjust top relative to previous object
               if (index > 0 && lastTop !== null && lastFontSize !== null) {
                 top = lastTop + lastFontSize; // place it below previous
@@ -35561,7 +35701,7 @@ G(this.navElem.querySelector('.fpd-group-paste-by'), 'click', e => {
 
               const fontSize = props.textSize || obj.fontSize || 120;
               const elementType = props.curved ? 'curvedText' : 'text';
-
+              console.log(scaleX, scaleY, "value of scaleX and scaleY")
               const restoredText = t.currentViewInstance.fabricCanvas.addElement(
                 elementType,
                 savedTitle || objectText, // title
@@ -36969,7 +37109,6 @@ G(this.navElem.querySelector('.fpd-group-paste-by'), 'click', e => {
               this.fpdInstance.mainOptions.modalMode
             )
             G(n, 'click', i => {
-              alert("chchhchskk1121")
               i.preventDefault(),
                 X(document.body, [
                   'fpd-overflow-hidden',
@@ -37800,7 +37939,7 @@ G(this.navElem.querySelector('.fpd-group-paste-by'), 'click', e => {
                     r.addEventListener('click', e => {
                       console.log('88888888', t, r)
                       console.log('fpdInstance', fpdInstance)
-                      console.log('Anoop Data 4-1--', fpdInstance, e, r)
+                      console.log('1Anoop Data 4-1--', fpdInstance, e, r)
                       let valueofTitle = e?.srcElement.dataset.title
                       console.log('valueofTitle', valueofTitle)
                       localStorage.setItem('valueofTitle', valueofTitle)

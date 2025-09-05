@@ -242,7 +242,7 @@ export class HomeComponent implements AfterViewInit {
           langJSON: 'assets/data/langs/default.json',
           // layout: 'topbar',
           stageWidth: 2500,
-          stageHeight: 1000,
+          stageHeight: 700,
           initialActiveModule: 'products',
           // toolbarPlacement: "inside-top",
           editorMode: false,
@@ -967,24 +967,75 @@ export class HomeComponent implements AfterViewInit {
 
       // Move layer up in stack
       document.getElementById('TextMoveUp')?.addEventListener('click', () => {
+        // const canvas = this.designer.currentViewInstance.fabricCanvas;
+        // const obj = canvas.getActiveObject();
+        // console.log('Text Move Up clicked', canvas, obj);
+        // if (obj) {
+        //   canvas.bringForward(obj); // Moves object one step up in layer
+        //   canvas.requestRenderAll();
+        // }
         const canvas = this.designer.currentViewInstance.fabricCanvas;
         const obj = canvas.getActiveObject();
-        console.log('Text Move Up clicked', canvas, obj);
-        if (obj) {
-          canvas.bringForward(obj); // Moves object one step up in layer
-          canvas.requestRenderAll();
+        if (!obj) return;
+
+        // Find the overlay object
+        const overlayObj = canvas.getObjects().find((o: any) => o.title === "Overlay");
+
+        if (overlayObj) {
+          const overlayIndex = canvas.getObjects().indexOf(overlayObj);
+          const objIndex = canvas.getObjects().indexOf(obj);
+
+          console.log("Overlay index:", overlayIndex, "Object index:", objIndex);
+
+          // Only bring forward if object is still below overlay
+          if (objIndex < overlayIndex - 1) {
+            canvas.bringForward(obj);
+          } else {
+            alert("Not possible to move above Overlay layer!");
+          }
+        } else {
+          // If no overlay, just move forward normally
+          canvas.bringForward(obj);
         }
+
+        canvas.requestRenderAll();
       });
 
       // Move layer down in stack
       document.getElementById('TextMoveDown')?.addEventListener('click', () => {
+        // const canvas = this.designer.currentViewInstance.fabricCanvas;
+        // const obj = canvas.getActiveObject();
+        // console.log('Text Move Down clicked', canvas, obj);
+        // if (obj) {
+        //   canvas.sendBackwards(obj); // Moves object one step down in layer
+        //   canvas.requestRenderAll();
+        // }
         const canvas = this.designer.currentViewInstance.fabricCanvas;
         const obj = canvas.getActiveObject();
-        console.log('Text Move Down clicked', canvas, obj);
-        if (obj) {
-          canvas.sendBackwards(obj); // Moves object one step down in layer
-          canvas.requestRenderAll();
+        if (!obj) return;
+
+        console.log("Text Move Down clicked", obj);
+
+        // Find your base object (assuming it has title "Base")
+        const baseObj = canvas.getObjects().find((o: any) => o.title === "Base");
+
+        if (baseObj) {
+          const baseIndex = canvas.getObjects().indexOf(baseObj);
+          const objIndex = canvas.getObjects().indexOf(obj);
+
+          if (objIndex > baseIndex + 1) {
+            // move one step down, but never below base
+            canvas.sendBackwards(obj);
+          } else {
+            alert("Reached just above base, not moving further down.");
+          }
+        } else {
+          // if no base, just move normally
+          canvas.sendBackwards(obj);
         }
+
+        canvas.requestRenderAll();
+
       });
 
 
