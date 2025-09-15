@@ -29906,6 +29906,7 @@ console.log("t:", t);
               div.appendChild(picture)
 
               div.addEventListener('click', event => {
+                console.log('Element clicked 1:', event)
                 const current = event.currentTarget
                 console.log('current', current, 'event', event)
                 const i = Array.from(
@@ -30280,6 +30281,9 @@ console.log("t:", t);
 
           // Your existing click logic unchanged...
           div.addEventListener('click', event => {
+            // document.querySelector('fpd-element-toolbar')?.classList.add('fpd-show');
+            // document.querySelector('.fpd-ungroup1')?.classList.add('fpd-hidden');
+            console.log('Element clicked 2:', event)
             const current = event.currentTarget
             console.log('current', current, 'event', event)
             const i = Array.from(
@@ -30306,6 +30310,7 @@ console.log("t:", t);
                 dataTitle,
                 parameters
               )
+               document.querySelector('.fpd-ungroup1')?.classList.add('fpd-hidden');
             } else if (n.category) {
               Ke(this, ni).push(i)
               $e(this, si, n.category)
@@ -36161,7 +36166,16 @@ G(this.navElem.querySelector('.fpd-group-paste-by'), 'click', e => {
               )
             }
           })
-          r.append(a),
+          r.append(a);
+            console.log(r,"eeee",a, "sjjs",t);
+            if(t.source != ""){
+              console.log("inside if",t.source);
+              document.querySelector('body').classList.add('notgroup')
+            }
+            else{
+              document.querySelector('body').classList.remove('notgroup')
+            }
+            console.log("eeee1111",e)
             Kr(this, ia, ya).call(this, 'color'),
             Kr(this, sa, wa).call(this, 'color', 'fill', !0),
             Kr(this, sa, wa).call(
@@ -36190,6 +36204,7 @@ G(this.navElem.querySelector('.fpd-group-paste-by'), 'click', e => {
             }
           })),
           Jr(this, $r).append(e),
+          console.log("eeee1",e),
           Kr(this, ia, ya).call(this, 'color'),
           Kr(this, sa, wa).call(this, 'color', 'fill', !0))
         let i = Boolean(
@@ -36198,6 +36213,7 @@ G(this.navElem.querySelector('.fpd-group-paste-by'), 'click', e => {
             t.__editorMode
         )
         ;(i || t.rotatable) &&
+        console.log("eeee1112",e),
           (Kr(this, ia, ya).call(this, 'transform'),
           Kr(this, na, xa).call(this, 'transform', 'scale', i),
           Kr(this, la, Ea).call(this, t.lockUniScaling),
@@ -36219,7 +36235,17 @@ G(this.navElem.querySelector('.fpd-group-paste-by'), 'click', e => {
             'flip',
             Boolean(i || t.__editorMode)
           )),
+          console.log("eeee1113",t);
+          if(t.source == undefined){
+              console.log("inside if",t.source);
+              document.querySelector('body').classList.remove('notgroup')
+            }
+            else{
+              console.log("inside else",t.source);
+              document.querySelector('body').classList.add('notgroup')
+            }
           (t.draggable || t.zChangeable || t.__editorMode) &&
+          
             (Kr(this, ia, ya).call(this, 'position'),
             Kr(this, sa, wa).call(
               this,
@@ -36233,6 +36259,7 @@ G(this.navElem.querySelector('.fpd-group-paste-by'), 'click', e => {
               'align',
               Boolean(t.draggable || t.__editorMode)
             )),
+            console.log("eeee1114",e),
           'text' === t.getType() && (t.editable || t.__editorMode)
             ? (Kr(this, ia, ya).call(this, 'edit-text'),
               Kr(this, ia, ya).call(
@@ -36240,6 +36267,7 @@ G(this.navElem.querySelector('.fpd-group-paste-by'), 'click', e => {
                 'text-size',
                 Boolean(t.resizable || t.__editorMode) && !t.widthFontSize
               ),
+              console.log("eeee11115",e),
               Kr(this, ia, ya).call(this, 'font-family'),
               Kr(this, ia, ya).call(this, 'text-format'),
               t.curvable &&
@@ -36260,6 +36288,7 @@ G(this.navElem.querySelector('.fpd-group-paste-by'), 'click', e => {
           t.advancedEditing &&
             t.source &&
             st(t.source) &&
+            console.log("eeee1",t), 
             (Kr(this, ia, ya).call(this, 'advanced-editing'),
             Kr(this, sa, wa).call(this, 'advanced-editing', 'filters', !0),
             Kr(this, sa, wa).call(
@@ -38808,10 +38837,13 @@ G(this.navElem.querySelector('.fpd-group-paste-by'), 'click', e => {
               {
                 ...this.currentViewInstance.options.customImageParameters,
                 copyable: true,
-                lockUniScaling: false
+                lockUniScaling: true,
+                autoSelect: true,
+                title: e.title ? e.title : 'Custom Element'
               },
               i
             )),
+            document.querySelector('.fpd-ungroup1').classList.add('fpd-hidden'),
             console.log(
               i,
               'addCanvasDesign--1',

@@ -1422,7 +1422,7 @@ export class HomeComponent implements AfterViewInit {
 
 
         document.addEventListener("click", function (e:any) {
-         
+            console.log("Document clicked", e.target, e);
             // Find the toolbar ancestor
             const toolbar = e.target.closest("fpd-element-toolbar");
             if (!toolbar) return; // click was outside

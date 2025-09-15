@@ -457,3 +457,4 @@ fpd-element-toolbar[data-fabric-type="group"]{
 }
 fpd-element-toolbar>.fpd-tools-nav>div>div.fpd-ungroup1{padding: 10px 10px 10px 0;}
 .fpd-group-copy-by svg, .fpd-group-paste-by svg{min-width: 32px;}
+.notgroup fpd-element-toolbar.fpd-smart>.fpd-tools-nav>div>div.fpd-ungroup1{display: none;}
