@@ -232,178 +232,178 @@ export class HomeComponent implements AfterViewInit {
         const fpdTarget = document.getElementById('fpd-target');
         if (!fpdTarget) return;
 
-        this.appOptions = {
-          productsJSON: 'assets/data/products/product-categories.json',
-          // productsJSON: 'https://styleflip-backend-jdm5.ithemes.xyz/api/productmeta/getAllProductMetas',
-          productsJSON1: 'assets/data/products/product-categories-new.json',
-          // designsJSON: 'assets/data/designs/design-categories.json',
-          designsJSON:
-            'https://styleflip-backend-jdm5.ithemes.xyz/api/element/getAllElements',
-          langJSON: 'assets/data/langs/default.json',
-          // layout: 'topbar',
-          stageWidth: 2500,
-          stageHeight: 700,
-          initialActiveModule: 'products',
-          // toolbarPlacement: "inside-top",
-          editorMode: false,
-          smartGuides: true,
-          imageEditor: true,
-          customTextParameters: {
-            colors: false,
-            removable: true,
-            resizable: true,
-            draggable: true,
-            rotatable: true,
-            autoCenter: true,
-            boundingBox: 'Base',
-          },
-          customImageParameters: {
-            draggable: true,
-            removable: true,
-            resizable: true,
-            rotatable: true,
-            colors: '#000',
-            autoCenter: true,
-            boundingBox: 'Base',
-            patterns: true,
-            filters: true,
-          },
-          actions: {
-            // 'top': ['download', 'share', 'print', 'save', 'preview-lightbox', 'paste'],
-            top: [],
-            // 'right': ['manage-layers', 'magnify-glass', 'zoom', 'reset-product', 'qr-code', 'ruler'],
-            right: [],
-            // 'bottom': ['zoom'],
-            left: ['undo', 'redo', 'download', 'zoom', 'reset-product'],
-            center: [],
-            // 'center': ['download','preview-lightbox','paste','zoom','reset-product','qr-code','ruler']
-          },
-          selectedColor: '#f5f5f5',
-          boundingBoxColor: '#005ede',
-          outOfBoundaryColor: '#990000',
-          cornerIconColor: '#000000',
-          mainBarModules: [
-            'products',
-            'productsnew',
-            'designs',
-            'text',
-            'images',
-            'manage-layers',
-            // 'text-layers',
-            'save-load',
-          ],
-          patterns: [
-            {
-              title: 'Polka Dots',
-              url: 'https://www.toptal.com/designers/subtlepatterns/patterns/polka-dots.png',
-            },
-            {
-              title: 'Stripes',
-              url: 'https://www.toptal.com/designers/subtlepatterns/patterns/diagonal-stripes.png',
-            },
-            {
-              title: 'Wood Grain',
-              url: 'https://www.toptal.com/designers/subtlepatterns/patterns/wood-pattern.png',
-            },
-          ],
-          fonts: fontData,
-          textTemplates: [
-            {
-              text: 'I love Styleflip',
-              properties: {
-                fontSize: 50,
-                fontFamily: 'Bangers',
-                fill: '#ff5722', // Vibrant orange
-                stroke: '#000000', // Black outline
-                strokeWidth: 2,
-                shadow: 'rgba(0,0,0,0.3) 2px 2px 3px',
-                curved: true, // Enable curved text
-                curveSpacing: 5, // Space between letters
-                curveRadius: 180, // Adjust radius of the curve
-                curveReverse: false,
-                curvable: 1,
-                patterns: true,
-              },
-            },
-            {
-              text: 'Fun Times',
-              properties: {
-                fontSize: 80,
-                fontFamily: 'Fredoka One',
-                fill: '#3f51b5', // Blue
-                stroke: '#010101',
-                curvable: 1, // White outline
-                strokeWidth: 3,
-                shadow: 'rgba(255,255,255,0.5) 0px 0px 6px',
-              },
-            },
-            {
-              text: 'Creative Soul',
-              properties: {
-                fontSize: 70,
-                fontFamily: 'Pacifico',
-                fill: '#e91e63', // Pink
-                stroke: '#ffc107', // Yellow outline
-                curvable: 1,
-                strokeWidth: 2,
-                shadow: 'rgba(0,0,0,0.2) 1px 1px 4px',
-              },
-            },
-            {
-              text: 'Dream Big',
-              properties: {
-                fontSize: 98,
-                fontFamily: 'Lobster',
-                fill: '#4caf50', // Green
-                stroke: '#ffffff', // White outline
-                strokeWidth: 2,
-                curvable: 1,
-                shadow: 'rgba(0,0,0,0.4) 3px 3px 5px',
-              },
-            },
-          ],
-          fileServerURL: 'https://file.handler.php.stageprojects.xyz/',
-          // fileServerURL: 'http://localhost/fpd/file-handler.php',
-          uploadZone: {
-            useDataURL: true, // ✅ allows upload directly in browser
-          },
-          facebookAppId: '325741021422456',
-          instagramClientId: 'bbe4d544897b4fb0b1bae5a6b44a310b',
-          instagramRedirectUri: 'assets/html/instagram_auth.html',
-          instagramTokenUri: '',
-          colorPickerPalette: [
-            '#000',
-            '#f4cccc',
-            '#fce5cd',
-            '#fff2cc',
-            '#d9ead3',
-            '#d0e0e3',
-            '#cfe2f3',
-            '#d9d2e9',
-            '#ead1dc',
-            '#5f27cd',
-            '#222f3e',
-            '#10ac84',
-          ],
-          pixabayApiKey: '3326084-d99995263eac7194c77ed7401',
-          pixabayLang: 'en',
-          pixabayHighResImages: false,
-          elementParameters: {},
+        // this.appOptions = {
+        //   productsJSON: 'assets/data/products/product-categories.json',
+        //   // productsJSON: 'https://styleflip-backend-jdm5.ithemes.xyz/api/productmeta/getAllProductMetas',
+        //   productsJSON1: 'assets/data/products/product-categories-new.json',
+        //   // designsJSON: 'assets/data/designs/design-categories.json',
+        //   designsJSON:
+        //     'https://styleflip-backend-jdm5.ithemes.xyz/api/element/getAllElements',
+        //   langJSON: 'assets/data/langs/default.json',
+        //   // layout: 'topbar',
+        //   stageWidth: 2500,
+        //   stageHeight: 700,
+        //   initialActiveModule: 'products',
+        //   // toolbarPlacement: "inside-top",
+        //   editorMode: false,
+        //   smartGuides: true,
+        //   imageEditor: true,
+        //   customTextParameters: {
+        //     colors: false,
+        //     removable: true,
+        //     resizable: true,
+        //     draggable: true,
+        //     rotatable: true,
+        //     autoCenter: true,
+        //     boundingBox: 'Base',
+        //   },
+        //   customImageParameters: {
+        //     draggable: true,
+        //     removable: true,
+        //     resizable: true,
+        //     rotatable: true,
+        //     colors: '#000',
+        //     autoCenter: true,
+        //     boundingBox: 'Base',
+        //     patterns: true,
+        //     filters: true,
+        //   },
+        //   actions: {
+        //     // 'top': ['download', 'share', 'print', 'save', 'preview-lightbox', 'paste'],
+        //     top: [],
+        //     // 'right': ['manage-layers', 'magnify-glass', 'zoom', 'reset-product', 'qr-code', 'ruler'],
+        //     right: [],
+        //     // 'bottom': ['zoom'],
+        //     left: ['undo', 'redo', 'download', 'zoom', 'reset-product'],
+        //     center: [],
+        //     // 'center': ['download','preview-lightbox','paste','zoom','reset-product','qr-code','ruler']
+        //   },
+        //   selectedColor: '#f5f5f5',
+        //   boundingBoxColor: '#005ede',
+        //   outOfBoundaryColor: '#990000',
+        //   cornerIconColor: '#000000',
+        //   mainBarModules: [
+        //     'products',
+        //     'productsnew',
+        //     'designs',
+        //     'text',
+        //     'images',
+        //     'manage-layers',
+        //     // 'text-layers',
+        //     'save-load',
+        //   ],
+        //   patterns: [
+        //     {
+        //       title: 'Polka Dots',
+        //       url: 'https://www.toptal.com/designers/subtlepatterns/patterns/polka-dots.png',
+        //     },
+        //     {
+        //       title: 'Stripes',
+        //       url: 'https://www.toptal.com/designers/subtlepatterns/patterns/diagonal-stripes.png',
+        //     },
+        //     {
+        //       title: 'Wood Grain',
+        //       url: 'https://www.toptal.com/designers/subtlepatterns/patterns/wood-pattern.png',
+        //     },
+        //   ],
+        //   fonts: fontData,
+        //   textTemplates: [
+        //     {
+        //       text: 'I love Styleflip',
+        //       properties: {
+        //         fontSize: 50,
+        //         fontFamily: 'Bangers',
+        //         fill: '#ff5722', // Vibrant orange
+        //         stroke: '#000000', // Black outline
+        //         strokeWidth: 2,
+        //         shadow: 'rgba(0,0,0,0.3) 2px 2px 3px',
+        //         curved: true, // Enable curved text
+        //         curveSpacing: 5, // Space between letters
+        //         curveRadius: 180, // Adjust radius of the curve
+        //         curveReverse: false,
+        //         curvable: 1,
+        //         patterns: true,
+        //       },
+        //     },
+        //     {
+        //       text: 'Fun Times',
+        //       properties: {
+        //         fontSize: 80,
+        //         fontFamily: 'Fredoka One',
+        //         fill: '#3f51b5', // Blue
+        //         stroke: '#010101',
+        //         curvable: 1, // White outline
+        //         strokeWidth: 3,
+        //         shadow: 'rgba(255,255,255,0.5) 0px 0px 6px',
+        //       },
+        //     },
+        //     {
+        //       text: 'Creative Soul',
+        //       properties: {
+        //         fontSize: 70,
+        //         fontFamily: 'Pacifico',
+        //         fill: '#e91e63', // Pink
+        //         stroke: '#ffc107', // Yellow outline
+        //         curvable: 1,
+        //         strokeWidth: 2,
+        //         shadow: 'rgba(0,0,0,0.2) 1px 1px 4px',
+        //       },
+        //     },
+        //     {
+        //       text: 'Dream Big',
+        //       properties: {
+        //         fontSize: 98,
+        //         fontFamily: 'Lobster',
+        //         fill: '#4caf50', // Green
+        //         stroke: '#ffffff', // White outline
+        //         strokeWidth: 2,
+        //         curvable: 1,
+        //         shadow: 'rgba(0,0,0,0.4) 3px 3px 5px',
+        //       },
+        //     },
+        //   ],
+        //   fileServerURL: 'https://file.handler.php.stageprojects.xyz/',
+        //   // fileServerURL: 'http://localhost/fpd/file-handler.php',
+        //   uploadZone: {
+        //     useDataURL: true, // ✅ allows upload directly in browser
+        //   },
+        //   facebookAppId: '325741021422456',
+        //   instagramClientId: 'bbe4d544897b4fb0b1bae5a6b44a310b',
+        //   instagramRedirectUri: 'assets/html/instagram_auth.html',
+        //   instagramTokenUri: '',
+        //   colorPickerPalette: [
+        //     '#000',
+        //     '#f4cccc',
+        //     '#fce5cd',
+        //     '#fff2cc',
+        //     '#d9ead3',
+        //     '#d0e0e3',
+        //     '#cfe2f3',
+        //     '#d9d2e9',
+        //     '#ead1dc',
+        //     '#5f27cd',
+        //     '#222f3e',
+        //     '#10ac84',
+        //   ],
+        //   pixabayApiKey: '3326084-d99995263eac7194c77ed7401',
+        //   pixabayLang: 'en',
+        //   pixabayHighResImages: false,
+        //   elementParameters: {},
 
-          lazyLoad: true,
-          toolbarPlacement: 'smart',
-          // imageParameters:{
-          //   advancedEditing: true
-          // }
-        };
+        //   lazyLoad: true,
+        //   toolbarPlacement: 'smart',
+        //   // imageParameters:{
+        //   //   advancedEditing: true
+        //   // }
+        // };
 
-        this.designer = new FancyProductDesigner(
-          this.document.querySelector('#clothing-designer'),
-          this.appOptions
-        );
+        // this.designer = new FancyProductDesigner(
+        //   this.document.querySelector('#clothing-designer'),
+        //   this.appOptions
+        // );
         
-       
-        const dataofproducts = localStorage.getItem('fpdProductsJSON');
+         console.log("designer is 1", this.designer);
+        const dataofproducts = this.designer.product;
         console.log('dataofproducts', dataofproducts); 
         const canvas = this.designer?.currentViewInstance?.fabricCanvas;
        
@@ -1488,19 +1488,264 @@ export class HomeComponent implements AfterViewInit {
 
   ngOnInit() {
     
-    window.addEventListener('load', () => {
-      fetch('https://styleflip-backend-jdm5.ithemes.xyz/api/product/getAllProducts')
-        .then(res => res.json())
-        .then(data => {
-          console.log('Large products loaded:', data);
-          console.log('', this.designer)
-          localStorage.setItem('fpdProductsJSON', JSON.stringify(data));
-          this.designer.product = data;
-          console.log(this.designer.product, '1111111111111', this.designer)
-        })
-        .catch(err => console.error('Error loading large products:', err));
-    });   
+    // window.addEventListener('load', () => {
+    //   fetch('https://styleflip-backend-jdm5.ithemes.xyz/api/product/getAllProducts')
+    //     .then(res => res.json())
+    //     .then(data => {
+    //       console.log('Large products loaded:', data);
+    //       console.log('', this.designer)
+    //       // localStorage.setItem('fpdProductsJSON', JSON.stringify(data));
+    //       this.designer.product = data;
+    //       console.log(this.designer.product, '1111111111111', this.designer)
+    //     })
+    //     .catch(err => console.error('Error loading large products:', err));
+    // });   
 
+    // Open or create IndexedDB
+  function openDB(): Promise<IDBDatabase> {
+    return new Promise((resolve, reject) => {
+      const request = indexedDB.open("FPD_DB", 1);
+
+      request.onupgradeneeded = (event: any) => {
+        const db = event.target.result;
+        if (!db.objectStoreNames.contains("products")) {
+          db.createObjectStore("products", { keyPath: "id", autoIncrement: true });
+        }
+      };
+
+      request.onsuccess = (event: any) => {
+        resolve(event.target.result);
+      };
+
+      request.onerror = (event: any) => {
+        reject(event.target.error);
+      };
+    });
+  }
+
+  // Save products in IndexedDB
+  async function saveProducts(data: any[]) {
+    const db = await openDB();
+    const tx = db.transaction("products", "readwrite");
+    const store = tx.objectStore("products");
+
+    store.clear(); // clear old data
+
+    if (Array.isArray(data)) {
+      data.forEach((item) => store.add(item));
+    } else {
+      store.add(data);
+    }
+
+    return new Promise<void>((resolve, reject) => {
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => reject(tx.error);
+      tx.onabort = () => reject(tx.error);
+    });
+  }
+
+  // Load products from IndexedDB
+  async function getProducts(): Promise<any[]> {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction("products", "readonly");
+      const store = tx.objectStore("products");
+      const request = store.getAll();
+
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error);
+    });
+  }
+
+  // Attach getProducts to window and bind 'this'
+  (window as any).getProducts = getProducts.bind(this);
+  const storedFonts = localStorage.getItem('fontList');
+      const fontData = storedFonts ? JSON.parse(storedFonts) : null;
+  // window.addEventListener("load", () => {
+  this.appOptions = {
+          productsJSON: 'assets/data/products/product-categories.json',
+          // productsJSON: 'https://styleflip-backend-jdm5.ithemes.xyz/api/productmeta/getAllProductMetas',
+          productsJSON1: 'assets/data/products/product-categories-new.json',
+          // designsJSON: 'assets/data/designs/design-categories.json',
+          designsJSON:
+            'https://styleflip-backend-jdm5.ithemes.xyz/api/element/getAllElements',
+          langJSON: 'assets/data/langs/default.json',
+          // layout: 'topbar',
+          stageWidth: 2500,
+          stageHeight: 700,
+          initialActiveModule: 'products',
+          // toolbarPlacement: "inside-top",
+          editorMode: false,
+          smartGuides: true,
+          imageEditor: true,
+          customTextParameters: {
+            colors: false,
+            removable: true,
+            resizable: true,
+            draggable: true,
+            rotatable: true,
+            autoCenter: true,
+            boundingBox: 'Base',
+          },
+          customImageParameters: {
+            draggable: true,
+            removable: true,
+            resizable: true,
+            rotatable: true,
+            colors: '#000',
+            autoCenter: true,
+            boundingBox: 'Base',
+            patterns: true,
+            filters: true,
+          },
+          actions: {
+            // 'top': ['download', 'share', 'print', 'save', 'preview-lightbox', 'paste'],
+            top: [],
+            // 'right': ['manage-layers', 'magnify-glass', 'zoom', 'reset-product', 'qr-code', 'ruler'],
+            right: [],
+            // 'bottom': ['zoom'],
+            left: ['undo', 'redo', 'download', 'zoom', 'reset-product'],
+            center: [],
+            // 'center': ['download','preview-lightbox','paste','zoom','reset-product','qr-code','ruler']
+          },
+          selectedColor: '#f5f5f5',
+          boundingBoxColor: '#005ede',
+          outOfBoundaryColor: '#990000',
+          cornerIconColor: '#000000',
+          mainBarModules: [
+            'products',
+            'productsnew',
+            'designs',
+            'text',
+            'images',
+            'manage-layers',
+            // 'text-layers',
+            'save-load',
+          ],
+          patterns: [
+            {
+              title: 'Polka Dots',
+              url: 'https://www.toptal.com/designers/subtlepatterns/patterns/polka-dots.png',
+            },
+            {
+              title: 'Stripes',
+              url: 'https://www.toptal.com/designers/subtlepatterns/patterns/diagonal-stripes.png',
+            },
+            {
+              title: 'Wood Grain',
+              url: 'https://www.toptal.com/designers/subtlepatterns/patterns/wood-pattern.png',
+            },
+          ],
+          fonts: fontData,
+          textTemplates: [
+            {
+              text: 'I love Styleflip',
+              properties: {
+                fontSize: 50,
+                fontFamily: 'Bangers',
+                fill: '#ff5722', // Vibrant orange
+                stroke: '#000000', // Black outline
+                strokeWidth: 2,
+                shadow: 'rgba(0,0,0,0.3) 2px 2px 3px',
+                curved: true, // Enable curved text
+                curveSpacing: 5, // Space between letters
+                curveRadius: 180, // Adjust radius of the curve
+                curveReverse: false,
+                curvable: 1,
+                patterns: true,
+              },
+            },
+            {
+              text: 'Fun Times',
+              properties: {
+                fontSize: 80,
+                fontFamily: 'Fredoka One',
+                fill: '#3f51b5', // Blue
+                stroke: '#010101',
+                curvable: 1, // White outline
+                strokeWidth: 3,
+                shadow: 'rgba(255,255,255,0.5) 0px 0px 6px',
+              },
+            },
+            {
+              text: 'Creative Soul',
+              properties: {
+                fontSize: 70,
+                fontFamily: 'Pacifico',
+                fill: '#e91e63', // Pink
+                stroke: '#ffc107', // Yellow outline
+                curvable: 1,
+                strokeWidth: 2,
+                shadow: 'rgba(0,0,0,0.2) 1px 1px 4px',
+              },
+            },
+            {
+              text: 'Dream Big',
+              properties: {
+                fontSize: 98,
+                fontFamily: 'Lobster',
+                fill: '#4caf50', // Green
+                stroke: '#ffffff', // White outline
+                strokeWidth: 2,
+                curvable: 1,
+                shadow: 'rgba(0,0,0,0.4) 3px 3px 5px',
+              },
+            },
+          ],
+          fileServerURL: 'https://file.handler.php.stageprojects.xyz/',
+          // fileServerURL: 'http://localhost/fpd/file-handler.php',
+          uploadZone: {
+            useDataURL: true, // ✅ allows upload directly in browser
+          },
+          facebookAppId: '325741021422456',
+          instagramClientId: 'bbe4d544897b4fb0b1bae5a6b44a310b',
+          instagramRedirectUri: 'assets/html/instagram_auth.html',
+          instagramTokenUri: '',
+          colorPickerPalette: [
+            '#000',
+            '#f4cccc',
+            '#fce5cd',
+            '#fff2cc',
+            '#d9ead3',
+            '#d0e0e3',
+            '#cfe2f3',
+            '#d9d2e9',
+            '#ead1dc',
+            '#5f27cd',
+            '#222f3e',
+            '#10ac84',
+          ],
+          pixabayApiKey: '3326084-d99995263eac7194c77ed7401',
+          pixabayLang: 'en',
+          pixabayHighResImages: false,
+          elementParameters: {},
+
+          lazyLoad: true,
+          toolbarPlacement: 'smart',
+          // imageParameters:{
+          //   advancedEditing: true
+          // }
+        };
+    this.designer = new FancyProductDesigner(
+          this.document.querySelector('#clothing-designer'),
+          this.appOptions
+        );
+        console.log("designer is", this.designer);
+    fetch("https://styleflip-backend-jdm5.ithemes.xyz/api/product/getAllProducts")
+      .then((res) => res.json())
+      .then(async (data) => {
+        console.log("Large products loaded:", data);
+
+        await saveProducts(data); // Save in IndexedDB
+
+        const stored = await getProducts(); // Read back from IndexedDB
+        console.log("IndexedDB products:", stored);
+        console.log("", this.designer);
+        this.designer.product = stored;
+        console.log(this.designer.product, "✅ Products loaded into designer");
+      })
+      .catch((err) => console.error("Error loading large products:", err));
+  // });
 
     const slug = this.route.snapshot.paramMap.get('slug');
     const manufacturer = this.route.snapshot.paramMap.get('manufacturer');

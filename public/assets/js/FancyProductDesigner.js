@@ -39234,9 +39234,16 @@ G(this.navElem.querySelector('.fpd-group-paste-by'), 'click', e => {
             }, 1)
         })
       }
-      function Wo () {
-        const savedJson = localStorage.getItem('fpdProductsJSON');
-        this.mainOptions.productsJSON = JSON.parse(savedJson);
+      async function Wo () {
+        alert("check data is");
+        // const savedJson = localStorage.getItem('fpdProductsJSON');
+        console.log("Fetching from IndexedDB---")
+        const savedJson = await getProducts("Products");
+        console.log("Loaded from IndexedDB:", savedJson);
+        // this.mainOptions.productsJSON = JSON.parse(savedJson);
+        this.mainOptions.productsJSON = Array.isArray(savedJson) || typeof savedJson === "object"
+        ? savedJson
+        : JSON.parse(savedJson);
         console.log("this.mainOptions.productsJSON",this.mainOptions.productsJSON)
         q(this, 'ready', {}),
           (this.warningsWrapper =
