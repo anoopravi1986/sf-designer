@@ -25356,7 +25356,7 @@
               this.options.cornerIconColor),
             (s = z(
               {
-                containerClass: 'fpd-view-stage fpd-hidden min-w-[800px]',
+                containerClass: 'fpd-view-stage fpd-view-staage-mains fpd-hidden min-w-[800px]',
                 selection: this.options.multiSelection,
                 selectionBorderColor: this.options.multiSelectionColor,
                 selectionColor: o(this.options.multiSelectionColor)
@@ -25465,6 +25465,7 @@
                 i = e.price;
 
               console.log('object:added', e, i);
+              
               if(e && e.text){
                 document.querySelector('.fpd-group-paste-by').classList.add('fpd-hidden');
                 document.querySelector('.fpd-group-copy-by').classList.add('fpd-hidden');
@@ -28769,8 +28770,10 @@ console.log("t:", t);
                     editable: true,
                     hasControls: true,
                     evented: true,
+                    selected: false,
                     transformable: true,
                     lockMovementX: true,
+                    isMoving: true,
                     objectCaching: false,
                   });
 
@@ -28798,6 +28801,7 @@ console.log("t:", t);
                       console.log('Type:', element.type, 'Title:', element.title, element);
                       if (element.type === 'i-text') {
                         if (element && typeof t.currentViewInstance.fabricCanvas.setActiveObject === 'function') {
+                          console.log("Found i-text element:", element);
                           t.currentViewInstance.fabricCanvas.setActiveObject(element);
                           t.currentViewInstance.fabricCanvas.renderAll();
                           break;
@@ -29296,7 +29300,8 @@ console.log("t:", t);
                             resizable: true,
                             boundingBox: 'base',
                             _addToUZ: t.currentViewInstance.currentUploadZone,
-                            _calcWidth: true
+                            _calcWidth: true,
+                            advancedEditing: false
                           }
 
                           // Save last 2 props to localStorage
@@ -29368,6 +29373,7 @@ console.log("t:", t);
                             scaleX: 1,
                             scaleY: 1,
                             rotatable:1,
+                            advancedEditing: false,
                             title: title + '' + Math.floor(Math.random() * 100000),
                           })
 
@@ -35872,7 +35878,7 @@ G(this.navElem.querySelector('.fpd-group-paste-by'), 'click', e => {
                     document.querySelector('.fpd-tool-font-family')?.classList.remove('fpd-active');
                     document.querySelector('.fpd-panel-font-family')?.classList.remove('fpd-active');
                     document.querySelector('fpd-element-toolbar').classList.remove('my-font-family', 'fpd-panel-visible');
-                    debugger;
+                   // debugger;
                     return 0
                   }
                   else{
@@ -38254,9 +38260,10 @@ G(this.navElem.querySelector('.fpd-group-paste-by'), 'click', e => {
             },
             elementAdd: t => {
               console.log('elementAdd', t)
+              t.selected = true;
               let { element: e } = t
               if (e) {
-                console.log(e.getType(),e.draggable, 'elementAddsss', e)
+                console.log(e.getType(),e.draggable, 'elementAddsss', e, e.selected)
                 if(e.getType() == 'text') {e.removable = true}
                 if (e.getType() == 'image' & e.draggable == '0') {
                   console.log('image draggable', e.draggable);
@@ -38265,6 +38272,7 @@ G(this.navElem.querySelector('.fpd-group-paste-by'), 'click', e => {
                   // const scale = Math.min(scaleX, scaleY);
                   // e.scaleX = scale;
                   // e.scaleY = scale;
+                  e.selected = true;
                 }
                 
                 if (
@@ -39235,7 +39243,6 @@ G(this.navElem.querySelector('.fpd-group-paste-by'), 'click', e => {
         })
       }
       async function Wo () {
-        alert("check data is");
         // const savedJson = localStorage.getItem('fpdProductsJSON');
         console.log("Fetching from IndexedDB---")
         const savedJson = await getProducts("Products");

@@ -7,12 +7,14 @@ import {
   HostListener,
   ElementRef,
 } from '@angular/core';
+import { createIcons, icons } from 'lucide';
 import { isPlatformBrowser, DOCUMENT, CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { Title } from '@angular/platform-browser';
 
 declare var FancyProductDesigner: any;
+declare const lucide: any;
 import $ from 'jquery';
 import { filter } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
@@ -421,6 +423,7 @@ export class HomeComponent implements AfterViewInit {
         if (this.designer?.currentViewInstance?.fabricCanvas) {
           this.designer.currentViewInstance.fabricCanvas.selection = true;
         }
+        // this.designer.fpdInstance.actionsBar.doAction('reset-product')
 
         // Optionally: Add a keyboard shortcut (Ctrl+G) to group selected objects
         window.addEventListener('keydown', (event: KeyboardEvent) => {
@@ -764,6 +767,7 @@ export class HomeComponent implements AfterViewInit {
 
       this.moveBoldToPrimaryTools()
     }, 3000);
+    createIcons({ icons });
   }
 
   moveBoldToPrimaryTools(): void {
@@ -1487,7 +1491,11 @@ export class HomeComponent implements AfterViewInit {
   }
 
   ngOnInit() {
-    
+    setTimeout(() => {
+      lucide.createIcons(); 
+      // 👆 use nameAttr if you’re using data-moduleicon
+      // if you use data-lucide, remove nameAttr
+    }, 5000);
     // window.addEventListener('load', () => {
     //   fetch('https://styleflip-backend-jdm5.ithemes.xyz/api/product/getAllProducts')
     //     .then(res => res.json())
@@ -1742,6 +1750,9 @@ export class HomeComponent implements AfterViewInit {
         console.log("IndexedDB products:", stored);
         console.log("", this.designer);
         this.designer.product = stored;
+        console.log(this.designer.product, "1111111111111Vivks", this.designer.fpdInstance);
+        
+       
         console.log(this.designer.product, "✅ Products loaded into designer");
       })
       .catch((err) => console.error("Error loading large products:", err));

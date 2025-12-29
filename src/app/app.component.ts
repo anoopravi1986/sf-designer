@@ -1,4 +1,4 @@
-import { Component, Inject, PLATFORM_ID } from '@angular/core';
+import { Component, Inject, PLATFORM_ID, AfterViewInit } from '@angular/core';
 import { createIcons, icons } from 'lucide';
 import { isPlatformBrowser } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
@@ -13,4 +13,8 @@ import { FormsModule } from '@angular/forms';
 export class AppComponent {
   title = 'designer-angular';
   constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
+  ngAfterViewInit() {
+    createIcons({ icons });
+  }
+
 }
