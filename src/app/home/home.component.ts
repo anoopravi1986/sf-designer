@@ -1475,6 +1475,21 @@ export class HomeComponent implements AfterViewInit {
               }
 
             console.log("Toolbar updated with class:", toolbar.className);
+            document.body.classList.forEach(cls => {
+              if (cls.startsWith('fpd-type-')) {
+                document.body.classList.remove(cls);
+              }
+            });
+
+            // 2️⃣ Find fpd-type-* class from toolbar
+            const typeClass = toolbar.className
+              .split(' ')
+              .find((cls: string) => cls.startsWith('fpd-type-'));
+
+            // 3️⃣ Add it to body
+            if (typeClass) {
+              document.body.classList.add(typeClass);
+            }
           });
 
 

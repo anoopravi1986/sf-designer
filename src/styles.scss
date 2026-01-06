@@ -476,3 +476,5 @@ fpd-element-toolbar>.fpd-tools-nav>div>div.fpd-ungroup1{padding: 10px 10px 10px 
 .notgroup fpd-element-toolbar.fpd-smart>.fpd-tools-nav>div>div.fpd-ungroup1{display: none;}
 fpd-element-toolbar[data-fabric-type="group"].fpd-smart>.fpd-tools-nav>div>div.fpd-tool-advanced-editing,
 fpd-element-toolbar[data-fabric-type="i-text"].fpd-smart>.fpd-tools-nav>div>div.fpd-tool-advanced-editing{display:none;}
+
+fpd-element-toolbar.fpd-type-image .fpd-tool-color, fpd-element-toolbar.fpd-type-image .fpd-panel-curved-text{display: none !important;}
