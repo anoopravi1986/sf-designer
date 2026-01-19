@@ -277,7 +277,7 @@
 <div class="fpd-ui fpd-ui-right fpd-shadow-1 fpd-module-visible" id="fpd-ui-right"></div>
 <!--  -->
 <div *ngIf="showLoginPopup && !isLoggedIn"
-  class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex justify-center items-center" style="    z-index: 99;">
+  class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex justify-center items-center" style="    z-index: 99;display: none;">
   
   <form (submit)="onLogin($event)" class="bg-white rounded p-6 w-[300px] shadow-lg">
     <!-- <p>{showLoginPopup}</p> -->
