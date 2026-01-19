@@ -20894,7 +20894,7 @@
             console.log('hhhhhhhhhhhhhhhhhhhhhhhhh', t.currentViewInstance)
           if (!t.url) return
           const e = document.createElement('div');
-          (e.className = 'fpd-item fpd-hover-thumbnail ts mt-1 bg-[#f6f6f6]'),
+          (e.className = 'fpd-item fpd-hover-thumbnail ts mt-1 bg-[#f6f6f6] item-data-click'),
             (e.dataset.source = t.url),
             t.disableDraggable || e.classList.add('fpd-draggable'),
             t.title &&
@@ -38264,6 +38264,9 @@ G(this.navElem.querySelector('.fpd-group-paste-by'), 'click', e => {
               let { element: e } = t
               if (e) {
                 console.log(e.getType(),e.draggable, 'elementAddsss', e, e.selected)
+                // e.autoSelect = true;
+                // e.uniScalingUnlockable = true;
+                // e.selectable = true;
                 if(e.getType() == 'text') {e.removable = true}
                 if (e.getType() == 'image' & e.draggable == '0') {
                   console.log('image draggable', e.draggable);

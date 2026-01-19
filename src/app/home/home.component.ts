@@ -7,7 +7,7 @@ import {
   HostListener,
   ElementRef,
 } from '@angular/core';
-import { createIcons, icons } from 'lucide';
+import { createIcons, icons, Variable } from 'lucide';
 import { isPlatformBrowser, DOCUMENT, CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 
@@ -2125,50 +2125,143 @@ export class HomeComponent implements AfterViewInit {
   }
 
   onLogin(event: Event) {
-    event.preventDefault();
+  event.preventDefault();
+  console.log('Attempting Shopify login for:', this.email);
 
-    const query = `
-      mutation GenerateCustomerToken($email: String!, $password: String!) {
-        generateCustomerToken(email: $email, password: $password) {
-          token
-          __typename
+  const query = `
+    mutation customerAccessTokenCreate($input: CustomerAccessTokenCreateInput!) {
+      customerAccessTokenCreate(input: $input) {
+        customerAccessToken {
+          accessToken
+          expiresAt
+        }
+        customerUserErrors {
+          field
+          message
         }
       }
-    `;
+    }
+  `;
 
-    const variables = {
+  const variables = {
+    input: {
       email: this.email,
       password: this.password,
-    };
+    },
+  };
 
-    const payload = {
-      query,
-      variables,
-    };
-
-    this.http
-      .post<any>('https://styleflip.v2.ithemes.xyz/graphql', payload)
-      .subscribe({
-        next: (response) => {
-          const token = response?.data?.generateCustomerToken?.token;
-          localStorage.setItem('authToken', token)
-          if (token) {
-            console.log('Login success:', token);
-            localStorage.setItem('customerToken', token);
-            this.getCustomerDetails(token); // optional
-            this.isLoggedIn = true;
-            this.showLoginPopup = false;
-            this.closeLoginPopup();
-          } else {
-            alert('Login failed. No token returned.');
+  const payload = {
+    query: `
+      mutation customerAccessTokenCreate($input: CustomerAccessTokenCreateInput!) {
+        customerAccessTokenCreate(input: $input) {
+          customerAccessToken {
+            accessToken
+            expiresAt
           }
+          customerUserErrors {
+            message
+          }
+        }
+      }
+    `,
+    variables: {
+      input: {
+        email: this.email,
+        password: this.password
+      }
+    }
+  };
+
+  console.log(variables, 'Shopify login payload:', payload);
+
+  this.http
+    .post<any>(
+      'https://styleflip-store.myshopify.com/api/2024-01/graphql.json',
+      payload,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Shopify-Storefront-Access-Token': '2e73a385a2189ddcf0c328bf1a1433bb',
         },
-        error: (err) => {
-          console.error('Login error:', err);
-          alert('Invalid credentials or network issue.');
-        },
-      });
-  }
+      }
+    )
+    .subscribe({
+      next: (response) => {
+        console.log('Shopify login response:', response);
+        const data = response?.data?.customerAccessTokenCreate;
+
+        if (data?.customerAccessToken?.accessToken) {
+          const token = data.customerAccessToken.accessToken;
+
+          localStorage.setItem('customerToken', token);
+          this.isLoggedIn = true;
+          this.showLoginPopup = false;
+          this.closeLoginPopup();
+
+          console.log('Shopify login success:', token);
+
+          this.getCustomerDetails(token); // optional
+        } else {
+          const errorMsg =
+            data?.customerUserErrors?.[0]?.message ||
+            'Login failed. Invalid credentials.';
+          alert(errorMsg);
+        }
+      },
+      error: (err) => {
+        console.log('Shopify login error:', err);
+        alert('Network error or Shopify API issue.');
+      },
+    });
+}
+
+
+
+  // onLogin(event: Event) {
+  //   event.preventDefault();
+
+  //   const query = `
+  //     mutation GenerateCustomerToken($email: String!, $password: String!) {
+  //       generateCustomerToken(email: $email, password: $password) {
+  //         token
+  //         __typename
+  //       }
+  //     }
+  //   `;
+
+  //   const variables = {
+  //     email: this.email,
+  //     password: this.password,
+  //   };
+
+  //   const payload = {
+  //     query,
+  //     variables,
+  //   };
+
+  //   this.http
+  //     .post<any>('https://styleflip.v2.ithemes.xyz/graphql', payload)
+  //     .subscribe({
+  //       next: (response) => {
+  //         const token = response?.data?.generateCustomerToken?.token;
+  //         localStorage.setItem('authToken', token)
+  //         if (token) {
+  //           console.log('Login success:', token);
+  //           localStorage.setItem('customerToken', token);
+  //           this.getCustomerDetails(token); // optional
+  //           this.isLoggedIn = true;
+  //           this.showLoginPopup = false;
+  //           this.closeLoginPopup();
+  //         } else {
+  //           alert('Login failed. No token returned.');
+  //         }
+  //       },
+  //       error: (err) => {
+  //         console.error('Login error:', err);
+  //         alert('Invalid credentials or network issue.');
+  //       },
+  //     });
+  // }
   // onLogin(event: Event) {
   //   event.preventDefault();
   //   // Add your login logic here
