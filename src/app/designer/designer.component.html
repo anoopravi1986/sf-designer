@@ -1,9 +1,9 @@
 <div class="p-4">
-  <input [(ngModel)]="prompt" class="border p-2" placeholder="Enter prompt..." />
-  <button class="ml-2 p-2 bg-blue-500 text-white rounded" (click)="generate()">Generate</button>
+  <input [(ngModel)]="prompt" class="p-2 border" placeholder="Enter prompt..." />
+  <button class="p-2 ml-2 text-white bg-blue-500 rounded" (click)="generate()">Generate</button>
 
   <div class="mt-4" *ngIf="imageUrl">
-    <img [src]="imageUrl" alt="Generated Image" class="rounded shadow-md max-w-sm" />
+    <img [src]="imageUrl" alt="Generated Image" class="max-w-sm rounded shadow-md" />
   </div>
 
   <div *ngIf="response">

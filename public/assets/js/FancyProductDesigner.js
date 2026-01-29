@@ -15822,6 +15822,8 @@
                       this.callSuper('render', t)))
                 },
                 _splitTextIntoLines: function (t) {
+                  console.log("test t:",t);
+                  
                   for (
                     var i = t.split(this._reNewline),
                       n = new Array(i.length),
@@ -21271,7 +21273,7 @@
 
                         const title = document.createElement('h4');
                         title.textContent = dataTitle;
-                        title.className = 'font-bold mb-1 text-capitalize';
+                        title.className = 'mb-1 font-bold text-capitalize';
 
                         const para = document.createElement('p');
                         para.className = 'mt-2';
@@ -21280,7 +21282,7 @@
                         para.textContent = `Uploaded by Anoop ${timeupload}`; // replace with real content if needed
 
                         let buttonDonw = document.createElement('button');
-                        buttonDonw.className = 'download-button flex items-center gap-2 w-full p-2 text-left hover:bg-gray-100';
+                        buttonDonw.className = 'flex items-center w-full gap-2 p-2 text-left download-button hover:bg-gray-100';
                         buttonDonw.innerHTML = `
                           <svg xmlns="http://www.w3.org/2000/svg" style="width:20px;height:20px;" class="w-4 h-4 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 4v12" />
@@ -21289,7 +21291,7 @@
                         `;
 
                         let buttonDel = document.createElement('button');
-                        buttonDel.className = 'delete-button flex items-center gap-2 w-full p-2 text-left hover:bg-gray-100';
+                        buttonDel.className = 'flex items-center w-full gap-2 p-2 text-left delete-button hover:bg-gray-100';
                         buttonDel.innerHTML = `
                           <span class="fpd-icon-bin"></span>
                           Delete
@@ -21701,14 +21703,14 @@
 
                 const title = document.createElement('h4');
                 title.textContent = dataTitle;
-                title.className = 'font-bold mb-1 text-capitalize';
+                title.className = 'mb-1 font-bold text-capitalize';
 
                 const para = document.createElement('p');
                 para.className = 'mt-2';
                 para.textContent = 'Uploaded by Anoop S 2 min ago'; // replace with real content if needed
 
                 const buttonDonw = document.createElement('button');
-                buttonDonw.className = 'download-button flex items-center gap-2 w-full p-2 text-left hover:bg-gray-100';
+                buttonDonw.className = 'flex items-center w-full gap-2 p-2 text-left download-button hover:bg-gray-100';
                 buttonDonw.innerHTML = `
                   <svg xmlns="http://www.w3.org/2000/svg" style="width:20px;height:20px;" class="w-4 h-4 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 4v12" />
@@ -21717,7 +21719,7 @@
                 `;
 
                 const buttonDel = document.createElement('button');
-                buttonDel.className = 'delete-button flex items-center gap-2 w-full p-2 text-left hover:bg-gray-100';
+                buttonDel.className = 'flex items-center w-full gap-2 p-2 text-left delete-button hover:bg-gray-100';
                 buttonDel.innerHTML = `
                   <span class="fpd-icon-bin"></span>
                   Delete
@@ -28381,10 +28383,10 @@ console.log("t:", t);
               let currentOffset = 0
 
               const wrapper = document.createElement('div')
-              wrapper.className = 'relative w-full fpd-designs-tags mt-2'
+              wrapper.className = 'relative w-full mt-2 fpd-designs-tags'
 
               const container = document.createElement('div')
-              container.className = 'w-full overflow-hidden mt-2 our-elements'
+              container.className = 'w-full mt-2 overflow-hidden our-elements'
 
               const flexWrapper = document.createElement('div')
               flexWrapper.className =
@@ -29017,7 +29019,7 @@ console.log("t:", t);
 
               const tagContainerText = document.createElement('div')
               tagContainerText.className =
-                'fpd-tag-filter flex gap-2 mb-0 flex-nowrap overflow-x-auto'
+                'flex gap-2 mb-0 overflow-x-auto fpd-tag-filter flex-nowrap'
 
               allTagsSet.forEach(tag => {
                 const tagButton = document.createElement('button')
@@ -29138,7 +29140,7 @@ console.log("t:", t);
               // if (tagList) {
               //     const tags = tagList.split(',').map(tag => tag.trim());
               //     const tagWrapperText = document.createElement('div');
-              //     tagWrapperText.className = 'fpd-tags flex gap-1 mt-1 flex-wrap';
+              //     tagWrapperText.className = 'flex flex-wrap gap-1 mt-1 fpd-tags';
 
               //     tags.forEach(tag => {
               //         const tagLabel = document.createElement('span');
@@ -29154,10 +29156,10 @@ console.log("t:", t);
                 const categoryName = categoryBlock.getAttribute('data-category') || 'Uncategorized';
 
                 const categoryContainer = document.createElement('div');
-                categoryContainer.className = 'box-contain-text relative';
+                categoryContainer.className = 'relative box-contain-text';
 
                 const categoryTitle = document.createElement('div');
-                categoryTitle.className = 'fpd-category-title text-md font-semibold mb-2 mt-4';
+                categoryTitle.className = 'mt-4 mb-2 font-semibold fpd-category-title text-md';
                 categoryTitle.textContent = categoryName;
 
                 categoryContainer.appendChild(categoryTitle);
@@ -29193,7 +29195,7 @@ console.log("t:", t);
                     tagContainer.className = 'flex items-center my-2 gap-[10px] flex-wrap happy1';
 
                     const popup1 = document.createElement('div');
-                    popup1.className = 'fpd-popup hidden'; // initially hidden
+                    popup1.className = 'hidden fpd-popup'; // initially hidden
 
                     const popup = document.createElement('div');
                     popup.className = 'content-section bg-white border border-[#ccc] rounded-[6px] p-[10px] shadow-custom-light';
@@ -29813,11 +29815,11 @@ console.log("t:", t);
 
         // Create outer wrapper (position relative for arrow buttons)
         const wrapper = document.createElement('div')
-        wrapper.className = 'relative w-full fpd-designs-tags mt-2'
+        wrapper.className = 'relative w-full mt-2 fpd-designs-tags'
 
         // Step 1: Create container with overflow hidden
         const container = document.createElement('div')
-        container.className = 'w-full overflow-hidden mt-2 our-elements'
+        container.className = 'w-full mt-2 overflow-hidden our-elements'
 
         // Step 2: Create flex wrapper that will slide using translateX
         const flexWrapper = document.createElement('div')
@@ -30064,7 +30066,7 @@ console.log("t:", t);
         container.appendChild(rightArrow)
 
         const e = document.createElement('div')
-        e.className = 'fpd-category fpd-item-group relative'
+        e.className = 'relative fpd-category fpd-item-group'
         e.dataset.title = t.title
         e.dataset.search = t.title.toLowerCase()
 
@@ -30082,7 +30084,7 @@ console.log("t:", t);
 
         // Hidden image container
         const hiddenImagesContainer = document.createElement('div')
-        hiddenImagesContainer.className = 'fpd-thumbnails hidden'
+        hiddenImagesContainer.className = 'hidden fpd-thumbnails'
         hiddenImagesContainer.style.display = 'none'
 
         // Guard: make sure t.designs or t.images exist
@@ -30206,7 +30208,7 @@ console.log("t:", t);
           const dots = document.createElement('div')
           dots.innerHTML = '⋯'
           dots.className =
-            'absolute top-1 right-1 text-lg font-bold text-black top-0 right-0 bg-opacity-40 rounded-full px-2 cursor-pointer hidden group-hover:block z-10'
+            'absolute top-0 right-0 z-10 hidden px-2 text-lg font-bold text-black rounded-full cursor-pointer top-1 right-1 bg-opacity-40 group-hover:block'
 
           // Tooltip container
           const tooltip = document.createElement('div')
@@ -30366,7 +30368,7 @@ console.log("t:", t);
                 // Add back button
                 const backBtn = document.createElement('button')
                 backBtn.innerText = '← Back'
-                backBtn.className = 'text-blue-600 underline mb-3 block ml-auto'
+                backBtn.className = 'block mb-3 ml-auto text-blue-600 underline'
                 backBtn.addEventListener('click', () => {
                   console.log('this.gridElem', this.gridElem, 'Japp')
                   this.gridElem.innerHTML = ''
@@ -30390,7 +30392,7 @@ console.log("t:", t);
                 t.category.forEach(subCat => {
                   const subWrap = document.createElement('div')
                   subWrap.className =
-                    'fpd-category fpd-item-group relative mb-6'
+                    'relative mb-6 fpd-category fpd-item-group'
 
                   const subHeading = document.createElement('h4')
                   subHeading.className =
@@ -30444,7 +30446,7 @@ console.log("t:", t);
                       const backBtn = document.createElement('button')
                       backBtn.innerText = '← Back'
                       backBtn.className =
-                        'text-blue-600 underline mb-3 block ml-auto'
+                        'block mb-3 ml-auto text-blue-600 underline'
                       backBtn.addEventListener('click', () => {
                         console.log('2 back btn')
                         this.gridElem.innerHTML = ''
@@ -30471,7 +30473,7 @@ console.log("t:", t);
                       // Full subcategory block
                       const subWrapFull = document.createElement('div')
                       subWrapFull.className =
-                        'fpd-category fpd-item-group relative mb-6'
+                        'relative mb-6 fpd-category fpd-item-group'
 
                       const fullHeading = document.createElement('h4')
                       fullHeading.className =
@@ -32553,7 +32555,7 @@ console.log("t:", t);
             e.append(i)
           const n = document.createElement('div')
           let s
-          ;(n.className = 'fpd-cell-full bg-white'),
+          ;(n.className = 'bg-white fpd-cell-full'),
             e.append(n),
             1 == t.maxLines
               ? ((s = document.createElement('input')),
@@ -32602,7 +32604,7 @@ console.log("t:", t);
             : []
           if (a.length) {
             const i = document.createElement('div')
-            ;(i.className = 'fpd-cell-1 bg-white'),
+            ;(i.className = 'bg-white fpd-cell-1'),
               e.append(i),
               rs(this, os, ds)
                 .call(this, a, i, t)
@@ -32611,7 +32613,7 @@ console.log("t:", t);
         }
         if (t.resizable || t.__editorMode) {
           const i = document.createElement('div')
-          ;(i.className = 'fpd-cell-2 bg-white'), e.append(i)
+          ;(i.className = 'bg-white fpd-cell-2'), e.append(i)
           const n = document.createElement('input')
           ;(n.className = 'fpd-tooltip'),
             n.setAttribute(
@@ -37756,7 +37758,7 @@ G(this.navElem.querySelector('.fpd-group-paste-by'), 'click', e => {
                       sct = e.subcategorytype ? e.subcategorytype : 'General'
                     const r = document.createElement('div')
                     r.className =
-                      'fpd-item fpd-hover-thumbnail text mt-1 skins-det'
+                      'mt-1 fpd-item fpd-hover-thumbnail text skins-det'
                     r.dataset.title = s
                     r.dataset.index = i
                     r.dataset.source = n
@@ -37941,7 +37943,7 @@ G(this.navElem.querySelector('.fpd-group-paste-by'), 'click', e => {
                       sct = e.subcategorytype ? e.subcategorytype : 'General'
                     const r = document.createElement('div')
                     r.className =
-                      'fpd-item fpd-hover-thumbnail text mt-1 skins-det'
+                      'mt-1 fpd-item fpd-hover-thumbnail text skins-det'
                     r.dataset.title = s
                     r.dataset.index = i
                     r.dataset.source = n
