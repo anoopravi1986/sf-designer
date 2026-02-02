@@ -204,6 +204,10 @@ fpd-module-uploads .fpd-item.fpd-hover-thumbnail.ts .fa-solid.fa-trash{display: 
       }
     }
 
+    fpd-element-toolbar .fpd-tools-nav .fpd-panel-text-format{max-width: 230px;}
+    // icon bold
+    .fpd-tools-group div.active svg path{fill: var(--theme-color);}
+    .fpd-tools-group div svg{min-width: 20px;}
 
     .valueoffpdmoduleproducts-active{
       position: relative;
