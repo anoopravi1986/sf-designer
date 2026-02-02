@@ -1,3 +1,4 @@
+
 import {
   AfterViewInit,
   Component,
@@ -52,8 +53,6 @@ interface Category {
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss'],
 })
-
-
 export class HomeComponent implements AfterViewInit {
   isBoxVisible = false;
   email: string = '';
@@ -64,8 +63,7 @@ export class HomeComponent implements AfterViewInit {
   initialLetter: string = 'A';
   private savedContent: string = '';
   fontArrayStr: any;
-
-  
+  private searchTimeout: any;
 
   constructor(
     @Inject(PLATFORM_ID) private platformId: any,
@@ -118,13 +116,6 @@ export class HomeComponent implements AfterViewInit {
               for (const group of productGroups) {
                 for (let i = 0; i < group.length; i++) {
                   const product = group[i];
-                  // console.log(
-                  //   'compare',
-                  //   product.manufacturer,
-                  //   manufacturer,
-                  //   this.slugify(product.title),
-                  //   productTitle
-                  // );
                   const isMatch =
                     product.manufacturer === manufacturer &&
                     this.slugify(product.title) === productTitle;
@@ -165,17 +156,14 @@ export class HomeComponent implements AfterViewInit {
       fetch('https://styleflip-backend-jdm5.ithemes.xyz/api/font/getAllFonts')
       .then(res => res.json())
       .then(data => {
-          console.log('font data is',data); // ✅ Logs just the array: []
-          // You can use it directly
+          console.log('font data is',data);
           this.fontArrayStr = data;
           localStorage.setItem('fontList', JSON.stringify(this.fontArrayStr));
-        
       })
       .catch(err => {
         console.error('Error fetching fonts:', err);
       });
 
-      
       const storedFonts = localStorage.getItem('fontList');
       const fontData = storedFonts ? JSON.parse(storedFonts) : null;
 
@@ -187,14 +175,14 @@ export class HomeComponent implements AfterViewInit {
         const manufacturerSlug =
           this.route.snapshot.paramMap.get('manufacturer') || '';
         const titleSlug = this.route.snapshot.paramMap.get('slug') || '';
-        // const manufacturerSlug = params['manufacturer'];
-        //       const titleSlug = params['slug'];
+        
         console.log(
           'productIndex,categoryIndex,',
           this.reversedManufacturerSlugMap[manufacturerSlug],
           titleSlug
         );
-       const pageTitle = `${
+        
+        const pageTitle = `${
           titleSlug.trim() ? titleSlug.replace(/-/g, '') : 'Styleflip'
         } | ${manufacturerSlug.replace(/-/g, ' ')} - Design Your Product`;
 
@@ -217,282 +205,10 @@ export class HomeComponent implements AfterViewInit {
           manufacturerSlug
         );
 
-        'assets/data/products/product-categories.json'
-        
-        console.log("fontssssssssssss data is",fontData)
-        
-
-        // console.log(
-        //   productIndex,
-        //   categoryIndex,
-        //   childIndex,
-        //   'productIndex,categoryIndex,',
-        //   titleSlug,
-        //   manufacturerSlug
-        // );
-
         const fpdTarget = document.getElementById('fpd-target');
         if (!fpdTarget) return;
 
-        // this.appOptions = {
-        //   productsJSON: 'assets/data/products/product-categories.json',
-        //   // productsJSON: 'https://styleflip-backend-jdm5.ithemes.xyz/api/productmeta/getAllProductMetas',
-        //   productsJSON1: 'assets/data/products/product-categories-new.json',
-        //   // designsJSON: 'assets/data/designs/design-categories.json',
-        //   designsJSON:
-        //     'https://styleflip-backend-jdm5.ithemes.xyz/api/element/getAllElements',
-        //   langJSON: 'assets/data/langs/default.json',
-        //   // layout: 'topbar',
-        //   stageWidth: 2500,
-        //   stageHeight: 700,
-        //   initialActiveModule: 'products',
-        //   // toolbarPlacement: "inside-top",
-        //   editorMode: false,
-        //   smartGuides: true,
-        //   imageEditor: true,
-        //   customTextParameters: {
-        //     colors: false,
-        //     removable: true,
-        //     resizable: true,
-        //     draggable: true,
-        //     rotatable: true,
-        //     autoCenter: true,
-        //     boundingBox: 'Base',
-        //   },
-        //   customImageParameters: {
-        //     draggable: true,
-        //     removable: true,
-        //     resizable: true,
-        //     rotatable: true,
-        //     colors: '#000',
-        //     autoCenter: true,
-        //     boundingBox: 'Base',
-        //     patterns: true,
-        //     filters: true,
-        //   },
-        //   actions: {
-        //     // 'top': ['download', 'share', 'print', 'save', 'preview-lightbox', 'paste'],
-        //     top: [],
-        //     // 'right': ['manage-layers', 'magnify-glass', 'zoom', 'reset-product', 'qr-code', 'ruler'],
-        //     right: [],
-        //     // 'bottom': ['zoom'],
-        //     left: ['undo', 'redo', 'download', 'zoom', 'reset-product'],
-        //     center: [],
-        //     // 'center': ['download','preview-lightbox','paste','zoom','reset-product','qr-code','ruler']
-        //   },
-        //   selectedColor: '#f5f5f5',
-        //   boundingBoxColor: '#005ede',
-        //   outOfBoundaryColor: '#990000',
-        //   cornerIconColor: '#000000',
-        //   mainBarModules: [
-        //     'products',
-        //     'productsnew',
-        //     'designs',
-        //     'text',
-        //     'images',
-        //     'manage-layers',
-        //     // 'text-layers',
-        //     'save-load',
-        //   ],
-        //   patterns: [
-        //     {
-        //       title: 'Polka Dots',
-        //       url: 'https://www.toptal.com/designers/subtlepatterns/patterns/polka-dots.png',
-        //     },
-        //     {
-        //       title: 'Stripes',
-        //       url: 'https://www.toptal.com/designers/subtlepatterns/patterns/diagonal-stripes.png',
-        //     },
-        //     {
-        //       title: 'Wood Grain',
-        //       url: 'https://www.toptal.com/designers/subtlepatterns/patterns/wood-pattern.png',
-        //     },
-        //   ],
-        //   fonts: fontData,
-        //   textTemplates: [
-        //     {
-        //       text: 'I love Styleflip',
-        //       properties: {
-        //         fontSize: 50,
-        //         fontFamily: 'Bangers',
-        //         fill: '#ff5722', // Vibrant orange
-        //         stroke: '#000000', // Black outline
-        //         strokeWidth: 2,
-        //         shadow: 'rgba(0,0,0,0.3) 2px 2px 3px',
-        //         curved: true, // Enable curved text
-        //         curveSpacing: 5, // Space between letters
-        //         curveRadius: 180, // Adjust radius of the curve
-        //         curveReverse: false,
-        //         curvable: 1,
-        //         patterns: true,
-        //       },
-        //     },
-        //     {
-        //       text: 'Fun Times',
-        //       properties: {
-        //         fontSize: 80,
-        //         fontFamily: 'Fredoka One',
-        //         fill: '#3f51b5', // Blue
-        //         stroke: '#010101',
-        //         curvable: 1, // White outline
-        //         strokeWidth: 3,
-        //         shadow: 'rgba(255,255,255,0.5) 0px 0px 6px',
-        //       },
-        //     },
-        //     {
-        //       text: 'Creative Soul',
-        //       properties: {
-        //         fontSize: 70,
-        //         fontFamily: 'Pacifico',
-        //         fill: '#e91e63', // Pink
-        //         stroke: '#ffc107', // Yellow outline
-        //         curvable: 1,
-        //         strokeWidth: 2,
-        //         shadow: 'rgba(0,0,0,0.2) 1px 1px 4px',
-        //       },
-        //     },
-        //     {
-        //       text: 'Dream Big',
-        //       properties: {
-        //         fontSize: 98,
-        //         fontFamily: 'Lobster',
-        //         fill: '#4caf50', // Green
-        //         stroke: '#ffffff', // White outline
-        //         strokeWidth: 2,
-        //         curvable: 1,
-        //         shadow: 'rgba(0,0,0,0.4) 3px 3px 5px',
-        //       },
-        //     },
-        //   ],
-        //   fileServerURL: 'https://file.handler.php.stageprojects.xyz/',
-        //   // fileServerURL: 'http://localhost/fpd/file-handler.php',
-        //   uploadZone: {
-        //     useDataURL: true, // ✅ allows upload directly in browser
-        //   },
-        //   facebookAppId: '325741021422456',
-        //   instagramClientId: 'bbe4d544897b4fb0b1bae5a6b44a310b',
-        //   instagramRedirectUri: 'assets/html/instagram_auth.html',
-        //   instagramTokenUri: '',
-        //   colorPickerPalette: [
-        //     '#000',
-        //     '#f4cccc',
-        //     '#fce5cd',
-        //     '#fff2cc',
-        //     '#d9ead3',
-        //     '#d0e0e3',
-        //     '#cfe2f3',
-        //     '#d9d2e9',
-        //     '#ead1dc',
-        //     '#5f27cd',
-        //     '#222f3e',
-        //     '#10ac84',
-        //   ],
-        //   pixabayApiKey: '3326084-d99995263eac7194c77ed7401',
-        //   pixabayLang: 'en',
-        //   pixabayHighResImages: false,
-        //   elementParameters: {},
-
-        //   lazyLoad: true,
-        //   toolbarPlacement: 'smart',
-        //   // imageParameters:{
-        //   //   advancedEditing: true
-        //   // }
-        // };
-
-        // this.designer = new FancyProductDesigner(
-        //   this.document.querySelector('#clothing-designer'),
-        //   this.appOptions
-        // );
-        
-         console.log("designer is 1", this.designer);
-        const dataofproducts = this.designer.product;
-        console.log('dataofproducts', dataofproducts); 
-        const canvas = this.designer?.currentViewInstance?.fabricCanvas;
-       
-        if (canvas) {
-          canvas.selection = true;
-          canvas.selectionKey = 'shiftKey';
-          canvas.forEachObject((obj: any) => {
-            obj.selectable = true;
-            obj.evented = true;
-          });
-          canvas.renderAll();
-        }
-
-        // Enable multi-select on the Fabric.js canvas
-        if (this.designer?.currentViewInstance?.fabricCanvas) {
-          this.designer.currentViewInstance.fabricCanvas.selection = true;
-        }
-        // this.designer.fpdInstance.actionsBar.doAction('reset-product')
-
-        // Optionally: Add a keyboard shortcut (Ctrl+G) to group selected objects
-        window.addEventListener('keydown', (event: KeyboardEvent) => {
-          if (
-            event.ctrlKey &&
-            event.key.toLowerCase() === 'g' &&
-            this.designer?.currentViewInstance?.fabricCanvas
-          ) {
-            this.groupSelectedObjects();
-            event.preventDefault();
-          }
-        });
-
-        // ✅ Hook up buttons AFTER FPD is ready
-        // $('#print-button').click(() => designer.print());
-
-        // $('#preview-button').on('click', () => {
-        //   alert('Opening preview...');
-        //   console.log("jjjjj")
-        //   designer.previewLightbox();
-        // });
-        // $('#save-button').click(() => {
-        //   designer.getProduct().then((data: any) => {
-        //     console.log('Saved Design Data:', data);
-        //   });
-        // });
-
-        // 🔧 Get slugified brand/product name from route
-        // const brandSlug = this.route.snapshot.paramMap.get('manufacturer')?.toLowerCase() || '';
-        // const productSlug = this.route.snapshot.paramMap.get('slug')?.toLowerCase() || '';
-        // console.log(brandSlug,productSlug , "1234productSlug.....",this.designer.container)
-
-        // 🔧 Wait until FPD products are loaded
-        // const productLoadInterval = setInterval(() => {
-        // $(this.designer.container).on('fpdProductCreate', () => {
-        // setTimeout(() => {
-        //       const allProducts = $('.fpd-module-products .fpd-item');
-        //   console.log("1234yes it si scaalled")
-
-        //   // if (allProducts.length > 0) {
-        //     // clearInterval(productLoadInterval);
-
-        //     const matchingProduct = allProducts.filter((i, el) => {
-        //       const title = $(el).data('title')?.toString().toLowerCase() || '';
-        //       const manufacturer = $(el).data('manufacturer')?.toString().toLowerCase() || '';
-
-        //       const titleSlug = this.slugify(title);
-        //       const manufacturerSlug = this.slugify(manufacturer);
-
-        //       return titleSlug === productSlug && manufacturerSlug === brandSlug;
-        //     }).first();
-        //     console.log(matchingProduct , "1234matchingProductmatchingProduct")
-
-        //     if (matchingProduct.length > 0) {
-        //       matchingProduct.trigger('click');
-        //     } else {
-        //       console.warn('Matching product not found in FPD. Loading first product.');
-        //       allProducts.first().trigger('click');
-        //     }
-        //   // }
-        //   console.log(allProducts , "1234matchingProductmatchingProduct")
-        // // })
-        // // }, 200);
-        // }, 5000);
-
-        // Inside ngAfterViewInit or wherever you initialize FPD
-        //  const firstItem = $('.fpd-module-products .fpd-item').first();
-        //  const title = firstItem.data('title');
-        //  this.activeImageTitle = 'Apple Macbook Pro 16 2019 512GB SSD Storage';
+        console.log("fontssssssssssss data is",fontData)
 
         $(document).on('click', 'fpd-module-products .fpd-item', (event) => {
           localStorage.setItem('productIndex', '');
@@ -501,16 +217,13 @@ export class HomeComponent implements AfterViewInit {
           const clickedTitle = $(event.currentTarget).data('title');
           console.log(clickedTitle, 'cllllllll', $(event.currentTarget));
           const manufacturer = $(event.currentTarget).data('manufacturer');
-          // let updatedTarget = JSON.parse(JSON.stringify(event.target));
-          console.log(event);
           let ob: any;
 
           try {
             ob = (Object.entries(event.target)[1][1] as any)['manufacturer'];
           } catch (error) {
-            ob = 'apple'; // fallback
+            ob = 'apple';
           }
-          // console.log(event, Object.entries(event.target), 'Clicked:', ob, clickedTitle, 'Manufacturer:', manufacturer);
 
           const slug = this.slugify(clickedTitle);
           const manufacturerSlug = this.slugify(ob);
@@ -526,8 +239,7 @@ export class HomeComponent implements AfterViewInit {
         });
 
         $(document).on('click', '.item-data-click', (event) => {
-          event.stopPropagation(); // Prevent event bubbling
-          // this is the actual element you clicked
+          event.stopPropagation();
           const clickedDiv = event.currentTarget;
 
           console.log('You clicked:', clickedDiv);
@@ -542,9 +254,7 @@ export class HomeComponent implements AfterViewInit {
           const viewtitle = clickedDiv.getAttribute("data-title");
           console.log("viewvalue",viewvalue, viewtitle)
           const parameter = {removable: true,positioned: true, autoSelect: true,uniScalingUnlockable: true};
-          // console.log(view,'fpdvalue', fpdvalue, t.url)
-          console.log("t data",event)
-
+          
           fpdvalue.addCanvasDesign(
             viewvalue,
             viewtitle,
@@ -552,16 +262,13 @@ export class HomeComponent implements AfterViewInit {
           )
         });
 
-         $(document).on('click', '.item-data-click .fpd-three-dot-menu', (event) => {
-            event.stopPropagation(); // Prevent event bubbling
-            
-         })
-         $(document).on('click', '.item-data-click .delete-button', (event) => {
-            event.stopPropagation(); // Prevent event bubbling
-            
-         })
-
-
+        $(document).on('click', '.item-data-click .fpd-three-dot-menu', (event) => {
+            event.stopPropagation();
+        });
+        
+        $(document).on('click', '.item-data-click .delete-button', (event) => {
+            event.stopPropagation();
+        })
        
       }, 300);
 
@@ -580,24 +287,22 @@ export class HomeComponent implements AfterViewInit {
         if (hideIcon && mainBar) {
           console.log('Element found:', hideIcon, mainBar);
 
-          // Click event — collapse
           hideIcon.addEventListener('click', (event) => {
-            event.stopPropagation(); // Prevent event bubbling
+            event.stopPropagation();
             console.log('click happen');
             this.savedContent = mainBar.innerHTML;
             mainBar.style.maxWidth = '80px';
             mainBar.style.backgroundColor = '#f0f1f5';
             mainBar.classList.toggle('box-white-inactive');
-            hideIcon.style.display = 'none'; // 👈 hide the icon
+            hideIcon.style.display = 'none';
           });
 
-          // Observe content changes — expand
           const contentObserver = new MutationObserver(() => {
             if (mainBar.innerHTML !== this.savedContent) {
               mainBar.style.maxWidth = '';
               mainBar.style.backgroundColor = '#fff';
               mainBar.classList.remove('box-white-inactive');
-              hideIcon.style.display = 'flex'; // 👈 show icon again
+              hideIcon.style.display = 'flex';
             }
           });
 
@@ -607,7 +312,6 @@ export class HomeComponent implements AfterViewInit {
             characterData: true,
           });
 
-          // Observe class changes for fpd-active — expand
           const activeObserver = new MutationObserver((mutations) => {
             for (let mutation of mutations) {
               if (
@@ -626,12 +330,10 @@ export class HomeComponent implements AfterViewInit {
                         el.classList.remove('visible');
                       });
 
-                    // Remove "backdrop-test" from elements that have it
                     document
                       .querySelectorAll('.backdrop-test')
                       .forEach((el) => {
                         el.classList.remove('backdrop-test');
-                        // localStorage.getItem('fpdMenuClicked')
                       });
                   }
                   if (target.getAttribute('data-module') === 'designs') {
@@ -643,13 +345,12 @@ export class HomeComponent implements AfterViewInit {
                   mainBar.style.maxWidth = '';
                   mainBar.style.backgroundColor = '#fff';
                   mainBar.classList.remove('box-white-inactive');
-                  hideIcon.style.display = 'flex'; // 👈 show icon again
+                  hideIcon.style.display = 'flex';
                 }
               }
             }
           });
 
-          // Observe children of fpd-main-bar
           mainBar.querySelectorAll('*').forEach((child) => {
             activeObserver.observe(child, {
               attributes: true,
@@ -657,7 +358,6 @@ export class HomeComponent implements AfterViewInit {
             });
           });
 
-          // Re-scan DOM every 1s for new children
           const childScanInterval = setInterval(() => {
             mainBar.querySelectorAll('*').forEach((child) => {
               activeObserver.observe(child, {
@@ -667,7 +367,7 @@ export class HomeComponent implements AfterViewInit {
             });
           }, 1000);
         } else {
-          setTimeout(waitForElements, 300); // retry until elements exist
+          setTimeout(waitForElements, 300);
         }
       };
 
@@ -681,7 +381,10 @@ export class HomeComponent implements AfterViewInit {
 
       if (searchInput) {
         searchInput.addEventListener('keyup', () => {
-          this.filterThumbnailsP(searchInput.value);
+          clearTimeout(this.searchTimeout);
+          this.searchTimeout = setTimeout(() => {
+            this.filterThumbnailsP(searchInput.value);
+          }, 300);
         });
       }
 
@@ -690,7 +393,10 @@ export class HomeComponent implements AfterViewInit {
       ) as HTMLInputElement;
       if (searchInputs) {
         searchInputs.addEventListener('keyup', () => {
-          this.filterThumbnails(searchInputs.value);
+          clearTimeout(this.searchTimeout);
+          this.searchTimeout = setTimeout(() => {
+            this.filterThumbnails(searchInputs.value);
+          }, 300);
         });
       }
 
@@ -736,13 +442,12 @@ export class HomeComponent implements AfterViewInit {
               item.style.display = 'none';
             } else {
               seenIndexes.add(index);
-              item.style.display = ''; // Ensure visible
+              item.style.display = '';
             }
           });
         });
       };
 
-      // Step 1: Find .ProductModuleMy and observe inner DOM changes
       const productModule = this.document.querySelector('.ProductModuleMy');
 
       if (productModule) {
@@ -755,13 +460,11 @@ export class HomeComponent implements AfterViewInit {
           }
         });
 
-        // Step 2: Observe inner HTML (child elements) of the container
         innerHtmlObserver.observe(productModule, {
-          childList: true, // Watch for direct child changes
-          subtree: true, // Also look deep inside the tree
+          childList: true,
+          subtree: true,
         });
 
-        // Step 3: Run once initially
         checkAndHideDuplicateFpdItems();
       }
 
@@ -772,1011 +475,851 @@ export class HomeComponent implements AfterViewInit {
 
   moveBoldToPrimaryTools(): void {
     console.log('Moving Bold to Primary Tools');
-      const targetElement = document.getElementById('boldOutside');
+    const targetElement = document.getElementById('boldOutside');
 
-      if (targetElement) {
-        targetElement.addEventListener('click', (event) => {
-            this.designer.currentViewInstance.fabricCanvas.setElementOptions({
-              fontWeight:
-                this.designer.currentViewInstance.fabricCanvas.getActiveObject().fontWeight === 'bold'
-                  ? 'normal'
-                  : 'bold',
-            });
-
-            targetElement.classList.toggle(
-              'active',
-              this.designer.currentViewInstance.fabricCanvas.getActiveObject().fontWeight === 'bold'
-            );
+    if (targetElement) {
+      targetElement.addEventListener('click', (event) => {
+        this.designer.currentViewInstance.fabricCanvas.setElementOptions({
+          fontWeight:
+            this.designer.currentViewInstance.fabricCanvas.getActiveObject().fontWeight === 'bold'
+              ? 'normal'
+              : 'bold',
         });
-      }
 
-      const targetElement2 = document.getElementById('fontItalic');
-      if (targetElement2) {
-        targetElement2.addEventListener('click', () => {
-          this.designer.currentViewInstance.fabricCanvas.setElementOptions({
-            fontStyle:
-              this.designer.currentViewInstance.fabricCanvas.getActiveObject().fontStyle === 'italic'
-                ? 'normal'
-                : 'italic',
-          });
+        targetElement.classList.toggle(
+          'active',
+          this.designer.currentViewInstance.fabricCanvas.getActiveObject().fontWeight === 'bold'
+        );
+      });
+    }
 
-          targetElement2.classList.toggle(
-            'active',
+    const targetElement2 = document.getElementById('fontItalic');
+    if (targetElement2) {
+      targetElement2.addEventListener('click', () => {
+        this.designer.currentViewInstance.fabricCanvas.setElementOptions({
+          fontStyle:
             this.designer.currentViewInstance.fabricCanvas.getActiveObject().fontStyle === 'italic'
-          );
+              ? 'normal'
+              : 'italic',
         });
-      }
 
-      const targetElement3 = document.getElementById('UnderlineText');
-      if (targetElement3) {
-        targetElement3.addEventListener('click', () => {
-          this.designer.currentViewInstance.fabricCanvas.setElementOptions({
-            textDecoration:
-              this.designer.currentViewInstance.fabricCanvas.getActiveObject().textDecoration === 'underline'
-                ? 'normal'
-                : 'underline',
-          });
+        targetElement2.classList.toggle(
+          'active',
+          this.designer.currentViewInstance.fabricCanvas.getActiveObject().fontStyle === 'italic'
+        );
+      });
+    }
 
-          targetElement3.classList.toggle(
-            'active',
+    const targetElement3 = document.getElementById('UnderlineText');
+    if (targetElement3) {
+      targetElement3.addEventListener('click', () => {
+        this.designer.currentViewInstance.fabricCanvas.setElementOptions({
+          textDecoration:
             this.designer.currentViewInstance.fabricCanvas.getActiveObject().textDecoration === 'underline'
-          );
+              ? 'normal'
+              : 'underline',
         });
-      }
 
-      const targetElement4 = document.getElementById('TextTransform');
+        targetElement3.classList.toggle(
+          'active',
+          this.designer.currentViewInstance.fabricCanvas.getActiveObject().textDecoration === 'underline'
+        );
+      });
+    }
 
-      if (targetElement4) {
-        targetElement4.addEventListener('click', () => {
-          const obj = this.designer.currentViewInstance.fabricCanvas.getActiveObject();
-          if (!obj || !obj.text) return;
+    const targetElement4 = document.getElementById('TextTransform');
 
-          const spanIcon = targetElement4.querySelector('span');
+    if (targetElement4) {
+      targetElement4.addEventListener('click', () => {
+        const obj = this.designer.currentViewInstance.fabricCanvas.getActiveObject();
+        if (!obj || !obj.text) return;
 
-          // Cycle through transform states
-          const current = obj.textTransform || 'none';
-          const next = current === 'none' ? 'uppercase' : current === 'uppercase' ? 'lowercase' : 'none';
+        const spanIcon = targetElement4.querySelector('span');
 
-          // Apply transform
-          this.designer.currentViewInstance.fabricCanvas.setElementOptions({
-            textTransform: next,
-          });
+        const current = obj.textTransform || 'none';
+        const next = current === 'none' ? 'uppercase' : current === 'uppercase' ? 'lowercase' : 'none';
 
-          // Update icon
-          if (spanIcon) {
-            spanIcon.className = ''; // Remove previous icon class
-            if (next === 'uppercase') {
-              spanIcon.classList.add('fpd-icon-uppercase');
-            } else if (next === 'lowercase') {
-              spanIcon.classList.add('fpd-icon-lowercase');
-            } else {
-              spanIcon.classList.add('fpd-icon-text-transform');
-            }
-          }
+        this.designer.currentViewInstance.fabricCanvas.setElementOptions({
+          textTransform: next,
+        });
 
-          // Toggle 'active' class based on next transform state
-          if (next === 'none') {
-            targetElement4.classList.remove('active');
+        if (spanIcon) {
+          spanIcon.className = '';
+          if (next === 'uppercase') {
+            spanIcon.classList.add('fpd-icon-uppercase');
+          } else if (next === 'lowercase') {
+            spanIcon.classList.add('fpd-icon-lowercase');
           } else {
-            targetElement4.classList.add('active');
+            spanIcon.classList.add('fpd-icon-text-transform');
           }
-        });
+        }
 
-      }
-
-      const alignButton = document.getElementById('textAlignCust');
-
-      if (alignButton) {
-        alignButton.addEventListener('click', () => {
-          const span = alignButton.querySelector('span');
-          const obj = this.designer.currentViewInstance.fabricCanvas.getActiveObject();
-          if (!obj || !obj.text) return;
-
-          const current = obj.textAlign || 'left';
-
-          // Determine next alignment
-          const next = current === 'left' ? 'center' : current === 'center' ? 'right' : 'left';
-
-          // Set textAlign
-          this.designer.currentViewInstance.fabricCanvas.setElementOptions({
-            textAlign: next,
-          });
-
-          // Update icon class based on new alignment
-          if (span) {
-            span.className = ''; // Reset
-            span.setAttribute('data-option', next);
-
-            if (next === 'center') {
-              span.classList.add('fpd-icon-format-align-center');
-            } else if (next === 'right') {
-              span.classList.add('fpd-icon-format-align-right');
-            } else {
-              span.classList.add('fpd-icon-format-align-left');
-            }
-          }
-
-
-          const allAlignButtons = document.querySelectorAll('.fpd-align-button span');
-          allAlignButtons.forEach(el => el.classList.remove('active'));
-
-          if (span) {
-            span.classList.add('active-icon');
-          }
-        });
-      }
-
-
-      const positionButton = document.getElementById('CenterTools');
-
-      if (positionButton) {
-        positionButton.addEventListener('click', (e) => {
-          
-            const target = e.currentTarget as HTMLElement;
-            console.log("target is aad",document.querySelector('.fpd-panel-position')?.classList);
-            if (document.querySelector('.fpd-panel-position')?.classList.contains('fpd-active')) {
-              document.querySelector('fpd-element-toolbar')?.classList.remove('fpd-panel-visible','my-position');
-            }
-             if (document.body.classList.contains('fpd-toolbar-transform-our')) {
-                        document.body.classList.remove('fpd-toolbar-transform-our');
-                        document.querySelector('.fpd-tool-transform')?.classList.remove('fpd-active');
-                    }
-            var hasClass = target.classList.contains('letter-spac-active');
-            if(hasClass){
-              var toolbar = e.target ? (e.target as HTMLElement).closest("fpd-element-toolbar") : null;
-              // Step 1: Remove 'letter-spac-active' class from the clicked element
-              target.classList.remove('letter-spac-active');
-              const subPanel = document.querySelector('.fpd-sub-panel');
-              if (!subPanel) return;
-
-              // Step 2: Remove 'fpd-active' from any active children in sub-panel
-              subPanel.querySelectorAll(':scope > .fpd-active').forEach(el => {
-                el.classList.remove('fpd-active');
-              });
-              if (toolbar) {
-                toolbar.classList.forEach((c: any) => {
-                  if (toolbar && c.startsWith("my-")) toolbar.classList.remove(c);
-                });
-              }
-
-              return;
-            }
-
-            target.classList.add('letter-spac-active');
-            // Step 1: Find the closest `.fpd-sub-panel` parent
-            const subPanel = document.querySelector('.fpd-sub-panel');
-            console.log("subPanel data is", subPanel)
-            if (!subPanel) return;
-
-            // Step 2: Remove 'fpd-active' from any active children in sub-panel
-            subPanel.querySelectorAll(':scope > .fpd-active').forEach(el => {
-              el.classList.remove('fpd-active');
-            });
-
-            // Step 3: Find `.fpd-panel-position` inside the same sub-panel
-            const positionPanel = subPanel.querySelector('.fpd-panel-position');
-            if (positionPanel) {
-              positionPanel.classList.add('fpd-active', 'fpd-pos-data-sec');
-            }
-
-            const elementtoolbar = document.querySelector('fpd-element-toolbar');
-            console.log("djjjjj",elementtoolbar)
-            console.log("test test");
-            if(elementtoolbar){
-              elementtoolbar.classList.add('fpd-panel-visible')
-            }
-        });
-      }
-
-
-      // Move layer up in stack
-      document.getElementById('TextMoveUp')?.addEventListener('click', () => {
-        // const canvas = this.designer.currentViewInstance.fabricCanvas;
-        // const obj = canvas.getActiveObject();
-        // console.log('Text Move Up clicked', canvas, obj);
-        // if (obj) {
-        //   canvas.bringForward(obj); // Moves object one step up in layer
-        //   canvas.requestRenderAll();
-        // }
-        const canvas = this.designer.currentViewInstance.fabricCanvas;
-        const obj = canvas.getActiveObject();
-        if (!obj) return;
-
-        // Find the overlay object
-        const overlayObj = canvas.getObjects().find((o: any) => o.title === "Overlay");
-
-        if (overlayObj) {
-          const overlayIndex = canvas.getObjects().indexOf(overlayObj);
-          const objIndex = canvas.getObjects().indexOf(obj);
-
-          console.log("Overlay index:", overlayIndex, "Object index:", objIndex);
-
-          // Only bring forward if object is still below overlay
-          if (objIndex < overlayIndex - 1) {
-            canvas.bringForward(obj);
-          } else {
-            alert("Not possible to move above Overlay layer!");
-          }
+        if (next === 'none') {
+          targetElement4.classList.remove('active');
         } else {
-          // If no overlay, just move forward normally
+          targetElement4.classList.add('active');
+        }
+      });
+    }
+
+    const alignButton = document.getElementById('textAlignCust');
+
+    if (alignButton) {
+      alignButton.addEventListener('click', () => {
+        const span = alignButton.querySelector('span');
+        const obj = this.designer.currentViewInstance.fabricCanvas.getActiveObject();
+        if (!obj || !obj.text) return;
+
+        const current = obj.textAlign || 'left';
+
+        const next = current === 'left' ? 'center' : current === 'center' ? 'right' : 'left';
+
+        this.designer.currentViewInstance.fabricCanvas.setElementOptions({
+          textAlign: next,
+        });
+
+        if (span) {
+          span.className = '';
+          span.setAttribute('data-option', next);
+
+          if (next === 'center') {
+            span.classList.add('fpd-icon-format-align-center');
+          } else if (next === 'right') {
+            span.classList.add('fpd-icon-format-align-right');
+          } else {
+            span.classList.add('fpd-icon-format-align-left');
+          }
+        }
+
+        const allAlignButtons = document.querySelectorAll('.fpd-align-button span');
+        allAlignButtons.forEach(el => el.classList.remove('active'));
+
+        if (span) {
+          span.classList.add('active-icon');
+        }
+      });
+    }
+
+    const positionButton = document.getElementById('CenterTools');
+
+    if (positionButton) {
+      positionButton.addEventListener('click', (e) => {
+        const target = e.currentTarget as HTMLElement;
+        console.log("target is aad",document.querySelector('.fpd-panel-position')?.classList);
+        if (document.querySelector('.fpd-panel-position')?.classList.contains('fpd-active')) {
+          document.querySelector('fpd-element-toolbar')?.classList.remove('fpd-panel-visible','my-position');
+        }
+        if (document.body.classList.contains('fpd-toolbar-transform-our')) {
+          document.body.classList.remove('fpd-toolbar-transform-our');
+          document.querySelector('.fpd-tool-transform')?.classList.remove('fpd-active');
+        }
+        var hasClass = target.classList.contains('letter-spac-active');
+        if(hasClass){
+          var toolbar = e.target ? (e.target as HTMLElement).closest("fpd-element-toolbar") : null;
+          target.classList.remove('letter-spac-active');
+          const subPanel = document.querySelector('.fpd-sub-panel');
+          if (!subPanel) return;
+
+          subPanel.querySelectorAll(':scope > .fpd-active').forEach(el => {
+            el.classList.remove('fpd-active');
+          });
+          if (toolbar) {
+            toolbar.classList.forEach((c: any) => {
+              if (toolbar && c.startsWith("my-")) toolbar.classList.remove(c);
+            });
+          }
+
+          return;
+        }
+
+        target.classList.add('letter-spac-active');
+        const subPanel = document.querySelector('.fpd-sub-panel');
+        console.log("subPanel data is", subPanel)
+        if (!subPanel) return;
+
+        subPanel.querySelectorAll(':scope > .fpd-active').forEach(el => {
+          el.classList.remove('fpd-active');
+        });
+
+        const positionPanel = subPanel.querySelector('.fpd-panel-position');
+        if (positionPanel) {
+          positionPanel.classList.add('fpd-active', 'fpd-pos-data-sec');
+        }
+
+        const elementtoolbar = document.querySelector('fpd-element-toolbar');
+        console.log("djjjjj",elementtoolbar)
+        console.log("test test");
+        if(elementtoolbar){
+          elementtoolbar.classList.add('fpd-panel-visible')
+        }
+      });
+    }
+
+    document.getElementById('TextMoveUp')?.addEventListener('click', () => {
+      const canvas = this.designer.currentViewInstance.fabricCanvas;
+      const obj = canvas.getActiveObject();
+      if (!obj) return;
+
+      const overlayObj = canvas.getObjects().find((o: any) => o.title === "Overlay");
+
+      if (overlayObj) {
+        const overlayIndex = canvas.getObjects().indexOf(overlayObj);
+        const objIndex = canvas.getObjects().indexOf(obj);
+
+        console.log("Overlay index:", overlayIndex, "Object index:", objIndex);
+
+        if (objIndex < overlayIndex - 1) {
           canvas.bringForward(obj);
-        }
-
-        canvas.requestRenderAll();
-      });
-
-      // Move layer down in stack
-      document.getElementById('TextMoveDown')?.addEventListener('click', () => {
-        // const canvas = this.designer.currentViewInstance.fabricCanvas;
-        // const obj = canvas.getActiveObject();
-        // console.log('Text Move Down clicked', canvas, obj);
-        // if (obj) {
-        //   canvas.sendBackwards(obj); // Moves object one step down in layer
-        //   canvas.requestRenderAll();
-        // }
-        const canvas = this.designer.currentViewInstance.fabricCanvas;
-        const obj = canvas.getActiveObject();
-        if (!obj) return;
-
-        console.log("Text Move Down clicked", obj);
-
-        // Find your base object (assuming it has title "Base")
-        const baseObj = canvas.getObjects().find((o: any) => o.title === "Base");
-
-        if (baseObj) {
-          const baseIndex = canvas.getObjects().indexOf(baseObj);
-          const objIndex = canvas.getObjects().indexOf(obj);
-
-          if (objIndex > baseIndex + 1) {
-            // move one step down, but never below base
-            canvas.sendBackwards(obj);
-          } else {
-            alert("Reached just above base, not moving further down.");
-          }
         } else {
-          // if no base, just move normally
+          alert("Not possible to move above Overlay layer!");
+        }
+      } else {
+        canvas.bringForward(obj);
+      }
+
+      canvas.requestRenderAll();
+    });
+
+    document.getElementById('TextMoveDown')?.addEventListener('click', () => {
+      const canvas = this.designer.currentViewInstance.fabricCanvas;
+      const obj = canvas.getActiveObject();
+      if (!obj) return;
+
+      console.log("Text Move Down clicked", obj);
+
+      const baseObj = canvas.getObjects().find((o: any) => o.title === "Base");
+
+      if (baseObj) {
+        const baseIndex = canvas.getObjects().indexOf(baseObj);
+        const objIndex = canvas.getObjects().indexOf(obj);
+
+        if (objIndex > baseIndex + 1) {
           canvas.sendBackwards(obj);
+        } else {
+          alert("Reached just above base, not moving further down.");
         }
-
-        canvas.requestRenderAll();
-
-      });
-
-
-      const minusEl = document.getElementById('minusElement');
-      const plusEl = document.getElementById('plusElement');
-
-      if (minusEl) {
-        minusEl.addEventListener('click', () => {
-          const inputEl = document.querySelector('input[data-control="fontSize"]') as HTMLInputElement;
-          if (inputEl) {
-            let current = parseInt(inputEl.value) || 1;
-            current = Math.max(1, current - 1); // Prevent going below 1
-            inputEl.value = String(current);
-
-            // Update canvas font size
-            this.designer.currentViewInstance.fabricCanvas.setElementOptions({
-              fontSize: current,
-            });
-          }
-        });
+      } else {
+        canvas.sendBackwards(obj);
       }
 
-      if (plusEl) {
-        plusEl.addEventListener('click', () => {
-          const inputEl = document.querySelector('input[data-control="fontSize"]') as HTMLInputElement;
-          if (inputEl) {
-            let current = parseInt(inputEl.value) || 1;
-            current = Math.min(200, current + 1); // Prevent going above 200
-            inputEl.value = String(current);
+      canvas.requestRenderAll();
+    });
 
-            // Update canvas font size
-            this.designer.currentViewInstance.fabricCanvas.setElementOptions({
-              fontSize: current,
-            });
-          }
+    const minusEl = document.getElementById('minusElement');
+    const plusEl = document.getElementById('plusElement');
+
+    if (minusEl) {
+      minusEl.addEventListener('click', () => {
+        const inputEl = document.querySelector('input[data-control="fontSize"]') as HTMLInputElement;
+        if (inputEl) {
+          let current = parseInt(inputEl.value) || 1;
+          current = Math.max(1, current - 1);
+          inputEl.value = String(current);
+
+          this.designer.currentViewInstance.fabricCanvas.setElementOptions({
+            fontSize: current,
+          });
+        }
+      });
+    }
+
+    if (plusEl) {
+      plusEl.addEventListener('click', () => {
+        const inputEl = document.querySelector('input[data-control="fontSize"]') as HTMLInputElement;
+        if (inputEl) {
+          let current = parseInt(inputEl.value) || 1;
+          current = Math.min(200, current + 1);
+          inputEl.value = String(current);
+
+          this.designer.currentViewInstance.fabricCanvas.setElementOptions({
+            fontSize: current,
+          });
+        }
+      });
+    }
+
+    let fpdIconMoveUp = document.querySelector('.fpd-icon-move-up');
+    fpdIconMoveUp?.addEventListener('click', () => {
+      document.querySelector('.fpd-icon-move-up')?.classList.add('active-icon');
+      setTimeout(() => {
+        document.querySelector('.fpd-icon-move-up')?.classList.remove('active-icon');
+      }, 1000)
+    });
+
+    let fpdIconMoveDown = document.querySelector('.fpd-icon-move-down');
+    fpdIconMoveDown?.addEventListener('click', () => {
+      document.querySelector('.fpd-icon-move-down')?.classList.add('active-icon');
+      setTimeout(() => {
+        document.querySelector('.fpd-icon-move-down')?.classList.remove('active-icon');
+      }, 1000)
+    });
+
+    let copiedObject: any = null;
+    
+    document.getElementById('copytext')?.addEventListener('click', (e) => {
+      console.log("e.currentTarget",e.currentTarget)
+      const canvas = this.designer.currentViewInstance.fabricCanvas;
+      const obj = canvas.getActiveObject();
+      if (obj) {
+        obj.clone((cloned: any) => {
+          copiedObject = cloned;
+          console.log('Copied object:', copiedObject);
+          this.showToast('Copied successfully!');
         });
       }
+    });
+    document.addEventListener('keydown', (e: KeyboardEvent) => {
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'c') {
+    e.preventDefault();
 
-       /* code to add and remove class on click on layer move up icon */
-      let fpdIconMoveUp = document.querySelector('.fpd-icon-move-up');
-      fpdIconMoveUp?.addEventListener('click', () => {
-        document.querySelector('.fpd-icon-move-up')?.classList.add('active-icon');
-       setTimeout(() => {
-          document.querySelector('.fpd-icon-move-up')?.classList.remove('active-icon');
-        }, 1000)
+    const canvas = this.designer.currentViewInstance.fabricCanvas;
+    const obj = canvas.getActiveObject();
+
+    if (obj) {
+      obj.clone((cloned: any) => {
+        copiedObject = cloned;
+        console.log('Copied via Ctrl+C:', copiedObject);
+        this.showToast('Copied successfully!');
       });
-      /* code to add and remove class on click on layer move up icon */
+    }
+  }
+});
 
-      /* code to add and remove class on click on layer move up icon */
-      let fpdIconMoveDown = document.querySelector('.fpd-icon-move-down');
-      fpdIconMoveDown?.addEventListener('click', () => {
-        document.querySelector('.fpd-icon-move-down')?.classList.add('active-icon');
-       setTimeout(() => {
-          document.querySelector('.fpd-icon-move-down')?.classList.remove('active-icon');
-        }, 1000)
+    document.getElementById('pastetext')?.addEventListener('click', () => {
+      const canvas = this.designer.currentViewInstance.fabricCanvas;
+      if (copiedObject) {
+        this.designer.currentViewInstance.fabricCanvas.duplicateElement(
+          this.designer.currentElement
+        )
+        this.showToast('Paste successfully!');
+      }
+    });
+    document.addEventListener('keydown', (e: KeyboardEvent) => {
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'v') {
+    e.preventDefault();
+
+    if (copiedObject) {
+      this.designer.currentViewInstance.fabricCanvas.duplicateElement(
+        this.designer.currentElement
+      );
+      this.showToast('Paste successfully!');
+    }
+  }
+});
+
+    document.getElementById('letter-spacing')?.addEventListener('click', (e) => {
+      console.log("e.currentTarget",e.currentTarget)
+      document.body.classList.remove('fpd-toolbar-transform-our');
+      const target = e.currentTarget as HTMLElement;
+      if(document.getElementById('letter-spacing')?.classList.contains('letter-spac-active')){
+        console.log("letter-spacing is active")
+        const elementtoolbar = document.querySelector('fpd-element-toolbar');
+        if(elementtoolbar){
+          elementtoolbar.classList.remove('fpd-panel-visible')
+        }
+        document.getElementById('letter-spacing')?.classList.remove('letter-spac-active')
+        return;
+      }
+
+      target.classList.add('letter-spac-active');
+      const subPanel = document.querySelector('.fpd-sub-panel');
+      console.log("subPanel data is", subPanel)
+      if (!subPanel) return;
+
+      subPanel.querySelectorAll(':scope > .fpd-active').forEach(el => {
+        el.classList.remove('fpd-active');
       });
-      /* code to add and remove class on click on layer move up icon */
-
-      let copiedObject: any = null;
       
-      // COPY
-      document.getElementById('copytext')?.addEventListener('click', (e) => {
-        console.log("e.currentTarget",e.currentTarget)
-        // if (e.currentTarget) {
-        //   (e.currentTarget as HTMLElement).classList.add('active');
-        // }
-        const canvas = this.designer.currentViewInstance.fabricCanvas;
-        const obj = canvas.getActiveObject();
-        if (obj) {
-          obj.clone((cloned: any) => {
-            copiedObject = cloned;
-            console.log('Copied object:', copiedObject);
-            this.showToast('Copied successfully!');
-          });
-        }
-        
-      });
+      const positionPanel = subPanel.querySelector('.fpd-panel-text-size');
+      if (positionPanel) {
+        positionPanel.classList.add('fpd-active', 'fpd-letter-spacing-lineheight');
+        this.document.body.classList.remove('fpd-tools-custom-data')
+      }
 
-      // PASTE
-      document.getElementById('pastetext')?.addEventListener('click', () => {
-        const canvas = this.designer.currentViewInstance.fabricCanvas;
-        if (copiedObject) {
-          // const e = this.designer.currentViewInstance.options;
-          // copiedObject.clone((cloned: any) => {
-          //   cloned.set({
-          //     left: cloned.left + 10,
-          //     top: cloned.top + 10,
-          //     evented: true,
-          //     selectable: true,
-          //     removable: true,
-          //     resizable: 1,
-          //     transformable: true,
-          //     editable: true,
-          //     hasControls: true,
-          //     textTransform: "none",
-          //     isEditable: true,
-          //     zChangeable: 1,
-          //     boundingBox: "Base",
-          //     boundingBoxMode: "clipping",
-          //     copyable: true,
-          //     draggable: true,
-          //     lockScalingX: false,
-          //     lockScalingY: false,
-          //     lockUniScaling: true,
-          //     colors: ['#000'],
-          //     cornerSize: 24,
-          //     textBox: false,
-          //     rotatable: true,
-          //     userAdded: true
-          //   });
+      const elementtoolbar = document.querySelector('fpd-element-toolbar');
+      console.log("djjjjj",elementtoolbar)
+      console.log("test testsss");
+      if(elementtoolbar){
+        elementtoolbar.classList.add('fpd-panel-visible')
+      }
+    });
 
-          //   const canvas = this.designer.currentViewInstance.fabricCanvas;
+    function setupShareButtonHandlersForAllMenus() {
+      const shareMenus = document.querySelectorAll('.fpd-share-menussss');
 
-          //   // canvas.add(cloned);
-          //   // canvas.setActiveObject(cloned);
-          //   // canvas.renderAll();
-          //   let n = 'happy text'
-          //   const text = n;
-          //   console.log("updated data", cloned  )
-          //   this.designer.currentViewInstance.fabricCanvas.addElement('text', n, text, cloned);
-
-            
-          //   const objects = this.designer.currentViewInstance.fabricCanvas.getObjects();
-          //   const element = objects[objects.length - 3]; 
-          //   console.log("jsj",this.designer.currentViewInstance.fabricCanvas.setActiveObject)
-          //   // Highlight/select the new element
-          //   if (element && typeof this.designer.currentViewInstance.fabricCanvas.setActiveObject === 'function') {
-          //       this.designer.currentViewInstance.fabricCanvas.setActiveObject(element);
-          //       this.designer.currentViewInstance.fabricCanvas.renderAll();
-          //   }
-
-          //   // ✅ Trigger Fancy Product Designer events
-          //   $(document).trigger('fpdRefreshLayers');
-          //   $(document).trigger('elementAdd', [cloned]);
-
-            
-          // });
-          this.designer.currentViewInstance.fabricCanvas.duplicateElement(
-              this.designer.currentElement
-            )
-
-             this.showToast('Paste successfully!');
-
-        }
-      });
-
-       document.getElementById('letter-spacing')?.addEventListener('click', (e) => {
-        console.log("e.currentTarget",e.currentTarget)
-            document.body.classList.remove('fpd-toolbar-transform-our');
-            const target = e.currentTarget as HTMLElement;
-            if(document.getElementById('letter-spacing')?.classList.contains('letter-spac-active')){
-              console.log("letter-spacing is active")
-              const elementtoolbar = document.querySelector('fpd-element-toolbar');
-              if(elementtoolbar){
-                elementtoolbar.classList.remove('fpd-panel-visible')
-              }
-              document.getElementById('letter-spacing')?.classList.remove('letter-spac-active')
-              return;
-            }
-
-
-            target.classList.add('letter-spac-active');
-            const subPanel = document.querySelector('.fpd-sub-panel');
-            console.log("subPanel data is", subPanel)
-            if (!subPanel) return;
-
-            // Step 2: Remove 'fpd-active' from any active children in sub-panel
-            subPanel.querySelectorAll(':scope > .fpd-active').forEach(el => {
-              el.classList.remove('fpd-active');
-            });
-            
-            
-            // Step 3: Find `.fpd-panel-position` inside the same sub-panel
-            const positionPanel = subPanel.querySelector('.fpd-panel-text-size');
-            if (positionPanel) {
-              positionPanel.classList.add('fpd-active', 'fpd-letter-spacing-lineheight');
-              this.document.body.classList.remove('fpd-tools-custom-data')
-            }
-
-            const elementtoolbar = document.querySelector('fpd-element-toolbar');
-            console.log("djjjjj",elementtoolbar)
-            console.log("test testsss");
-            if(elementtoolbar){
-              elementtoolbar.classList.add('fpd-panel-visible')
-            }
-       });
-       
-
-       function setupShareButtonHandlersForAllMenus() {
-          const shareMenus = document.querySelectorAll('.fpd-share-menussss');
-
-          shareMenus.forEach((shareMenu) => {
-            const observer = new MutationObserver((mutations) => {
-              mutations.forEach((mutation) => {
-                if (
-                  mutation.type === 'attributes' &&
-                  mutation.attributeName === 'style'
-                ) {
-                  const display = window.getComputedStyle(shareMenu as HTMLElement).display;
-                  if (display === 'block') {
-                    const shareBtn = shareMenu.querySelector('.fpd-share-link-btn');
-                    if (shareBtn) {
-                      // Prevent duplicate bindings
-                      shareBtn.removeEventListener('click', handleShareClick);
-                      shareBtn.addEventListener('click', handleShareClick, { once: true });
-                    }
-                  }
+      shareMenus.forEach((shareMenu) => {
+        const observer = new MutationObserver((mutations) => {
+          mutations.forEach((mutation) => {
+            if (
+              mutation.type === 'attributes' &&
+              mutation.attributeName === 'style'
+            ) {
+              const display = window.getComputedStyle(shareMenu as HTMLElement).display;
+              if (display === 'block') {
+                const shareBtn = shareMenu.querySelector('.fpd-share-link-btn');
+                if (shareBtn) {
+                  shareBtn.removeEventListener('click', handleShareClick);
+                  shareBtn.addEventListener('click', handleShareClick, { once: true });
                 }
+              }
+            }
+          });
+        });
+
+        observer.observe(shareMenu, {
+          attributes: true,
+          attributeFilter: ['style'],
+        });
+      });
+    }
+
+    function handleShareClick(e: Event) {
+      alert("check");
+      e.stopPropagation();
+      e.preventDefault();
+      console.log('Share button clicked', e);
+
+      const target = e.currentTarget as HTMLElement;
+
+      const parentItem = target.closest('.fpd-item.fpd-hover-thumbnail.ts') as HTMLElement;
+
+      if (!parentItem) {
+        alert('Design element not found.');
+        return;
+      }
+
+      const dataSource = parentItem.getAttribute('data-source');
+      const dataTitle = parentItem.getAttribute('data-title');
+
+      const storedData = localStorage.getItem('clothing-designer');
+
+      let matchedData: any[] = [];
+
+      if (storedData) {
+        try {
+          const parsedData = JSON.parse(storedData);
+
+          if (Array.isArray(parsedData)) {
+            matchedData = parsedData.filter(item => item.title === dataTitle);
+            console.log("Matched Data of:", matchedData);
+          } else {
+            console.error("Data is not an array:", parsedData);
+          }
+        } catch (err) {
+          console.error("Failed to parse localStorage data:", err);
+        }
+      } else {
+        console.warn("No data found in localStorage for key:");
+      }
+      console.log("matchedData",matchedData, matchedData[0]?.design_id)
+      if (!dataSource || !dataTitle) {
+        alert('Missing design data.');
+        return;
+      }
+
+      fetch(`https://styleflip-backend-jdm5.ithemes.xyz/api/sharedproduct/search?title=${encodeURIComponent(dataTitle)}&design_id=${matchedData[0]?.design_id}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+        .then(response => response.json())
+        .then(data => {
+          console.log('Search API Response:', data);
+
+          if (data && data.product && data.product.length > 0) {
+            const firstProduct = data.product[0];
+            const urlBase = window.location.origin;
+            const shareUrl = `${urlBase}/savedesign?design_id=${data.design_id}&title=${encodeURIComponent(data.title)}`;
+
+            const urlField = document.querySelector('.fpd-share-link-url');
+            const copyBtn = document.querySelector('.fpd-share-link-btn');
+
+            if (urlField) urlField.textContent = shareUrl;
+
+            if (navigator.clipboard && copyBtn) {
+              navigator.clipboard.writeText(shareUrl).then(() => {
+                copyBtn.textContent = 'Copied!';
+                setTimeout(() => {
+                  copyBtn.textContent = 'Copy Link';
+                }, 1200);
               });
-            });
-
-            observer.observe(shareMenu, {
-              attributes: true,
-              attributeFilter: ['style'],
-            });
-          });
-        }
-
-        function handleShareClick(e: Event) {
-          alert("check");
-          e.stopPropagation();
-          e.preventDefault();
-          console.log('Share button clicked', e);
-
-          const target = e.currentTarget as HTMLElement;
-
-          // Traverse up to find closest `.fpd-item`
-          const parentItem = target.closest('.fpd-item.fpd-hover-thumbnail.ts') as HTMLElement;
-
-          if (!parentItem) {
-            alert('Design element not found.');
-            return;
-          }
-
-          const dataSource = parentItem.getAttribute('data-source');
-          const dataTitle = parentItem.getAttribute('data-title');
-
-          const storedData = localStorage.getItem('clothing-designer');
-
-            let matchedData: any[] = [];
-
-            if (storedData) {
-              try {
-                const parsedData = JSON.parse(storedData);
-
-                if (Array.isArray(parsedData)) {
-                  // Step 2: Find all items that match dataTitle
-                  matchedData = parsedData.filter(item => item.title === dataTitle);
-
-                  console.log("Matched Data of:", matchedData);
-                } else {
-                  console.error("Data is not an array:", parsedData);
-                }
-              } catch (err) {
-                console.error("Failed to parse localStorage data:", err);
-              }
             } else {
-              console.warn("No data found in localStorage for key:");
+              window.prompt('Copy this link:', shareUrl);
             }
-            console.log("matchedData",matchedData, matchedData[0]?.design_id)
-          if (!dataSource || !dataTitle) {
-            alert('Missing design data.');
-            return;
-          }
-
-          // API call to search product by title
-        fetch(`https://styleflip-backend-jdm5.ithemes.xyz/api/sharedproduct/search?title=${encodeURIComponent(dataTitle)}&design_id=${matchedData[0]?.design_id}`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json'
+          } else {
+            alert('No product found with this title.');
           }
         })
-          .then(response => response.json())
-          .then(data => {
-            console.log('Search API Response:', data);
+        .catch(err => {
+          console.error('Error searching product:', err);
+          alert('Error searching product.');
+        });
+    }
 
-            // Assuming API returns: { products: [{ _id: '...', title: '...' }, ...] }
-            if (data && data.product && data.product.length > 0) {
-              const firstProduct = data.product[0]; // Take the first matching product
-              const urlBase = window.location.origin;
-              const shareUrl = `${urlBase}/savedesign?design_id=${data.design_id}&title=${encodeURIComponent(data.title)}`;
+    setupShareButtonHandlersForAllMenus();
 
-              const urlField = document.querySelector('.fpd-share-link-url');
-              const copyBtn = document.querySelector('.fpd-share-link-btn');
+    const panel = document.getElementById('panel-text-size-data');
 
-              if (urlField) urlField.textContent = shareUrl;
-
-              if (navigator.clipboard && copyBtn) {
-                navigator.clipboard.writeText(shareUrl).then(() => {
-                  copyBtn.textContent = 'Copied!';
-                  setTimeout(() => {
-                    copyBtn.textContent = 'Copy Link';
-                  }, 1200);
-                });
-              } else {
-                window.prompt('Copy this link:', shareUrl);
-              }
-            } else {
-              alert('No product found with this title.');
+    if (panel) {
+      const observer = new MutationObserver((mutationsList) => {
+        for (const mutation of mutationsList) {
+          if (
+            mutation.type === 'attributes' &&
+            mutation.attributeName === 'class'
+          ) {
+            const hasClass = panel.classList.contains('fpd-active');
+            if (!hasClass) {
+              this.document.getElementById('letter-spacing')?.classList.remove('letter-spac-active');
+              console.log('Class "fpd-active" was removed from #panel-text-size-data');
             }
-          })
-          .catch(err => {
-            console.error('Error searching product:', err);
-            alert('Error searching product.');
-          });
+          }
+        }
+      });
 
+      observer.observe(panel, { attributes: true });
+    }
+
+    const paneldata = document.querySelector('.fpd-panel-position');
+
+    if (paneldata) {
+      const observer = new MutationObserver((mutationsList) => {
+        for (const mutation of mutationsList) {
+          if (
+            mutation.type === 'attributes' &&
+            mutation.attributeName === 'class'
+          ) {
+            const hasClass = paneldata.classList.contains('fpd-active');
+            if (!hasClass) {
+              this.document.getElementById('CenterTools')?.classList.remove('letter-spac-active');
+              console.log('Class "fpd-active" was removed from #panel-text-size-data');
+            }
+          }
+        }
+      });
+
+      observer.observe(paneldata, { attributes: true });
+    }
+
+    document.addEventListener('click', function (event) {
+      const productStage = document.querySelector('.fpd-product-stage');
+      const viewStage = document.querySelector('.fpd-view-stage');
+      const toolbar = document.querySelector('fpd-element-toolbar');
+      
+      const clickedInsideProductStage = productStage?.contains(event.target as Node);
+      const clickedInsideViewStage = viewStage?.contains(event.target as Node);
+
+      if (clickedInsideProductStage && !clickedInsideViewStage) {
+        if (toolbar) {
+          toolbar.classList.remove('fpd-show');
+        }
+      }
+    });
+
+    document.addEventListener("click", function (e:any) {
+      console.log("Document clicked", e.target, e);
+      const toolbar = e.target.closest("fpd-element-toolbar");
+      if (!toolbar) return;
+      console.log("toolbar is", toolbar);
+     
+      if(e.target.classList.contains("fa-close")) {
+        console.log("e.target is", e.target);
+        const transformSpac = document.querySelector('.fpd-tool-transform');
+        let transformActive = transformSpac?.classList.contains('fpd-active');
+        if(transformActive){
+          document.querySelector('.fpd-tool-transform')?.classList.remove('fpd-active');
+        }
+      }
+     
+      if (toolbar.classList.contains("fpd-show")) {
+        const target = e.target.closest("[title], [data-panel]");
+        console.log("target is", target);
+        if (!target) return;
+
+        const value = target.getAttribute("title") || target.getAttribute("data-panel");
+        console.log("target value is", value);
+        if (!value) return;
+
+        const newClass = "my-" + value.toLowerCase().replace(/\s+/g, '-');
+
+        if (toolbar) {
+          toolbar.classList.forEach((c:any) => {
+            if (c.startsWith("my-")) toolbar.classList.remove(c);
+          });
         }
 
-        // Run after DOM is ready
-        setupShareButtonHandlersForAllMenus();
-
-
-
-       const panel = document.getElementById('panel-text-size-data');
-
-      if (panel) {
-        const observer = new MutationObserver((mutationsList) => {
-          for (const mutation of mutationsList) {
-            if (
-              mutation.type === 'attributes' &&
-              mutation.attributeName === 'class'
-            ) {
-              const hasClass = panel.classList.contains('fpd-active');
-              if (!hasClass) {
-                this.document.getElementById('letter-spacing')?.classList.remove('letter-spac-active');
-                console.log('Class "fpd-active" was removed from #panel-text-size-data');
-                // ✅ Your condition logic here
-              }
-            }
+        toolbar.classList.add(newClass);
+      }
+      else {
+        toolbar.classList.forEach((c: any) => {
+          if (c.startsWith("my-")) { 
+            console.log("removing class", c);
+            toolbar.classList.remove(c); 
           }
         });
-
-        observer.observe(panel, { attributes: true });
       }
 
+      console.log("Toolbar updated with class:", toolbar.className);
+      document.body.classList.forEach(cls => {
+        if (cls.startsWith('fpd-type-')) {
+          document.body.classList.remove(cls);
+        }
+      });
 
-      const paneldata = document.querySelector('.fpd-panel-position');
+      const typeClass = toolbar.className
+        .split(' ')
+        .find((cls: string) => cls.startsWith('fpd-type-'));
 
-      if (paneldata) {
-        const observer = new MutationObserver((mutationsList) => {
-          for (const mutation of mutationsList) {
-            if (
-              mutation.type === 'attributes' &&
-              mutation.attributeName === 'class'
-            ) {
-              const hasClass = paneldata.classList.contains('fpd-active');
-              if (!hasClass) {
-                this.document.getElementById('CenterTools')?.classList.remove('letter-spac-active');
-                console.log('Class "fpd-active" was removed from #panel-text-size-data');
-                // ✅ Your condition logic here
-              }
-              //let lettspac = document.querySelector('.letter-spac-active');
-              /*const transformSpac = document.querySelector('.fpd-tool-transform');
-              let transformActive = transformSpac.classList.contains('fpd-active');
-              if(transformActive){
-              document.querySelector('.fpd-tool-transform')?.classList.remove('fpd-active');
-              }*/
-            }
-          }
-        });
-
-        observer.observe(paneldata, { attributes: true });
+      if (typeClass) {
+        document.body.classList.add(typeClass);
       }
-
-      document.addEventListener('click', function (event) {
-          const productStage = document.querySelector('.fpd-product-stage');
-          const viewStage = document.querySelector('.fpd-view-stage');
-          const toolbar = document.querySelector('fpd-element-toolbar');
-          
-
-          // Check if the click is inside .fpd-product-stage but NOT inside .fpd-view-stage
-          const clickedInsideProductStage = productStage?.contains(event.target as Node);
-          const clickedInsideViewStage = viewStage?.contains(event.target as Node);
-
-          if (clickedInsideProductStage && !clickedInsideViewStage) {
-            // Hide or remove toolbar
-            if (toolbar) {
-              toolbar.classList.remove('fpd-show'); // If using Tailwind
-              // toolbar.style.display = 'none'; // If not using Tailwind
-              // lettspac?.classList.remove('letter-spac-active');
-            }
-          }
-        });
-
-
-        document.addEventListener("click", function (e:any) {
-            console.log("Document clicked", e.target, e);
-            // Find the toolbar ancestor
-            const toolbar = e.target.closest("fpd-element-toolbar");
-            if (!toolbar) return; // click was outside
-            console.log("toolbar is", toolbar);
-            // Check if clicked element (or closest) has title or data-panel
-           
-           if(e.target.classList.contains("fa-close")) {
-            console.log("e.target is", e.target);
-              const transformSpac = document.querySelector('.fpd-tool-transform');
-              let transformActive = transformSpac?.classList.contains('fpd-active');
-              if(transformActive){
-              document.querySelector('.fpd-tool-transform')?.classList.remove('fpd-active');
-              }
-            }
-           
-            
-            if (toolbar.classList.contains("fpd-show")) {
-               const target = e.target.closest("[title], [data-panel]");
-                console.log("target is", target);
-                if (!target) return;
-
-              // Prefer title, fallback to data-panel
-              const value = target.getAttribute("title") || target.getAttribute("data-panel");
-              console.log("target value is", value);
-              if (!value) return;
-  
-              const newClass = "my-" + value.toLowerCase().replace(/\s+/g, '-');
-  
-              // Update class
-              if (toolbar) {
-                toolbar.classList.forEach((c:any) => {
-                  if (c.startsWith("my-")) toolbar.classList.remove(c);
-                });
-              }
-
-              toolbar.classList.add(newClass);
-            }
-            else {
-                // If fpd-show is missing → remove all my-* classes
-                toolbar.classList.forEach((c: any) => {
-                  if (c.startsWith("my-")) { 
-                    console.log("removing class", c);
-                    toolbar.classList.remove(c); 
-                  }
-                });
-              }
-
-            console.log("Toolbar updated with class:", toolbar.className);
-            document.body.classList.forEach(cls => {
-              if (cls.startsWith('fpd-type-')) {
-                document.body.classList.remove(cls);
-              }
-            });
-
-            // 2️⃣ Find fpd-type-* class from toolbar
-            const typeClass = toolbar.className
-              .split(' ')
-              .find((cls: string) => cls.startsWith('fpd-type-'));
-
-            // 3️⃣ Add it to body
-            if (typeClass) {
-              document.body.classList.add(typeClass);
-            }
-          });
-
-
-        
-    }
+    });
+  }
 
   slugify(title: string): string {
     return title
       ?.toLowerCase()
       ?.trim()
-      ?.replace(/[^\w\s-]/g, '') // Remove special chars
-      ?.replace(/\s+/g, '-') // Replace spaces with -
-      ?.replace(/--+/g, '-'); // Collapse hyphens
+      ?.replace(/[^\w\s-]/g, '')
+      ?.replace(/\s+/g, '-')
+      ?.replace(/--+/g, '-');
   }
 
   ngOnInit() {
     setTimeout(() => {
       lucide.createIcons(); 
-      // 👆 use nameAttr if you’re using data-moduleicon
-      // if you use data-lucide, remove nameAttr
     }, 5000);
-    // window.addEventListener('load', () => {
-    //   fetch('https://styleflip-backend-jdm5.ithemes.xyz/api/product/getAllProducts')
-    //     .then(res => res.json())
-    //     .then(data => {
-    //       console.log('Large products loaded:', data);
-    //       console.log('', this.designer)
-    //       // localStorage.setItem('fpdProductsJSON', JSON.stringify(data));
-    //       this.designer.product = data;
-    //       console.log(this.designer.product, '1111111111111', this.designer)
-    //     })
-    //     .catch(err => console.error('Error loading large products:', err));
-    // });   
+    
+    function openDB(): Promise<IDBDatabase> {
+      return new Promise((resolve, reject) => {
+        const request = indexedDB.open("FPD_DB", 1);
 
-    // Open or create IndexedDB
-  function openDB(): Promise<IDBDatabase> {
-    return new Promise((resolve, reject) => {
-      const request = indexedDB.open("FPD_DB", 1);
+        request.onupgradeneeded = (event: any) => {
+          const db = event.target.result;
+          if (!db.objectStoreNames.contains("products")) {
+            db.createObjectStore("products", { keyPath: "id", autoIncrement: true });
+          }
+        };
 
-      request.onupgradeneeded = (event: any) => {
-        const db = event.target.result;
-        if (!db.objectStoreNames.contains("products")) {
-          db.createObjectStore("products", { keyPath: "id", autoIncrement: true });
-        }
-      };
+        request.onsuccess = (event: any) => {
+          resolve(event.target.result);
+        };
 
-      request.onsuccess = (event: any) => {
-        resolve(event.target.result);
-      };
-
-      request.onerror = (event: any) => {
-        reject(event.target.error);
-      };
-    });
-  }
-
-  // Save products in IndexedDB
-  async function saveProducts(data: any[]) {
-    const db = await openDB();
-    const tx = db.transaction("products", "readwrite");
-    const store = tx.objectStore("products");
-
-    store.clear(); // clear old data
-
-    if (Array.isArray(data)) {
-      data.forEach((item) => store.add(item));
-    } else {
-      store.add(data);
+        request.onerror = (event: any) => {
+          reject(event.target.error);
+        };
+      });
     }
 
-    return new Promise<void>((resolve, reject) => {
-      tx.oncomplete = () => resolve();
-      tx.onerror = () => reject(tx.error);
-      tx.onabort = () => reject(tx.error);
-    });
-  }
-
-  // Load products from IndexedDB
-  async function getProducts(): Promise<any[]> {
-    const db = await openDB();
-    return new Promise((resolve, reject) => {
-      const tx = db.transaction("products", "readonly");
+    async function saveProducts(data: any[]) {
+      const db = await openDB();
+      const tx = db.transaction("products", "readwrite");
       const store = tx.objectStore("products");
-      const request = store.getAll();
 
-      request.onsuccess = () => resolve(request.result);
-      request.onerror = () => reject(request.error);
-    });
-  }
+      store.clear();
 
-  // Attach getProducts to window and bind 'this'
-  (window as any).getProducts = getProducts.bind(this);
-  const storedFonts = localStorage.getItem('fontList');
-      const fontData = storedFonts ? JSON.parse(storedFonts) : null;
-  // window.addEventListener("load", () => {
-  this.appOptions = {
-          productsJSON: 'assets/data/products/product-categories.json',
-          // productsJSON: 'https://styleflip-backend-jdm5.ithemes.xyz/api/productmeta/getAllProductMetas',
-          productsJSON1: 'assets/data/products/product-categories-new.json',
-          // designsJSON: 'assets/data/designs/design-categories.json',
-          designsJSON:
-            'https://styleflip-backend-jdm5.ithemes.xyz/api/element/getAllElements',
-          langJSON: 'assets/data/langs/default.json',
-          // layout: 'topbar',
-          stageWidth: 2500,
-          stageHeight: 700,
-          initialActiveModule: 'products',
-          // toolbarPlacement: "inside-top",
-          editorMode: false,
-          smartGuides: true,
-          imageEditor: true,
-          customTextParameters: {
-            colors: false,
-            removable: true,
-            resizable: true,
-            draggable: true,
-            rotatable: true,
-            autoCenter: true,
-            boundingBox: 'Base',
-          },
-          customImageParameters: {
-            draggable: true,
-            removable: true,
-            resizable: true,
-            rotatable: true,
-            colors: '#000',
-            autoCenter: true,
-            boundingBox: 'Base',
+      if (Array.isArray(data)) {
+        data.forEach((item) => store.add(item));
+      } else {
+        store.add(data);
+      }
+
+      return new Promise<void>((resolve, reject) => {
+        tx.oncomplete = () => resolve();
+        tx.onerror = () => reject(tx.error);
+        tx.onabort = () => reject(tx.error);
+      });
+    }
+
+    async function getProducts(): Promise<any[]> {
+      const db = await openDB();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction("products", "readonly");
+        const store = tx.objectStore("products");
+        const request = store.getAll();
+
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+      });
+    }
+
+    (window as any).getProducts = getProducts.bind(this);
+    const storedFonts = localStorage.getItem('fontList');
+    const fontData = storedFonts ? JSON.parse(storedFonts) : null;
+    
+    this.appOptions = {
+      productsJSON: 'assets/data/products/product-categories.json',
+      productsJSON1: 'assets/data/products/product-categories-new.json',
+      designsJSON: 'https://styleflip-backend-jdm5.ithemes.xyz/api/element/getAllElements',
+      langJSON: 'assets/data/langs/default.json',
+      stageWidth: 2500,
+      stageHeight: 700,
+      initialActiveModule: 'products',
+      editorMode: false,
+      smartGuides: true,
+      imageEditor: true,
+      customTextParameters: {
+        colors: false,
+        removable: true,
+        resizable: true,
+        draggable: true,
+        rotatable: true,
+        autoCenter: true,
+        boundingBox: 'Base',
+      },
+      customImageParameters: {
+        draggable: true,
+        removable: true,
+        resizable: true,
+        rotatable: true,
+        colors: '#000',
+        autoCenter: true,
+        boundingBox: 'Base',
+        patterns: true,
+        filters: true,
+      },
+      actions: {
+        top: [],
+        right: [],
+        left: ['undo', 'redo', 'download', 'zoom', 'reset-product'],
+        center: [],
+      },
+      selectedColor: '#f5f5f5',
+      boundingBoxColor: '#005ede',
+      outOfBoundaryColor: '#990000',
+      cornerIconColor: '#000000',
+      mainBarModules: [
+        'products',
+        'productsnew',
+        'designs',
+        'text',
+        'images',
+        'manage-layers',
+        'save-load',
+      ],
+      patterns: [
+        {
+          title: 'Polka Dots',
+          url: 'https://www.toptal.com/designers/subtlepatterns/patterns/polka-dots.png',
+        },
+        {
+          title: 'Stripes',
+          url: 'https://www.toptal.com/designers/subtlepatterns/patterns/diagonal-stripes.png',
+        },
+        {
+          title: 'Wood Grain',
+          url: 'https://www.toptal.com/designers/subtlepatterns/patterns/wood-pattern.png',
+        },
+      ],
+      fonts: fontData,
+      textTemplates: [
+        {
+          text: 'I love Styleflip',
+          properties: {
+            fontSize: 50,
+            fontFamily: 'Bangers',
+            fill: '#ff5722',
+            stroke: '#000000',
+            strokeWidth: 2,
+            shadow: 'rgba(0,0,0,0.3) 2px 2px 3px',
+            curved: true,
+            curveSpacing: 5,
+            curveRadius: 180,
+            curveReverse: false,
+            curvable: 1,
             patterns: true,
-            filters: true,
           },
-          actions: {
-            // 'top': ['download', 'share', 'print', 'save', 'preview-lightbox', 'paste'],
-            top: [],
-            // 'right': ['manage-layers', 'magnify-glass', 'zoom', 'reset-product', 'qr-code', 'ruler'],
-            right: [],
-            // 'bottom': ['zoom'],
-            left: ['undo', 'redo', 'download', 'zoom', 'reset-product'],
-            center: [],
-            // 'center': ['download','preview-lightbox','paste','zoom','reset-product','qr-code','ruler']
+        },
+        {
+          text: 'Fun Times',
+          properties: {
+            fontSize: 80,
+            fontFamily: 'Fredoka One',
+            fill: '#3f51b5',
+            stroke: '#010101',
+            curvable: 1,
+            strokeWidth: 3,
+            shadow: 'rgba(255,255,255,0.5) 0px 0px 6px',
           },
-          selectedColor: '#f5f5f5',
-          boundingBoxColor: '#005ede',
-          outOfBoundaryColor: '#990000',
-          cornerIconColor: '#000000',
-          mainBarModules: [
-            'products',
-            'productsnew',
-            'designs',
-            'text',
-            'images',
-            'manage-layers',
-            // 'text-layers',
-            'save-load',
-          ],
-          patterns: [
-            {
-              title: 'Polka Dots',
-              url: 'https://www.toptal.com/designers/subtlepatterns/patterns/polka-dots.png',
-            },
-            {
-              title: 'Stripes',
-              url: 'https://www.toptal.com/designers/subtlepatterns/patterns/diagonal-stripes.png',
-            },
-            {
-              title: 'Wood Grain',
-              url: 'https://www.toptal.com/designers/subtlepatterns/patterns/wood-pattern.png',
-            },
-          ],
-          fonts: fontData,
-          textTemplates: [
-            {
-              text: 'I love Styleflip',
-              properties: {
-                fontSize: 50,
-                fontFamily: 'Bangers',
-                fill: '#ff5722', // Vibrant orange
-                stroke: '#000000', // Black outline
-                strokeWidth: 2,
-                shadow: 'rgba(0,0,0,0.3) 2px 2px 3px',
-                curved: true, // Enable curved text
-                curveSpacing: 5, // Space between letters
-                curveRadius: 180, // Adjust radius of the curve
-                curveReverse: false,
-                curvable: 1,
-                patterns: true,
-              },
-            },
-            {
-              text: 'Fun Times',
-              properties: {
-                fontSize: 80,
-                fontFamily: 'Fredoka One',
-                fill: '#3f51b5', // Blue
-                stroke: '#010101',
-                curvable: 1, // White outline
-                strokeWidth: 3,
-                shadow: 'rgba(255,255,255,0.5) 0px 0px 6px',
-              },
-            },
-            {
-              text: 'Creative Soul',
-              properties: {
-                fontSize: 70,
-                fontFamily: 'Pacifico',
-                fill: '#e91e63', // Pink
-                stroke: '#ffc107', // Yellow outline
-                curvable: 1,
-                strokeWidth: 2,
-                shadow: 'rgba(0,0,0,0.2) 1px 1px 4px',
-              },
-            },
-            {
-              text: 'Dream Big',
-              properties: {
-                fontSize: 98,
-                fontFamily: 'Lobster',
-                fill: '#4caf50', // Green
-                stroke: '#ffffff', // White outline
-                strokeWidth: 2,
-                curvable: 1,
-                shadow: 'rgba(0,0,0,0.4) 3px 3px 5px',
-              },
-            },
-          ],
-          fileServerURL: 'https://file.handler.php.stageprojects.xyz/',
-          // fileServerURL: 'http://localhost/fpd/file-handler.php',
-          uploadZone: {
-            useDataURL: true, // ✅ allows upload directly in browser
+        },
+        {
+          text: 'Creative Soul',
+          properties: {
+            fontSize: 70,
+            fontFamily: 'Pacifico',
+            fill: '#e91e63',
+            stroke: '#ffc107',
+            curvable: 1,
+            strokeWidth: 2,
+            shadow: 'rgba(0,0,0,0.2) 1px 1px 4px',
           },
-          facebookAppId: '325741021422456',
-          instagramClientId: 'bbe4d544897b4fb0b1bae5a6b44a310b',
-          instagramRedirectUri: 'assets/html/instagram_auth.html',
-          instagramTokenUri: '',
-          colorPickerPalette: [
-            '#000',
-            '#f4cccc',
-            '#fce5cd',
-            '#fff2cc',
-            '#d9ead3',
-            '#d0e0e3',
-            '#cfe2f3',
-            '#d9d2e9',
-            '#ead1dc',
-            '#5f27cd',
-            '#222f3e',
-            '#10ac84',
-          ],
-          pixabayApiKey: '3326084-d99995263eac7194c77ed7401',
-          pixabayLang: 'en',
-          pixabayHighResImages: false,
-          elementParameters: {},
-
-          lazyLoad: true,
-          toolbarPlacement: 'smart',
-          // imageParameters:{
-          //   advancedEditing: true
-          // }
-        };
+        },
+        {
+          text: 'Dream Big',
+          properties: {
+            fontSize: 98,
+            fontFamily: 'Lobster',
+            fill: '#4caf50',
+            stroke: '#ffffff',
+            strokeWidth: 2,
+            curvable: 1,
+            shadow: 'rgba(0,0,0,0.4) 3px 3px 5px',
+          },
+        },
+      ],
+      fileServerURL: 'https://file.handler.php.stageprojects.xyz/',
+      uploadZone: {
+        useDataURL: true,
+      },
+      facebookAppId: '325741021422456',
+      instagramClientId: 'bbe4d544897b4fb0b1bae5a6b44a310b',
+      instagramRedirectUri: 'assets/html/instagram_auth.html',
+      instagramTokenUri: '',
+      colorPickerPalette: [
+        '#000',
+        '#f4cccc',
+        '#fce5cd',
+        '#fff2cc',
+        '#d9ead3',
+        '#d0e0e3',
+        '#cfe2f3',
+        '#d9d2e9',
+        '#ead1dc',
+        '#5f27cd',
+        '#222f3e',
+        '#10ac84',
+      ],
+      pixabayApiKey: '3326084-d99995263eac7194c77ed7401',
+      pixabayLang: 'en',
+      pixabayHighResImages: false,
+      elementParameters: {},
+      lazyLoad: true,
+      toolbarPlacement: 'smart',
+    };
+    
     this.designer = new FancyProductDesigner(
-          this.document.querySelector('#clothing-designer'),
-          this.appOptions
-        );
-        console.log("designer is", this.designer);
+      this.document.querySelector('#clothing-designer'),
+      this.appOptions
+    );
+    console.log("designer is", this.designer);
+    
     fetch("https://styleflip-backend-jdm5.ithemes.xyz/api/product/getAllProducts")
       .then((res) => res.json())
       .then(async (data) => {
         console.log("Large products loaded:", data);
-
-        await saveProducts(data); // Save in IndexedDB
-
-        const stored = await getProducts(); // Read back from IndexedDB
+        await saveProducts(data);
+        const stored = await getProducts();
         console.log("IndexedDB products:", stored);
-        console.log("", this.designer);
         this.designer.product = stored;
-        console.log(this.designer.product, "1111111111111Vivks", this.designer.fpdInstance);
-        
-       
         console.log(this.designer.product, "✅ Products loaded into designer");
       })
       .catch((err) => console.error("Error loading large products:", err));
-  // });
 
     const slug = this.route.snapshot.paramMap.get('slug');
     const manufacturer = this.route.snapshot.paramMap.get('manufacturer');
     console.log(this.route.snapshot.paramMap, 'Selected slug:', slug);
     const currentUrl = this.router.url;
+    
     if (currentUrl.includes('savedesign')) {
       this.showFPDLoading(true);
       this.route.queryParams.subscribe(params => {
@@ -1794,121 +1337,37 @@ export class HomeComponent implements AfterViewInit {
         })
           .then(response => response.json())
           .then(data => {
-              console.log("data is:", data)
-              let existing = localStorage.getItem('clothing-designer');
-              let parsed = existing ? JSON.parse(existing) : [];
+            console.log("data is:", data)
+            let existing = localStorage.getItem('clothing-designer');
+            let parsed = existing ? JSON.parse(existing) : [];
 
-              // ✅ Only push if localStorage is empty
-              if (parsed.length === 0) {
-                parsed.push(data);
-                localStorage.setItem('clothing-designer', JSON.stringify(parsed));
-              }
-              const designTitleData = localStorage.getItem('clothing-designer');
-              console.log("ddddddddddddddddddAnoooooo")
-              let matchedDesign = null;
-              if (designTitleData) {
-                const parsedDesigns = JSON.parse(designTitleData);
-                matchedDesign = parsedDesigns.find((i: any) => i.title === title);
-              }
+            if (parsed.length === 0) {
+              parsed.push(data);
+              localStorage.setItem('clothing-designer', JSON.stringify(parsed));
+            }
+            const designTitleData = localStorage.getItem('clothing-designer');
+            console.log("ddddddddddddddddddAnoooooo")
+            let matchedDesign = null;
+            if (designTitleData) {
+              const parsedDesigns = JSON.parse(designTitleData);
+              matchedDesign = parsedDesigns.find((i: any) => i.title === title);
+            }
 
-              if (matchedDesign) {
-                setTimeout(() => {
-                  console.log(matchedDesign, 'Matched Design:', this.designer);
-                  this.designer.currentViewInstance.fabricCanvas.clear();
-                  this.designer.loadProduct(matchedDesign.product)
-                  this.showFPDLoading(false);
-                  const gridContainer = document.querySelector('.fpd-saved-designs');
-                  // if (gridContainer) {
-                  //    this.designer.currentViewInstance.fabricCanvas.clear();
-                  //   const savedDesigns = gridContainer.querySelector('.fpd-grid.fpd-grid-contain');
-                  //   if (savedDesigns) {
-                  //     // Step 3: Get all .fpd-item elements
-                  //     const fpdItems = savedDesigns.querySelectorAll('.fpd-item');
-
-                  //     fpdItems.forEach(item => {
-                  //       const dataTitle = item.getAttribute('data-title');
-
-                  //       if (dataTitle === matchedDesign.title) {
-                  //         // Step 4: Match found, get outer HTML
-                  //         const itemHTML = item.outerHTML;
-                  //         console.log('Matched HTML:', itemHTML);
-                  //         const s = itemHTML;
-                  //         this.designer.fpdInstance.addSavedProduct(s)
-                  //         // You can return or use this as needed
-                  //       }
-                  //     });
-                  //   } else {
-                  //     console.warn('.fpd-saved-designs not found inside .fpd-grid-contain');
-                  //   }
-                  // }
-
-                  // this.designer.currentViewInstance.fabricCanvas.addElement('image', {
-                  //   source: matchedDesign.thumbnail,
-                  //   title: matchedDesign.title,
-                  // });
-                
-                  // this.designer.currentViewInstance.fabricCanvas.addElement(
-                  //   'image',
-                  //           matchedDesign.thumbnail,
-                  //           matchedDesign.title,
-                  //           matchedDesign.product
-                  // )
-                  // this.designer.loadProduct(matchedDesign.product)
-                  // this.designer?.currentViewInstance?.fabricCanvas?.clear();
-                  // if (this.designer && matchedDesign && matchedDesign.product) {
-                  //   console.log('Loading saved design:', matchedDesign.title);
-                  //   const viewIndex = 0; // Or use a dynamic value from localStorage
-
-                  //   const savedView = matchedDesign.product[viewIndex];
-
-                  //   if (savedView && savedView.elements) {
-                  //     console.log(savedView, 'Loading saved design inside:', savedView.title);
-                  //     // Clear current canvas view
-                  //     this.designer.currentViewInstance.fabricCanvas.clear();
-                  //     // this.designer.currentViewInstance.fabricCanvas.addElements(savedView);  
-                  //     // this.designer.currentViewInstance.fabricCanvas.renderAll();
-
-                  //     savedView.elements.forEach((element: any) => {
-                  //       this.designer.currentViewInstance.fabricCanvas.loadFromJSON(
-                  //         element,
-                  //         () => {
-                  //           this.designer.currentViewInstance.fabricCanvas.renderAll();
-                  //           console.log('Loaded element:', element);
-                  //         }
-                  //       );
-                  //     });
-                  //     // this.designer.fpdInstance.addView(JSON.parse(savedView), true)
-                  //     // this.designer.mainOptions.getViewInstance().loadView(JSON.parse(savedView))
-                  //     // this.designer.fpdInstance.addView({
-                  //     //   title: savedView.title,
-                  //     //   thumbnail: savedView.thumbnail,
-                  //     //   elements: savedView.elements,
-                  //     //   options: savedView.options
-                  //     // })
-                  //     // Load saved view into FPD
-                  //     // this.designer.mainOptions.loadElementJSON(
-                  //     //   savedView.elements,
-                  //     //   () => {
-                  //     //     console.log(`Loaded view "${savedView.title}" into canvas.`);
-                  //     //     this.designer.currentViewInstance.fabricCanvas.renderAll();
-                  //     //   },
-                  //     //   viewIndex
-                  //     // );
-                  //   } else {
-                  //     console.warn('No valid view data found in matchedDesign.product[0].');
-                  //   }
-                  // }
-                  // this.designer?.currentViewInstance?.fabricCanvas?.setActiveObject(null);
-                  // this.designer?.loadProduct(matchedDesign);
-                  console.log('Matched Design:', matchedDesign);
-                }, 10000);
-              } else {
-                console.log('No matching title found in designTitleData.');
-              }
+            if (matchedDesign) {
+              setTimeout(() => {
+                console.log(matchedDesign, 'Matched Design:', this.designer);
+                this.designer.currentViewInstance.fabricCanvas.clear();
+                this.designer.loadProduct(matchedDesign.product)
+                this.showFPDLoading(false);
+                const gridContainer = document.querySelector('.fpd-saved-designs');
+              }, 10000);
+            } else {
+              console.log('No matching title found in designTitleData.');
+            }
           });
-        // 👉 You can now use id/title as needed
       });
     }
+    
     console.log('Current URL:', currentUrl, 'local');
     if(slug === null){
       localStorage.setItem('selectedSlug', ''); 
@@ -1920,14 +1379,15 @@ export class HomeComponent implements AfterViewInit {
     else{
       localStorage.setItem('selectedSlug', 'top-face-with-slipmat'); 
     }
+    
     const token = localStorage.getItem('authToken');
     if (token) {
       this.isLoggedIn = true;
       this.showLoginPopup = false;
     }
     this.loadDesigns();
-    
   }
+  
   bottomMenu() {
     const sourceElement = document.getElementById('content-text');
     console.log('sourceElement', sourceElement);
@@ -1939,53 +1399,184 @@ export class HomeComponent implements AfterViewInit {
       localStorage.setItem('valueofTitle', '');
     }
   }
+  
   showToast(message: string = 'Copied successfully!') {
-  let toast = document.getElementById('custom-toast') as HTMLElement | null;
+    let toast = document.getElementById('custom-toast') as HTMLElement | null;
 
-  if (!toast) {
-    toast = document.createElement('div');
-    toast.id = 'custom-toast';
-    toast.style.position = 'fixed';
-    toast.style.bottom = '30px';
-    toast.style.left = '70%';
-    toast.style.transform = 'translateX(-50%)';
-    toast.style.backgroundColor = '#333';
-    toast.style.color = '#fff';
-    toast.style.padding = '10px 16px';
-    toast.style.borderRadius = '6px';
-    toast.style.fontSize = '14px';
-    toast.style.zIndex = '9999';
-    toast.style.transition = 'opacity 0.4s ease, bottom 0.4s ease';
-    toast.style.opacity = '0';
-    toast.style.visibility = 'hidden';
+    if (!toast) {
+      toast = document.createElement('div');
+      toast.id = 'custom-toast';
+      toast.style.position = 'fixed';
+      toast.style.bottom = '30px';
+      toast.style.left = '70%';
+      toast.style.transform = 'translateX(-50%)';
+      toast.style.backgroundColor = '#333';
+      toast.style.color = '#fff';
+      toast.style.padding = '10px 16px';
+      toast.style.borderRadius = '6px';
+      toast.style.fontSize = '14px';
+      toast.style.zIndex = '9999';
+      toast.style.transition = 'opacity 0.4s ease, bottom 0.4s ease';
+      toast.style.opacity = '0';
+      toast.style.visibility = 'hidden';
 
-    document.body.appendChild(toast);
+      document.body.appendChild(toast);
+    }
+
+    toast.textContent = message;
+    toast.style.visibility = 'visible';
+    toast.style.opacity = '1';
+    toast.style.top = '10px';
+    toast.style.bottom = 'auto';
+
+    setTimeout(() => {
+      if (toast) {
+        toast.style.opacity = '0';
+        toast.style.bottom = '30px';
+        toast.style.visibility = 'hidden';
+      }
+    }, 2000);
   }
 
-  toast.textContent = message;
-  toast.style.visibility = 'visible';
-  toast.style.opacity = '1';
-  toast.style.top = '10px';
-  toast.style.bottom = 'auto';
+  filterThumbnails(searchTerm: string) {
+    console.log('searchTerm', searchTerm);
+    
+    // Add debounce and minimum character check
+    if (searchTerm.length < 2) {
+      // Show all thumbnails
+      const parentDiv = document.querySelector('div[data-moduleicon="layout-panel-left"]');
+      if (!parentDiv) return;
 
-  setTimeout(() => {
-    if (toast) {
-      toast.style.opacity = '0';
-      toast.style.bottom = '30px';
-      toast.style.visibility = 'hidden';
+      const thumbnails = parentDiv.querySelectorAll('.fpd-grid .fpd-item.fpd-hover-thumbnail');
+      thumbnails.forEach((thumb: Element) => {
+        (thumb as HTMLElement).style.display = 'flex';
+      });
+      return;
     }
-  }, 2000);
+
+    const parentDiv = document.querySelector('div[data-moduleicon="layout-panel-left"]');
+    console.log('parentDiv', parentDiv);
+    if (!parentDiv) return;
+
+    const thumbnails = parentDiv.querySelectorAll('.fpd-grid .fpd-item.fpd-hover-thumbnail');
+    console.log('parentDivdata', thumbnails);
+
+    thumbnails.forEach((thumb: Element) => {
+      const title = thumb.getAttribute('data-title')?.toLowerCase() || '';
+      console.log('title', title, 'searchTerm', searchTerm);
+      const search = searchTerm.toLowerCase();
+
+      // Improved search logic - search for words, not just letters
+      const titleWords = title.split(' ');
+      const matches = titleWords.some(word => word.startsWith(search));
+      
+      (thumb as HTMLElement).style.display = matches ? 'flex' : 'none';
+    });
+  }
+
+filterThumbnailsP(searchTerm: string) {
+  console.log('searchTerm', searchTerm);
+  
+  // Add minimum character limit
+  if (searchTerm.length < 2) {
+    // Show all thumbnails when search is too short
+    const allThumbnails = document.querySelectorAll('.fpd-item.fpd-hover-thumbnail');
+    console.log('Showing all thumbnails (search too short)', allThumbnails.length);
+    allThumbnails.forEach((thumb: Element) => {
+      (thumb as HTMLElement).style.display = 'flex';
+    });
+    
+    // Also show all parent containers
+    document.querySelectorAll('.box-contain-text').forEach((container) => {
+      (container as HTMLElement).style.display = 'block';
+    });
+    return;
+  }
+
+  // Normalize search term
+  const search = searchTerm.toLowerCase().trim();
+  
+  // Get ALL thumbnail containers to search through
+  const containers = [
+    ...document.querySelectorAll('.fpd-grid.skins-data'),
+    ...document.querySelectorAll('.fpd-grid.ProductModule'),
+    ...document.querySelectorAll('.fpd-grid')
+  ];
+  
+  console.log('Found containers to search:', containers.length);
+   console.log('containers data ', containers);
+  
+  let totalMatches = 0;
+  let totalItems = 0;
+  
+  containers.forEach((container) => {
+    const thumbnails = container.querySelectorAll('.fpd-item.fpd-hover-thumbnail');
+    totalItems += thumbnails.length;
+      console.log('thumbnails data ', thumbnails);
+    thumbnails.forEach((thumb: Element) => {
+      const title = thumb.getAttribute('data-title')?.toLowerCase() || '';
+      const matches = this.doesTitleMatchSearch(title, search);
+        console.log('matches data ', matches);
+      if (matches) {
+        totalMatches++;
+        console.log(`Match found: "${title}" for search "${search}"`);
+      }
+      
+      (thumb as HTMLElement).style.display = matches ? 'flex' : 'none';
+    });
+  });
+  
+  console.log(`Search results: ${totalMatches} matches out of ${totalItems} items for "${search}"`);
+  
+  // Handle parent containers visibility
+  document.querySelectorAll('.box-contain-text').forEach((container) => {
+    const children = container.querySelectorAll('.fpd-item');
+    const anyVisible = Array.from(children).some(
+      (child) => (child as HTMLElement).style.display !== 'none'
+    );
+    (container as HTMLElement).style.display = anyVisible ? 'block' : 'none';
+  });
 }
+
+// Updated helper method for better search matching
+doesTitleMatchSearch(title: string, search: string): boolean {
+  if (!search || search.length < 2) return true;
+  
+  // Clean up the title for better matching
+  const cleanTitle = title.toLowerCase().replace(/[^\w\s-]/g, ' ');
+  
+  // Split search into individual words
+  const searchWords = search.split(/\s+/).filter(word => word.length > 0);
+  
+  // If search is a single word
+  if (searchWords.length === 1) {
+    const searchWord = searchWords[0];
+    
+    // Check if any word in title starts with search word
+    const titleWords = cleanTitle.split(/\s+/);
+    return titleWords.some(word => word.startsWith(searchWord));
+  }
+  
+  // If search has multiple words (like "head phone")
+  // Check if ALL search words appear in the title (in any order)
+  return searchWords.every(searchWord => {
+    // Check if any word in title starts with this search word
+    const titleWords = cleanTitle.split(/\s+/);
+    return titleWords.some(titleWord => titleWord.startsWith(searchWord));
+  });
+}
+
+// Helper method to preview the design
 
   previewImage: string = '';
   showPreviewModal: boolean = false;
+  
   preview() {
     if (
       this.designer &&
       this.designer.currentViewInstance &&
       this.designer.currentViewInstance.fabricCanvas
     ) {
-      // Only export the current canvas (not all pages/views)
       const canvas = this.designer.currentViewInstance.fabricCanvas;
       const dataUrl = canvas.toDataURL({
         format: 'png',
@@ -1997,7 +1588,6 @@ export class HomeComponent implements AfterViewInit {
       image.src = dataUrl;
 
       image.onload = () => {
-        // Create a div with background image
         const previewDiv = document.createElement('div');
         previewDiv.style.background = `url(${image.src})`;
         previewDiv.style.height = '90vh';
@@ -2011,7 +1601,6 @@ export class HomeComponent implements AfterViewInit {
         previewDiv.style.left = '0';
         previewDiv.style.backgroundColor = '#fff';
 
-        // Add close button
         const closeButton = document.createElement('button');
         closeButton.innerText = '✖';
         closeButton.style.position = 'absolute';
@@ -2033,6 +1622,7 @@ export class HomeComponent implements AfterViewInit {
       console.error('Designer or current canvas is not ready.');
     }
   }
+  
   showDropdown = false;
 
   @ViewChild('dropdownWrapper') dropdownWrapper!: ElementRef;
@@ -2051,71 +1641,6 @@ export class HomeComponent implements AfterViewInit {
     }
   }
 
-  filterThumbnails(searchTerm: string) {
-    console.log('searchTerm', searchTerm);
-    const parentDiv = document.querySelector(
-      'div[data-moduleicon="layout-panel-left"]'
-    );
-    console.log('parentDiv', parentDiv);
-    if (!parentDiv) return;
-
-    const thumbnails = parentDiv.querySelectorAll(
-      '.fpd-grid .fpd-item.fpd-hover-thumbnail'
-    );
-    console.log('parentDivdata', thumbnails);
-
-    thumbnails.forEach((thumb: Element) => {
-      const title = thumb.getAttribute('data-title')?.toLowerCase() || '';
-      console.log('title', title, 'searchTerm', searchTerm);
-      const search = searchTerm.toLowerCase();
-
-      (thumb as HTMLElement).style.display = title.includes(search)
-        ? 'flex'
-        : 'none';
-    });
-  }
-
-  filterThumbnailsP(searchTerm: string) {
-    console.log('searchTerm', searchTerm);
-    const parentDiv = document.querySelector(
-      'div[data-moduleicon="book-copy"]'
-    );
-    console.log('parentDiv', parentDiv);
-    if (!parentDiv) return;
-
-    const dataTitle = parentDiv.getAttribute('data-title');
-    console.log('dataTitle', dataTitle);
-    const thumbnails = parentDiv.querySelectorAll(
-      '.fpd-grid.skins-data .fpd-item.fpd-hover-thumbnail'
-    );
-    console.log('parentDivdataif', thumbnails.length);
-    if (!thumbnails || thumbnails.length === 0) {
-      console.log('No thumbnails found in the parent div.');
-      const thumbnails = parentDiv.querySelectorAll(
-        '.fpd-grid.ProductModule .fpd-item.fpd-hover-thumbnail'
-      );
-      thumbnails.forEach((thumb: Element) => {
-        const title = thumb.getAttribute('data-title')?.toLowerCase() || '';
-        console.log('title', title, 'searchTerm', searchTerm);
-        const search = searchTerm.toLowerCase();
-
-        (thumb as HTMLElement).style.display = title.includes(search)
-          ? 'flex'
-          : 'none';
-      });
-    } else {
-      thumbnails.forEach((thumb: Element) => {
-        const title = thumb.getAttribute('data-title')?.toLowerCase() || '';
-        console.log('title', title, 'searchTerm', searchTerm);
-        const search = searchTerm.toLowerCase();
-
-        (thumb as HTMLElement).style.display = title.includes(search)
-          ? 'flex'
-          : 'none';
-      });
-    }
-  }
-
   openLoginPopup() {
     this.showLoginPopup = true;
   }
@@ -2125,149 +1650,73 @@ export class HomeComponent implements AfterViewInit {
   }
 
   onLogin(event: Event) {
-  event.preventDefault();
-  console.log('Attempting Shopify login for:', this.email);
+    event.preventDefault();
+    console.log('Attempting Shopify login for:', this.email);
 
-  const query = `
-    mutation customerAccessTokenCreate($input: CustomerAccessTokenCreateInput!) {
-      customerAccessTokenCreate(input: $input) {
-        customerAccessToken {
-          accessToken
-          expiresAt
-        }
-        customerUserErrors {
-          field
-          message
-        }
-      }
-    }
-  `;
-
-  const variables = {
-    input: {
-      email: this.email,
-      password: this.password,
-    },
-  };
-
-  const payload = {
-    query: `
-      mutation customerAccessTokenCreate($input: CustomerAccessTokenCreateInput!) {
-        customerAccessTokenCreate(input: $input) {
-          customerAccessToken {
-            accessToken
-            expiresAt
-          }
-          customerUserErrors {
-            message
+    const payload = {
+      query: `
+        mutation customerAccessTokenCreate($input: CustomerAccessTokenCreateInput!) {
+          customerAccessTokenCreate(input: $input) {
+            customerAccessToken {
+              accessToken
+              expiresAt
+            }
+            customerUserErrors {
+              message
+            }
           }
         }
+      `,
+      variables: {
+        input: {
+          email: this.email,
+          password: this.password
+        }
       }
-    `,
-    variables: {
-      input: {
-        email: this.email,
-        password: this.password
-      }
-    }
-  };
+    };
 
-  console.log(variables, 'Shopify login payload:', payload);
+    // console.log(variables, 'Shopify login payload:', payload);
 
-  this.http
-    .post<any>(
-      'https://styleflip-store.myshopify.com/api/2024-01/graphql.json',
-      payload,
-      {
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Shopify-Storefront-Access-Token': '2e73a385a2189ddcf0c328bf1a1433bb',
+    this.http
+      .post<any>(
+        'https://styleflip-store.myshopify.com/api/2024-01/graphql.json',
+        payload,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Shopify-Storefront-Access-Token': '2e73a385a2189ddcf0c328bf1a1433bb',
+          },
+        }
+      )
+      .subscribe({
+        next: (response) => {
+          console.log('Shopify login response:', response);
+          const data = response?.data?.customerAccessTokenCreate;
+
+          if (data?.customerAccessToken?.accessToken) {
+            const token = data.customerAccessToken.accessToken;
+
+            localStorage.setItem('customerToken', token);
+            this.isLoggedIn = true;
+            this.showLoginPopup = false;
+            this.closeLoginPopup();
+
+            console.log('Shopify login success:', token);
+            this.getCustomerDetails(token);
+          } else {
+            const errorMsg =
+              data?.customerUserErrors?.[0]?.message ||
+              'Login failed. Invalid credentials.';
+            alert(errorMsg);
+          }
         },
-      }
-    )
-    .subscribe({
-      next: (response) => {
-        console.log('Shopify login response:', response);
-        const data = response?.data?.customerAccessTokenCreate;
+        error: (err) => {
+          console.log('Shopify login error:', err);
+          alert('Network error or Shopify API issue.');
+        },
+      });
+  }
 
-        if (data?.customerAccessToken?.accessToken) {
-          const token = data.customerAccessToken.accessToken;
-
-          localStorage.setItem('customerToken', token);
-          this.isLoggedIn = true;
-          this.showLoginPopup = false;
-          this.closeLoginPopup();
-
-          console.log('Shopify login success:', token);
-
-          this.getCustomerDetails(token); // optional
-        } else {
-          const errorMsg =
-            data?.customerUserErrors?.[0]?.message ||
-            'Login failed. Invalid credentials.';
-          alert(errorMsg);
-        }
-      },
-      error: (err) => {
-        console.log('Shopify login error:', err);
-        alert('Network error or Shopify API issue.');
-      },
-    });
-}
-
-
-
-  // onLogin(event: Event) {
-  //   event.preventDefault();
-
-  //   const query = `
-  //     mutation GenerateCustomerToken($email: String!, $password: String!) {
-  //       generateCustomerToken(email: $email, password: $password) {
-  //         token
-  //         __typename
-  //       }
-  //     }
-  //   `;
-
-  //   const variables = {
-  //     email: this.email,
-  //     password: this.password,
-  //   };
-
-  //   const payload = {
-  //     query,
-  //     variables,
-  //   };
-
-  //   this.http
-  //     .post<any>('https://styleflip.v2.ithemes.xyz/graphql', payload)
-  //     .subscribe({
-  //       next: (response) => {
-  //         const token = response?.data?.generateCustomerToken?.token;
-  //         localStorage.setItem('authToken', token)
-  //         if (token) {
-  //           console.log('Login success:', token);
-  //           localStorage.setItem('customerToken', token);
-  //           this.getCustomerDetails(token); // optional
-  //           this.isLoggedIn = true;
-  //           this.showLoginPopup = false;
-  //           this.closeLoginPopup();
-  //         } else {
-  //           alert('Login failed. No token returned.');
-  //         }
-  //       },
-  //       error: (err) => {
-  //         console.error('Login error:', err);
-  //         alert('Invalid credentials or network issue.');
-  //       },
-  //     });
-  // }
-  // onLogin(event: Event) {
-  //   event.preventDefault();
-  //   // Add your login logic here
-  //   console.log('Login submitted');
-  //   this.closeLoginPopup();
-  // }
   getCustomerDetails(token: string) {
     const customerQuery = {
       query: `
@@ -2302,7 +1751,7 @@ export class HomeComponent implements AfterViewInit {
       .post<any>('https://styleflip.v2.ithemes.xyz/graphql', customerQuery, {
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`, // 🔐 Use token in header
+          Authorization: `Bearer ${token}`,
         },
       })
       .subscribe(
@@ -2335,9 +1784,8 @@ export class HomeComponent implements AfterViewInit {
     if (parentDiv) {
       let currentOffset = 0;
 
-      // Create outer wrapper (position relative for arrow buttons)
       const tagWrapperMain = document.createElement('div');
-      tagWrapperMain.className = 'relative w-full fpd-designs-tags mt-2';
+      tagWrapperMain.className = 'relative w-full mt-2 fpd-designs-tags';
 
       const tagWrapper = document.createElement('div');
       tagWrapper.className = 'flex gap-2 mt-2 ml-[5px] fixed md:top-[164px]';
@@ -2350,13 +1798,11 @@ export class HomeComponent implements AfterViewInit {
         tagButton.innerText = tag as string;
 
         tagButton.addEventListener('click', () => {
-          // Step 1: Highlight clicked tag and unhighlight others
           document
             .querySelectorAll('.fpd-tag-btn')
             .forEach((btn) => btn.classList.remove('!bg-[#40576d12]'));
           tagButton.classList.add('!bg-[#40576d12]');
 
-          // Step 2: Filter visible .fpd-item based on tag
           const selectedTag = (tag as string).toLowerCase();
           const items = document.querySelectorAll('#DesignModule .fpd-item');
 
@@ -2370,7 +1816,6 @@ export class HomeComponent implements AfterViewInit {
               : 'none';
           });
 
-          // Step 3: Hide parent .box-contain-text if all children are hidden
           document
             .querySelectorAll('.box-contain-text')
             .forEach((container) => {
@@ -2383,7 +1828,6 @@ export class HomeComponent implements AfterViewInit {
                 : 'none';
             });
 
-          // Step 4: Show Reset Button and shrink search box
           const resetBtn = document.getElementById('fpd-reset-button');
           resetBtn?.classList.remove('hidden');
 
@@ -2405,29 +1849,24 @@ export class HomeComponent implements AfterViewInit {
             if (inputboxdiv) {
               inputboxdiv.style.display = 'none';
             }
-            // Show all fpd-item elements
             document
               .querySelectorAll('.fpd-item.fpd-hover-thumbnail')
               .forEach((item) => {
-                (item as HTMLElement).style.display = 'flex'; // or 'block' depending on your layout
+                (item as HTMLElement).style.display = 'flex';
               });
 
-            // Show all parent .box-contain-text containers
             document
               .querySelectorAll('.box-contain-text')
               .forEach((container) => {
                 (container as HTMLElement).style.display = 'block';
               });
 
-            // Remove active class from all tag buttons
             document.querySelectorAll('.fpd-tag-btn').forEach((btn) => {
               btn.classList.remove('!bg-[#40576d12]');
             });
 
-            // Hide the reset button again
             resetBtn.classList.add('hidden');
 
-            // Reset search box width
             const searchBox = document.querySelector(
               '#searchbox-design'
             ) as HTMLElement;
@@ -2436,7 +1875,6 @@ export class HomeComponent implements AfterViewInit {
               searchBox.style.marginLeft = '5px';
             }
 
-            // Clear the search input value
             const searchInput = document.getElementById(
               'searchInput'
             ) as HTMLInputElement;
@@ -2451,7 +1889,6 @@ export class HomeComponent implements AfterViewInit {
 
       parentDiv.appendChild(tagWrapper);
 
-      // Step 5: Create left arrow
       const leftArrow = document.createElement('button');
       leftArrow.innerHTML = `
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
@@ -2460,9 +1897,8 @@ export class HomeComponent implements AfterViewInit {
         `;
       leftArrow.className =
         'fixed md:left-[90px] md:top-[178px] z-[9] bg-gradient-to-r from-white/0 to-white shadow p-0 rounded-full hover:bg-gray-100 disabled:hidden';
-      leftArrow.disabled = true; // initially disabled
+      leftArrow.disabled = true;
 
-      // Step 6: Create right arrow
       const rightArrow = document.createElement('button');
       rightArrow.innerHTML = `
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
@@ -2472,27 +1908,22 @@ export class HomeComponent implements AfterViewInit {
       rightArrow.className =
         'fixed md:left-[380px] md:top-[210px] z-[9] mt-[-20px] -translate-y-1/2 bg-gradient-to-r from-white/0 to-white shadow p-0 rounded-full hover:bg-gray-100 disabled:hidden';
 
-      // Update arrow states
       function updateArrows() {
         const wrapperWidth = tagWrapperMain.offsetWidth;
         const contentWidth = tagWrapper.scrollWidth;
 
-        // Prevent scrolling beyond bounds
         if (currentOffset > 0) currentOffset = 0;
         if (Math.abs(currentOffset) >= contentWidth - wrapperWidth) {
           currentOffset = -1 * (contentWidth - wrapperWidth);
         }
 
-        // Apply transform
         tagWrapper.style.transform = `translateX(${currentOffset}px)`;
 
-        // Enable or disable arrows
         leftArrow.disabled = currentOffset === 0;
         rightArrow.disabled =
-          Math.abs(currentOffset) >= contentWidth - wrapperWidth - 1; // Allow 1px tolerance
+          Math.abs(currentOffset) >= contentWidth - wrapperWidth - 1;
       }
 
-      // Scroll left
       leftArrow.onclick = () => {
         const tag = tagWrapper.querySelector('div');
         if (tag) {
@@ -2502,7 +1933,6 @@ export class HomeComponent implements AfterViewInit {
         }
       };
 
-      // Scroll right
       rightArrow.onclick = () => {
         const tag = tagWrapper.querySelector('div');
         if (tag) {
@@ -2528,7 +1958,6 @@ export class HomeComponent implements AfterViewInit {
     const activeObject = canvas.getActiveObject();
     console.log(activeObject._objects.length, 'activeObject', activeObject);
     if (activeObject._objects.length > 1 && activeObject.type === 'activeSelection') {
-      // Group the selected objects
       activeObject.toGroup();
       canvas.requestRenderAll();
     }
@@ -2544,6 +1973,7 @@ export class HomeComponent implements AfterViewInit {
   closeBox(): void {
     this.isBoxVisible = false;
   }
+  
   downloadDesign(): void {
     if ((window as any).fpdInstance?.doAction) {
       (window as any).fpdInstance.doAction('download');
@@ -2554,13 +1984,14 @@ export class HomeComponent implements AfterViewInit {
 
   onItemClick(item: string): void {
     console.log('Clicked:', item);
-    this.closeBox(); // hide after any item is clicked
+    this.closeBox();
   }
 
   dowloadButton() {
     console.log('Download button clicked', this.designer.actionsBar);
     this.designer.actionsBar.doAction('download');
   }
+  
   printDesign() {
     console.log('Print Design button clicked', this.designer.actionsBar);
     if (
@@ -2575,14 +2006,11 @@ export class HomeComponent implements AfterViewInit {
         enableRetinaScaling: true,
       });
 
-      // Open a new window and print the image
       const printWindow = window.open('', '_blank');
       if (printWindow) {
-        // Create the document structure
         const doc = printWindow.document;
         doc.title = 'Print Design';
 
-        // Add styles
         const style = doc.createElement('style');
         style.textContent = `
           body { margin: 0; text-align: center; background: #fff; }
@@ -2590,12 +2018,10 @@ export class HomeComponent implements AfterViewInit {
         `;
         doc.head.appendChild(style);
 
-        // Add image
         const img = doc.createElement('img');
         img.src = dataUrl;
         img.onload = () => {
           printWindow.print();
-          // printWindow.close();
         };
         doc.body.appendChild(img);
       }
@@ -2603,6 +2029,7 @@ export class HomeComponent implements AfterViewInit {
       console.error('Designer or current canvas is not ready.');
     }
   }
+  
   saveDesign() {
     console.log('llllllllllllllllllllllllllll');
     if (
@@ -2610,14 +2037,11 @@ export class HomeComponent implements AfterViewInit {
       this.designer.currentViewInstance &&
       this.designer.currentViewInstance.fabricCanvas
     ) {
-      // Calculate multiplier for thumbnail (example: 300x300)
-      const stageWidth =
-       1800;
+      const stageWidth = 1800;
       const stageHeight =
         this.designer.currentViewInstance.options.stageHeight || 1000;
       const targetWidth = 300;
       const targetHeight = 300;
-      // 'cover' logic: scale to cover the target area
       const scale = Math.max(
         targetWidth / stageWidth,
         targetHeight / stageHeight
@@ -2638,7 +2062,6 @@ export class HomeComponent implements AfterViewInit {
             title,
           };
 
-          // Save to localStorage if enabled
           if (product && this.designer.mainOptions?.saveActionBrowserStorage) {
             const storageKey =
               this.designer.container?.id || 'fpd-saved-designs';
@@ -2654,7 +2077,6 @@ export class HomeComponent implements AfterViewInit {
             window.localStorage.setItem(storageKey, JSON.stringify(savedList));
           }
 
-          // Dispatch custom event if needed
           if (product) {
             this.designer.dispatchEvent?.(
               new CustomEvent('actionSave', { detail: savedItem })
@@ -2662,9 +2084,8 @@ export class HomeComponent implements AfterViewInit {
             this.designer.doUnsavedAlert = false;
           }
 
-          // Show success message
           this.showSuccessMessage('Design saved successfully!');
-          this.loadSavedProducts(); // <-- Add this line
+          this.loadSavedProducts();
         },
         { multiplier: scale, format: 'png', backgroundColor: 'transparent' }
       );
@@ -2674,12 +2095,10 @@ export class HomeComponent implements AfterViewInit {
   }
 
   addSavedProduct(item: { thumbnail: string; product: any; title: string }) {
-    // Create a wrapper div for the saved product
     const wrapper = document.createElement('div');
     wrapper.className = 'fpd-item saved-design';
     wrapper.style.position = 'relative';
 
-    // Thumbnail image
     const img = document.createElement('img');
     img.src = item.thumbnail;
     img.alt = item.title || 'Saved Design';
@@ -2688,14 +2107,12 @@ export class HomeComponent implements AfterViewInit {
     img.style.objectFit = 'cover';
     wrapper.appendChild(img);
 
-    // Title
     const titleDiv = document.createElement('div');
     titleDiv.innerText = item.title || '';
     titleDiv.style.fontSize = '12px';
     titleDiv.style.marginTop = '4px';
     wrapper.appendChild(titleDiv);
 
-    // Remove (trash) button
     const trashBtn = document.createElement('button');
     trashBtn.innerHTML = '🗑️';
     trashBtn.style.position = 'absolute';
@@ -2706,7 +2123,6 @@ export class HomeComponent implements AfterViewInit {
     trashBtn.style.cursor = 'pointer';
     wrapper.appendChild(trashBtn);
 
-    // Click to load product
     wrapper.addEventListener('click', () => {
       if (this.designer?.loadProduct) {
         this.designer.loadProduct(item.product);
@@ -2714,7 +2130,6 @@ export class HomeComponent implements AfterViewInit {
       }
     });
 
-    // Remove from localStorage and UI
     trashBtn.addEventListener('click', (event) => {
       event.stopPropagation();
       const storageKey = this.designer?.container?.id || 'fpd-saved-designs';
@@ -2732,7 +2147,6 @@ export class HomeComponent implements AfterViewInit {
         window.localStorage.setItem(storageKey, JSON.stringify(savedList));
       }
       wrapper.remove();
-      // Optionally dispatch event
       this.designer?.dispatchEvent?.(
         new CustomEvent('actionLoad:Remove', {
           detail: { index, item: wrapper },
@@ -2740,12 +2154,10 @@ export class HomeComponent implements AfterViewInit {
       );
     });
 
-    // Append to grid
     this.savedGrid.nativeElement.appendChild(wrapper);
   }
 
   loadSavedProducts() {
-    // Clear current grid
     if (this.savedGrid?.nativeElement) {
       this.savedGrid.nativeElement.innerHTML = '';
     }
@@ -2761,7 +2173,6 @@ export class HomeComponent implements AfterViewInit {
   }
 
   showSuccessMessage(message: string) {
-    // Simple toast message, can be replaced with Angular Material Snackbar or similar
     const toast = document.createElement('div');
     toast.innerText = message;
     toast.style.position = 'fixed';
@@ -2782,9 +2193,8 @@ export class HomeComponent implements AfterViewInit {
     }, 2000);
   }
 
-  
   loadDesigns() {
-    const apiUrl = 'https://styleflip-backend-jdm5.ithemes.xyz/api/text/getAllData'; // Replace with your real API
+    const apiUrl = 'https://styleflip-backend-jdm5.ithemes.xyz/api/text/getAllData';
 
     this.http.get<Category[]>(apiUrl).subscribe({
       next: (data) => {
@@ -2793,7 +2203,6 @@ export class HomeComponent implements AfterViewInit {
         const container = document.getElementById('content-text');
         if (container) {
           container.innerHTML = html;
-          // console.log('Design data loaded successfully:', html);
           this.bottomMenu();
         }
       },
@@ -2823,7 +2232,6 @@ export class HomeComponent implements AfterViewInit {
                     data-tags="${this.escapeHtml(tags)}">`;
 
         for (const span of product.texts) {
-          // console.log('Span Data:', span);
           const paramStr = JSON.stringify(span.parameters).replace(/"/g, '&quot;');
           html += `<span data-parameters='${paramStr}'>${this.escapeHtml(span.text)}</span>`;
         }
@@ -2831,12 +2239,10 @@ export class HomeComponent implements AfterViewInit {
         html += `</div>`;
       }
 
-
       html += `</div>`;
     }
 
     return html;
-    
   }
 
   escapeHtml(text: string): string {
@@ -2850,14 +2256,10 @@ export class HomeComponent implements AfterViewInit {
     return text.replace(/[&<>"']/g, (m) => map[m]);
   }
 
-
   showFPDLoading(show: boolean) {
     const loader = document.getElementById('fpd-loader');
     if (loader) {
       loader.style.display = show ? 'flex' : 'none';
     }
   }
-
-
-  
 }
