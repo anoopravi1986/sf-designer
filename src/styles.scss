@@ -204,10 +204,12 @@ fpd-module-uploads .fpd-item.fpd-hover-thumbnail.ts .fa-solid.fa-trash{display: 
       }
     }
 
+    span[title="Group Text"] svg rect{    stroke: #6b6f73;}
     fpd-element-toolbar .fpd-tools-nav .fpd-panel-text-format{max-width: 230px;}
     // icon bold
     .fpd-tools-group div.active svg path{fill: var(--theme-color);}
-    .fpd-tools-group div svg{min-width: 20px;}
+    .fpd-tools-group div svg, .fpd-tool-remove svg{min-width: 20px;}
+    div.fpd-tools-group div#TextMoveUp svg, div.fpd-tools-group div#TextMoveDown svg{min-width: 24px;}
 
     .valueoffpdmoduleproducts-active{
       position: relative;

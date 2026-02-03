@@ -661,7 +661,7 @@ export class HomeComponent implements AfterViewInit {
       if (!obj) return;
 
       const overlayObj = canvas.getObjects().find((o: any) => o.title === "Overlay");
-
+      console.log("Text Move Up clicked", obj, overlayObj);
       if (overlayObj) {
         const overlayIndex = canvas.getObjects().indexOf(overlayObj);
         const objIndex = canvas.getObjects().indexOf(obj);
