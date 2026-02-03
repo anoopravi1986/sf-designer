@@ -35210,6 +35210,9 @@ console.log("t:", t);
               'click',
               e => {
                 console.log("e",e)
+                const allSpans = this.subPanel.querySelectorAll('.fpd-curved-options > span');
+                allSpans.forEach(span => span.classList.remove('fpd-active'));
+                e.currentTarget.classList.add('fpd-active');
                 const valueoftext = e.currentTarget.getAttribute('data-value');
                 console.log("Clicked span data-value:", valueoftext);
                 // if(valueoftext === 'curved') {
