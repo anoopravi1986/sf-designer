@@ -31130,13 +31130,13 @@ console.log("t:", t);
             i.querySelector('picture')
           ),
           G(i, ['click'], t => {
-            this.fpdInstance.loadingCustomImage ||
-              this.fpdInstance._addGridItemToCanvas(
-                t.currentTarget,
-                {},
-                void 0,
-                !1
-              )
+            // this.fpdInstance.loadingCustomImage ||
+            //   this.fpdInstance._addGridItemToCanvas(
+            //     t.currentTarget,
+            //     {},
+            //     void 0,
+            //     !1
+            //   )
           }),
           G(i.querySelector('.fa-trash'), 'click', t => {
             console.log('delete image', i,'jjjjjjjjj',t)
@@ -35175,6 +35175,9 @@ console.log("t:", t);
               'click',
               e => {
                 console.log("e",e)
+                const allSpans = this.subPanel.querySelectorAll('.fpd-curved-options > span');
+                allSpans.forEach(span => span.classList.remove('fpd-active'));
+                e.currentTarget.classList.add('fpd-active');
                 const valueoftext = e.currentTarget.getAttribute('data-value');
                 console.log("Clicked span data-value:", valueoftext);
                 // if(valueoftext === 'curved') {
