@@ -38311,11 +38311,11 @@ G(this.navElem.querySelector('.fpd-group-paste-by'), 'click', e => {
                 if(e.getType() == 'text') {e.removable = true}
                 if (e.getType() == 'image' & e.draggable == '0') {
                   console.log('image draggable', e.draggable);
-                  // const scaleX = e.canvas.width / e.width;
-                  // const scaleY = e.canvas.width / e.height;
-                  // const scale = Math.min(scaleX, scaleY);
-                  // e.scaleX = scale;
-                  // e.scaleY = scale;
+                  const scaleX = e.canvas.width / e.width;
+                  const scaleY = e.canvas.width / e.height;
+                  const scale = Math.min(scaleX, scaleY);
+                  e.scaleX = scale;
+                  e.scaleY = scale;
                   e.selected = true;
                 }
                 
