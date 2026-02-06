@@ -216,6 +216,7 @@ export class HomeComponent implements AfterViewInit {
           console.log(event.currentTarget, 'click happen', event);
           const clickedTitle = $(event.currentTarget).data('title');
           console.log(clickedTitle, 'cllllllll', $(event.currentTarget));
+          
           const manufacturer = $(event.currentTarget).data('manufacturer');
           let ob: any;
 
@@ -769,21 +770,21 @@ export class HomeComponent implements AfterViewInit {
       }
     });
     document.addEventListener('keydown', (e: KeyboardEvent) => {
-  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'c') {
-    e.preventDefault();
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'c') {
+        e.preventDefault();
 
-    const canvas = this.designer.currentViewInstance.fabricCanvas;
-    const obj = canvas.getActiveObject();
+        const canvas = this.designer.currentViewInstance.fabricCanvas;
+        const obj = canvas.getActiveObject();
 
-    if (obj) {
-      obj.clone((cloned: any) => {
-        copiedObject = cloned;
-        console.log('Copied via Ctrl+C:', copiedObject);
-        this.showToast('Copied successfully!');
-      });
-    }
-  }
-});
+        if (obj) {
+          obj.clone((cloned: any) => {
+            copiedObject = cloned;
+            console.log('Copied via Ctrl+C:', copiedObject);
+            this.showToast('Copied successfully!');
+          });
+        }
+      }
+    });
 
     document.getElementById('pastetext')?.addEventListener('click', () => {
       const canvas = this.designer.currentViewInstance.fabricCanvas;
@@ -795,17 +796,17 @@ export class HomeComponent implements AfterViewInit {
       }
     });
     document.addEventListener('keydown', (e: KeyboardEvent) => {
-  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'v') {
-    e.preventDefault();
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'v') {
+        e.preventDefault();
 
-    if (copiedObject) {
-      this.designer.currentViewInstance.fabricCanvas.duplicateElement(
-        this.designer.currentElement
-      );
-      this.showToast('Paste successfully!');
-    }
-  }
-});
+        if (copiedObject) {
+          this.designer.currentViewInstance.fabricCanvas.duplicateElement(
+            this.designer.currentElement
+          );
+          this.showToast('Paste successfully!');
+        }
+      }
+    });
 
     document.getElementById('letter-spacing')?.addEventListener('click', (e) => {
       console.log("e.currentTarget",e.currentTarget)
@@ -1962,7 +1963,7 @@ doesTitleMatchSearch(title: string, search: string): boolean {
       canvas.requestRenderAll();
     }
     else{
-      alert('Please select at least 2 objects to group.');
+      alert('Please select at least 2 objects to group.jsjj');
     }
   }
 
