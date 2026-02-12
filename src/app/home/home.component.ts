@@ -256,11 +256,11 @@ export class HomeComponent implements AfterViewInit {
           console.log("viewvalue",viewvalue, viewtitle)
           const parameter = {removable: true,positioned: true, autoSelect: true,uniScalingUnlockable: true};
           
-          fpdvalue.addCanvasDesign(
-            viewvalue,
-            viewtitle,
-            parameter
-          )
+          // fpdvalue.addCanvasDesign(
+          //   viewvalue,
+          //   viewtitle,
+          //   parameter
+          // )
         });
 
         $(document).on('click', '.item-data-click .fpd-three-dot-menu', (event) => {
@@ -761,21 +761,51 @@ export class HomeComponent implements AfterViewInit {
       console.log("e.currentTarget",e.currentTarget)
       const canvas = this.designer.currentViewInstance.fabricCanvas;
       const obj = canvas.getActiveObject();
-      if (obj) {
-        obj.clone((cloned: any) => {
-          copiedObject = cloned;
-          console.log('Copied object:', copiedObject);
-          this.showToast('Copied successfully!');
-        });
+      // if (obj) {
+      //   obj.clone((cloned: any) => {
+      //     copiedObject = cloned;
+      //     console.log('Copied object:', copiedObject);
+      //     this.showToast('Copied successfully!');
+      //   });
+      // }
+
+
+      if (!obj) return;
+
+      // 🔥 CURVED TEXT
+      if (obj.type === 'curved-text') {
+
+        copiedObject = {
+          type: 'curved-text',
+          params: {
+            ...obj.toObject(),   // 🔥 includes ALL FPD custom props
+          }
+        };
+
+        console.log('Copied curved text params:', copiedObject);
+        this.showToast('Curved text copied!');
+        return;
       }
+
+      // 🔥 NORMAL OBJECTS (image, text, group)
+      obj.clone((cloned: any) => {
+        copiedObject = {
+          type: obj.type,
+          object: cloned
+        };
+        console.log('Copied object:', copiedObject);
+        this.showToast('Copied successfully!');
+      });
     });
     document.addEventListener('keydown', (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'c') {
+        console.log("Ctrl+C pressed",);
         e.preventDefault();
 
         const canvas = this.designer.currentViewInstance.fabricCanvas;
-        const obj = canvas.getActiveObject();
 
+        const obj = canvas.getActiveObject();
+        console.log("Ctrl+C pressed, active object:", obj);
         if (obj) {
           obj.clone((cloned: any) => {
             copiedObject = cloned;
@@ -786,15 +816,88 @@ export class HomeComponent implements AfterViewInit {
       }
     });
 
+    // document.getElementById('pastetext')?.addEventListener('click', () => {
+    //   const canvas = this.designer.currentViewInstance.fabricCanvas;
+    //   if (copiedObject) {
+    //     this.designer.currentViewInstance.fabricCanvas.duplicateElement(
+    //       this.designer.currentElement
+    //     )
+    //     this.showToast('Paste successfully!');
+    //   }
+    // });
     document.getElementById('pastetext')?.addEventListener('click', () => {
-      const canvas = this.designer.currentViewInstance.fabricCanvas;
-      if (copiedObject) {
-        this.designer.currentViewInstance.fabricCanvas.duplicateElement(
-          this.designer.currentElement
-        )
-        this.showToast('Paste successfully!');
-      }
-    });
+      
+  const view   = this.designer.currentViewInstance;
+  const canvas = view.fabricCanvas;
+  console.log("e.currentTarget copiedObjectdata",copiedObject)
+  if (!copiedObject) return;
+
+  /* -------------------------------------------------
+   * 🔥 CURVED TEXT — manual recreate (FPD safe)
+   * ------------------------------------------------- */
+  if (copiedObject.type === 'curved-text') {
+
+    const zoom = canvas.getZoom();
+
+    const params = {
+      ...copiedObject.params,
+
+      // 🎯 same visual size
+      scaleX: (copiedObject.scaleX || 1),
+      scaleY: (copiedObject.scaleY || 1),
+
+      // 🎯 same position (+ small offset)
+      left: (copiedObject.left || 500) + 20,
+      top:  (copiedObject.top  || 500) + 20,
+
+      angle: copiedObject.angle || 0,
+      flipX: copiedObject.flipX || false,
+      flipY: copiedObject.flipY || false,
+
+      colors: copiedObject.colors || ['#000000'],
+      originX: copiedObject.originX || 'center',
+      originY: copiedObject.originY || 'center',
+      curved: true,
+      curvable: copiedObject.curvable || 1,
+      selectable: true,
+      evented: true,
+      boundingBox: 'base',
+      boundingBoxMode: 'clipping',
+      hasControls: true,
+      draggable: true,
+      resizable: true,
+      rotatable: true,
+      removable: true,
+      lockUniScaling: true,
+      scalable: true,
+      editable: true,
+    };
+
+    // ❌ remove Fabric-only junk
+    delete params.objects;
+    delete params.clipPath;
+    delete params.path;
+
+    // ✅ REAL FPD API
+    canvas.addElement(
+      'curvedText',
+      params.text,        // title
+      params.text,        // text
+      params
+    );
+
+    canvas.requestRenderAll();
+    this.showToast('Curved text pasted ✔');
+    return;
+  }
+
+  /* -------------------------------------------------
+   * ✅ NORMAL TEXT / IMAGE / GROUP
+   * ------------------------------------------------- */
+  canvas.duplicateElement(this.designer.currentElement);
+  this.showToast('Paste successfully!');
+});
+
     document.addEventListener('keydown', (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'v') {
         e.preventDefault();
