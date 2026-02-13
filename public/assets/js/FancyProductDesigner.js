@@ -35807,7 +35807,7 @@ function updateFPDLayersToSingleGroup(group) {
                 console.log('Copy triggered', activeObj, 'Type', activeObj?.type);
 
                 if (activeObj.type === 'image') {
-                    console.log('Copying image safely');
+                    console.log('Copying image safely',activeObj);
                     
                     // 🔒 Backup filters
                     const originalFilters = activeObj.filters;
@@ -35821,6 +35821,8 @@ function updateFPDLayersToSingleGroup(group) {
                       copiedImage = cloned;
                       copiedGroup = null;
                       copiedImage.__originalTransform = {
+                        title: activeObj.title,
+                        id: activeObj.id,
                         left: activeObj.left,
                         top: activeObj.top,
                         scaleX: activeObj.scaleX,
@@ -35829,9 +35831,11 @@ function updateFPDLayersToSingleGroup(group) {
                         originX: activeObj.originX,
                         originY: activeObj.originY,
                         flipX: activeObj.flipX,
-                        flipY: activeObj.flipY
+                        flipY: activeObj.flipY,
+                        width: activeObj.width,
+                        height: activeObj.height
                       };
-                      console.log('✅ Image copied safely');
+                      console.log('✅ Image copied safely',copiedImage);
                       t.showToast?.('Image copied');
 
                       // 🔁 Restore original filters
@@ -35863,149 +35867,173 @@ function updateFPDLayersToSingleGroup(group) {
                 }
               }
 
+              function placeAboveBase(canvas, obj) {
+                const objects = canvas.getObjects();
+                const baseIndex = objects.findIndex(o => o.title === 'Base');
+
+                if (baseIndex !== -1) {
+                  canvas.moveTo(obj, baseIndex + 1);
+                }
+              }
+
 
               G(this.navElem.querySelector('.fpd-group-paste-by'), 'click', e => {
-  const fabricCanvas = this.fpdInstance.currentViewInstance?.fabricCanvas;
-  console.log("click function call", copiedGroup, copiedImage);
-  if (!fabricCanvas) return;
+                const fabricCanvas = this.fpdInstance.currentViewInstance?.fabricCanvas;
+                console.log("click function call", copiedGroup, copiedImage, fabricCanvas);
+                if (!fabricCanvas) return;
 
-  // ❌ Nothing copied
-  if (!copiedGroup && !copiedImage) {
-    this.showToast('Nothing to paste. Copy a group or image first.', 'error');
-    return;
-  }
-  /* =========================
-     🖼 IMAGE PASTE (SAFE)
-  ========================== */
-  if (copiedImage) {
+                // ❌ Nothing copied
+                if (!copiedGroup && !copiedImage) {
+                  this.showToast('Nothing to paste. Copy a group or image first.', 'error');
+                  return;
+                }
+                /* =========================
+                  🖼 IMAGE PASTE (SAFE)
+                ========================== */
+                if (copiedImage) {
+                  console.log("copiedImage",copiedImage)
+                  const viewInstancesss = this.fpdInstance.currentViewInstance;
+                  const fabricCanvas = this.fpdInstance.currentViewInstance.fabricCanvas;
+                  const zoom = fabricCanvas.getZoom();
 
-  const fabricCanvas = this.fpdInstance.currentViewInstance.fabricCanvas;
-  const zoom = fabricCanvas.getZoom();
+                  const tData = copiedImage.__originalTransform || {};
+                  console.log('📌 Original transform:', tData, 'Canvas zoom:', zoom,'ins',viewInstancesss);
 
-  const tData = copiedImage.__originalTransform || {};
-  console.log('📌 Original transform:', tData, 'Canvas zoom:', zoom);
+                  // Prevent Fabric filter crash
+                  copiedImage.filters = Array.isArray(copiedImage.filters)
+                    ? copiedImage.filters
+                    : [];
 
-  // Prevent Fabric filter crash
-  copiedImage.filters = Array.isArray(copiedImage.filters)
-    ? copiedImage.filters
-    : [];
+                  copiedImage.clone(clonedObj => {
+                    console.log("scalX and scaleY",tData.scaleX,tData.scaleY);
+                    clonedObj.set({
+                      scaleX: tData.scaleX || 1,
+                      scaleY: tData.scaleY || 1,
 
-  copiedImage.clone(clonedObj => {
+                      angle: tData.angle ?? 0,
+                      flipX: tData.flipX ?? false,
+                      flipY: tData.flipY ?? false,
+                      width: tData.width,
+                      height: tData.height,
+                      copyable: 1,
+                      originX: tData.originX || 'center',
+                      originY: tData.originY || 'center',
 
-    // 🔥 NORMALIZE SCALE AGAINST CANVAS ZOOM
-    const scaleX = (tData.scaleX ?? 1) / zoom;
-    const scaleY = (tData.scaleY ?? 1) / zoom;
+                      lockUniScaling: true,
+                      uniformScaling: true,
 
-    clonedObj.set({
-      scaleX,
-      scaleY,
+                      selectable: true,
+                      evented: true,
+                      hasControls: true,
+                      draggable: true,
+                      resizable: true,
+                      removable: true,
+                      rotatable: true,
+                      locked: false,
+                      zChangeable: 1,
+                      boundingBox: 'Base',
+                      clipPath: null,
+                      objectCaching: false
+                    });
+                    // clonedObj = fabricCanvas._activeObject;
+                    
+                    // Add FIRST
+                    fabricCanvas.add(clonedObj);
 
-      angle: tData.angle ?? 0,
-      flipX: tData.flipX ?? false,
-      flipY: tData.flipY ?? false,
+                    // Restore exact position
+                    clonedObj.set({
+                      title: tData.title + ' Copy',
+                      id: tData.id + 'Copy',
+                      scaleX: tData.scaleX || 1,
+                      scaleY: tData.scaleY || 1,
+                      isCustom: true
+                    })
+                    console.log("clonedObj data is",clonedObj)
+                    clonedObj.setPositionByOrigin(
+                      { x: tData.left, y: tData.top },
+                      clonedObj.originX,
+                      clonedObj.originY
+                    );
 
-      originX: tData.originX || 'center',
-      originY: tData.originY || 'center',
+                    clonedObj.setCoords();
 
-      lockUniScaling: true,
-      uniformScaling: true,
+                    placeAboveBase(fabricCanvas, clonedObj);
+                    keepBelowOverlay(fabricCanvas, clonedObj);
+                    
+                    fabricCanvas.fire('elementAdd', { element: clonedObj });
+                    // fabricCanvas._objects.push(clonedObj);
+                    fabricCanvas.setActiveObject(clonedObj);
+                    // fabricCanvas.requestRenderAll();
+                    
+                    fabricCanvas.requestRenderAll();
 
-      selectable: true,
-      evented: true,
-      hasControls: true,
-      draggable: true,
-      resizable: true,
-      removable: true,
-      rotatable: true,
+                    console.log('✅ Image pasted with TRUE original size', {
+                      left: clonedObj.left,
+                      top: clonedObj.top,
+                      scaleX: clonedObj.scaleX,
+                      scaleY: clonedObj.scaleY,
+                      width: clonedObj.width,
+                      height: clonedObj.height
+                    });
 
-      boundingBox: 'Base',
-      clipPath: null,
-      objectCaching: false
-    });
-
-    // Add FIRST
-    fabricCanvas.add(clonedObj);
-
-    // Restore exact position
-    clonedObj.setPositionByOrigin(
-      { x: tData.left, y: tData.top },
-      clonedObj.originX,
-      clonedObj.originY
-    );
-
-    clonedObj.setCoords();
-
-    keepBelowOverlay(fabricCanvas, clonedObj);
-
-    fabricCanvas.setActiveObject(clonedObj);
-    fabricCanvas.requestRenderAll();
-
-    console.log('✅ Image pasted with TRUE original size', {
-      left: clonedObj.left,
-      top: clonedObj.top,
-      scaleX: clonedObj.scaleX,
-      scaleY: clonedObj.scaleY,
-      zoom
-    });
-
-    // this.showToast?.('Image pasted successfully 🖼️');
-  });
-}
+                    // this.showToast?.('Image pasted successfully 🖼️');
+                  });
+                }
 
 
-  /* =========================
-     🔹 GROUP PASTE
-  ========================== */
-  else if (copiedGroup) {
-    console.log("copied group coming");
-    copiedGroup.clone(clonedObj => {
+                /* =========================
+                  🔹 GROUP PASTE
+                ========================== */
+                else if (copiedGroup) {
+                  console.log("copied group coming");
+                  copiedGroup.clone(clonedObj => {
 
-      clonedObj.set({
-        left: (copiedGroup.left || 0) + 20,
-        top: (copiedGroup.top || 0) + 20,
-        selectable: true,
-        evented: true,
-        hasControls: true,
-        resizable: true,
-        draggable: true,
-        removable: true,
-        positioned: true,
-        originX: copiedGroup.originX || 'center',
-        originY: copiedGroup.originY || 'center',
-        rotatable: true,
-        lockUniScaling: true,
+                    clonedObj.set({
+                      left: (copiedGroup.left || 0) + 20,
+                      top: (copiedGroup.top || 0) + 20,
+                      selectable: true,
+                      evented: true,
+                      hasControls: true,
+                      resizable: true,
+                      draggable: true,
+                      removable: true,
+                      positioned: true,
+                      originX: copiedGroup.originX || 'center',
+                      originY: copiedGroup.originY || 'center',
+                      rotatable: true,
+                      lockUniScaling: true,
 
-        // 🔒 base + no clipping
-        boundingBox: 'Base',
-        clipPath: null,
-        objectCaching: false
-      });
+                      // 🔒 base + no clipping
+                      boundingBox: 'Base',
+                      clipPath: null,
+                      objectCaching: false
+                    });
 
-      // Preserve child behavior
-      if (clonedObj.type === 'group' && Array.isArray(clonedObj._objects)) {
-        clonedObj._objects.forEach(child => {
-          child.set({
-            selectable: false,
-            evented: false,
-            clipPath: null,
-            objectCaching: false
-          });
-        });
-      }
+                    // Preserve child behavior
+                    if (clonedObj.type === 'group' && Array.isArray(clonedObj._objects)) {
+                      clonedObj._objects.forEach(child => {
+                        child.set({
+                          selectable: false,
+                          evented: false,
+                          clipPath: null,
+                          objectCaching: false
+                        });
+                      });
+                    }
 
-      fabricCanvas.add(clonedObj);
-      keepBelowOverlay(fabricCanvas, clonedObj);
-      fabricCanvas.setActiveObject(clonedObj);
-      fabricCanvas.requestRenderAll();
+                    fabricCanvas.add(clonedObj);
+                    keepBelowOverlay(fabricCanvas, clonedObj);
+                    fabricCanvas.setActiveObject(clonedObj);
+                    fabricCanvas.requestRenderAll();
 
-      this.showToast('Group pasted successfully 🎉');
-    });
+                    this.showToast('Group pasted successfully 🎉');
+                  });
 
-    return;
-  }
+                  return;
+                }
 
-  
-});
+                
+              });
 
 
 

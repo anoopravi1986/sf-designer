@@ -805,14 +805,30 @@ export class HomeComponent implements AfterViewInit {
         const canvas = this.designer.currentViewInstance.fabricCanvas;
 
         const obj = canvas.getActiveObject();
-        console.log("Ctrl+C pressed, active object:", obj);
-        if (obj) {
-          obj.clone((cloned: any) => {
-            copiedObject = cloned;
-            console.log('Copied via Ctrl+C:', copiedObject);
-            this.showToast('Copied successfully!');
-          });
+        console.log("Ctrl+C pressed, active object:", obj, obj.type);
+        
+
+        if (!obj) return;
+
+        // 🔥 FIX: normalize image before clone
+        if (obj.type === 'image') {
+          if (!Array.isArray(obj.filters)) {
+            obj.filters = [];
+          }
         }
+
+        obj.clone((cloned: any) => {
+          // 🔥 ALSO normalize cloned image
+          if (cloned.type === 'image') {
+            if (!Array.isArray(cloned.filters)) {
+              cloned.filters = [];
+            }
+          }
+
+          copiedObject = cloned;
+          console.log('Copied via Ctrl+C:', copiedObject);
+          this.showToast('Copied successfully!');
+        });
       }
     });
 
