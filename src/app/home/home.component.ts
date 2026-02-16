@@ -659,27 +659,94 @@ export class HomeComponent implements AfterViewInit {
     document.getElementById('TextMoveUp')?.addEventListener('click', () => {
       const canvas = this.designer.currentViewInstance.fabricCanvas;
       const obj = canvas.getActiveObject();
+      console.log('Text Move Up clicked, active object:', obj); 
       if (!obj) return;
 
-      const overlayObj = canvas.getObjects().find((o: any) => o.title === "Overlay");
-      console.log("Text Move Up clicked", obj, overlayObj);
-      if (overlayObj) {
-        const overlayIndex = canvas.getObjects().indexOf(overlayObj);
-        const objIndex = canvas.getObjects().indexOf(obj);
+      const objects = canvas.getObjects();
+      const overlayObj = objects.find((o: any) => o.title === 'Overlay');
 
-        console.log("Overlay index:", overlayIndex, "Object index:", objIndex);
+      console.log('Text Move Up clicked', obj, overlayObj);
+
+      if (overlayObj) {
+        const overlayIndex = objects.indexOf(overlayObj);
+        const objIndex = objects.indexOf(obj);
+
+        console.log('Overlay index:', overlayIndex, 'Object index:', objIndex);
 
         if (objIndex < overlayIndex - 1) {
           canvas.bringForward(obj);
+          moveLayerRowUp(obj.id);
         } else {
-          alert("Not possible to move above Overlay layer!");
+          alert('Not possible to move above Overlay layer!');
+          return;
         }
       } else {
         canvas.bringForward(obj);
+        moveLayerRowUp(obj.id);
       }
 
+      /* =========================
+        🔁 IMPORTANT: sync layers
+      ========================== */
+      obj.setCoords();
+      console.log('✅ Layer moved up & layer panel notified 1', obj);
+      // 🔹 Fabric event (FPD listens to this)
+      // canvas.fire('object:modified', { target: obj });
+
+      // 🔹 FPD custom event (used by layer panel)
+      canvas.fire('object:modified', { target: obj });
+      canvas.fire('elementModify', {
+        element: obj,
+        options: {}
+      })
+
       canvas.requestRenderAll();
-    });
+
+      console.log('✅ Layer moved up & layer panel notified');
+
+
+      
+    
+});
+
+function moveLayerRowUp(elementId: string) {
+
+  const list = document.querySelector('.fpd-list');
+  if (!list) return;
+
+  const row = document.getElementById(elementId);
+  if (!row) return;
+
+  const prevRow = row.previousElementSibling;
+
+  // Prevent moving above Base
+  if (!prevRow || prevRow.classList.contains('fpd-locked')) {
+    console.log('Cannot move above Base');
+    return;
+  }
+
+  list.insertBefore(row, prevRow);
+
+  console.log('✅ DOM layer moved up');
+}
+
+function moveLayerRowDown(elementId: string) {
+
+  const list = document.querySelector('.fpd-list');
+  if (!list) return;
+
+  const row = document.getElementById(elementId);
+  if (!row) return;
+
+  const nextRow = row.nextElementSibling;
+  if (!nextRow) return;
+
+  list.insertBefore(nextRow, row);
+
+  console.log('✅ DOM layer moved down');
+}
+
+
 
     document.getElementById('TextMoveDown')?.addEventListener('click', () => {
       const canvas = this.designer.currentViewInstance.fabricCanvas;
@@ -696,14 +763,17 @@ export class HomeComponent implements AfterViewInit {
 
         if (objIndex > baseIndex + 1) {
           canvas.sendBackwards(obj);
+          moveLayerRowDown(obj.id);
         } else {
           alert("Reached just above base, not moving further down.");
         }
       } else {
         canvas.sendBackwards(obj);
+        moveLayerRowDown(obj.id);
       }
 
       canvas.requestRenderAll();
+      
     });
 
     const minusEl = document.getElementById('minusElement');
@@ -2382,4 +2452,18 @@ doesTitleMatchSearch(title: string, search: string): boolean {
       loader.style.display = show ? 'flex' : 'none';
     }
   }
+}
+function moveLayerRowUp(elementId: string) {
+  const list = document.querySelector('.fpd-list');
+  if (!list) return;
+
+  const row = document.getElementById(elementId);
+  if (!row) return;
+
+  const prevRow = row.previousElementSibling;
+  if (!prevRow) return;
+
+  list.insertBefore(row, prevRow);
+
+  console.log('✅ DOM layer moved up');
 }

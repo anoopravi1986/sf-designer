@@ -32223,11 +32223,50 @@ console.log("t:", t);
         }
       }
       function Qn () {
-        var t, e, i
-        ;(this.listElem.innerHTML = ''),
-          this.fpdInstance
-            .getElements(this.fpdInstance.currentViewIndex, 'all', !1)
-            .forEach(t => {
+        console.log("this.fpdInstance our 32226",this.fpdInstance.getElements('all'))
+        const elements = this.fpdInstance.getElements('all');
+if (!Array.isArray(elements) || !elements.length) return;
+
+/* =========================
+   1️⃣ Move Base to index 0
+========================= */
+const baseIndex = elements.findIndex(el => el?.title === 'Base');
+console.log('base Index of data is', baseIndex);
+
+if (baseIndex > 0) {
+  const [baseLayer] = elements.splice(baseIndex, 1);
+  elements.unshift(baseLayer);
+}
+
+/* =========================
+   2️⃣ Hide repeated titles
+========================= */
+const seenTitles = new Set();
+const normalizedElements = [];
+
+elements.forEach(el => {
+  const title = el?.title?.trim();
+
+  // If title already exists → skip (hide duplicate)
+  if (title && seenTitles.has(title)) {
+    return;
+  }
+
+  if (title) {
+    seenTitles.add(title);
+  }
+
+  normalizedElements.push(el);
+});
+
+console.log('✅ Normalized elements order (Base first, no duplicates):', normalizedElements);
+
+        // var t, e, i
+        // ;(this.listElem.innerHTML = ''),
+        //   this.fpdInstance
+        //     .getElements(this.fpdInstance.currentViewIndex, 'all', !1)
+            this.listElem.innerHTML = '';
+            normalizedElements.forEach(t => {
               console.log(t.title,'seting up all the layers again', t, t.checkEditable());
               
               if(t && t.title != 'Overlay'){
@@ -35870,11 +35909,24 @@ function updateFPDLayersToSingleGroup(group) {
               function placeAboveBase(canvas, obj) {
                 const objects = canvas.getObjects();
                 const baseIndex = objects.findIndex(o => o.title === 'Base');
-
+                console.log(objects,"object baseindix",baseIndex)
                 if (baseIndex !== -1) {
                   canvas.moveTo(obj, baseIndex + 1);
                 }
               }
+
+              function getTopEditableZ(canvas) {
+                let maxZ = 0;
+
+                canvas.getObjects().forEach(o => {
+                  if (o.boundingBox === 'Base') return;      // ignore base
+                  if (o.zChangeable !== 1) return;           // ignore locked layers
+                  maxZ = Math.max(maxZ, o.z || 0);
+                });
+
+                return maxZ + 1;
+              }
+
 
 
               G(this.navElem.querySelector('.fpd-group-paste-by'), 'click', e => {
@@ -35933,21 +35985,27 @@ function updateFPDLayersToSingleGroup(group) {
                       zChangeable: 1,
                       boundingBox: 'Base',
                       clipPath: null,
-                      objectCaching: false
+                      objectCaching: false,
                     });
                     // clonedObj = fabricCanvas._activeObject;
                     
                     // Add FIRST
                     fabricCanvas.add(clonedObj);
+                    const topZ = getTopEditableZ(fabricCanvas);
+
 
                     // Restore exact position
                     clonedObj.set({
+                      z: topZ,
                       title: tData.title + ' Copy',
                       id: tData.id + 'Copy',
                       scaleX: tData.scaleX || 1,
                       scaleY: tData.scaleY || 1,
-                      isCustom: true
+                      isCustom: true,
+                      crossOrigin: 'anonymous'
                     })
+
+                    fabricCanvas.moveTo(clonedObj, fabricCanvas.getObjects().length - 1);
                     console.log("clonedObj data is",clonedObj)
                     clonedObj.setPositionByOrigin(
                       { x: tData.left, y: tData.top },
