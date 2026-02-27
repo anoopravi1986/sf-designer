@@ -472,6 +472,61 @@ export class HomeComponent implements AfterViewInit {
       this.moveBoldToPrimaryTools()
     }, 3000);
     createIcons({ icons });
+
+    setTimeout(() => {
+
+      const btnOpacity = document.getElementById('fpd-opacity-btn');
+      const panel = document.getElementById('fpd-opacity-panel');
+      const sliderOpacity = document.getElementById('fpd-opacity-range') as HTMLInputElement;
+      console.log('Opacity elements:', { btnOpacity, panel, sliderOpacity });
+      if (!btnOpacity || !panel || !sliderOpacity) return;
+      
+
+      // 🔹 Toggle panel
+      btnOpacity.addEventListener('click', () => {
+        console.log('Opacity button clicked, toggling panel. Current display:', panel.style.display);
+        panel.style.display =
+          panel.style.display === 'block' ? 'none' : 'block';
+  
+        // Sync slider with current object opacity
+        const canvas = this.designer.currentViewInstance.fabricCanvas;
+        const obj = canvas.getActiveObject();
+  
+        if (obj) {
+          sliderOpacity.value = obj.opacity ?? 1;
+          var percent = (parseFloat(sliderOpacity.value) / parseFloat(sliderOpacity.max)) * 100;
+          sliderOpacity.style.setProperty('--progress', percent + '%');
+        }
+      });
+      function updateSliderProgress() {
+        const percent = (parseFloat(sliderOpacity.value) / parseFloat(sliderOpacity.max)) * 100;
+        sliderOpacity.style.setProperty('--progress', percent + '%');
+      }
+      // 🔹 Change opacity live
+      sliderOpacity.addEventListener('input', () => {
+        updateSliderProgress();
+        const canvas = this.designer.currentViewInstance.fabricCanvas;
+        const obj = canvas.getActiveObject();
+        if (!obj) return;
+  
+        obj.set('opacity', parseFloat(sliderOpacity.value));
+  
+        canvas.requestRenderAll();
+  
+        // Notify FPD layer panel
+        canvas.fire('object:modified', { target: obj });
+  
+      });
+
+      document.addEventListener('click', (e: any) => {
+        if (
+          !panel.contains(e.target) &&
+          !btnOpacity.contains(e.target)
+        ) {
+          panel.style.display = 'none';
+        }
+      });
+    }, 5000);
   }
 
   moveBoldToPrimaryTools(): void {
@@ -677,7 +732,8 @@ export class HomeComponent implements AfterViewInit {
           canvas.bringForward(obj);
           moveLayerRowUp(obj.id);
         } else {
-          alert('Not possible to move above Overlay layer!');
+          // alert('Not possible to move above Overlay layer!');
+          this.showToast('Not possible to move above Overlay layer!');
           return;
         }
       } else {
@@ -765,7 +821,8 @@ function moveLayerRowDown(elementId: string) {
           canvas.sendBackwards(obj);
           moveLayerRowDown(obj.id);
         } else {
-          alert("Reached just above base, not moving further down.");
+          // alert("Reached just above base, not moving further down.");
+          this.showToast("Reached just above base, not moving further down.");
         }
       } else {
         canvas.sendBackwards(obj);
