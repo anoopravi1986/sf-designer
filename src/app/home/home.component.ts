@@ -1185,7 +1185,60 @@ export class HomeComponent implements AfterViewInit {
 
         }
       });
+// Add this near your other keyboard event listeners in ngAfterViewInit()
+document.addEventListener('keydown', (e: KeyboardEvent) => {
+  // Check for Delete or Backspace key
+  if (e.key === 'Delete' || e.key === 'Backspace') {
+    // Prevent default browser behavior (like going back in history for Backspace)
+    e.preventDefault();
+    
+    const canvas = this.designer?.currentViewInstance?.fabricCanvas;
+    if (!canvas) return;
+    
+    const activeObject = canvas.getActiveObject();
+    
+    if (activeObject) {
+      // Check if it's a group of objects
+      if (activeObject.type === 'activeSelection') {
+        // Delete all selected objects in the group
+        activeObject.forEachObject((obj: any) => {
+          canvas.remove(obj);
+        });
+      } else {
+        // Delete single object
+        canvas.remove(activeObject);
+      }
+      
+      canvas.discardActiveObject();
+      canvas.requestRenderAll();
+      
+      this.showToast('Item deleted successfully!');
+    }
+  }
+});
 
+// Also add a click handler for delete button if you have one
+document.getElementById('deletetext')?.addEventListener('click', () => {
+  const canvas = this.designer?.currentViewInstance?.fabricCanvas;
+  if (!canvas) return;
+  
+  const activeObject = canvas.getActiveObject();
+  
+  if (activeObject) {
+    if (activeObject.type === 'activeSelection') {
+      activeObject.forEachObject((obj: any) => {
+        canvas.remove(obj);
+      });
+    } else {
+      canvas.remove(activeObject);
+    }
+    
+    canvas.discardActiveObject();
+    canvas.requestRenderAll();
+    
+    this.showToast('Item deleted successfully!');
+  }
+});
        document.getElementById('letter-spacing')?.addEventListener('click', (e) => {
         console.log("e.currentTarget",e.currentTarget)
             document.body.classList.remove('fpd-toolbar-transform-our');
@@ -2337,7 +2390,7 @@ export class HomeComponent implements AfterViewInit {
 
       // Create outer wrapper (position relative for arrow buttons)
       const tagWrapperMain = document.createElement('div');
-      tagWrapperMain.className = 'relative w-full fpd-designs-tags mt-2';
+      tagWrapperMain.className = 'relative w-full mt-2 fpd-designs-tags';
 
       const tagWrapper = document.createElement('div');
       tagWrapper.className = 'flex gap-2 mt-2 ml-[5px] fixed md:top-[164px]';
