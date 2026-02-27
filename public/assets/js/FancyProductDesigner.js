@@ -2092,22 +2092,55 @@
               return r
             },
             loadImage: function (t, e, i, n) {
+              // if (t) {
+              //   console.log('Image created:', s);
+              //   var s = E.util.createImage(),
+              //     r = function () {
+              //       e && e.call(i, s, !1), (s = s.onload = s.onerror = null)
+              //     }
+              //   ;(s.onload = r),
+              //     (s.onerror = function () {
+              //       E.log('Error loading ' + s.src),
+              //         e && e.call(i, null, !0),
+              //         (s = s.onload = s.onerror = null)
+              //     }),
+              //     0 !== t?.indexOf('data') && null != n && (s.crossOrigin = n),
+              //     'data:image/svg' === t.substring(0, 14) &&
+              //       ((s.onload = null), E.util.loadImageInDom(s, r)),
+              //     (s.src = t)
+              // }
               if (t) {
-                var s = E.util.createImage(),
-                  r = function () {
-                    e && e.call(i, s, !1), (s = s.onload = s.onerror = null)
-                  }
-                ;(s.onload = r),
-                  (s.onerror = function () {
-                    E.log('Error loading ' + s.src),
-                      e && e.call(i, null, !0),
-                      (s = s.onload = s.onerror = null)
-                  }),
-                  0 !== t?.indexOf('data') && null != n && (s.crossOrigin = n),
-                  'data:image/svg' === t.substring(0, 14) &&
-                    ((s.onload = null), E.util.loadImageInDom(s, r)),
-                  (s.src = t)
-              } else e && e.call(i, t)
+                var s = E.util.createImage();
+                console.log('Image created:', s);
+
+                var r = function () {
+                  console.log('Image loaded:', s);
+                  e && e.call(i, s, !1);
+                  s = s.onload = s.onerror = null;
+                };
+
+                s.onload = r;
+
+                s.onerror = function () {
+                  console.error('Error loading image:', s.src, s);
+                  E.log('Error loading ' + s.src);
+                  e && e.call(i, null, !0);
+                  s = s.onload = s.onerror = null;
+                };
+
+                if (0 !== t?.indexOf('data') && n != null) {
+                  s.crossOrigin = n;
+                }
+
+                if ('data:image/svg' === t.substring(0, 14)) {
+                  s.onload = null;
+                  E.util.loadImageInDom(s, r);
+                }
+
+                s.src = t;
+              }
+ 
+              else e && e.call(i, t)
             },
             loadImageInDom: function (t, e) {
               var i = E.document.createElement('div')
@@ -15822,6 +15855,8 @@
                       this.callSuper('render', t)))
                 },
                 _splitTextIntoLines: function (t) {
+                  console.log("test t:",t);
+                  
                   for (
                     var i = t.split(this._reNewline),
                       n = new Array(i.length),
@@ -21271,7 +21306,7 @@
 
                         const title = document.createElement('h4');
                         title.textContent = dataTitle;
-                        title.className = 'font-bold mb-1 text-capitalize';
+                        title.className = 'mb-1 font-bold text-capitalize';
 
                         const para = document.createElement('p');
                         para.className = 'mt-2';
@@ -21280,7 +21315,7 @@
                         para.textContent = `Uploaded by Anoop ${timeupload}`; // replace with real content if needed
 
                         let buttonDonw = document.createElement('button');
-                        buttonDonw.className = 'download-button flex items-center gap-2 w-full p-2 text-left hover:bg-gray-100';
+                        buttonDonw.className = 'flex items-center w-full gap-2 p-2 text-left download-button hover:bg-gray-100';
                         buttonDonw.innerHTML = `
                           <svg xmlns="http://www.w3.org/2000/svg" style="width:20px;height:20px;" class="w-4 h-4 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 4v12" />
@@ -21289,7 +21324,7 @@
                         `;
 
                         let buttonDel = document.createElement('button');
-                        buttonDel.className = 'delete-button flex items-center gap-2 w-full p-2 text-left hover:bg-gray-100';
+                        buttonDel.className = 'flex items-center w-full gap-2 p-2 text-left delete-button hover:bg-gray-100';
                         buttonDel.innerHTML = `
                           <span class="fpd-icon-bin"></span>
                           Delete
@@ -21701,14 +21736,14 @@
 
                 const title = document.createElement('h4');
                 title.textContent = dataTitle;
-                title.className = 'font-bold mb-1 text-capitalize';
+                title.className = 'mb-1 font-bold text-capitalize';
 
                 const para = document.createElement('p');
                 para.className = 'mt-2';
                 para.textContent = 'Uploaded by Anoop S 2 min ago'; // replace with real content if needed
 
                 const buttonDonw = document.createElement('button');
-                buttonDonw.className = 'download-button flex items-center gap-2 w-full p-2 text-left hover:bg-gray-100';
+                buttonDonw.className = 'flex items-center w-full gap-2 p-2 text-left download-button hover:bg-gray-100';
                 buttonDonw.innerHTML = `
                   <svg xmlns="http://www.w3.org/2000/svg" style="width:20px;height:20px;" class="w-4 h-4 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 4v12" />
@@ -21717,7 +21752,7 @@
                 `;
 
                 const buttonDel = document.createElement('button');
-                buttonDel.className = 'delete-button flex items-center gap-2 w-full p-2 text-left hover:bg-gray-100';
+                buttonDel.className = 'flex items-center w-full gap-2 p-2 text-left delete-button hover:bg-gray-100';
                 buttonDel.innerHTML = `
                   <span class="fpd-icon-bin"></span>
                   Delete
@@ -25462,7 +25497,7 @@
             'object:added': t => {
               console.log("t value is in",t)
               let e = t.target,
-                i = e.price;
+                i = e.price ?? 0;
 
               console.log('object:added', e, i);
               
@@ -28190,6 +28225,8 @@ console.log("t:", t);
                             console.log('search input', input)
                           }
                           this.selectCategory(t.currentTarget.dataset.index)
+                          console.log('Selected category index:', t.currentTarget.dataset.index, t.currentTarget.innerText)
+                          localStorage.setItem('valueofTitleActiveDatais', t.currentTarget.innerText)
                         }),
                         e.append(n)
                     })),
@@ -28381,10 +28418,10 @@ console.log("t:", t);
               let currentOffset = 0
 
               const wrapper = document.createElement('div')
-              wrapper.className = 'relative w-full fpd-designs-tags mt-2'
+              wrapper.className = 'relative w-full mt-2 fpd-designs-tags'
 
               const container = document.createElement('div')
-              container.className = 'w-full overflow-hidden mt-2 our-elements'
+              container.className = 'w-full mt-2 overflow-hidden our-elements'
 
               const flexWrapper = document.createElement('div')
               flexWrapper.className =
@@ -28608,10 +28645,14 @@ console.log("t:", t);
 
         // ========== Main Click Logic ==========
         r.addEventListener('click', e => {
+          // debugger;
+          localStorage.setItem('clickedTitleProdcutInside', '');
           console.log('check for fpdInstance', this.fpdInstance)
           console.log('check for Updtes', this.fpdInstance.selectProduct)
           const parentDiv = e.target.closest('div').parentElement
           const parentDivId = parentDiv?.id
+          const clickedTitle = e.currentTarget.dataset.title;
+          localStorage.setItem('clickedTitleProdcutInside', clickedTitle);
           localStorage.setItem('parentDivId', parentDivId)
 
           console.log('Parent div:', parentDiv?.id)
@@ -28696,6 +28737,7 @@ console.log("t:", t);
             G(confirmBtn, ['click'], () => {
               modal.remove()
               console.log('Anoop Data 5-1')
+              debugger;
               localStorage.setItem('UE', true)
               console.log(
                 'target.dataset.index',
@@ -29017,7 +29059,7 @@ console.log("t:", t);
 
               const tagContainerText = document.createElement('div')
               tagContainerText.className =
-                'fpd-tag-filter flex gap-2 mb-0 flex-nowrap overflow-x-auto'
+                'flex gap-2 mb-0 overflow-x-auto fpd-tag-filter flex-nowrap'
 
               allTagsSet.forEach(tag => {
                 const tagButton = document.createElement('button')
@@ -29138,7 +29180,7 @@ console.log("t:", t);
               // if (tagList) {
               //     const tags = tagList.split(',').map(tag => tag.trim());
               //     const tagWrapperText = document.createElement('div');
-              //     tagWrapperText.className = 'fpd-tags flex gap-1 mt-1 flex-wrap';
+              //     tagWrapperText.className = 'flex flex-wrap gap-1 mt-1 fpd-tags';
 
               //     tags.forEach(tag => {
               //         const tagLabel = document.createElement('span');
@@ -29154,10 +29196,10 @@ console.log("t:", t);
                 const categoryName = categoryBlock.getAttribute('data-category') || 'Uncategorized';
 
                 const categoryContainer = document.createElement('div');
-                categoryContainer.className = 'box-contain-text relative';
+                categoryContainer.className = 'relative box-contain-text';
 
                 const categoryTitle = document.createElement('div');
-                categoryTitle.className = 'fpd-category-title text-md font-semibold mb-2 mt-4';
+                categoryTitle.className = 'mt-4 mb-2 font-semibold fpd-category-title text-md';
                 categoryTitle.textContent = categoryName;
 
                 categoryContainer.appendChild(categoryTitle);
@@ -29193,7 +29235,7 @@ console.log("t:", t);
                     tagContainer.className = 'flex items-center my-2 gap-[10px] flex-wrap happy1';
 
                     const popup1 = document.createElement('div');
-                    popup1.className = 'fpd-popup hidden'; // initially hidden
+                    popup1.className = 'hidden fpd-popup'; // initially hidden
 
                     const popup = document.createElement('div');
                     popup.className = 'content-section bg-white border border-[#ccc] rounded-[6px] p-[10px] shadow-custom-light';
@@ -29813,11 +29855,11 @@ console.log("t:", t);
 
         // Create outer wrapper (position relative for arrow buttons)
         const wrapper = document.createElement('div')
-        wrapper.className = 'relative w-full fpd-designs-tags mt-2'
+        wrapper.className = 'relative w-full mt-2 fpd-designs-tags'
 
         // Step 1: Create container with overflow hidden
         const container = document.createElement('div')
-        container.className = 'w-full overflow-hidden mt-2 our-elements'
+        container.className = 'w-full mt-2 overflow-hidden our-elements'
 
         // Step 2: Create flex wrapper that will slide using translateX
         const flexWrapper = document.createElement('div')
@@ -30064,7 +30106,7 @@ console.log("t:", t);
         container.appendChild(rightArrow)
 
         const e = document.createElement('div')
-        e.className = 'fpd-category fpd-item-group relative'
+        e.className = 'relative fpd-category fpd-item-group'
         e.dataset.title = t.title
         e.dataset.search = t.title.toLowerCase()
 
@@ -30082,7 +30124,7 @@ console.log("t:", t);
 
         // Hidden image container
         const hiddenImagesContainer = document.createElement('div')
-        hiddenImagesContainer.className = 'fpd-thumbnails hidden'
+        hiddenImagesContainer.className = 'hidden fpd-thumbnails'
         hiddenImagesContainer.style.display = 'none'
 
         // Guard: make sure t.designs or t.images exist
@@ -30206,7 +30248,7 @@ console.log("t:", t);
           const dots = document.createElement('div')
           dots.innerHTML = '⋯'
           dots.className =
-            'absolute top-1 right-1 text-lg font-bold text-black top-0 right-0 bg-opacity-40 rounded-full px-2 cursor-pointer hidden group-hover:block z-10'
+            'absolute top-0 right-0 z-10 hidden px-2 text-lg font-bold text-black rounded-full cursor-pointer top-1 right-1 bg-opacity-40 group-hover:block'
 
           // Tooltip container
           const tooltip = document.createElement('div')
@@ -30366,7 +30408,7 @@ console.log("t:", t);
                 // Add back button
                 const backBtn = document.createElement('button')
                 backBtn.innerText = '← Back'
-                backBtn.className = 'text-blue-600 underline mb-3 block ml-auto'
+                backBtn.className = 'block mb-3 ml-auto text-blue-600 underline'
                 backBtn.addEventListener('click', () => {
                   console.log('this.gridElem', this.gridElem, 'Japp')
                   this.gridElem.innerHTML = ''
@@ -30390,7 +30432,7 @@ console.log("t:", t);
                 t.category.forEach(subCat => {
                   const subWrap = document.createElement('div')
                   subWrap.className =
-                    'fpd-category fpd-item-group relative mb-6'
+                    'relative mb-6 fpd-category fpd-item-group'
 
                   const subHeading = document.createElement('h4')
                   subHeading.className =
@@ -30444,7 +30486,7 @@ console.log("t:", t);
                       const backBtn = document.createElement('button')
                       backBtn.innerText = '← Back'
                       backBtn.className =
-                        'text-blue-600 underline mb-3 block ml-auto'
+                        'block mb-3 ml-auto text-blue-600 underline'
                       backBtn.addEventListener('click', () => {
                         console.log('2 back btn')
                         this.gridElem.innerHTML = ''
@@ -30471,7 +30513,7 @@ console.log("t:", t);
                       // Full subcategory block
                       const subWrapFull = document.createElement('div')
                       subWrapFull.className =
-                        'fpd-category fpd-item-group relative mb-6'
+                        'relative mb-6 fpd-category fpd-item-group'
 
                       const fullHeading = document.createElement('h4')
                       fullHeading.className =
@@ -31128,13 +31170,13 @@ console.log("t:", t);
             i.querySelector('picture')
           ),
           G(i, ['click'], t => {
-            this.fpdInstance.loadingCustomImage ||
-              this.fpdInstance._addGridItemToCanvas(
-                t.currentTarget,
-                {},
-                void 0,
-                !1
-              )
+            // this.fpdInstance.loadingCustomImage ||
+            //   this.fpdInstance._addGridItemToCanvas(
+            //     t.currentTarget,
+            //     {},
+            //     void 0,
+            //     !1
+            //   )
           }),
           G(i.querySelector('.fa-trash'), 'click', t => {
             console.log('delete image', i,'jjjjjjjjj',t)
@@ -32181,13 +32223,66 @@ console.log("t:", t);
         }
       }
       function Qn () {
-        var t, e, i
-        ;(this.listElem.innerHTML = ''),
-          this.fpdInstance
-            .getElements(this.fpdInstance.currentViewIndex, 'all', !1)
-            .forEach(t => {
-              console.log('seting up all the layers again', t, t.checkEditable());
+        console.log("this.fpdInstance our 32226",this.fpdInstance.getElements('all'))
+        const elements = this.fpdInstance.getElements('all');
+if (!Array.isArray(elements) || !elements.length) return;
+
+/* =========================
+   1️⃣ Move Base to index 0
+========================= */
+const baseIndex = elements.findIndex(el => el?.title === 'Base');
+console.log('base Index of data is', baseIndex);
+
+if (baseIndex > 0) {
+  const [baseLayer] = elements.splice(baseIndex, 1);
+  elements.unshift(baseLayer);
+}
+
+/* =========================
+   2️⃣ Hide repeated titles
+========================= */
+const seenTitles = new Set();
+const normalizedElements = [];
+
+elements.forEach(el => {
+  const title = el?.title?.trim();
+
+  // If title already exists → skip (hide duplicate)
+  if (title && seenTitles.has(title)) {
+    return;
+  }
+
+  if (title) {
+    seenTitles.add(title);
+  }
+
+  normalizedElements.push(el);
+});
+
+console.log('✅ Normalized elements order (Base first, no duplicates):', normalizedElements);
+
+        // var t, e, i
+        // ;(this.listElem.innerHTML = ''),
+        //   this.fpdInstance
+        //     .getElements(this.fpdInstance.currentViewIndex, 'all', !1)
+            this.listElem.innerHTML = '';
+            normalizedElements.forEach(t => {
+              console.log(t.title,'seting up all the layers again', t, t.checkEditable());
+              
               if(t && t.title != 'Overlay'){
+                if (!t.title || t.title === 'undefined') {
+                  console.log("coming thereeeeeeee", t)
+                  // const newTitle = `Group Text ${groupCounter}`;
+                  // groupCounter++;
+
+                  // // ✅ IMPORTANT: update title on element AND layer data
+                  // t.title = newTitle;
+
+                  // // FPD internal sync (this is what was missing)
+                  // if (typeof t.set === 'function') {
+                  //   t.set('title', newTitle);
+                  // }
+                }
                 Wn(this, Yn, Kn).call(this, t)
               }
               else{
@@ -32553,7 +32648,7 @@ console.log("t:", t);
             e.append(i)
           const n = document.createElement('div')
           let s
-          ;(n.className = 'fpd-cell-full bg-white'),
+          ;(n.className = 'bg-white fpd-cell-full'),
             e.append(n),
             1 == t.maxLines
               ? ((s = document.createElement('input')),
@@ -32602,7 +32697,7 @@ console.log("t:", t);
             : []
           if (a.length) {
             const i = document.createElement('div')
-            ;(i.className = 'fpd-cell-1 bg-white'),
+            ;(i.className = 'bg-white fpd-cell-1'),
               e.append(i),
               rs(this, os, ds)
                 .call(this, a, i, t)
@@ -32611,7 +32706,7 @@ console.log("t:", t);
         }
         if (t.resizable || t.__editorMode) {
           const i = document.createElement('div')
-          ;(i.className = 'fpd-cell-2 bg-white'), e.append(i)
+          ;(i.className = 'bg-white fpd-cell-2'), e.append(i)
           const n = document.createElement('input')
           ;(n.className = 'fpd-tooltip'),
             n.setAttribute(
@@ -34556,7 +34651,7 @@ console.log("t:", t);
         }
         connectedCallback () {
           this.innerHTML =
-        '<div class="fpd-close-sub-panel"> <span class="fa-solid fa-close"></span>  </div> <div class="fpd-close"> <span class="fa-solid fa-close"></span> </div> <div class="fpd-tools-nav fpd-scroll-area"> <div class="fpd-primary-tools"><div class="fpd-tool-font-family" data-panel="font-family"> <fpd-dropdown placeholder=""></fpd-dropdown> <span class="fpd-icon-font"></span> <span class="fpd-label" data-defaulttext="Font">toolbar.font</span> </div> <div class="fpd-tool-edit-text" data-panel="edit-text"> <span class="fpd-icon-text-input"></span> <span class="fpd-label" data-defaulttext="Edit Text">toolbar.edit_text</span> </div> <div class="flex flex-plus-minus-icon fpd-hidden" id="minusCust"><button style="padding:0px 10px;background:#fff;" class="fpd-tool-text-size-customize-icon minus" id="minusElement">-</button><div class="fpd-tool-text-size fpd-tool-text-size-customize" data-panel="text-size"> <input type="text" class="fpd-input"> <span class="fpd-icon-font-size"></span> <span class="fpd-label" data-defaulttext="Size & Spacing">toolbar.text_size_spacing</span></div><button class="fpd-tool-text-size-customize-icon plus" id="plusElement" style="padding:0px 10px;background:#fff;">+</button></div> <div class="fpd-tool-color" data-panel="color"> <span class="fpd-current-fill"></span> <span class="fpd-label" data-defaulttext="Color">toolbar.color</span> </div></div> <div class="fpd-panel-text-format fpd-padding"><div class="fpd-tools-group flex !flex-row p-2"><div id="boldOutside" class="fpd-tool-text-bold fpd-toggle bold-outside" data-defaulttext="Bold" data-control="fontWeight" data-enabled="bold" data-disabled="normal" title="toolbar.bold"> <span class="fpd-icon-format-bold"></span> </div><div id="fontItalic" class="fpd-tool-text-italic fpd-toggle" data-defaulttext="Italic" data-control="fontStyle" data-enabled="italic" data-disabled="normal" title="Italic"> <span class="fpd-icon-format-italic"></span> </div><div id="UnderlineText" class="fpd-tool-text-underline fpd-toggle" data-defaulttext="Underline" data-control="textDecoration" data-enabled="underline" data-disabled="normal" title="Underline"> <span class="fpd-icon-format-underline"></span> </div><div id="TextTransform" class="fpd-tool-text-transform fpd-btn-options" data-control="textTransform" data-options="{&quot;none&quot;: &quot;fpd-icon-text-transform&quot;, &quot;uppercase&quot;: &quot;fpd-icon-uppercase&quot;, &quot;lowercase&quot;: &quot;fpd-icon-lowercase&quot;}" data-defaulttext="Text Transform" title="Text Transform"> <span class="fpd-icon-text-transform"></span> </div><div class="extra-icon"><span title="letter-spacing" id="letter-spacing"><svg xmlns="http://www.w3.org/2000/svg" id="Layer_1" data-name="Layer 1" viewBox="0 0 19 19" style="width:30px;height:30px;"><defs><style>.cls-1 {fill: #6b6f73;}</style></defs><path class="cls-1" d="M14.7,1.29v3.17h-.31c-.18-.73-.39-1.26-.61-1.58-.23-.32-.53-.58-.93-.76-.22-.1-.6-.16-1.15-.16h-.87v9.04c0,.6.03.97.1,1.12.07.15.2.28.39.39s.46.17.79.17h.39v.32h-6.14v-.32h.39c.34,0,.61-.06.82-.18.15-.08.27-.22.35-.41.06-.14.1-.5.1-1.09V1.97h-.85c-.79,0-1.36.17-1.72.5-.5.47-.82,1.13-.95,2h-.33V1.29h10.53Z"/><rect class="cls-1" x="3.13" y="15.4" width="13.29" height="1"/><polygon class="cls-1" points=".39 15.9 3.53 17.71 3.53 14.09 .39 15.9"/><polygon class="cls-1" points="18.61 15.9 15.47 14.09 15.47 17.71 18.61 15.9"/></svg></span></div> <div id="textAlignCust" title="Text Align" class="fpd-tool-text-align fpd-btn-group" data-control="textAlign"> <span class="fpd-icon-format-align-left" data-option="left"></span></div><div title="Position" id="CenterTools" class="fpd-tool-position-align fpd-btn-group" data-control="textAlign"> <div data-do="align-center"> <span class="fpd-icon-align-vertical-middle"></span> </div></div> </div></div><div class="fpd-secondary-tools fpd-scroll-area" id="SecondaryIconBoxHeader"> <div class="fpd-tool-text-format" data-panel="text-format" title="Text Format"> <span class="fpd-icon-text-format"></span> <span class="fpd-label" data-defaulttext="Format">toolbar.text_format</span> </div> <div class="fpd-tool-transform" data-panel="transform" title="Transform"> <span class="fpd-icon-transform"></span> <span class="fpd-label" data-defaulttext="Transform">toolbar.transform</span> </div> <div class="fpd-tool-layer-depth fpd-tools-group"> <div data-do="layer-up" title="Move Up" id="TextMoveUp"> <span title="Move Up" class="fpd-icon-move-up"></span> <span data-defaulttext="Move Up">toolbar.move_up</span> </div> <div data-do="layer-down" id="TextMoveDown"> <span title="Move Down" class="fpd-icon-move-down"></span> <span data-defaulttext="Move Down">toolbar.move_down</span> </div> </div> <div class="fpd-tool-position" data-panel="position" title="Position"> <span class="fpd-icon-align-vertical-middle"></span> <span class="fpd-label" data-defaulttext="Position">toolbar.position</span> </div> <div class="fpd-tool-curved-text" data-panel="curved-text" title="Curved Text"> <span class="fpd-icon-curved-text"></span> <span class="fpd-label" data-defaulttext="Curved Text">toolbar.curved_text</span> </div><div class="fpd-ungroup1 items-center fpd-hidden"><span style="min-width:23px;"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="component" class="lucide lucide-component" style="transform: rotate(45deg);"><path d="M15.536 11.293a1 1 0 0 0 0 1.414l2.376 2.377a1 1 0 0 0 1.414 0l2.377-2.377a1 1 0 0 0 0-1.414l-2.377-2.377a1 1 0 0 0-1.414 0z"></path><path d="M2.297 11.293a1 1 0 0 0 0 1.414l2.377 2.377a1 1 0 0 0 1.414 0l2.377-2.377a1 1 0 0 0 0-1.414L6.088 8.916a1 1 0 0 0-1.414 0z"></path><path d="M8.916 17.912a1 1 0 0 0 0 1.415l2.377 2.376a1 1 0 0 0 1.414 0l2.377-2.376a1 1 0 0 0 0-1.415l-2.377-2.376a1 1 0 0 0-1.414 0z"></path><path d="M8.916 4.674a1 1 0 0 0 0 1.414l2.377 2.376a1 1 0 0 0 1.414 0l2.377-2.376a1 1 0 0 0 0-1.414l-2.377-2.377a1 1 0 0 0-1.414 0z"></path></svg></span><span class="fpd-label">Ungroup Text</span></div><div class="!flex-row !ml-0 !mr-0 border !border-[#d7dade] !border-solid rounded !px-0 !py-[2px]" style="border-style:solid;"><div class="fpd-group-copy-by items-center fpd-hidden" title="Copy Group"><svg xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg" fill="#000000" width="22" height="22" viewBox="0 0 32 32"><path d="M 4 4 L 4 24 L 11 24 L 11 22 L 6 22 L 6 6 L 18 6 L 18 7 L 20 7 L 20 4 Z M 12 8 L 12 28 L 28 28 L 28 8 Z M 14 10 L 26 10 L 26 26 L 14 26 Z"></path></svg></div><div class="fpd-group-paste-by items-center fpd-hidden" title="Paste Group"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" fill="#000000" width="22" height="22" viewBox="0 0 36 36" version="1.1" preserveAspectRatio="xMidYMid meet"><path d="M22.6,4H21.55a3.89,3.89,0,0,0-7.31,0H13.4A2.41,2.41,0,0,0,11,6.4V10H25V6.4A2.41,2.41,0,0,0,22.6,4ZM23,8H13V6.25A.25.25,0,0,1,13.25,6h2.69l.12-1.11A1.24,1.24,0,0,1,16.61,4a2,2,0,0,1,3.15,1.18l.09.84h2.9a.25.25,0,0,1,.25.25Z" class="clr-i-outline clr-i-outline-path-1"></path><path d="M33.25,18.06H21.33l2.84-2.83a1,1,0,1,0-1.42-1.42L17.5,19.06l5.25,5.25a1,1,0,0,0,.71.29,1,1,0,0,0,.71-1.7l-2.84-2.84H33.25a1,1,0,0,0,0-2Z" class="clr-i-outline clr-i-outline-path-2"></path><path d="M29,16h2V6.68A1.66,1.66,0,0,0,29.35,5H27.08V7H29Z" class="clr-i-outline clr-i-outline-path-3"></path><path d="M29,31H7V7H9V5H6.64A1.66,1.66,0,0,0,5,6.67V31.32A1.66,1.66,0,0,0,6.65,33H29.36A1.66,1.66,0,0,0,31,31.33V22.06H29Z" class="clr-i-outline clr-i-outline-path-4"></path><rect x="0" y="0" width="36" height="36" fill-opacity="0"></rect></svg></div></div> <div class="fpd-tool-advanced-editing" data-panel="advanced-editing"> <span class="fpd-icon-effects"></span> <span class="fpd-label" data-defaulttext="Edit Image">toolbar.advanced_editing</span> </div> <div class="fpd-tool-remove-bg"> <span class="fpd-icon-remove-bg"></span> <span class="fpd-label" data-defaulttext="Remove Background">toolbar.remove_background</span> </div> <div class="fpd-tool-reset flex flex-col" data-action="reset-product" title="Reset"> <span class="fpd-icon-reset"></span> <span class="fpd-label" data-defaulttext="Reset">toolbar.reset</span> </div> <div class="fpd-ungroup items-center"><span title="Group Text" style="min-width:23px;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="3" y="3" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.5"/> <rect x="15" y="3" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.5"/><rect x="9" y="9" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.5"/><rect x="3" y="15" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.5"/> <rect x="15" y="15" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.5"/></svg></span><span class="fpd-label">Group Text</span></div><div class="!flex-row !ml-0 !mr-0 border !border-[#d7dade] !border-solid rounded !px-0 !py-[2px]" style="border-style:solid;"><div class="extra-icon"><span id="copytext"><svg xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg" fill="#000000" width="22" height="22" viewBox="0 0 32 32"><path d="M 4 4 L 4 24 L 11 24 L 11 22 L 6 22 L 6 6 L 18 6 L 18 7 L 20 7 L 20 4 Z M 12 8 L 12 28 L 28 28 L 28 8 Z M 14 10 L 26 10 L 26 26 L 14 26 Z"/></svg></span></div><div class="extra-icon"><span id="pastetext"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" fill="#000000" width="22" height="22" viewBox="0 0 36 36" version="1.1" preserveAspectRatio="xMidYMid meet"><path d="M22.6,4H21.55a3.89,3.89,0,0,0-7.31,0H13.4A2.41,2.41,0,0,0,11,6.4V10H25V6.4A2.41,2.41,0,0,0,22.6,4ZM23,8H13V6.25A.25.25,0,0,1,13.25,6h2.69l.12-1.11A1.24,1.24,0,0,1,16.61,4a2,2,0,0,1,3.15,1.18l.09.84h2.9a.25.25,0,0,1,.25.25Z" class="clr-i-outline clr-i-outline-path-1"/><path d="M33.25,18.06H21.33l2.84-2.83a1,1,0,1,0-1.42-1.42L17.5,19.06l5.25,5.25a1,1,0,0,0,.71.29,1,1,0,0,0,.71-1.7l-2.84-2.84H33.25a1,1,0,0,0,0-2Z" class="clr-i-outline clr-i-outline-path-2"/><path d="M29,16h2V6.68A1.66,1.66,0,0,0,29.35,5H27.08V7H29Z" class="clr-i-outline clr-i-outline-path-3"/><path d="M29,31H7V7H9V5H6.64A1.66,1.66,0,0,0,5,6.67V31.32A1.66,1.66,0,0,0,6.65,33H29.36A1.66,1.66,0,0,0,31,31.33V22.06H29Z" class="clr-i-outline clr-i-outline-path-4"/><rect x="0" y="0" width="36" height="36" fill-opacity="0"/></svg></span></div></div><div class="fpd-tool-duplicate"> <span class="fpd-icon-copy"></span> <span class="fpd-label" data-defaulttext="Duplicate">toolbar.duplicate</span> </div> <div class="fpd-tool-remove flex flex-col"> <span class="fpd-icon-bin" title="Remove"></span> <span class="fpd-label" data-defaulttext="Remove">toolbar.remove</span> </div> </div> </div> <div class="fpd-sub-panel"> <div class="fpd-panel-color"> <div class="fpd-panel-tabs"> <span data-tab="fill" data-defaulttext="Fill" class="fpd-active">toolbar.fill</span> <span data-tab="stroke" data-defaulttext="Stroke" class="fpd-tool-text-stroke">toolbar.stroke</span> <span data-tab="shadow" data-defaulttext="Shadow" class="fpd-tool-text-shadow">toolbar.shadow</span> </div> <div class="fpd-panel-tabs-content fpd-scroll-area"> <div data-id="fill" class="fpd-active"> <div class="fpd-color-wrapper"></div> <div class="fpd-tool-fill-opacity fpd-input"> <span class="fpd-label" data-defaulttext="Transparency">toolbar.transparency</span> <fpd-range-slider class="fpd-progress" value="1" step="0.01" min="0" max="1" data-control="opacity"></fpd-range-slider> <input class="fpd-slider-number fpd-number" type="number" value="1" step="0.01" min="0" max="1" data-control="opacity"/> </div> </div> <div data-id="stroke"> <div class="fpd-stroke-color-wrapper"></div> <div class="fpd-tool-stroke-width fpd-input"> <span class="fpd-label" data-defaulttext="Stroke Width">toolbar.stroke_width</span> <fpd-range-slider class="fpd-progress" value="0" step="1" min="0" max="20" data-control="strokeWidth"></fpd-range-slider> <input class="fpd-slider-number fpd-number" type="number" value="0" step="1" min="0" max="20" data-control="strokeWidth"/> </div> </div> <div data-id="shadow"> <div class="fpd-shadow-color-wrapper"></div> <div class="fpd-tool-shadow-blur fpd-input"> <span class="fpd-label" data-defaulttext="Blur">toolbar.shadow_blur</span> <fpd-range-slider class="fpd-progress" value="0" step="1" min="0" max="200" data-control="shadowBlur"></fpd-range-slider> <input class="fpd-slider-number fpd-number" type="number" value="0" step="1" min="0" max="200" data-control="shadowBlur"/> </div> <div class="fpd-tool-shadow-offsetX fpd-input"> <span class="fpd-label" data-defaulttext="Offset X">toolbar.shadow_offset_x</span> <fpd-range-slider class="fpd-progress" value="0" step="1" min="-100" max="100" data-control="shadowOffsetX"></fpd-range-slider> <input class="fpd-slider-number fpd-number" type="number" value="0" step="1" min="-100" max="100" data-control="shadowOffsetX"/> </div> <div class="fpd-tool-shadow-offsetY fpd-input"> <span class="fpd-label" data-defaulttext="Offset Y">toolbar.shadow_offset_y</span> <fpd-range-slider class="fpd-progress" value="0" step="1" min="-100" max="100" data-control="shadowOffsetY"></fpd-range-slider> <input class="fpd-slider-number fpd-number" type="number" value="0" step="1" min="-100" max="100" data-control="shadowOffsetY"/> </div> <div class="fpd-btn fpd-secondary fpd-remove-shadow" data-defaulttext="Remove Shadow">toolbar.remove_shadow</div> </div> </div> </div> <div class="fpd-panel-edit-text fpd-padding"> <textarea data-control="text"></textarea> </div> <div id="panel-text-size-data" class="fpd-panel-text-size fpd-padding"> <div class="fpd-tool-text-size fpd-input"> <span class="fpd-label" data-defaulttext="Font Size">toolbar.font_size</span> <fpd-range-slider class="fpd-progress" value="12" step="1" min="1" max="200" data-control="fontSize"></fpd-range-slider> <input class="fpd-slider-number fpd-number" type="number" value="12" step="1" min="1" max="200" data-control="fontSize"/> </div> <div class="fpd-tool-text-line-spacing fpd-input"> <span class="fpd-label" data-defaulttext="Line Spacing">toolbar.line_spacing</span> <fpd-range-slider class="fpd-progress" value="1" step="0.1" min="-2" max="3" data-control="lineHeight"></fpd-range-slider> <input class="fpd-slider-number fpd-number" type="number" value="1" step="0.1" min="-2" max="3" data-control="lineHeight"/> </div> <div class="fpd-tool-text-letter-spacing fpd-input"> <span class="fpd-label" data-defaulttext="Letter Spacing">toolbar.letter_spacing</span> <fpd-range-slider class="fpd-progress" value="0" step="1" min="-30" max="30" data-control="letterSpacing"></fpd-range-slider> <input class="fpd-slider-number fpd-number" type="number" value="0" step="1" min="-30" max="30" data-control="letterSpacing"/> </div> </div> <div class="fpd-panel-text-format fpd-padding"> <div class="fpd-tools-group"> <div class="fpd-tool-text-bold fpd-toggle" data-defaulttext="Bold" data-control="fontWeight" data-enabled="bold" data-disabled="normal" title="toolbar.bold"> <span class="fpd-icon-format-bold"></span> </div> <div class="fpd-tool-text-italic fpd-toggle" data-defaulttext="Italic" data-control="fontStyle" data-enabled="italic" data-disabled="normal" title="toolbar.italic"> <span class="fpd-icon-format-italic"></span> </div> <div class="fpd-tool-text-underline fpd-toggle" data-defaulttext="Underline" data-control="textDecoration" data-enabled="underline" data-disabled="normal" title="toolbar.underline"> <span class="fpd-icon-format-underline"></span> </div> <div class="fpd-tool-text-transform fpd-btn-options" data-control="textTransform" data-options=\'{"none": "fpd-icon-text-transform", "uppercase": "fpd-icon-uppercase", "lowercase": "fpd-icon-lowercase"}\' data-defaulttext="Text Transform" title="toolbar.text_transform"> <span class="fpd-icon-text-transform"></span> </div> </div> <div class="fpd-tool-text-align fpd-btn-group" data-control="textAlign"> <span class="fpd-icon-format-align-left" data-option="left"></span> <span class="fpd-icon-format-align-center" data-option="center"></span> <span class="fpd-icon-format-align-right" data-option="right"></span> <span class="fpd-icon-format-align-justify" data-option="justify"></span> </div> </div> <div class="fpd-panel-font-family fpd-padding" data-control="fontFamily"> <div class="flex items-center gap-0 border border-[#35475a33] border-solid !rounded-[8px]"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="min-w-[24px] text-black relative top-[-2px] ml-[8px]"><path fill="currentColor" d="M15.2 16.34a7.5 7.5 0 1 1 1.38-1.45l4.2 4.2a1 1 0 1 1-1.42 1.41l-4.16-4.16zm-4.7.16a6 6 0 1 0 0-12 6 6 0 0 0 0 12z"></path></svg><input class="border-none !border-0 p-1 px-3 !text-sm !mb-0 placeholder-gray-500 !shadow-none" type="text" data-defaulttext="Search" placeholder="toolbar.font_family_search"/></div> <div class="fpd-scroll-area"> <div class="fpd-fonts-list"></div> </div> </div> <div class="fpd-panel-curved-text fpd-padding"> <div class="fpd-curved-options"> <span data-value="normal"> <svg width="48" height="14" viewBox="0 0 48 14" fill="none" xmlns="http://www.w3.org/2000/svg"> <path d="M2.04787 13.327H0L4.60146 0.673004H6.83039L11.4318 13.327H9.38398L5.76899 2.97148H5.6691L2.04787 13.327ZM2.39126 8.37167H9.03434V9.97814H2.39126V8.37167Z" fill="#485563"/> <path d="M13.2784 13.327V0.673004H17.961C18.8684 0.673004 19.6197 0.821293 20.2149 1.11787C20.8101 1.41033 21.2555 1.80783 21.551 2.31036C21.8465 2.80878 21.9943 3.37104 21.9943 3.99715C21.9943 4.5244 21.8965 4.96926 21.7008 5.33175C21.5052 5.69011 21.243 5.97845 20.9142 6.19677C20.5895 6.41096 20.2315 6.56749 19.8403 6.66635V6.78992C20.2648 6.81052 20.679 6.94645 21.0827 7.19772C21.4906 7.44487 21.8278 7.79705 22.0942 8.25428C22.3606 8.7115 22.4938 9.26759 22.4938 9.92253C22.4938 10.5692 22.3398 11.15 22.0317 11.6649C21.7279 12.1757 21.2575 12.5814 20.6207 12.8821C19.9839 13.1787 19.1701 13.327 18.1795 13.327H13.2784ZM15.2076 11.6896H17.9922C18.9162 11.6896 19.578 11.5125 19.9776 11.1583C20.3772 10.804 20.577 10.3612 20.577 9.82985C20.577 9.43029 20.475 9.06369 20.2711 8.73004C20.0671 8.39639 19.7758 8.1307 19.397 7.93298C19.0224 7.73527 18.577 7.63641 18.0609 7.63641H15.2076V11.6896ZM15.2076 6.14734H17.7924C18.2253 6.14734 18.6145 6.06496 18.9599 5.90019C19.3096 5.73542 19.5864 5.50475 19.7903 5.20817C19.9984 4.90748 20.1025 4.55323 20.1025 4.14544C20.1025 3.62231 19.9173 3.18362 19.5468 2.82937C19.1764 2.47513 18.6082 2.298 17.8424 2.298H15.2076V6.14734Z" fill="#485563"/> <path d="M35.4022 4.78802H33.4542C33.3793 4.37611 33.2399 4.01362 33.0359 3.70057C32.8319 3.38752 32.5822 3.12183 32.2867 2.90352C31.9912 2.6852 31.6602 2.52044 31.294 2.40922C30.9318 2.298 30.5468 2.2424 30.1389 2.2424C29.4022 2.2424 28.7425 2.4257 28.1597 2.7923C27.5812 3.1589 27.1233 3.69645 26.7862 4.40494C26.4532 5.11343 26.2867 5.97845 26.2867 7C26.2867 8.02979 26.4532 8.89892 26.7862 9.60741C27.1233 10.3159 27.5832 10.8514 28.166 11.2139C28.7487 11.5764 29.4043 11.7576 30.1327 11.7576C30.5364 11.7576 30.9194 11.7041 31.2815 11.597C31.6478 11.4857 31.9787 11.323 32.2742 11.1088C32.5697 10.8946 32.8195 10.6331 33.0234 10.3241C33.2315 10.0111 33.3751 9.65273 33.4542 9.24905L35.4022 9.25523C35.2981 9.87722 35.0963 10.4498 34.7966 10.9729C34.501 11.4919 34.1202 11.9409 33.654 12.3199C33.192 12.6947 32.6634 12.9851 32.0682 13.1911C31.4729 13.397 30.8236 13.5 30.1202 13.5C29.013 13.5 28.0265 13.2405 27.1608 12.7215C26.295 12.1984 25.6124 11.4507 25.1129 10.4786C24.6176 9.5065 24.3699 8.34696 24.3699 7C24.3699 5.64892 24.6197 4.48939 25.1191 3.52139C25.6186 2.54927 26.3012 1.80371 27.167 1.2847C28.0328 0.761565 29.0172 0.5 30.1202 0.5C30.7986 0.5 31.4313 0.5968 32.0182 0.7904C32.6093 0.97988 33.14 1.25998 33.6103 1.6307C34.0806 1.99731 34.4698 2.44629 34.7778 2.97766C35.0858 3.50491 35.294 4.10837 35.4022 4.78802Z" fill="#485563"/> <path d="M41.8502 13.327H37.7107V0.673004H41.9813C43.2341 0.673004 44.3101 0.926331 45.2092 1.43299C46.1082 1.93552 46.7971 2.65843 47.2758 3.60171C47.7586 4.54087 48 5.66746 48 6.98146C48 8.29959 47.7565 9.43235 47.2695 10.3798C46.7867 11.3272 46.0874 12.0562 45.1717 12.567C44.256 13.0737 43.1488 13.327 41.8502 13.327ZM39.64 11.6587H41.744C42.718 11.6587 43.5276 11.4775 44.1727 11.115C44.8179 10.7484 45.3007 10.2191 45.6212 9.52709C45.9417 8.83096 46.102 7.98241 46.102 6.98146C46.102 5.98875 45.9417 5.14639 45.6212 4.45437C45.3049 3.76236 44.8325 3.23717 44.204 2.8788C43.5754 2.52044 42.795 2.34125 41.8626 2.34125H39.64V11.6587Z" fill="#485563"/> </svg> </span> <span data-value="curved"> <svg width="60" height="26" viewBox="0 0 60 26" fill="none" xmlns="http://www.w3.org/2000/svg"> <path d="M4.30362 19.2601L2.8934 20.2466L0 9.08293L1.5349 8.00919L10.7657 14.7396L9.35546 15.7261L1.90512 10.1456L1.83632 10.1938L4.30362 19.2601ZM2.16616 15.591L6.74076 12.3909L7.51036 13.5267L2.93577 16.7269L2.16616 15.591Z" fill="#485563"/> <path d="M17.9225 11.7765L15.7371 1.14353L19.5693 0.330317C20.3119 0.172734 20.9524 0.166864 21.4907 0.312707C22.0283 0.455088 22.4615 0.711755 22.7901 1.08271C23.1181 1.4502 23.3361 1.897 23.4442 2.42311C23.5353 2.86615 23.5321 3.25695 23.4346 3.59552C23.3364 3.93062 23.1716 4.21845 22.9401 4.459C22.7114 4.69537 22.4455 4.88907 22.1424 5.04008L22.1637 5.14392C22.5147 5.0875 22.8772 5.1298 23.251 5.27081C23.6275 5.40765 23.9642 5.64504 24.2612 5.98298C24.5582 6.32091 24.7632 6.76505 24.8763 7.31539C24.988 7.85881 24.9623 8.37359 24.7991 8.85974C24.6387 9.34171 24.3238 9.76433 23.8546 10.1276C23.3846 10.4874 22.7443 10.7533 21.9336 10.9254L17.9225 11.7765ZM19.2186 10.0656L21.4975 9.58204C22.2537 9.42157 22.7648 9.1578 23.0306 8.79074C23.2964 8.42367 23.3835 8.01689 23.2917 7.57039C23.2227 7.23465 23.0759 6.9443 22.8514 6.69936C22.6268 6.45442 22.3425 6.28177 21.9984 6.18141C21.6576 6.08032 21.2761 6.0746 20.8537 6.16423L18.5186 6.65975L19.2186 10.0656ZM18.2614 5.4085L20.3768 4.95961C20.7311 4.88443 21.0353 4.74762 21.2896 4.54917C21.5473 4.35 21.734 4.1081 21.8497 3.82347C21.9681 3.53466 21.9921 3.21892 21.9216 2.87625C21.8313 2.43667 21.6039 2.10021 21.2396 1.86688C20.8752 1.63355 20.3797 1.58338 19.7529 1.71639L17.5966 2.17395L18.2614 5.4085Z" fill="#485563"/> <path d="M43.1012 4.5657L41.5023 4.25126C41.5069 3.89201 41.4506 3.56401 41.3335 3.26726C41.2163 2.9705 41.054 2.70627 40.8464 2.47458C40.6389 2.24288 40.3938 2.05061 40.111 1.89775C39.8316 1.74557 39.5245 1.63655 39.1897 1.57071C38.5849 1.45179 38.014 1.49978 37.4768 1.71468C36.9431 1.93025 36.481 2.30938 36.0905 2.85206C35.7035 3.39541 35.428 4.09755 35.264 4.95849C35.0987 5.82637 35.0958 6.58574 35.2554 7.23659C35.4184 7.88811 35.71 8.41365 36.1301 8.81321C36.5502 9.21276 37.0592 9.47133 37.6571 9.58891C37.9885 9.65408 38.3114 9.67076 38.6258 9.63896C38.9443 9.60435 39.2421 9.52064 39.519 9.38783C39.796 9.25501 40.043 9.07488 40.26 8.84744C40.481 8.6172 40.6564 8.33836 40.7861 8.01091L42.3841 8.33056C42.1988 8.83796 41.9412 9.28792 41.6112 9.68042C41.2854 10.0701 40.9007 10.3871 40.4572 10.6312C40.0178 10.8725 39.5373 11.0319 39.0157 11.1094C38.494 11.1869 37.9445 11.1689 37.3671 11.0553C36.4584 10.8766 35.6903 10.4987 35.063 9.92152C34.4363 9.34089 33.996 8.60062 33.7421 7.70072C33.4916 6.80149 33.4745 5.78428 33.6907 4.64909C33.9076 3.51043 34.2987 2.57351 34.8641 1.83833C35.4301 1.09968 36.1101 0.581522 36.904 0.283862C37.6986 -0.0172703 38.5486 -0.0788126 39.454 0.0992351C40.0109 0.208751 40.5146 0.392457 40.9653 0.650354C41.42 0.90545 41.8107 1.22718 42.1372 1.61554C42.4644 2.00042 42.7118 2.44164 42.8793 2.93918C43.0475 3.43326 43.1215 3.97543 43.1012 4.5657Z" fill="#485563"/> <path d="M51.5599 16.7757L48.7094 14.7817L54.7715 5.8346L57.7123 7.89185C58.5751 8.49539 59.1947 9.19283 59.5711 9.98417C59.9494 10.7726 60.0775 11.6156 59.9552 12.5131C59.8378 13.4097 59.4643 14.3226 58.8348 15.2517C58.2033 16.1837 57.493 16.8673 56.7038 17.3025C55.9174 17.7398 55.0866 17.9185 54.2113 17.8385C53.338 17.7556 52.4542 17.4013 51.5599 16.7757ZM50.8371 14.5315L52.2861 15.5451C52.9568 16.0143 53.6011 16.2761 54.219 16.3306C54.8389 16.3822 55.425 16.2405 55.9772 15.9056C56.5314 15.5678 57.0483 15.0451 57.5278 14.3373C58.0034 13.6354 58.2966 12.9626 58.4074 12.319C58.5211 11.6773 58.4473 11.0784 58.1862 10.5222C57.9251 9.96604 57.4735 9.4634 56.8314 9.01425L55.3008 7.94352L50.8371 14.5315Z" fill="#485563"/> <path d="M57.0036 24.5816C53.8499 20.4523 49.8075 17.1117 45.1862 14.816C40.565 12.5203 35.4877 11.3305 30.3437 11.3379C25.1997 11.3453 20.1257 12.5496 15.5109 14.8585C10.896 17.1675 6.86285 20.5196 3.7207 24.658L5.4326 25.1704C8.37306 21.2977 12.1473 18.1607 16.466 16C20.7846 13.8393 25.5329 12.7123 30.3467 12.7054C35.1605 12.6984 39.9119 13.8119 44.2366 15.9602C48.5612 18.1085 52.3442 21.2347 55.2954 25.0989L57.0036 24.5816Z" fill="#485563"/> </svg> </span> <span data-value="curveReverse"> <svg width="54" height="25" viewBox="0 0 54 25" fill="none" xmlns="http://www.w3.org/2000/svg"> <path d="M54.0007 1.3373C50.9302 5.23068 46.9944 8.38039 42.495 10.5449C37.9956 12.7094 33.0522 13.8312 28.0439 13.8242C23.0356 13.8173 18.0954 12.6818 13.6023 10.5048C9.10912 8.32778 5.18233 5.16714 2.12305 1.26525L3.78979 0.747006C6.65271 4.39845 10.3275 7.35622 14.5322 9.39348C18.737 11.4307 23.36 12.4934 28.0469 12.4999C32.7337 12.5064 37.3598 11.4566 41.5704 9.43103C45.781 7.40546 49.4642 4.45791 52.3376 0.814432L54.0007 1.3373Z" fill="#485563"/> <path d="M1.37302 16.3375L0 15.4074L8.98733 9.06152L10.4818 10.0739L7.66465 20.5998L6.29163 19.6696L8.69804 11.1241L8.63106 11.0787L1.37302 16.3375ZM3.91457 13.19L8.36853 16.2073L7.61922 17.2783L3.16527 14.2609L3.91457 13.19Z" fill="#485563"/> <path d="M15.9304 23.9401L18.0582 13.9146L21.7893 14.6814C22.5123 14.83 23.086 15.0705 23.5104 15.4029C23.9355 15.7321 24.2236 16.1199 24.3745 16.5665C24.5262 17.0097 24.5494 17.4794 24.4441 17.9754C24.3554 18.3932 24.2027 18.7296 23.9859 18.9848C23.7697 19.2367 23.5123 19.4222 23.2136 19.5413C22.9189 19.6578 22.6073 19.7232 22.279 19.7375L22.2582 19.8354C22.593 19.9212 22.9001 20.0967 23.1796 20.3619C23.4631 20.6245 23.6725 20.9588 23.8079 21.3646C23.9432 21.7705 23.9559 22.2329 23.8457 22.7518C23.737 23.2641 23.5166 23.6991 23.1846 24.0566C22.8566 24.4115 22.4136 24.6559 21.8556 24.7899C21.2983 24.9206 20.625 24.9048 19.8356 24.7426L15.9304 23.9401ZM17.7429 22.9587L19.9617 23.4147C20.698 23.566 21.2551 23.534 21.6331 23.3188C22.011 23.1036 22.2447 22.7855 22.334 22.3645C22.4012 22.0479 22.3816 21.7408 22.2752 21.443C22.1688 21.1453 21.9813 20.8871 21.7128 20.6684C21.4475 20.4504 21.1093 20.2992 20.698 20.2147L18.4245 19.7475L17.7429 22.9587ZM18.6749 18.5677L20.7345 18.991C21.0794 19.0618 21.4033 19.0603 21.7063 18.9863C22.0126 18.913 22.272 18.7756 22.4843 18.574C22.7007 18.3699 22.8432 18.1062 22.9118 17.7832C22.9998 17.3687 22.9259 16.9908 22.6903 16.6495C22.4547 16.3082 22.0318 16.0748 21.4215 15.9494L19.3222 15.518L18.6749 18.5677Z" fill="#485563"/> <path d="M39.1873 17.1784L37.6305 17.4749C37.5063 17.159 37.3382 16.8922 37.1263 16.6744C36.9144 16.4567 36.6732 16.2836 36.403 16.1551C36.1327 16.0266 35.8425 15.9461 35.5323 15.9134C35.2256 15.8802 34.9092 15.8946 34.5832 15.9567C33.9944 16.0688 33.4958 16.3148 33.0874 16.6948C32.6824 17.0742 32.4005 17.571 32.2418 18.1853C32.0864 18.799 32.0885 19.5117 32.2482 20.3235C32.4091 21.1417 32.678 21.807 33.0549 22.3194C33.4351 22.831 33.8863 23.1865 34.4087 23.3859C34.931 23.5852 35.4832 23.6295 36.0654 23.5186C36.388 23.4572 36.6857 23.3563 36.9583 23.2161C37.2337 23.072 37.4727 22.8923 37.6754 22.6772C37.8781 22.462 38.0368 22.2161 38.1515 21.9396C38.2689 21.6592 38.3277 21.3525 38.3278 21.0197L39.8855 20.7282C39.8995 21.2383 39.8277 21.724 39.67 22.1853C39.5149 22.6427 39.2807 23.0574 38.9674 23.4295C38.6567 23.7977 38.2797 24.1089 37.8362 24.3631C37.3927 24.6174 36.8899 24.798 36.3277 24.9051C35.4429 25.0736 34.614 25.0175 33.841 24.7369C33.0673 24.4529 32.4049 23.9627 31.8538 23.2663C31.3061 22.5692 30.9269 21.6855 30.7164 20.6152C30.5052 19.5416 30.5236 18.5822 30.7715 17.737C31.0187 16.8885 31.4477 16.1921 32.0585 15.648C32.6686 15.1005 33.4144 14.7428 34.2959 14.575C34.8381 14.4717 35.3589 14.4523 35.8581 14.5168C36.3601 14.5775 36.828 14.7193 37.2618 14.9423C37.695 15.162 38.0762 15.4595 38.4054 15.8349C38.7339 16.207 38.9946 16.6548 39.1873 17.1784Z" fill="#485563"/> <path d="M51.4414 18.6799L48.666 20.5601L42.7638 12.1242L45.6271 10.1845C46.4671 9.61549 47.3066 9.29566 48.1457 9.22507C48.9829 9.15173 49.782 9.32077 50.5429 9.7322C51.3046 10.139 51.992 10.7804 52.6049 11.6564C53.2197 12.5351 53.5848 13.4009 53.7002 14.2536C53.8183 15.1045 53.6896 15.9082 53.3139 16.6646C52.9362 17.4183 52.3121 18.0901 51.4414 18.6799ZM49.1814 18.5717L50.5921 17.616C51.2451 17.1736 51.7034 16.6851 51.9668 16.1504C52.2284 15.613 52.3052 15.0408 52.1973 14.4339C52.0875 13.8242 51.7992 13.1858 51.3323 12.5185C50.8693 11.8567 50.3689 11.3679 49.8313 11.0521C49.2964 10.7345 48.7347 10.5989 48.1461 10.6455C47.5576 10.6921 46.9508 10.9271 46.3256 11.3506L44.8354 12.3601L49.1814 18.5717Z" fill="#485563"/> </svg> </span> </div> <div class="fpd-tool-curved-text-radius fpd-input"> <span class="fpd-label" data-defaulttext="Radius">toolbar.radius</span> <fpd-range-slider class="fpd-progress" value="80" step="1" min="0" max="400" data-control="curveRadius"></fpd-range-slider> <input class="fpd-slider-number fpd-number" type="number" value="80" step="1" min="0" max="400" data-control="curveRadius"/> </div> </div> <div class="fpd-panel-transform fpd-padding"> <div class="fpd-tool-angle fpd-input"> <span class="fpd-label" data-defaulttext="Rotate">toolbar.rotate</span> <fpd-range-slider class="fpd-progress" value="1" step="1" min="0" max="359" data-control="angle"></fpd-range-slider> <input class="fpd-slider-number fpd-number" type="number" value="1" step="1" min="0" max="359" data-control="angle"/> </div> <div class="fpd-tool-scaleX fpd-tool-scale fpd-input"> <span class="fpd-label" data-defaulttext="Scale X">toolbar.scaleX</span> <fpd-range-slider class="fpd-progress" value="1" step="0.01" min="0" max="5" data-control="scaleX"></fpd-range-slider> <input class="fpd-slider-number fpd-number" type="number" value="1" step="0.01" min="0" max="5" data-control="scaleX"/> </div> <div class="fpd-tool-uniscaling-locker fpd-tool-scale fpd-toggle" data-control="lockUniScaling" data-enabled="true" data-disabled="false"> <span class="fpd-icon-unlocked"></span> </div> <div class="fpd-tool-scaleY fpd-tool-scale fpd-input"> <span class="fpd-label" data-defaulttext="Scale Y">toolbar.scaleY</span> <fpd-range-slider class="fpd-progress" value="1" step="0.01" min="0" max="5" data-control="scaleY"></fpd-range-slider> <input class="fpd-slider-number fpd-number" type="number" value="1" step="0.01" min="0" max="5" data-control="scaleY"/> </div> <div class="fpd-tool-flip fpd-tools-group"> <div data-do="flip-x"> <span class="fpd-icon-flip-horizontal"></span> <span data-defaulttext="Flip Horizontal">toolbar.flip_h</span> </div> <div data-do="flip-y"> <span class="fpd-icon-flip-vertical"></span> <span data-defaulttext="Flip Vertical">toolbar.flip_v</span> </div> </div> </div> <div class="fpd-panel-position"> <div class="fpd-panel-tabs"> <span data-tab="align" data-defaulttext="Align">toolbar.align</span> <span data-tab="arrange" data-defaulttext="Arrange" class="fpd-active">toolbar.arrange</span> </div> <div class="fpd-panel-tabs-content fpd-scroll-area"> <div data-id="align"> <div class="fpd-tool-position-align fpd-tools-group"> <div data-do="align-top"> <span class="fpd-icon-align-top"></span> <span data-defaulttext="Top">toolbar.align_top</span> </div> <div data-do="align-middle"> <span class="fpd-icon-align-horizontal-middle"></span> <span data-defaulttext="Middle">toolbar.center_h</span> </div> <div data-do="align-bottom"> <span class="fpd-icon-align-bottom"></span> <span data-defaulttext="Bottom">toolbar.align_bottom</span> </div> <div data-do="align-left"> <span class="fpd-icon-align-left"></span> <span data-defaulttext="Left">toolbar.align_left</span> </div> <div data-do="align-center"> <span class="fpd-icon-align-vertical-middle"></span> <span data-defaulttext="Center">toolbar.center_v</span> </div> <div data-do="align-right"> <span class="fpd-icon-align-right"></span> <span data-defaulttext="Right">toolbar.align_right</span> </div> </div> </div> <div data-id="arrange"> <div class="fpd-tool-layer-depth fpd-tools-group"> <div data-do="layer-up"> <span class="fpd-icon-move-up"></span> <span data-defaulttext="Move Up">toolbar.move_up</span> </div> <div data-do="layer-down"> <span class="fpd-icon-move-down"></span> <span data-defaulttext="Move Down">toolbar.move_down</span> </div> </div> </div> </div> </div> <div class="fpd-panel-advanced-editing"> <div class="fpd-panel-tabs"> <span data-tab="filters" data-defaulttext="Filters" class="fpd-active">toolbar.filters</span> <span data-tab="crop" data-defaulttext="Crop">toolbar.crop</span> </div> <div class="fpd-panel-tabs-content"> <div data-id="filters"> <div class="fpd-tool-filters fpd-grid fpd-scroll-area fpd-padding"></div> </div> <div data-id="crop"> <div class="fpd-tool-crop-masks fpd-grid fpd-scroll-area fpd-padding"></div> </div> </div> </div> </div>'
+        '<div class="fpd-close-sub-panel"> <span class="fa-solid fa-close"></span>  </div> <div class="fpd-close"> <span class="fa-solid fa-close"></span> </div> <div class="fpd-tools-nav fpd-scroll-area"> <span id="fpd-opacity-btn" class=""> <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g fill="currentColor" fill-rule="evenodd"><path d="M3 2h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zm0 8h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1v-2a1 1 0 0 1 1-1zm0 8h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1v-2a1 1 0 0 1 1-1z"></path><path d="M11 2h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zm0 8h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1v-2a1 1 0 0 1 1-1zm0 8h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1v-2a1 1 0 0 1 1-1z" opacity=".45"></path><path d="M19 2h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zm0 8h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1v-2a1 1 0 0 1 1-1zm0 8h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1v-2a1 1 0 0 1 1-1z" opacity=".15"></path><path d="M7 6h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1zm0 8h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1v-2a1 1 0 0 1 1-1z" opacity=".7"></path><path d="M15 6h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1zm0 8h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1v-2a1 1 0 0 1 1-1z" opacity=".3"></path></g></svg> </span> <!-- 🔹 Opacity Slider Panel --> <div id="fpd-opacity-panel" class="fpd-opacity-panel fpd-tool-fill-opacity fpd-progress"> <input type="range" id="fpd-opacity-range" min="0" max="1" step="0.01" value="1"> </div><div class="fpd-primary-tools"><div class="fpd-tool-font-family" data-panel="font-family"> <fpd-dropdown placeholder=""></fpd-dropdown> <span class="fpd-icon-font"></span> <span class="fpd-label" data-defaulttext="Font">toolbar.font</span> </div> <div class="fpd-tool-edit-text" data-panel="edit-text"> <span class="fpd-icon-text-input"></span> <span class="fpd-label" data-defaulttext="Edit Text">toolbar.edit_text</span> </div> <div class="flex flex-plus-minus-icon fpd-hidden" id="minusCust"><button style="padding: 0px 2px;background:#fff;" class="fpd-tool-text-size-customize-icon minus" id="minusElement">-</button><div class="fpd-tool-text-size fpd-tool-text-size-customize" data-panel="text-size"> <input type="text" class="fpd-input"> <span class="fpd-icon-font-size"></span> <span class="fpd-label" data-defaulttext="Size & Spacing">toolbar.text_size_spacing</span></div><button class="fpd-tool-text-size-customize-icon plus" id="plusElement" style="padding: 0px 2px;background:#fff;">+</button></div> <div class="fpd-tool-color" data-panel="color"> <span class="fpd-current-fill"></span> <span class="fpd-label" data-defaulttext="Color">toolbar.color</span> </div></div> <div class="fpd-panel-text-format fpd-padding"><div class="fpd-tools-group flex !flex-row p-2"><div id="boldOutside" class="fpd-tool-text-bold fpd-toggle bold-outside" data-defaulttext="Bold" data-control="fontWeight" data-enabled="bold" data-disabled="normal" title="toolbar.bold"> <svg style="height:20px;" xmlns="http://www.w3.org/2000/svg" id="Layer_1" data-name="Layer 1"><defs><style>.cls-1 {fill: #6b6e73;}</style></defs><path class="cls-1" d="M15.55,11.52c-.26-.51-.64-.93-1.14-1.25-.35-.23-.76-.38-1.2-.5.64-.24,1.16-.59,1.57-1.08.52-.62.79-1.39.79-2.29,0-1.22-.43-2.17-1.3-2.86-.86-.69-2.08-1.03-3.66-1.03h-6.54v14.98h6.78c1.06,0,1.98-.16,2.74-.49.76-.33,1.35-.8,1.75-1.43.4-.63.61-1.38.61-2.26,0-.68-.13-1.28-.39-1.78ZM6.67,4.57h3.46c.94,0,1.63.18,2.09.54.46.36.69.9.69,1.6s-.23,1.24-.69,1.6c-.46.36-1.16.54-2.09.54h-3.46v-4.29ZM13.2,13.98c-.07.24-.18.45-.33.64-.15.18-.33.34-.55.46-.22.12-.48.21-.79.27-.3.06-.65.09-1.03.09h-3.82v-4.51h3.82c.38,0,.73.03,1.03.09.3.06.57.15.79.27.22.12.4.27.55.45.15.18.26.39.33.63.07.24.11.52.11.83s-.04.57-.11.81Z"/></svg> </div><div id="fontItalic" class="fpd-tool-text-italic fpd-toggle" data-defaulttext="Italic" data-control="fontStyle" data-enabled="italic" data-disabled="normal" title="Italic"> <svg xmlns="http://www.w3.org/2000/svg" id="Layer_1" data-name="Layer 1" style="height:20px;"><defs><style>.cls-1 {fill: #6b6e73;}</style></defs><polygon class="cls-1" points="16.21 3.53 16.21 2.53 7.99 2.53 7.99 3.53 11.43 3.53 7.53 16.47 3.79 16.47 3.79 17.47 12.01 17.47 12.01 16.47 8.57 16.47 12.47 3.53 16.21 3.53"/></svg> </div><div id="UnderlineText" class="fpd-tool-text-underline fpd-toggle" data-defaulttext="Underline" data-control="textDecoration" data-enabled="underline" data-disabled="normal" title="Underline"> <svg xmlns="http://www.w3.org/2000/svg" style="height:20px;" id="Layer_1" data-name="Layer 1" ><defs><style>.cls-1 {fill: #6b6e73;}</style></defs><path class="cls-1" d="M10.02,15.18c-1.64,0-2.89-.44-3.75-1.31-.86-.87-1.29-2.14-1.29-3.82V2.47h1.46v7.51c0,1.31.3,2.28.91,2.93s1.49.97,2.67.97,2.06-.32,2.65-.97.89-1.62.89-2.93V2.47h1.46v7.58c0,1.67-.42,2.94-1.27,3.82-.85.87-2.09,1.31-3.73,1.31Z"/><rect class="cls-1" x="5.07" y="16.53" width="9.85" height="1"/></svg> </div><div id="TextTransform" class="fpd-tool-text-transform fpd-btn-options" data-control="textTransform" data-options="{&quot;none&quot;: &quot;fpd-icon-text-transform&quot;, &quot;uppercase&quot;: &quot;fpd-icon-uppercase&quot;, &quot;lowercase&quot;: &quot;fpd-icon-lowercase&quot;}" data-defaulttext="Text Transform" title="Text Transform"> <span class="dd fpd-icon-text-transform tts"></span> </div><div class="extra-icon"><span title="letter-spacing" id="letter-spacing"><svg xmlns="http://www.w3.org/2000/svg" id="Layer_1" data-name="Layer 1" viewBox="0 0 19 19" style="width:30px;height:30px;"><defs><style>.cls-1 {fill: #6b6f73;}</style></defs><path class="cls-1" d="M14.7,1.29v3.17h-.31c-.18-.73-.39-1.26-.61-1.58-.23-.32-.53-.58-.93-.76-.22-.1-.6-.16-1.15-.16h-.87v9.04c0,.6.03.97.1,1.12.07.15.2.28.39.39s.46.17.79.17h.39v.32h-6.14v-.32h.39c.34,0,.61-.06.82-.18.15-.08.27-.22.35-.41.06-.14.1-.5.1-1.09V1.97h-.85c-.79,0-1.36.17-1.72.5-.5.47-.82,1.13-.95,2h-.33V1.29h10.53Z"/><rect class="cls-1" x="3.13" y="15.4" width="13.29" height="1"/><polygon class="cls-1" points=".39 15.9 3.53 17.71 3.53 14.09 .39 15.9"/><polygon class="cls-1" points="18.61 15.9 15.47 14.09 15.47 17.71 18.61 15.9"/></svg></span></div> <div id="textAlignCust" title="Text Align" class="fpd-tool-text-align fpd-btn-group" data-control="textAlign"> <span class="fpd-icon-format-align-left" data-option="left"></span></div><div title="Position" id="CenterTools" class="fpd-tool-position-align fpd-btn-group" data-control="textAlign"> <div data-do="align-center"> <span class="fpd-icon-align-vertical-middle"></span> </div></div> </div></div><div class="fpd-secondary-tools fpd-scroll-area" id="SecondaryIconBoxHeader"> <div class="fpd-tool-advanced-editing" data-panel="advanced-editing"> <span class="fpd-icon-effects"></span> <span class="fpd-label" data-defaulttext="Edit Image">toolbar.advanced_editing</span> </div><div class="fpd-tool-text-format" data-panel="text-format" title="Text Format"> <span class="fpd-icon-text-format"></span> <span class="fpd-label" data-defaulttext="Format">toolbar.text_format</span> </div> <div class="fpd-tool-transform" data-panel="transform" title="Transform"> <span class="fpd-icon-transform"></span> <span class="fpd-label" data-defaulttext="Transform">toolbar.transform</span> </div> <div class="fpd-tool-layer-depth fpd-tools-group"> <div data-do="layer-up" title="Move Up" id="TextMoveUp"> <svg xmlns="http://www.w3.org/2000/svg" id="Layer_1" data-name="Layer 1" viewBox="0 0 20 20"> <defs> <style> .cls-1 { fill: #6b6e73; } </style> </defs> <path class="cls-1" d="M3.02,10.81l6.99,4.63,6.98-4.63-6.48-3.76v-1.71h2.11L10,.81l-2.61,4.53h2.11v1.71l-6.48,3.76ZM15.09,10.87l-5.08,3.37-5.09-3.37,4.59-2.66v3.6h1v-3.61l4.59,2.66Z"/> <polygon class="cls-1" points="10.01 17.99 4.24 14.17 3.69 15 10.01 19.19 16.31 15 15.76 14.17 10.01 17.99"/> </svg> <span data-defaulttext="Move Up">toolbar.move_up</span> </div> <div data-do="layer-down" id="TextMoveDown"> <svg xmlns="http://www.w3.org/2000/svg" id="Layer_1" data-name="Layer 1" viewBox="0 0 20 20"> <defs> <style> .cls-1 { fill: #6b6e73; } </style> </defs> <path class="cls-1" d="M10.5,12.95l6.48-3.76-6.99-4.63-6.98,4.63,6.48,3.76v1.71h-2.11l2.61,4.53,2.61-4.53h-2.11v-1.71ZM4.91,9.13l5.08-3.37,5.09,3.37-4.59,2.66v-3.6h-1v3.61l-4.59-2.66Z"/> <polygon class="cls-1" points="9.99 2.01 15.76 5.83 16.31 5 9.99 .81 3.69 5 4.24 5.83 9.99 2.01"/> </svg> <span data-defaulttext="Move Down">toolbar.move_down</span> </div> </div> <div class="fpd-tool-position" data-panel="position" title="Position"> <span class="fpd-icon-align-vertical-middle"></span> <span class="fpd-label" data-defaulttext="Position">toolbar.position</span> </div> <div class="fpd-tool-curved-text" data-panel="curved-text" title="Curved Text"> <span class="fpd-icon-curved-text"></span> <span class="fpd-label" data-defaulttext="Curved Text">toolbar.curved_text</span> </div><div class="fpd-ungroup1 items-center fpd-hidden"><span style="min-width:20px;"><svg xmlns="http://www.w3.org/2000/svg" id="Layer_1" data-name="Layer 1" viewBox="0 0 20 20"> <rect class="cls-1" x="3.01" y="2.94" width="4.66" height="4.66"/> <rect class="cls-1" x="3.01" y="12.53" width="4.66" height="4.66"/> <rect class="cls-1" x="12.33" y="12.53" width="4.66" height="4.66"/> <rect class="cls-1" x="12.33" y="2.81" width="4.66" height="4.66"/> </svg></span><span class="fpd-label">Ungroup Text</span></div><div class="!flex-row !ml-0 !mr-0 border-none !border-[#d7dade] !border-solid rounded !px-0 !py-[2px] groupby-text" style="border-style:solid;"><div class="fpd-group-copy-by items-center fpd-hidden" title="Copy Group"><svg xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg" fill="#000000" width="22" height="22" viewBox="0 0 32 32"><path d="M 4 4 L 4 24 L 11 24 L 11 22 L 6 22 L 6 6 L 18 6 L 18 7 L 20 7 L 20 4 Z M 12 8 L 12 28 L 28 28 L 28 8 Z M 14 10 L 26 10 L 26 26 L 14 26 Z"></path></svg></div><div class="fpd-group-paste-by items-center fpd-hidden" title="Paste Group"><svg xmlns="http://www.w3.org/2000/svg" id="Layer_1" data-name="Layer 1" width="22" height="22" viewBox="0 0 20 20"><defs><style>.cls-1 {fill: #6b6e73;}</style></defs><path class="cls-1" d="M11.91,16.25l-2.98-2.98.98-.98,2,2,3.96-3.96.98.98-4.94,4.94ZM15.76,9.3h-1.4v-3.5h-1.4v2.1h-7.01v-2.1h-1.4v9.81h4.2v1.4h-4.2c-.39,0-.72-.14-.99-.41-.27-.27-.41-.6-.41-.99V5.8c0-.39.14-.72.41-.99.27-.27.6-.41.99-.41h2.92c.13-.41.38-.74.75-1.01s.78-.39,1.23-.39c.47,0,.88.13,1.25.39s.62.6.74,1.01h2.91c.39,0,.72.14.99.41s.41.6.41.99v3.5ZM9.46,5.8c.2,0,.36-.07.5-.2.13-.13.2-.3.2-.5s-.07-.36-.2-.5c-.13-.13-.3-.2-.5-.2s-.36.07-.5.2-.2.3-.2.5.07.36.2.5.3.2.5.2Z"></path></svg></div></div> <div class="fpd-tool-remove-bg"> <span class="fpd-icon-remove-bg"></span> <span class="fpd-label" data-defaulttext="Remove Background">toolbar.remove_background</span> </div><div class="fpd-tool-fill-opacity fpd-input"> <fpd-range-slider class="fpd-progress" value="1" step="0.01" min="0" max="1" data-control="opacity"></fpd-range-slider> <input class="fpd-slider-number fpd-number" type="number" value="1" step="0.01" min="0" max="1" data-control="opacity"/> </div> <div class="fpd-tool-reset flex flex-col" data-action="reset-product" title="Reset"> <span class="fpd-icon-reset"></span> <span class="fpd-label" data-defaulttext="Reset">toolbar.reset</span></div> <div class="fpd-ungroup items-center"><span title="Group Text" style="min-width:20px;"><svg xmlns="http://www.w3.org/2000/svg" id="Layer_1" data-name="Layer 1" viewBox="0 0 20 20"> <rect class="cls-1" x="3.01" y="2.94" width="4.66" height="4.66"/> <rect class="cls-1" x="3.01" y="12.53" width="4.66" height="4.66"/> <rect class="cls-1" x="12.33" y="12.53" width="4.66" height="4.66"/> <rect class="cls-1" x="12.33" y="2.81" width="4.66" height="4.66"/> <rect class="cls-1" x="7.67" y="7.6" width="4.66" height="4.66"/> </svg></span><span class="fpd-label">Group Text</span></div><div class="!flex-row !ml-0 !mr-0 border !border-[#d7dade] rounded !px-0 !py-[2px] extra-icon-main-div-box" style="border-style:solid;"><div class="extra-icon"><span id="copytext"><svg xmlns="http://www.w3.org/2000/svg" id="Layer_1" data-name="Layer 1" viewBox="0 0 20 20" width="22" height="22"><defs><style>.cls-1 {fill: #6b6e73;}</style></defs><polygon class="cls-1" points="8.32 12.78 3.81 12.78 3.81 2.67 12.83 2.67 12.83 7.72 11.83 7.72 11.83 3.67 4.81 3.67 4.81 11.78 8.32 11.78 8.32 12.78"/><polygon class="cls-1" points="16.19 17.33 7.17 17.33 7.17 14.22 8.17 14.22 8.17 16.33 15.19 16.33 15.19 8.22 8.17 8.22 8.17 10.33 7.17 10.33 7.17 7.22 16.19 7.22 16.19 17.33"/><polygon class="cls-1" points="10.41 12.28 8.19 11 8.19 13.56 10.41 12.28"/></svg></span></div><div class="extra-icon"><span id="pastetext"><svg xmlns="http://www.w3.org/2000/svg" id="Layer_1" data-name="Layer 1" width="22" height="22" viewBox="0 0 20 20"><defs><style>.cls-1 {fill: #6b6e73;}</style></defs><path class="cls-1" d="M11.91,16.25l-2.98-2.98.98-.98,2,2,3.96-3.96.98.98-4.94,4.94ZM15.76,9.3h-1.4v-3.5h-1.4v2.1h-7.01v-2.1h-1.4v9.81h4.2v1.4h-4.2c-.39,0-.72-.14-.99-.41-.27-.27-.41-.6-.41-.99V5.8c0-.39.14-.72.41-.99.27-.27.6-.41.99-.41h2.92c.13-.41.38-.74.75-1.01s.78-.39,1.23-.39c.47,0,.88.13,1.25.39s.62.6.74,1.01h2.91c.39,0,.72.14.99.41s.41.6.41.99v3.5ZM9.46,5.8c.2,0,.36-.07.5-.2.13-.13.2-.3.2-.5s-.07-.36-.2-.5c-.13-.13-.3-.2-.5-.2s-.36.07-.5.2-.2.3-.2.5.07.36.2.5.3.2.5.2Z"/></svg></span></div></div><div class="fpd-tool-duplicate"> <span class="fpd-icon-copy"></span> <span class="fpd-label" data-defaulttext="Duplicate">toolbar.duplicate</span> </div> <div class="fpd-tool-remove flex flex-col"> <svg xmlns="http://www.w3.org/2000/svg" id="Layer_1" data-name="Layer 1" viewBox="0 0 20 20" width="22" height="22"><defs><style>.cls-1 {fill: #6b6e73;}</style></defs><path class="cls-1" d="M14.81,17.55H5.19c-.28,0-.5-.22-.5-.5V5.88c0-.28.22-.5.5-.5h9.61c.28,0,.5.22.5.5v11.17c0,.28-.22.5-.5.5ZM5.69,16.55h8.61V6.38H5.69v10.17Z"/><rect class="cls-1" x="3.67" y="3.67" width="12.67" height="1"/><rect class="cls-1" x="7.35" y="2.45" width="5.31" height="1.44"/></svg> <span class="fpd-label" data-defaulttext="Remove">toolbar.remove</span> </div> </div> </div> <div class="fpd-sub-panel"> <div class="fpd-panel-color"> <div class="fpd-panel-tabs"> <span data-tab="fill" data-defaulttext="Fill" class="fpd-active">toolbar.fill</span> <span data-tab="stroke" data-defaulttext="Stroke" class="fpd-tool-text-stroke">toolbar.stroke</span> <span data-tab="shadow" data-defaulttext="Shadow" class="fpd-tool-text-shadow">toolbar.shadow</span> </div> <div class="fpd-panel-tabs-content fpd-scroll-area"> <div data-id="fill" class="fpd-active"> <div class="fpd-color-wrapper"></div> <div class="fpd-tool-fill-opacity fpd-input"> <span class="fpd-label" data-defaulttext="Transparency">toolbar.transparency</span> <fpd-range-slider class="fpd-progress" value="1" step="0.01" min="0" max="1" data-control="opacity"></fpd-range-slider> <input class="fpd-slider-number fpd-number" type="number" value="1" step="0.01" min="0" max="1" data-control="opacity"/> </div> </div> <div data-id="stroke"> <div class="fpd-stroke-color-wrapper"></div> <div class="fpd-tool-stroke-width fpd-input"> <span class="fpd-label" data-defaulttext="Stroke Width">toolbar.stroke_width</span> <fpd-range-slider class="fpd-progress" value="0" step="1" min="0" max="20" data-control="strokeWidth"></fpd-range-slider> <input class="fpd-slider-number fpd-number" type="number" value="0" step="1" min="0" max="20" data-control="strokeWidth"/> </div> </div> <div data-id="shadow"> <div class="fpd-shadow-color-wrapper"></div> <div class="fpd-tool-shadow-blur fpd-input"> <span class="fpd-label" data-defaulttext="Blur">toolbar.shadow_blur</span> <fpd-range-slider class="fpd-progress" value="0" step="1" min="0" max="200" data-control="shadowBlur"></fpd-range-slider> <input class="fpd-slider-number fpd-number" type="number" value="0" step="1" min="0" max="200" data-control="shadowBlur"/> </div> <div class="fpd-tool-shadow-offsetX fpd-input"> <span class="fpd-label" data-defaulttext="Offset X">toolbar.shadow_offset_x</span> <fpd-range-slider class="fpd-progress" value="0" step="1" min="-100" max="100" data-control="shadowOffsetX"></fpd-range-slider> <input class="fpd-slider-number fpd-number" type="number" value="0" step="1" min="-100" max="100" data-control="shadowOffsetX"/> </div> <div class="fpd-tool-shadow-offsetY fpd-input"> <span class="fpd-label" data-defaulttext="Offset Y">toolbar.shadow_offset_y</span> <fpd-range-slider class="fpd-progress" value="0" step="1" min="-100" max="100" data-control="shadowOffsetY"></fpd-range-slider> <input class="fpd-slider-number fpd-number" type="number" value="0" step="1" min="-100" max="100" data-control="shadowOffsetY"/> </div> <div class="fpd-btn fpd-secondary fpd-remove-shadow" data-defaulttext="Remove Shadow">toolbar.remove_shadow</div> </div> </div> </div> <div class="fpd-panel-edit-text fpd-padding"> <textarea data-control="text"></textarea> </div> <div id="panel-text-size-data" class="fpd-panel-text-size fpd-padding"> <div class="fpd-tool-text-size fpd-input"> <span class="fpd-label" data-defaulttext="Font Size">toolbar.font_size</span> <fpd-range-slider class="fpd-progress" value="12" step="1" min="1" max="200" data-control="fontSize"></fpd-range-slider> <input class="fpd-slider-number fpd-number" type="number" value="12" step="1" min="1" max="200" data-control="fontSize"/> </div> <div class="fpd-tool-text-line-spacing fpd-input"> <span class="fpd-label" data-defaulttext="Line Spacing">toolbar.line_spacing</span> <fpd-range-slider class="fpd-progress" value="1" step="0.1" min="-2" max="3" data-control="lineHeight"></fpd-range-slider> <input class="fpd-slider-number fpd-number" type="number" value="1" step="0.1" min="-2" max="3" data-control="lineHeight"/> </div> <div class="fpd-tool-text-letter-spacing fpd-input"> <span class="fpd-label" data-defaulttext="Letter Spacing">toolbar.letter_spacing</span> <fpd-range-slider class="fpd-progress" value="0" step="1" min="-30" max="30" data-control="letterSpacing"></fpd-range-slider> <input class="fpd-slider-number fpd-number" type="number" value="0" step="1" min="-30" max="30" data-control="letterSpacing"/> </div> </div> <div class="fpd-panel-text-format fpd-padding"> <div class="fpd-tools-group"> <div class="fpd-tool-text-bold fpd-toggle" data-defaulttext="Bold" data-control="fontWeight" data-enabled="bold" data-disabled="normal" title="toolbar.bold"> <span class="fpd-icon-format-bold"></span> </div> <div class="fpd-tool-text-italic fpd-toggle" data-defaulttext="Italic" data-control="fontStyle" data-enabled="italic" data-disabled="normal" title="toolbar.italic"> <span class="fpd-icon-format-italic"></span> </div> <div class="fpd-tool-text-underline fpd-toggle" data-defaulttext="Underline" data-control="textDecoration" data-enabled="underline" data-disabled="normal" title="toolbar.underline"> <span class="fpd-icon-format-underline"></span> </div> <div class="fpd-tool-text-transform fpd-btn-options" data-control="textTransform" data-options=\'{"none": "fpd-icon-text-transform", "uppercase": "fpd-icon-uppercase", "lowercase": "fpd-icon-lowercase"}\' data-defaulttext="Text Transform" title="toolbar.text_transform"> <span class="fpd-icon-text-transform tsst"></span> </div> </div> <div class="fpd-tool-text-align fpd-btn-group" data-control="textAlign"> <span class="fpd-icon-format-align-left" data-option="left"></span> <span class="fpd-icon-format-align-center" data-option="center"></span> <span class="fpd-icon-format-align-right" data-option="right"></span> <span class="fpd-icon-format-align-justify" data-option="justify"></span> </div> </div> <div class="fpd-panel-font-family fpd-padding" data-control="fontFamily"> <div class="flex items-center gap-0 border border-[#35475a33] border-solid !rounded-[8px]"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="min-w-[24px] text-black relative top-[-2px] ml-[8px]"><path fill="currentColor" d="M15.2 16.34a7.5 7.5 0 1 1 1.38-1.45l4.2 4.2a1 1 0 1 1-1.42 1.41l-4.16-4.16zm-4.7.16a6 6 0 1 0 0-12 6 6 0 0 0 0 12z"></path></svg><input class="border-none !border-0 p-1 px-3 !text-sm !mb-0 placeholder-gray-500 !shadow-none" type="text" data-defaulttext="Search" placeholder="toolbar.font_family_search"/></div> <div class="fpd-scroll-area"> <div class="fpd-fonts-list"></div> </div> </div> <div class="fpd-panel-curved-text fpd-padding"> <div class="fpd-curved-options"> <span data-value="normal"> <svg width="48" height="14" viewBox="0 0 48 14" fill="none" xmlns="http://www.w3.org/2000/svg"> <path d="M2.04787 13.327H0L4.60146 0.673004H6.83039L11.4318 13.327H9.38398L5.76899 2.97148H5.6691L2.04787 13.327ZM2.39126 8.37167H9.03434V9.97814H2.39126V8.37167Z" fill="#485563"/> <path d="M13.2784 13.327V0.673004H17.961C18.8684 0.673004 19.6197 0.821293 20.2149 1.11787C20.8101 1.41033 21.2555 1.80783 21.551 2.31036C21.8465 2.80878 21.9943 3.37104 21.9943 3.99715C21.9943 4.5244 21.8965 4.96926 21.7008 5.33175C21.5052 5.69011 21.243 5.97845 20.9142 6.19677C20.5895 6.41096 20.2315 6.56749 19.8403 6.66635V6.78992C20.2648 6.81052 20.679 6.94645 21.0827 7.19772C21.4906 7.44487 21.8278 7.79705 22.0942 8.25428C22.3606 8.7115 22.4938 9.26759 22.4938 9.92253C22.4938 10.5692 22.3398 11.15 22.0317 11.6649C21.7279 12.1757 21.2575 12.5814 20.6207 12.8821C19.9839 13.1787 19.1701 13.327 18.1795 13.327H13.2784ZM15.2076 11.6896H17.9922C18.9162 11.6896 19.578 11.5125 19.9776 11.1583C20.3772 10.804 20.577 10.3612 20.577 9.82985C20.577 9.43029 20.475 9.06369 20.2711 8.73004C20.0671 8.39639 19.7758 8.1307 19.397 7.93298C19.0224 7.73527 18.577 7.63641 18.0609 7.63641H15.2076V11.6896ZM15.2076 6.14734H17.7924C18.2253 6.14734 18.6145 6.06496 18.9599 5.90019C19.3096 5.73542 19.5864 5.50475 19.7903 5.20817C19.9984 4.90748 20.1025 4.55323 20.1025 4.14544C20.1025 3.62231 19.9173 3.18362 19.5468 2.82937C19.1764 2.47513 18.6082 2.298 17.8424 2.298H15.2076V6.14734Z" fill="#485563"/> <path d="M35.4022 4.78802H33.4542C33.3793 4.37611 33.2399 4.01362 33.0359 3.70057C32.8319 3.38752 32.5822 3.12183 32.2867 2.90352C31.9912 2.6852 31.6602 2.52044 31.294 2.40922C30.9318 2.298 30.5468 2.2424 30.1389 2.2424C29.4022 2.2424 28.7425 2.4257 28.1597 2.7923C27.5812 3.1589 27.1233 3.69645 26.7862 4.40494C26.4532 5.11343 26.2867 5.97845 26.2867 7C26.2867 8.02979 26.4532 8.89892 26.7862 9.60741C27.1233 10.3159 27.5832 10.8514 28.166 11.2139C28.7487 11.5764 29.4043 11.7576 30.1327 11.7576C30.5364 11.7576 30.9194 11.7041 31.2815 11.597C31.6478 11.4857 31.9787 11.323 32.2742 11.1088C32.5697 10.8946 32.8195 10.6331 33.0234 10.3241C33.2315 10.0111 33.3751 9.65273 33.4542 9.24905L35.4022 9.25523C35.2981 9.87722 35.0963 10.4498 34.7966 10.9729C34.501 11.4919 34.1202 11.9409 33.654 12.3199C33.192 12.6947 32.6634 12.9851 32.0682 13.1911C31.4729 13.397 30.8236 13.5 30.1202 13.5C29.013 13.5 28.0265 13.2405 27.1608 12.7215C26.295 12.1984 25.6124 11.4507 25.1129 10.4786C24.6176 9.5065 24.3699 8.34696 24.3699 7C24.3699 5.64892 24.6197 4.48939 25.1191 3.52139C25.6186 2.54927 26.3012 1.80371 27.167 1.2847C28.0328 0.761565 29.0172 0.5 30.1202 0.5C30.7986 0.5 31.4313 0.5968 32.0182 0.7904C32.6093 0.97988 33.14 1.25998 33.6103 1.6307C34.0806 1.99731 34.4698 2.44629 34.7778 2.97766C35.0858 3.50491 35.294 4.10837 35.4022 4.78802Z" fill="#485563"/> <path d="M41.8502 13.327H37.7107V0.673004H41.9813C43.2341 0.673004 44.3101 0.926331 45.2092 1.43299C46.1082 1.93552 46.7971 2.65843 47.2758 3.60171C47.7586 4.54087 48 5.66746 48 6.98146C48 8.29959 47.7565 9.43235 47.2695 10.3798C46.7867 11.3272 46.0874 12.0562 45.1717 12.567C44.256 13.0737 43.1488 13.327 41.8502 13.327ZM39.64 11.6587H41.744C42.718 11.6587 43.5276 11.4775 44.1727 11.115C44.8179 10.7484 45.3007 10.2191 45.6212 9.52709C45.9417 8.83096 46.102 7.98241 46.102 6.98146C46.102 5.98875 45.9417 5.14639 45.6212 4.45437C45.3049 3.76236 44.8325 3.23717 44.204 2.8788C43.5754 2.52044 42.795 2.34125 41.8626 2.34125H39.64V11.6587Z" fill="#485563"/> </svg> </span> <span data-value="curved"> <svg width="60" height="26" viewBox="0 0 60 26" fill="none" xmlns="http://www.w3.org/2000/svg"> <path d="M4.30362 19.2601L2.8934 20.2466L0 9.08293L1.5349 8.00919L10.7657 14.7396L9.35546 15.7261L1.90512 10.1456L1.83632 10.1938L4.30362 19.2601ZM2.16616 15.591L6.74076 12.3909L7.51036 13.5267L2.93577 16.7269L2.16616 15.591Z" fill="#485563"/> <path d="M17.9225 11.7765L15.7371 1.14353L19.5693 0.330317C20.3119 0.172734 20.9524 0.166864 21.4907 0.312707C22.0283 0.455088 22.4615 0.711755 22.7901 1.08271C23.1181 1.4502 23.3361 1.897 23.4442 2.42311C23.5353 2.86615 23.5321 3.25695 23.4346 3.59552C23.3364 3.93062 23.1716 4.21845 22.9401 4.459C22.7114 4.69537 22.4455 4.88907 22.1424 5.04008L22.1637 5.14392C22.5147 5.0875 22.8772 5.1298 23.251 5.27081C23.6275 5.40765 23.9642 5.64504 24.2612 5.98298C24.5582 6.32091 24.7632 6.76505 24.8763 7.31539C24.988 7.85881 24.9623 8.37359 24.7991 8.85974C24.6387 9.34171 24.3238 9.76433 23.8546 10.1276C23.3846 10.4874 22.7443 10.7533 21.9336 10.9254L17.9225 11.7765ZM19.2186 10.0656L21.4975 9.58204C22.2537 9.42157 22.7648 9.1578 23.0306 8.79074C23.2964 8.42367 23.3835 8.01689 23.2917 7.57039C23.2227 7.23465 23.0759 6.9443 22.8514 6.69936C22.6268 6.45442 22.3425 6.28177 21.9984 6.18141C21.6576 6.08032 21.2761 6.0746 20.8537 6.16423L18.5186 6.65975L19.2186 10.0656ZM18.2614 5.4085L20.3768 4.95961C20.7311 4.88443 21.0353 4.74762 21.2896 4.54917C21.5473 4.35 21.734 4.1081 21.8497 3.82347C21.9681 3.53466 21.9921 3.21892 21.9216 2.87625C21.8313 2.43667 21.6039 2.10021 21.2396 1.86688C20.8752 1.63355 20.3797 1.58338 19.7529 1.71639L17.5966 2.17395L18.2614 5.4085Z" fill="#485563"/> <path d="M43.1012 4.5657L41.5023 4.25126C41.5069 3.89201 41.4506 3.56401 41.3335 3.26726C41.2163 2.9705 41.054 2.70627 40.8464 2.47458C40.6389 2.24288 40.3938 2.05061 40.111 1.89775C39.8316 1.74557 39.5245 1.63655 39.1897 1.57071C38.5849 1.45179 38.014 1.49978 37.4768 1.71468C36.9431 1.93025 36.481 2.30938 36.0905 2.85206C35.7035 3.39541 35.428 4.09755 35.264 4.95849C35.0987 5.82637 35.0958 6.58574 35.2554 7.23659C35.4184 7.88811 35.71 8.41365 36.1301 8.81321C36.5502 9.21276 37.0592 9.47133 37.6571 9.58891C37.9885 9.65408 38.3114 9.67076 38.6258 9.63896C38.9443 9.60435 39.2421 9.52064 39.519 9.38783C39.796 9.25501 40.043 9.07488 40.26 8.84744C40.481 8.6172 40.6564 8.33836 40.7861 8.01091L42.3841 8.33056C42.1988 8.83796 41.9412 9.28792 41.6112 9.68042C41.2854 10.0701 40.9007 10.3871 40.4572 10.6312C40.0178 10.8725 39.5373 11.0319 39.0157 11.1094C38.494 11.1869 37.9445 11.1689 37.3671 11.0553C36.4584 10.8766 35.6903 10.4987 35.063 9.92152C34.4363 9.34089 33.996 8.60062 33.7421 7.70072C33.4916 6.80149 33.4745 5.78428 33.6907 4.64909C33.9076 3.51043 34.2987 2.57351 34.8641 1.83833C35.4301 1.09968 36.1101 0.581522 36.904 0.283862C37.6986 -0.0172703 38.5486 -0.0788126 39.454 0.0992351C40.0109 0.208751 40.5146 0.392457 40.9653 0.650354C41.42 0.90545 41.8107 1.22718 42.1372 1.61554C42.4644 2.00042 42.7118 2.44164 42.8793 2.93918C43.0475 3.43326 43.1215 3.97543 43.1012 4.5657Z" fill="#485563"/> <path d="M51.5599 16.7757L48.7094 14.7817L54.7715 5.8346L57.7123 7.89185C58.5751 8.49539 59.1947 9.19283 59.5711 9.98417C59.9494 10.7726 60.0775 11.6156 59.9552 12.5131C59.8378 13.4097 59.4643 14.3226 58.8348 15.2517C58.2033 16.1837 57.493 16.8673 56.7038 17.3025C55.9174 17.7398 55.0866 17.9185 54.2113 17.8385C53.338 17.7556 52.4542 17.4013 51.5599 16.7757ZM50.8371 14.5315L52.2861 15.5451C52.9568 16.0143 53.6011 16.2761 54.219 16.3306C54.8389 16.3822 55.425 16.2405 55.9772 15.9056C56.5314 15.5678 57.0483 15.0451 57.5278 14.3373C58.0034 13.6354 58.2966 12.9626 58.4074 12.319C58.5211 11.6773 58.4473 11.0784 58.1862 10.5222C57.9251 9.96604 57.4735 9.4634 56.8314 9.01425L55.3008 7.94352L50.8371 14.5315Z" fill="#485563"/> <path d="M57.0036 24.5816C53.8499 20.4523 49.8075 17.1117 45.1862 14.816C40.565 12.5203 35.4877 11.3305 30.3437 11.3379C25.1997 11.3453 20.1257 12.5496 15.5109 14.8585C10.896 17.1675 6.86285 20.5196 3.7207 24.658L5.4326 25.1704C8.37306 21.2977 12.1473 18.1607 16.466 16C20.7846 13.8393 25.5329 12.7123 30.3467 12.7054C35.1605 12.6984 39.9119 13.8119 44.2366 15.9602C48.5612 18.1085 52.3442 21.2347 55.2954 25.0989L57.0036 24.5816Z" fill="#485563"/> </svg> </span> <span data-value="curveReverse"> <svg width="54" height="25" viewBox="0 0 54 25" fill="none" xmlns="http://www.w3.org/2000/svg"> <path d="M54.0007 1.3373C50.9302 5.23068 46.9944 8.38039 42.495 10.5449C37.9956 12.7094 33.0522 13.8312 28.0439 13.8242C23.0356 13.8173 18.0954 12.6818 13.6023 10.5048C9.10912 8.32778 5.18233 5.16714 2.12305 1.26525L3.78979 0.747006C6.65271 4.39845 10.3275 7.35622 14.5322 9.39348C18.737 11.4307 23.36 12.4934 28.0469 12.4999C32.7337 12.5064 37.3598 11.4566 41.5704 9.43103C45.781 7.40546 49.4642 4.45791 52.3376 0.814432L54.0007 1.3373Z" fill="#485563"/> <path d="M1.37302 16.3375L0 15.4074L8.98733 9.06152L10.4818 10.0739L7.66465 20.5998L6.29163 19.6696L8.69804 11.1241L8.63106 11.0787L1.37302 16.3375ZM3.91457 13.19L8.36853 16.2073L7.61922 17.2783L3.16527 14.2609L3.91457 13.19Z" fill="#485563"/> <path d="M15.9304 23.9401L18.0582 13.9146L21.7893 14.6814C22.5123 14.83 23.086 15.0705 23.5104 15.4029C23.9355 15.7321 24.2236 16.1199 24.3745 16.5665C24.5262 17.0097 24.5494 17.4794 24.4441 17.9754C24.3554 18.3932 24.2027 18.7296 23.9859 18.9848C23.7697 19.2367 23.5123 19.4222 23.2136 19.5413C22.9189 19.6578 22.6073 19.7232 22.279 19.7375L22.2582 19.8354C22.593 19.9212 22.9001 20.0967 23.1796 20.3619C23.4631 20.6245 23.6725 20.9588 23.8079 21.3646C23.9432 21.7705 23.9559 22.2329 23.8457 22.7518C23.737 23.2641 23.5166 23.6991 23.1846 24.0566C22.8566 24.4115 22.4136 24.6559 21.8556 24.7899C21.2983 24.9206 20.625 24.9048 19.8356 24.7426L15.9304 23.9401ZM17.7429 22.9587L19.9617 23.4147C20.698 23.566 21.2551 23.534 21.6331 23.3188C22.011 23.1036 22.2447 22.7855 22.334 22.3645C22.4012 22.0479 22.3816 21.7408 22.2752 21.443C22.1688 21.1453 21.9813 20.8871 21.7128 20.6684C21.4475 20.4504 21.1093 20.2992 20.698 20.2147L18.4245 19.7475L17.7429 22.9587ZM18.6749 18.5677L20.7345 18.991C21.0794 19.0618 21.4033 19.0603 21.7063 18.9863C22.0126 18.913 22.272 18.7756 22.4843 18.574C22.7007 18.3699 22.8432 18.1062 22.9118 17.7832C22.9998 17.3687 22.9259 16.9908 22.6903 16.6495C22.4547 16.3082 22.0318 16.0748 21.4215 15.9494L19.3222 15.518L18.6749 18.5677Z" fill="#485563"/> <path d="M39.1873 17.1784L37.6305 17.4749C37.5063 17.159 37.3382 16.8922 37.1263 16.6744C36.9144 16.4567 36.6732 16.2836 36.403 16.1551C36.1327 16.0266 35.8425 15.9461 35.5323 15.9134C35.2256 15.8802 34.9092 15.8946 34.5832 15.9567C33.9944 16.0688 33.4958 16.3148 33.0874 16.6948C32.6824 17.0742 32.4005 17.571 32.2418 18.1853C32.0864 18.799 32.0885 19.5117 32.2482 20.3235C32.4091 21.1417 32.678 21.807 33.0549 22.3194C33.4351 22.831 33.8863 23.1865 34.4087 23.3859C34.931 23.5852 35.4832 23.6295 36.0654 23.5186C36.388 23.4572 36.6857 23.3563 36.9583 23.2161C37.2337 23.072 37.4727 22.8923 37.6754 22.6772C37.8781 22.462 38.0368 22.2161 38.1515 21.9396C38.2689 21.6592 38.3277 21.3525 38.3278 21.0197L39.8855 20.7282C39.8995 21.2383 39.8277 21.724 39.67 22.1853C39.5149 22.6427 39.2807 23.0574 38.9674 23.4295C38.6567 23.7977 38.2797 24.1089 37.8362 24.3631C37.3927 24.6174 36.8899 24.798 36.3277 24.9051C35.4429 25.0736 34.614 25.0175 33.841 24.7369C33.0673 24.4529 32.4049 23.9627 31.8538 23.2663C31.3061 22.5692 30.9269 21.6855 30.7164 20.6152C30.5052 19.5416 30.5236 18.5822 30.7715 17.737C31.0187 16.8885 31.4477 16.1921 32.0585 15.648C32.6686 15.1005 33.4144 14.7428 34.2959 14.575C34.8381 14.4717 35.3589 14.4523 35.8581 14.5168C36.3601 14.5775 36.828 14.7193 37.2618 14.9423C37.695 15.162 38.0762 15.4595 38.4054 15.8349C38.7339 16.207 38.9946 16.6548 39.1873 17.1784Z" fill="#485563"/> <path d="M51.4414 18.6799L48.666 20.5601L42.7638 12.1242L45.6271 10.1845C46.4671 9.61549 47.3066 9.29566 48.1457 9.22507C48.9829 9.15173 49.782 9.32077 50.5429 9.7322C51.3046 10.139 51.992 10.7804 52.6049 11.6564C53.2197 12.5351 53.5848 13.4009 53.7002 14.2536C53.8183 15.1045 53.6896 15.9082 53.3139 16.6646C52.9362 17.4183 52.3121 18.0901 51.4414 18.6799ZM49.1814 18.5717L50.5921 17.616C51.2451 17.1736 51.7034 16.6851 51.9668 16.1504C52.2284 15.613 52.3052 15.0408 52.1973 14.4339C52.0875 13.8242 51.7992 13.1858 51.3323 12.5185C50.8693 11.8567 50.3689 11.3679 49.8313 11.0521C49.2964 10.7345 48.7347 10.5989 48.1461 10.6455C47.5576 10.6921 46.9508 10.9271 46.3256 11.3506L44.8354 12.3601L49.1814 18.5717Z" fill="#485563"/> </svg> </span> </div> <div class="fpd-tool-curved-text-radius fpd-input"> <span class="fpd-label" data-defaulttext="Radius">toolbar.radius</span> <fpd-range-slider class="fpd-progress" value="80" step="1" min="0" max="400" data-control="curveRadius"></fpd-range-slider> <input class="fpd-slider-number fpd-number" type="number" value="80" step="1" min="0" max="400" data-control="curveRadius"/> </div> </div> <div class="fpd-panel-transform fpd-padding"> <div class="fpd-tool-angle fpd-input"> <span class="fpd-label" data-defaulttext="Rotate">toolbar.rotate</span> <fpd-range-slider class="fpd-progress" value="1" step="1" min="0" max="359" data-control="angle"></fpd-range-slider> <input class="fpd-slider-number fpd-number" type="number" value="1" step="1" min="0" max="359" data-control="angle"/> </div> <div class="fpd-tool-scaleX fpd-tool-scale fpd-input"> <span class="fpd-label" data-defaulttext="Scale X">toolbar.scaleX</span> <fpd-range-slider class="fpd-progress" value="1" step="0.01" min="0" max="5" data-control="scaleX"></fpd-range-slider> <input class="fpd-slider-number fpd-number" type="number" value="1" step="0.01" min="0" max="5" data-control="scaleX"/> </div> <div class="fpd-tool-uniscaling-locker fpd-tool-scale fpd-toggle" data-control="lockUniScaling" data-enabled="true" data-disabled="false"> <span class="fpd-icon-unlocked"></span> </div> <div class="fpd-tool-scaleY fpd-tool-scale fpd-input"> <span class="fpd-label" data-defaulttext="Scale Y">toolbar.scaleY</span> <fpd-range-slider class="fpd-progress" value="1" step="0.01" min="0" max="5" data-control="scaleY"></fpd-range-slider> <input class="fpd-slider-number fpd-number" type="number" value="1" step="0.01" min="0" max="5" data-control="scaleY"/> </div> <div class="fpd-tool-flip fpd-tools-group"> <div data-do="flip-x"> <span class="fpd-icon-flip-horizontal"></span> <span data-defaulttext="Flip Horizontal">toolbar.flip_h</span> </div> <div data-do="flip-y"> <span class="fpd-icon-flip-vertical"></span> <span data-defaulttext="Flip Vertical">toolbar.flip_v</span> </div> </div> </div> <div class="fpd-panel-position"> <div class="fpd-panel-tabs"> <span data-tab="align" data-defaulttext="Align">toolbar.align</span> <span data-tab="arrange" data-defaulttext="Arrange" class="fpd-active">toolbar.arrange</span> </div> <div class="fpd-panel-tabs-content fpd-scroll-area"> <div data-id="align"> <div class="fpd-tool-position-align fpd-tools-group"> <div data-do="align-top"> <span class="fpd-icon-align-top"></span> <span data-defaulttext="Top">toolbar.align_top</span> </div> <div data-do="align-middle"> <span class="fpd-icon-align-horizontal-middle"></span> <span data-defaulttext="Middle">toolbar.center_h</span> </div> <div data-do="align-bottom"> <span class="fpd-icon-align-bottom"></span> <span data-defaulttext="Bottom">toolbar.align_bottom</span> </div> <div data-do="align-left"> <span class="fpd-icon-align-left"></span> <span data-defaulttext="Left">toolbar.align_left</span> </div> <div data-do="align-center"> <span class="fpd-icon-align-vertical-middle"></span> <span data-defaulttext="Center">toolbar.center_v</span> </div> <div data-do="align-right"> <span class="fpd-icon-align-right"></span> <span data-defaulttext="Right">toolbar.align_right</span> </div> </div> </div> <div data-id="arrange"> <div class="fpd-tool-layer-depth fpd-tools-group"> <div data-do="layer-up"> <span class="fpd-icon-move-up"></span> <span data-defaulttext="Move Up">toolbar.move_up</span> </div> <div data-do="layer-down"> <span class="fpd-icon-move-down"></span> <span data-defaulttext="Move Down">toolbar.move_down</span> </div> </div> </div> </div> </div> <div class="fpd-panel-advanced-editing"> <div class="fpd-panel-tabs"> <span data-tab="filters" data-defaulttext="Filters" class="fpd-active">toolbar.filters</span> <span data-tab="crop" data-defaulttext="Crop">toolbar.crop</span> </div> <div class="fpd-panel-tabs-content"> <div data-id="filters"> <div class="fpd-tool-filters fpd-grid fpd-scroll-area fpd-padding"></div> </div> <div data-id="crop"> <div class="fpd-tool-crop-masks fpd-grid fpd-scroll-area fpd-padding"></div> </div> </div> </div> </div>'
         }
       }
       customElements.define('fpd-element-toolbar', Gr)
@@ -34948,6 +35043,7 @@ console.log("t:", t);
               console.log(e, 'elementModify', t.detail,  "----------",e.fontSize)
               if (elementtypedatatype === 'group') {
                 console.log("group", t.detail.options)
+                localStorage.setItem("topvalueforgroup", t.detail.options.top);
                 const activeGroup = t.detail.activeObject;
                 let groupId = elementtypedata.title;
                 groupId = (elementtypedata.title || "").toString().replace(/\s+/g, "_")
@@ -34973,7 +35069,9 @@ console.log("t:", t);
                   scaleX: isNaN(t.detail.options?.scaleX) ? 1 : t.detail.options.scaleX,
                   scaleY: isNaN(t.detail.options?.scaleY) ? 1 : t.detail.options.scaleY,
                   flipX: t.detail.options?.flipX ?? false,
-                  flipY: t.detail.options?.flipY ?? false
+                  flipY: t.detail.options?.flipY ?? false,
+                  top: t.detail.options?.top ?? 500,
+                  left: t.detail.options?.left ?? 500
                 };
 
                 // Merge new updates
@@ -35173,6 +35271,9 @@ console.log("t:", t);
               'click',
               e => {
                 console.log("e",e)
+                const allSpans = this.subPanel.querySelectorAll('.fpd-sub-panel .fpd-panel-curved-text .fpd-curved-options > span');
+                allSpans.forEach(span => span.classList.remove('fpd-active'));
+                e.currentTarget.classList.add('fpd-active');
                 const valueoftext = e.currentTarget.getAttribute('data-value');
                 console.log("Clicked span data-value:", valueoftext);
                 // if(valueoftext === 'curved') {
@@ -35327,6 +35428,19 @@ console.log("t:", t);
                       toolbarEl.classList.add('fpd-show');
                       toolbarEl.classList.add('my-transform');
                       toolbarEl.classList.add('fpd-panel-visible');
+                      
+                       const textTransformDiv = toolbarEl.querySelector('#TextTransform');
+
+                        if (textTransformDiv) {
+                          // Find span inside that div
+                          const spanEl = textTransformDiv.querySelector('span');
+
+                          if (spanEl) {
+                            spanEl.classList.add('fpd-icon-text-transform');
+                          }
+                        }
+
+
                       document.querySelector('.fpd-panel-transform').classList.add('fpd-active');
                       document.querySelector('.fpd-tool-transform').classList.add('fpd-active');
                     }
@@ -35428,24 +35542,32 @@ console.log("t:", t);
               
             }),
             
-           
-
-            G(this.navElem.querySelector('.fpd-ungroup'), 'click', e => {
+            
               
-  console.log("data group is clicked");
+              G(this.navElem.querySelector('.fpd-ungroup'), 'click', e => {
+                let groupCounter = 1;
+  console.log('Group button clicked');
 
   const fabricCanvas = this.fpdInstance.currentViewInstance?.fabricCanvas;
-  const activeObject = fabricCanvas?.getActiveObject();
+  if (!fabricCanvas) return;
 
-  if (!activeObject || !Array.isArray(activeObject._objects)) {
-    alert('Please select multiple elements to group. Hold Shift and click on layers to select more than one.');
+  const activeObject = fabricCanvas.getActiveObject();
+
+  // --- VALIDATION ---
+  if (!activeObject || activeObject.type !== 'activeSelection') {
+    showToast('Please select multiple text elements (Shift + Click).', 5000);
+    // alert('Please select multiple text elements (Shift + Click).');
     return;
   }
-  
+
+  // ✅ SAVE VISUAL CENTER (MOST IMPORTANT FIX)
+  const centerPoint = activeObject.getCenterPoint();
+
+  // --- SAVE TEXT PROPERTIES BEFORE GROUP ---
   const savedPropsArray = [];
 
   activeObject._objects.forEach(obj => {
-    const params = {
+    savedPropsArray.push({
       text: obj.text,
       left: obj.left,
       top: obj.top,
@@ -35462,175 +35584,559 @@ console.log("t:", t);
       originY: obj.originY,
       fontWeight: obj.fontWeight || 'normal',
       underline: obj.underline || false,
-      textTransform: obj.textTransform || 'none',
-      boundingBox: 'base'
-    };
-    savedPropsArray.push(params);
+      textTransform: obj.textTransform || 'none'
+    });
   });
 
   localStorage.setItem('propstext', JSON.stringify(savedPropsArray));
 
-  // Trigger Group
-  const groupShortcut = new KeyboardEvent('keydown', {
-    key: 'g',
-    code: 'KeyG',
-    ctrlKey: true,
-    bubbles: true
+  // --- GROUP OBJECTS ---
+  const group = activeObject.toGroup();
+  fabricCanvas.setActiveObject(group);
+
+  // --- GROUP CONFIG (NO AUTO CENTER, NO CLIPPING) ---
+  const groupTitle = `Group Text ${groupCounter++}`;
+  const groupId = 'group_' + Date.now();
+
+  group.set({
+    title: groupTitle,
+    id: groupId,
+    autoSelect: true,
+    selectable: true,
+    hasControls: true,
+    removable: true,
+    resizable: true,
+    draggable: true,
+    rotatable: true,
+    zChangeable: true,
+    locked: false,
+    originX: 'center',
+    originY: 'center',
+    autoCenter: false,   // ❌ IMPORTANT: prevents jump
+    lockUniScaling: true,
+    textAlign: 'center',
+
+    // 🚫 disable base clipping
+    boundingBox: 'Base',
+    boundingBoxMode: 'clipping',
+    clipPath: null,
+    objectCaching: false
   });
-  document.dispatchEvent(groupShortcut);
 
-  const group = t.currentViewInstance.fabricCanvas.getActiveObject();
+  // ✅ RESTORE EXACT POSITION
+  group.setPositionByOrigin(centerPoint, 'center', 'center');
 
-  if (group) {
-    group.removable = true;
-    group.resizable = true;
-    group.positioned = true;
-    group.boundingBox = 'Base';
-    // group.boundingBoxMode = 'clipping';
+  // --- DISABLE CLIPPING ON CHILD OBJECTS ---
+  group._objects.forEach(obj => {
+    obj.evented = false;
+    obj.clipPath = null;
+    obj.boundingBox = null;
+    obj.boundingBoxMode = 'none';
+    obj.objectCaching = false;
+  });
 
-    group.selectable = true;
-    group.hasControls = true;
-    group.draggable = true;
-    group.textAlign = 'center';
-    group.autoCenter = true;
-    group.originX = 'center';
-    group.originY = 'center';
-    group.scaleX = 1;
-    group.scaleY = 1;
-    group.rotatable = 1;
+  console.log("group infornation of data us", group)
+  group.setCoords();
+  updateFPDLayersToSingleGroup(group);
+  fabricCanvas.requestRenderAll();
 
-    // --- CLIP TO BASE IMAGE ---
-    // const baseImage = fabricCanvas.getObjects().find(o => o.title === 'Overlay');
-    // if (baseImage) {
-    //   baseImage.set({
-    //     selectable: false,
-    //     evented: false,
-    //     lockMovementX: true,
-    //     lockMovementY: true,
-    //     lockRotation: true,
-    //     lockScalingX: true,
-    //     lockScalingY: true
-    //   });
-    //   baseImage.moveTo(0); // keep base at bottom
+  // --- COPY SUPPORT ---
+  let copiedGroup = null;
 
-    //   group.clipPath = new fabric.Rect({
-    //     left: baseImage.left - (baseImage.width * baseImage.scaleX) / 2,
-    //     top: baseImage.top - (baseImage.height * baseImage.scaleY) / 2,
-    //     width: baseImage.width * baseImage.scaleX,
-    //     height: baseImage.height * baseImage.scaleY,
-    //     absolutePositioned: true
-    //   });
-    // }
-
-    // --- COPY / PASTE SUPPORT ---
-    
-
-    // Copy when Ctrl+C
-    document.addEventListener('keydown', (ev) => {
-      if (ev.ctrlKey && ev.key.toLowerCase() === 'c') {
-        const obj = fabricCanvas.getActiveObject();
-        if (obj && obj.type === 'group') {
-          obj.clone((cloned) => {
-            copiedGroup = cloned;
-          });
-        }
+  document.addEventListener('keydown', ev => {
+    if (ev.ctrlKey && ev.key.toLowerCase() === 'c') {
+      const obj = fabricCanvas.getActiveObject();
+      if (obj && obj.type === 'group') {
+        obj.clone(clone => copiedGroup = clone);
       }
-    });
+    }
+  });
 
-    // Paste when Ctrl+V
-    document.addEventListener('keydown', (ev) => {
-      if (ev.ctrlKey && ev.key.toLowerCase() === 'v') {
-        if (copiedGroup) {
-          copiedGroup.clone((clonedObj) => {
-            clonedObj.left += 20;
-            clonedObj.top += 20;
-            fabricCanvas.add(clonedObj);
-            fabricCanvas.setActiveObject(clonedObj);
-            fabricCanvas.renderAll();
+  document.addEventListener('keydown', ev => {
+    if (ev.ctrlKey && ev.key.toLowerCase() === 'v') {
+      if (copiedGroup) {
+        copiedGroup.clone(cloned => {
+          cloned.set({
+            left: copiedGroup.left + 20,
+            top: copiedGroup.top + 20,
+            originX: 'center',
+            originY: 'center',
+            autoCenter: false,
+            clipPath: null,
+            boundingBox: null,
+            boundingBoxMode: 'none'
           });
-        }
-      }
-    });
-  }
 
-  // Hide ungroup button / show other UI
+          fabricCanvas.add(cloned);
+          fabricCanvas.setActiveObject(cloned);
+          fabricCanvas.requestRenderAll();
+          
+
+        });
+      }
+    }
+  });
+
+  // --- UI TOGGLE ---
   document.querySelector('.fpd-ungroup1')?.classList.remove('fpd-hidden');
   document.querySelector('.fpd-ungroup')?.classList.add('fpd-hidden');
   document.querySelector('.fpd-group-copy-by')?.classList.remove('fpd-hidden');
   document.querySelector('.fpd-group-paste-by')?.classList.remove('fpd-hidden');
-  const tagss = document.querySelector('fpd-element-toolbar');
-  if (tagss) {
-    tagss.classList.remove('fpd-show');
-    const imageElements = tagss.querySelectorAll('[data-fabric-type="image"]');
-    imageElements.forEach(el => {
+  document.querySelector('.fpd-tool-text-format').classList.add('fpd-hidden');
+  document.querySelector('.fpd-tool-curved-text').classList.add('fpd-hidden');
+  const toolbarEl = document.querySelector('fpd-element-toolbar');
+    if (toolbarEl) {
+      toolbarEl.setAttribute('data-fabric-type', 'group');
+      toolbarEl.setAttribute('data-element-type', 'image');
+    }
+
+
+  const toolbar = document.querySelector('fpd-element-toolbar');
+  if (toolbar) {
+    toolbar.classList.remove('fpd-show');
+    toolbar.querySelectorAll('[data-fabric-type="image"]').forEach(el => {
       el.setAttribute('data-fabric-type', 'group');
     });
-    t.deselectElement();
   }
+  fabricCanvas.discardActiveObject();
 
-   
-
-  const objects = t.currentViewInstance.fabricCanvas.getObjects();
-  for (let i = objects.length - 1; i >= 0; i--) {
-    const element = objects[i];
-    console.log('Type:', element.type, 'Title:', element.title, element);
-    if (element.type === 'group') {
-      if (element && typeof t.currentViewInstance.fabricCanvas.setActiveObject === 'function') {
-        t.currentViewInstance.fabricCanvas.setActiveObject(element);
-        t.currentViewInstance.fabricCanvas.renderAll();
-        break;
-      }
-    }
-    // You can access properties like obj.left, obj.top, obj.width, obj.height, etc.
-  }
-
-  console.log('grouping completed successfully.', group);
+  console.log('Text grouping completed successfully (POSITION PRESERVED)', group);
 });
 
-G(this.navElem.querySelector('.fpd-group-copy-by'), 'click', e => {
-  const fabricCanvas = this.fpdInstance.currentViewInstance?.fabricCanvas;
+let toastElement = null;
+let toastTimeout = null;
 
- 
-        const obj = fabricCanvas.getActiveObject();
-        if (obj && obj.type === 'group') {
-          obj.clone((cloned) => {
-            copiedGroup = cloned;
-          });
-        }
-  //        document.querySelector('.fpd-group-copy-by')?.classList.add('fpd-hidden');
-  // document.querySelector('.fpd-group-paste-by')?.classList.remove('fpd-hidden');
-})
-G(this.navElem.querySelector('.fpd-group-paste-by'), 'click', e => {
-  //alert("check paste");
-  const fabricCanvas = this.fpdInstance.currentViewInstance?.fabricCanvas;
-        if (copiedGroup) {
-          copiedGroup.clone((clonedObj) => {
-            clonedObj.left += 20;
-            clonedObj.top += 20;
-            // clonedObj.uniformScaling = true;
-            clonedObj.selectable = true;
-            clonedObj.hasControls = true;
-            clonedObj.resizable = true;
-            clonedObj.draggable = true;
-            clonedObj.removable = true;
-            clonedObj.positioned = true;
-            clonedObj.textAlign = 'center';
-            clonedObj.autoCenter = true;
-            clonedObj.originX = 'center';
-            clonedObj.originY = 'center';
-            clonedObj.scaleX = 1;
-            clonedObj.scaleY = 1;
-            clonedObj.rotatable = true;
-            clonedObj.lockUniScaling = true;  
-            clonedObj.uniformScaling = true;
-            fabricCanvas.add(clonedObj);
-            fabricCanvas.setActiveObject(clonedObj);
-            fabricCanvas.renderAll();
-          });
-        }
-        // t.currentElement.alignToPosition('left')
+function showToast(message, duration = 3000) {
 
-})
+    const container = document.getElementById('toast-container');
+
+    // If toast does not exist → create it
+    if (!toastElement) {
+        toastElement = document.createElement('div');
+        toastElement.style.background = 'rgba(0,0,0,0.85)';
+        toastElement.style.color = '#fff';
+        toastElement.style.padding = '10px 20px';
+        toastElement.style.borderRadius = '6px';
+        toastElement.style.boxShadow = '0 4px 10px rgba(0,0,0,0.3)';
+        toastElement.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
+        toastElement.style.transform = 'translateY(-20px)';
+        toastElement.style.opacity = '0';
+        container.appendChild(toastElement);
+    }
+
+    // Update message
+    toastElement.innerText = message;
+
+    // Show toast
+    toastElement.style.opacity = '1';
+    toastElement.style.transform = 'translateY(0)';
+
+    // Clear previous timeout if exists
+    if (toastTimeout) {
+        clearTimeout(toastTimeout);
+    }
+
+    // Set new timeout
+    toastTimeout = setTimeout(() => {
+        toastElement.style.opacity = '0';
+        toastElement.style.transform = 'translateY(-20px)';
+    }, duration);
+}
+
+
+
+function updateFPDLayersToSingleGroup(group) {
+  console.log("group data is", group);
+  const layersList = document.querySelector(
+    'fpd-module-manage-layers .fpd-list'
+  );
+  if (!layersList) return;
+
+  const groupTitle = group.title || 'Grouped Text';
+  console.log("group data is", groupTitle);
+  /* ============================
+     REMOVE CHILD TEXT LAYERS
+  ============================ */
+  layersList.querySelectorAll('.fpd-list-row').forEach(row => {
+    console.log("row data of list row is",row)
+    const label =
+      row.querySelector('.fpd-cell-1 textarea')?.value?.trim() ||
+      row.querySelector('.fpd-cell-1')?.innerText?.trim() ||
+      '';
+    console.log("label data",row,"is",label);
+    // hide text layers that belong to the group
+    if (
+      label &&
+      group._objects.some(obj => label.includes(obj.title || obj.text))
+    ) {
+      row.remove();
+    }
+  });
+  console.log("group data is a", layersList);
+  /* ============================
+     CHECK IF GROUP LAYER EXISTS
+  ============================ */
+  let groupRow = layersList.querySelector(
+    `.fpd-list-row[data-group-id="${groupTitle}"]`
+  );
+
+  /* ============================
+     CREATE GROUP LAYER ROW
+  ============================ */
+  if (!groupRow) {
+    groupRow = document.createElement('div');
+    groupRow.className = 'fpd-list-row fpd-group-layer';
+    groupRow.dataset.groupId = groupTitle;
+
+    groupRow.innerHTML = `
+      <div class="fpd-cell-0"><span></span></div>
+      <div class="fpd-cell-1">${groupTitle}</div>
+      <div class="fpd-cell-2">
+        <span class="fpd-lock-element">
+          <span class="fpd-icon-unlocked"></span>
+        </span>
+        <span class="fpd-visible-element">
+          <span class="fa-solid fa-eye"></span>
+        </span>
+        <span class="fpd-remove-element" style="cursor:pointer;">
+          <span class="fa-solid fa-trash"></span>
+        </span>
+      </div>
+    `;
+
+    // insert at top
+    layersList.insertBefore(groupRow, layersList.firstChild);
+  }
+
+  /* ============================
+     BIND CONTROLS TO GROUP
+  ============================ */
+  const canvas =
+    this?.fpdInstance?.currentViewInstance?.fabricCanvas ||
+  window?.fpdInstance?.currentViewInstance?.fabricCanvas;
+
+    console.log("current instance",t.currentViewInstance)
+  // t.currentViewInstance.fabricCanvas.removeElement(t.currentElement)
+
+  const removeBtn = groupRow.querySelector('.fpd-remove-element');
+  const lockBtn = groupRow.querySelector('.fpd-lock-element');
+  const visibleBtn = groupRow.querySelector('.fpd-visible-element');
+
+  if (removeBtn) {
+    removeBtn.onclick = () => {
+      console.log(t.currentElement, "canvas data", canvas);
+      console.log("current instance",t.currentViewInstance)
+      t.currentViewInstance.fabricCanvas.removeElement(group);
+      groupRow.remove();
+    };
+  }
+
+  if (lockBtn) {
+    lockBtn.onclick = () => {
+      group.selectable = !group.selectable;
+      lockBtn.innerHTML = group.selectable
+        ? `<span class="fpd-icon-unlocked"></span>`
+        : `<span class="fpd-icon-locked"></span>`;
+      canvas.requestRenderAll();
+    };
+  }
+
+  if (visibleBtn) {
+    visibleBtn.onclick = () => {
+      const view = t.currentViewInstance;
+      console.log("group",group);
+  if (!view || !group) return;
+
+  // 🔑 Get FPD element attached to fabric object
+  const element = group.fpdElement || group._objects;
+
+  if (!element) {
+    console.warn('FPD element not found on group');
+    return;
+  }
+
+  // ✅ Toggle visibility on FPD element
+  element.visible = !element.visible;
+
+  console.log("vt",element.visible);
+  // ✅ Sync visibility to fabric object
+  group.set('visible', element.visible);
+
+  // ✅ Force FPD + Fabric refresh
+  view.fabricCanvas.requestRenderAll();
+  view.updateLayers?.(); // safe optional call
+   console.log("vt1",visibleBtn.innerHTML);
+  // ✅ Update UI icon
+  visibleBtn.innerHTML = element.visible
+    ? `<span class="fa-solid fa-eye"></span>`
+    : `<span class="fa-solid fa-eye-slash"></span>`;
+    };
+      console.log("vt2",visibleBtn.innerHTML);
+  }
+}
+
+
+
+
+              let copiedImage = null;
+              G(this.navElem.querySelector('.fpd-group-copy-by'), 'click', e => {
+                const fabricCanvas = this.fpdInstance.currentViewInstance?.fabricCanvas;
+                if (!fabricCanvas) return;
+
+                const activeObj = fabricCanvas.getActiveObject();
+                console.log('Copy triggered', activeObj, 'Type', activeObj?.type);
+
+                if (activeObj.type === 'image') {
+                    console.log('Copying image safely',activeObj);
+                    
+                    // 🔒 Backup filters
+                    const originalFilters = activeObj.filters;
+
+                    // ✅ Force filters to be array
+                    activeObj.filters = Array.isArray(activeObj.filters)
+                      ? activeObj.filters
+                      : [];
+
+                    activeObj.clone(cloned => {
+                      copiedImage = cloned;
+                      copiedGroup = null;
+                      copiedImage.__originalTransform = {
+                        title: activeObj.title,
+                        id: activeObj.id,
+                        left: activeObj.left,
+                        top: activeObj.top,
+                        scaleX: activeObj.scaleX,
+                        scaleY: activeObj.scaleY,
+                        angle: activeObj.angle,
+                        originX: activeObj.originX,
+                        originY: activeObj.originY,
+                        flipX: activeObj.flipX,
+                        flipY: activeObj.flipY,
+                        width: activeObj.width,
+                        height: activeObj.height
+                      };
+                      console.log('✅ Image copied safely',copiedImage);
+                      t.showToast?.('Image copied');
+
+                      // 🔁 Restore original filters
+                      activeObj.filters = originalFilters;
+                    });
+                }
+                else if (!activeObj || activeObj.type !== 'group') {
+                  // alert('Please select a grouped element to copy.');
+                  showToast('Please select a grouped element to copy.', 5000);
+                  return;
+                }
+                else if (activeObj.type === 'group'){
+
+                  activeObj.clone(cloned => {
+                    copiedGroup = cloned;
+                    copiedImage = null;
+                    console.log('Group copied successfully', copiedGroup);
+                  });
+                }
+              });
+
+              function keepBelowOverlay(canvas, obj) {
+                const overlay = canvas.getObjects().find(o =>
+                  o.title === 'Overlay' || o.boundingBox === 'Base'
+                );
+
+                if (overlay) {
+                  const overlayIndex = canvas.getObjects().indexOf(overlay);
+                  canvas.moveTo(obj, overlayIndex - 1);
+                }
+              }
+
+              function placeAboveBase(canvas, obj) {
+                const objects = canvas.getObjects();
+                const baseIndex = objects.findIndex(o => o.title === 'Base');
+                console.log(objects,"object baseindix",baseIndex)
+                if (baseIndex !== -1) {
+                  canvas.moveTo(obj, baseIndex + 1);
+                }
+              }
+
+              function getTopEditableZ(canvas) {
+                let maxZ = 0;
+
+                canvas.getObjects().forEach(o => {
+                  if (o.boundingBox === 'Base') return;      // ignore base
+                  if (o.zChangeable !== 1) return;           // ignore locked layers
+                  maxZ = Math.max(maxZ, o.z || 0);
+                });
+
+                return maxZ + 1;
+              }
+
+
+
+              G(this.navElem.querySelector('.fpd-group-paste-by'), 'click', e => {
+                const fabricCanvas = this.fpdInstance.currentViewInstance?.fabricCanvas;
+                console.log("click function call", copiedGroup, copiedImage, fabricCanvas);
+                if (!fabricCanvas) return;
+
+                // ❌ Nothing copied
+                if (!copiedGroup && !copiedImage) {
+                  this.showToast('Nothing to paste. Copy a group or image first.', 'error');
+                  return;
+                }
+                /* =========================
+                  🖼 IMAGE PASTE (SAFE)
+                ========================== */
+                if (copiedImage) {
+                  console.log("copiedImage",copiedImage)
+                  const viewInstancesss = this.fpdInstance.currentViewInstance;
+                  const fabricCanvas = this.fpdInstance.currentViewInstance.fabricCanvas;
+                  const zoom = fabricCanvas.getZoom();
+
+                  const tData = copiedImage.__originalTransform || {};
+                  console.log('📌 Original transform:', tData, 'Canvas zoom:', zoom,'ins',viewInstancesss);
+
+                  // Prevent Fabric filter crash
+                  copiedImage.filters = Array.isArray(copiedImage.filters)
+                    ? copiedImage.filters
+                    : [];
+
+                  copiedImage.clone(clonedObj => {
+                    console.log("scalX and scaleY",tData.scaleX,tData.scaleY);
+                    clonedObj.set({
+                      scaleX: tData.scaleX || 1,
+                      scaleY: tData.scaleY || 1,
+
+                      angle: tData.angle ?? 0,
+                      flipX: tData.flipX ?? false,
+                      flipY: tData.flipY ?? false,
+                      width: tData.width,
+                      height: tData.height,
+                      copyable: 1,
+                      originX: tData.originX || 'center',
+                      originY: tData.originY || 'center',
+
+                      lockUniScaling: true,
+                      uniformScaling: true,
+
+                      selectable: true,
+                      evented: true,
+                      hasControls: true,
+                      draggable: true,
+                      resizable: true,
+                      removable: true,
+                      rotatable: true,
+                      locked: false,
+                      zChangeable: 1,
+                      boundingBox: 'Base',
+                      clipPath: null,
+                      objectCaching: false,
+                    });
+                    // clonedObj = fabricCanvas._activeObject;
+                    
+                    // Add FIRST
+                    fabricCanvas.add(clonedObj);
+                    const topZ = getTopEditableZ(fabricCanvas);
+
+
+                    // Restore exact position
+                    clonedObj.set({
+                      z: topZ,
+                      title: tData.title + ' Copy',
+                      id: tData.id + 'Copy',
+                      scaleX: tData.scaleX || 1,
+                      scaleY: tData.scaleY || 1,
+                      isCustom: true,
+                      crossOrigin: 'anonymous'
+                    })
+
+                    fabricCanvas.moveTo(clonedObj, fabricCanvas.getObjects().length - 1);
+                    console.log("clonedObj data is",clonedObj)
+                    clonedObj.setPositionByOrigin(
+                      { x: tData.left, y: tData.top },
+                      clonedObj.originX,
+                      clonedObj.originY
+                    );
+
+                    clonedObj.setCoords();
+
+                    placeAboveBase(fabricCanvas, clonedObj);
+                    keepBelowOverlay(fabricCanvas, clonedObj);
+                    
+                    fabricCanvas.fire('elementAdd', { element: clonedObj });
+                    // fabricCanvas._objects.push(clonedObj);
+                    fabricCanvas.setActiveObject(clonedObj);
+                    // fabricCanvas.requestRenderAll();
+                    
+                    fabricCanvas.requestRenderAll();
+
+                    console.log('✅ Image pasted with TRUE original size', {
+                      left: clonedObj.left,
+                      top: clonedObj.top,
+                      scaleX: clonedObj.scaleX,
+                      scaleY: clonedObj.scaleY,
+                      width: clonedObj.width,
+                      height: clonedObj.height
+                    });
+
+                    // this.showToast?.('Image pasted successfully 🖼️');
+                  });
+                }
+
+
+                /* =========================
+                  🔹 GROUP PASTE
+                ========================== */
+                else if (copiedGroup) {
+                  console.log("copied group coming");
+                  copiedGroup.clone(clonedObj => {
+
+                    clonedObj.set({
+                      left: (copiedGroup.left || 0) + 20,
+                      top: (copiedGroup.top || 0) + 20,
+                      selectable: true,
+                      evented: true,
+                      hasControls: true,
+                      resizable: true,
+                      draggable: true,
+                      removable: true,
+                      positioned: true,
+                      originX: copiedGroup.originX || 'center',
+                      originY: copiedGroup.originY || 'center',
+                      rotatable: true,
+                      lockUniScaling: true,
+
+                      // 🔒 base + no clipping
+                      boundingBox: 'Base',
+                      clipPath: null,
+                      objectCaching: false
+                    });
+
+                    // Preserve child behavior
+                    if (clonedObj.type === 'group' && Array.isArray(clonedObj._objects)) {
+                      clonedObj._objects.forEach(child => {
+                        child.set({
+                          selectable: false,
+                          evented: false,
+                          clipPath: null,
+                          objectCaching: false
+                        });
+                      });
+                    }
+
+                    fabricCanvas.add(clonedObj);
+                    keepBelowOverlay(fabricCanvas, clonedObj);
+                    fabricCanvas.setActiveObject(clonedObj);
+                    fabricCanvas.requestRenderAll();
+
+                    this.showToast('Group pasted successfully 🎉');
+                  });
+
+                  return;
+                }
+
+                
+              });
+
+
+
 
 
 
@@ -35669,6 +36175,7 @@ G(this.navElem.querySelector('.fpd-group-paste-by'), 'click', e => {
             let lastFontSize = null;
 
             activeObj._objects.forEach((obj, index) => {
+              console.log("obj data", obj)
               const props = savedPropsArray[index];
               if (!props) return;
 
@@ -35688,16 +36195,17 @@ G(this.navElem.querySelector('.fpd-group-paste-by'), 'click', e => {
 
               if (savedGroupTransform) {
                 console.log("data of ungroup text",savedGroupTransform);
+                // let topvalueforgroup = window.localStorage.getItem('topvalueforgroup')
                 left = savedGroupTransform.left ?? 500;
-                top = savedGroupTransform.top ?? 500;
+                top =  savedGroupTransform.top ?? 500;
                 scaleX = savedGroupTransform.scaleX ??  1;
                 scaleY = savedGroupTransform.scaleY ??  1;
                 flipX  = savedGroupTransform.flipX ?? obj.flipX ?? props.flipX ?? false;
                 flipY  = savedGroupTransform.flipY ?? obj.flipY ?? props.flipY ?? false;
               } else {
                 console.log("coming to else of obj", obj)
-                top = 500;
-                left = 500;
+                top = obj.top || 500;
+                left = obj.left || 500;
                 scaleX = obj.scaleX  || 1;
                 scaleY = obj.scaleY || 1;
                 flipX  = obj.flipX || props.flipX || false;
@@ -37756,7 +38264,7 @@ G(this.navElem.querySelector('.fpd-group-paste-by'), 'click', e => {
                       sct = e.subcategorytype ? e.subcategorytype : 'General'
                     const r = document.createElement('div')
                     r.className =
-                      'fpd-item fpd-hover-thumbnail text mt-1 skins-det'
+                      'mt-1 fpd-item fpd-hover-thumbnail text skins-det'
                     r.dataset.title = s
                     r.dataset.index = i
                     r.dataset.source = n
@@ -37787,12 +38295,30 @@ G(this.navElem.querySelector('.fpd-group-paste-by'), 'click', e => {
                     container.appendChild(r)
 
                     r.addEventListener('click', e => {
+                      document.body.classList.add('popup-open-hide-body');
                       console.log('88888888', t, r)
                       console.log('fpdInstance', fpdInstance)
                       console.log('Anoop Data 4-1--', fpdInstance, e, r)
-                      let valueofTitle = e?.srcElement.dataset.title
+                      let valueofTitleActiveDatais = window.localStorage.getItem('valueofTitleActiveDatais');
+                      console.log('valueofTitleActiveDatais', valueofTitleActiveDatais)
+                      let clickedTitleProdcutInside = window.localStorage.getItem('clickedTitleProdcutInside');
+                      console.log("clickedTitleProdcutInside",clickedTitleProdcutInside)
+                      let valueofTitle = e?.srcElement.dataset.title;
+                      const matchedProducts = fpdInstance.products.filter(product => {
+                        return product.category === valueofTitleActiveDatais;
+                      });
+                      const matchedProductsdata = matchedProducts[0]?.products || [];
+                      const flatProducts = matchedProductsdata.flat();
+                      const sortedProducts = flatProducts.find(item =>
+                          item?.productTitle === clickedTitleProdcutInside &&
+                          item?.title === valueofTitle
+                        );
+
+                      console.log(matchedProductsdata, 'Matched Products:', matchedProducts);
+                      console.log('Sorted Products:', sortedProducts);
                       console.log('valueofTitle', valueofTitle)
                       localStorage.setItem('valueofTitle', valueofTitle)
+                      // e = sortedProducts ? sortedProducts : e;
                       if (
                         (e.preventDefault(),
                         fpdInstance.mainOptions.swapProductConfirmation)
@@ -37854,6 +38380,9 @@ G(this.navElem.querySelector('.fpd-group-paste-by'), 'click', e => {
                         // });
                       }
 
+                      setTimeout(() => {
+                        document.body.classList.remove('popup-open-hide-body');
+                      }, 2000);
                       //  const i = Array.from(r.querySelectorAll(".fpd-item")).indexOf(s);
                       // fpdInstance.selectView(i), this.reset();
                     })
@@ -37871,12 +38400,18 @@ G(this.navElem.querySelector('.fpd-group-paste-by'), 'click', e => {
               console.log('coming else of value on load')
               const flatArray = i.flat() // Flatten the nested structure
               console.log(valueofTitle, 'coming else inside 1', flatArray)
-              p = [flatArray.find(item => item.title === valueofTitle)]
+              let clickedTitleProdcutInside = window.localStorage.getItem('clickedTitleProdcutInside');
+              p = [flatArray.find(
+                    item =>
+                      item.title === valueofTitle &&
+                      item.productTitle === clickedTitleProdcutInside
+                  )];
               console.log('coming else inside', p)
               if (p[0] === undefined || p[0] === null) {
                 p = [flatArray.find(item => item.productTitle === valueofTitle)]
                 console.log('coming else inside one', p)
               }
+              // p = this.sortedProducts ? this.sortedProducts : p;
               console.log("first2");
               this.loadProduct(p, this.mainOptions.replaceInitialElements)
             }
@@ -37941,7 +38476,7 @@ G(this.navElem.querySelector('.fpd-group-paste-by'), 'click', e => {
                       sct = e.subcategorytype ? e.subcategorytype : 'General'
                     const r = document.createElement('div')
                     r.className =
-                      'fpd-item fpd-hover-thumbnail text mt-1 skins-det'
+                      'mt-1 fpd-item fpd-hover-thumbnail text skins-det'
                     r.dataset.title = s
                     r.dataset.index = i
                     r.dataset.source = n
@@ -38263,6 +38798,7 @@ G(this.navElem.querySelector('.fpd-group-paste-by'), 'click', e => {
               t.selected = true;
               let { element: e } = t
               if (e) {
+                console.log("dddddddddddddddddddddddddddddJJJJJJJJJJJJJJJJJJJJJJJ",e)
                 console.log(e.getType(),e.draggable, 'elementAddsss', e, e.selected)
                 // e.autoSelect = true;
                 // e.uniScalingUnlockable = true;
@@ -38270,11 +38806,11 @@ G(this.navElem.querySelector('.fpd-group-paste-by'), 'click', e => {
                 if(e.getType() == 'text') {e.removable = true}
                 if (e.getType() == 'image' & e.draggable == '0') {
                   console.log('image draggable', e.draggable);
-                  // const scaleX = e.canvas.width / e.width;
-                  // const scaleY = e.canvas.width / e.height;
-                  // const scale = Math.min(scaleX, scaleY);
-                  // e.scaleX = scale;
-                  // e.scaleY = scale;
+                  const scaleX = e.canvas.width / e.width;
+                  const scaleY = e.canvas.width / e.height;
+                  const scale = Math.min(scaleX, scaleY);
+                  e.scaleX = scale;
+                  e.scaleY = scale;
                   e.selected = true;
                 }
                 

@@ -1,0 +1,327 @@
+/* =========================================================
+   GLOBAL RESET (SAFE)
+========================================================= */
+
+fpd-element-toolbar,
+fpd-element-toolbar * {
+  box-sizing: border-box;
+  font-family: inherit;
+}
+
+/* =========================================================
+   ELEMENT TOOLBAR WRAPPER
+========================================================= */
+
+fpd-element-toolbar {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  padding: 8px 10px;
+  background: #ffffff;
+  border-radius: 14px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  backdrop-filter: blur(6px);
+
+  max-width: fit-content;
+  z-index: 999;
+}
+
+/* =========================================================
+   CLOSE BUTTONS
+========================================================= */
+
+fpd-element-toolbar .fpd-close,
+fpd-element-toolbar .fpd-close-sub-panel {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: #f2f2f2;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+fpd-element-toolbar .fpd-close:hover,
+fpd-element-toolbar .fpd-close-sub-panel:hover {
+  background: #000;
+  color: #fff;
+}
+
+/* =========================================================
+   TOOL GROUPS
+========================================================= */
+
+.fpd-tools-nav {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.fpd-primary-tools {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* =========================================================
+   ICON BUTTONS (BOLD, ITALIC, ALIGN, ETC.)
+========================================================= */
+
+.fpd-tool-text-bold,
+.fpd-tool-text-italic,
+.fpd-tool-text-underline,
+.fpd-tool-text-transform,
+.fpd-tool-text-align span,
+.fpd-tool-btn {
+  width: 36px;
+  height: 36px;
+
+  border-radius: 10px;
+  background: #f6f6f6;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+/* Hover */
+.fpd-tool-text-bold:hover,
+.fpd-tool-text-italic:hover,
+.fpd-tool-text-underline:hover,
+.fpd-tool-text-transform:hover,
+.fpd-tool-text-align span:hover,
+.fpd-tool-btn:hover {
+  background: #000;
+  color: #fff;
+}
+
+/* Active */
+.fpd-active,
+.fpd-toggle.fpd-active {
+  background: #000 !important;
+  color: #fff !important;
+}
+
+/* SVG & icon sizing */
+fpd-element-toolbar svg,
+fpd-element-toolbar i {
+  width: 16px;
+  height: 16px;
+  fill: currentColor;
+}
+
+/* =========================================================
+   FONT FAMILY DROPDOWN
+========================================================= */
+
+.fpd-tool-font-family {
+  height: 36px;
+  padding: 0 10px;
+
+  border-radius: 10px;
+  background: #f6f6f6;
+  border: 1px solid #ddd;
+
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.fpd-tool-font-family .fpd-label {
+  font-size: 13px;
+  font-weight: 500;
+}
+
+/* =========================================================
+   FONT SIZE INPUT + PLUS / MINUS
+========================================================= */
+
+.fpd-tool-text-size {
+  height: 36px;
+  min-width: 80px;
+
+  border-radius: 10px;
+  background: #f6f6f6;
+  border: 1px solid #ddd;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.fpd-tool-text-size input {
+  width: 50px;
+  text-align: center;
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 13px;
+}
+
+/* Plus / minus buttons */
+.fpd-tool-text-size-customize-icon {
+  width: 24px;
+  height: 24px;
+
+  border-radius: 6px;
+  background: #eaeaea;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+}
+
+.fpd-tool-text-size-customize-icon:hover {
+  background: #000;
+  color: #fff;
+}
+
+/* =========================================================
+   COLOR PICKER
+========================================================= */
+
+.fpd-tool-color {
+  width: 36px;
+  height: 36px;
+
+  border-radius: 10px;
+  background: #f6f6f6;
+  border: 1px solid #ddd;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.fpd-current-fill {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+}
+
+/* =========================================================
+   DIVIDERS
+========================================================= */
+
+.fpd-toolbar-divider {
+  width: 1px;
+  height: 22px;
+  background: #ddd;
+  margin: 0 6px;
+}
+
+/* =========================================================
+   DELETE / REMOVE BUTTON
+========================================================= */
+
+.fpd-tool-remove,
+.fpd-tool-delete {
+  background: #ffecec !important;
+  color: #d60000 !important;
+}
+
+.fpd-tool-remove:hover,
+.fpd-tool-delete:hover {
+  background: #d60000 !important;
+  color: #fff !important;
+}
+
+
+/* =========================================================
+   ANIMATED FPD ELEMENT TOOLBAR
+========================================================= */
+
+/* Initial hidden state */
+fpd-element-toolbar {
+  opacity: 0;
+  transform: translateY(6px) scale(0.96);
+  pointer-events: none;
+
+  transition:
+    opacity 0.25s ease,
+    transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* When toolbar is shown */
+fpd-element-toolbar.fpd-show {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+
+/* ----------------------------------
+   Button micro-interaction
+----------------------------------- */
+
+fpd-element-toolbar .fpd-tool-btn,
+fpd-element-toolbar .fpd-toggle,
+fpd-element-toolbar .fpd-tool-text-align span {
+  transition:
+    background 0.15s ease,
+    color 0.15s ease,
+    transform 0.12s ease;
+}
+
+fpd-element-toolbar .fpd-tool-btn:hover,
+fpd-element-toolbar .fpd-toggle:hover,
+fpd-element-toolbar .fpd-tool-text-align span:hover {
+  transform: scale(1.08);
+}
+
+/* ----------------------------------
+   Active button pulse
+----------------------------------- */
+
+.fpd-active {
+  animation: fpd-active-pulse 0.25s ease;
+}
+
+@keyframes fpd-active-pulse {
+  0% {
+    transform: scale(0.92);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* ----------------------------------
+   Slide direction helpers
+----------------------------------- */
+
+fpd-element-toolbar.fpd-slide-top {
+  transform: translateY(-8px) scale(0.96);
+}
+
+fpd-element-toolbar.fpd-slide-bottom {
+  transform: translateY(8px) scale(0.96);
+}
+
+/* When visible */
+fpd-element-toolbar.fpd-show.fpd-slide-top,
+fpd-element-toolbar.fpd-show.fpd-slide-bottom {
+  transform: translateY(0) scale(1);
+}
+
+/* =========================================================
+   RESPONSIVE (OPTIONAL)
+========================================================= */
+
+@media (max-width: 768px) {
+  fpd-element-toolbar {
+    transform: scale(0.9);
+  }
+}
