@@ -21,7 +21,6 @@
     class="md:hidden fixed z-[99] bg-transparent text-white px-5 py-2 rounded w-[300px] text-sm truncate overflow-hidden whitespace-nowrap font-semibold pr-0">
     {{activeImageTitle}}
   </div>
-  <!-- Profile Initial Icon -->
   <div
     class="md:hidden fixed z-[99] top-[7px] right-[45px] md:relative md:top-auto md:right-auto min-w-[38px] w-[38px] h-[38px] max-h-10 rounded-full bg-[var(--theme-color)] text-white flex items-center justify-center font-semibold text-lg cursor-pointer"
     (click)="openLoginPopup()">
@@ -31,7 +30,7 @@
   <div
     class="box flex gap-2 flex-col md:hidden fixed z-[99] top-0 bottom-0 mt-0 left-0 right-0 p-4 bg-gray-700 border border-gray-300 rounded shadow"
     *ngIf="isBoxVisible">
-    <span class="close-btn absolute top-1 right-2 text-gray-500 cursor-pointer text-xl hover:text-black"
+    <!-- <span class="close-btn absolute top-1 right-2 text-gray-500 cursor-pointer text-xl hover:text-black"
       (click)="closeBox()">&times;</span>
     <button class="flex text-white font-semibold pl-2 pr-2">File</button>
     <button class="flex text-white items-center pl-2 pr-2 font-semibold" type="button"><span aria-hidden="true"
@@ -50,23 +49,18 @@
           </path>
         </svg></span><span class="pl-[8px]">
         <div class="BMOCzQ _6Mu4Ow FQ64gg" style="--s_rwAw: flex;">Editing</div>
-      </span></button>
-    <a href="https://www.youtube.com/playlist?list=PLU0ltU4FmAbDQ5keQV8cmBmJQ2ejcH4zF" target="_blank"
-      rel="noopener noreferrer" class="cursor-pointer">
+      </span></button> -->
+    <!-- <a href="https://www.youtube.com/playlist?list=PLU0ltU4FmAbDQ5keQV8cmBmJQ2ejcH4zF" target="_blank"
+      rel="noopener noreferrer" class="cursor-pointer"> -->
       <button
         class="border border-[#ffffff59] mr-[7px] rounded-[8px] font-semibold flex items-center gap-2 bg-transparent text-white pl-[0.565rem] pr-[1rem] py-2 text-sm rounded-[8px] min-w-[180px] justify-center">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M8.75 10.5a1.75 1.75 0 1 0 0-3.5 1.75 1.75 0 0 0 0 3.5Z" fill="currentColor"></path>
-          <path fill-rule="evenodd" clip-rule="evenodd"
-            d="M17 3H7a4 4 0 0 0-4 4v10a4 4 0 0 0 4 4h10a4 4 0 0 0 4-4V7a4 4 0 0 0-4-4Zm0 1.5h-2v5.182h4.5V7A2.5 2.5 0 0 0 17 4.5Zm-10 15h6.5v-15H7A2.5 2.5 0 0 0 4.5 7v10A2.5 2.5 0 0 0 7 19.5Zm10 0h-2v-8.318h4.5V17a2.5 2.5 0 0 1-2.5 2.5Z"
-            fill="currentColor"></path>
-        </svg>
-        Need Help
+        
+        Save
       </button>
-    </a>
+    <!-- </a> -->
   </div>
-  <button class="hidden md:block text-white font-semibold ml-[15px]">File</button>
-  <button class="hidden md:flex text-white items-center pl-2 pr-2 font-semibold" type="button"><span aria-hidden="true"
+  <!-- <button class="hidden md:block text-white font-semibold ml-[15px]">File</button> -->
+  <!-- <button class="hidden md:flex text-white items-center pl-2 pr-2 font-semibold" type="button"><span aria-hidden="true"
       class="uRWxVA dkWypw w2m0dg"><svg style="color: #ffffffb3;" xmlns="http://www.w3.org/2000/svg" width="16"
         height="16" viewBox="0 0 16 16">
         <path fill="currentColor"
@@ -82,7 +76,7 @@
         </path>
       </svg></span><span class="pl-[8px]">
       <div class="BMOCzQ _6Mu4Ow FQ64gg" style="--s_rwAw: flex;">Editing</div>
-    </span></button>
+    </span></button> -->
 </div>
 <div
   class="md:fixed md:top-[3px] md:right-0 w-auto md:w-[50%] bg-transparent z-50 hidden md:flex items-center justify-end gap-4 pl-4 pr-2 h-[50px] text-sm">
@@ -93,36 +87,50 @@
     {{activeImageTitle}}
   </div>
   <!-- Desktop Profile Initial Icon -->
-  <div
+  <!-- <div
     class="fixed top-[7px] right-[45px] md:relative md:top-auto md:right-auto min-w-[38px] w-[38px] h-[38px] max-h-10 rounded-full bg-[var(--theme-color)] text-white flex items-center justify-center font-semibold text-lg cursor-pointer"
     (click)="openLoginPopup()">
     {{initialLetter}}
-  </div>
+  </div> -->
 
 
 
-  <div class="relative md:min-w-[290px] hidden md:flex" #dropdownWrapper>
-    <a href="https://www.youtube.com/playlist?list=PLU0ltU4FmAbDQ5keQV8cmBmJQ2ejcH4zF" target="_blank"
-      rel="noopener noreferrer" class="cursor-pointer">
+  <div class="relative md:min-w-[320px] hidden md:flex" #dropdownWrapper>
+    
+    <!-- <a href="https://www.youtube.com/playlist?list=PLU0ltU4FmAbDQ5keQV8cmBmJQ2ejcH4zF" target="_blank"
+      rel="noopener noreferrer" class="cursor-pointer"> -->
       <button
-        class="border border-[#ffffff59] mr-[7px] rounded-[8px] font-semibold flex items-center gap-2 bg-transparent text-white pl-[0.565rem] pr-[1rem] py-2 text-sm rounded-[8px] min-w-[180px] justify-center">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M8.75 10.5a1.75 1.75 0 1 0 0-3.5 1.75 1.75 0 0 0 0 3.5Z" fill="currentColor"></path>
-          <path fill-rule="evenodd" clip-rule="evenodd"
-            d="M17 3H7a4 4 0 0 0-4 4v10a4 4 0 0 0 4 4h10a4 4 0 0 0 4-4V7a4 4 0 0 0-4-4Zm0 1.5h-2v5.182h4.5V7A2.5 2.5 0 0 0 17 4.5Zm-10 15h6.5v-15H7A2.5 2.5 0 0 0 4.5 7v10A2.5 2.5 0 0 0 7 19.5Zm10 0h-2v-8.318h4.5V17a2.5 2.5 0 0 1-2.5 2.5Z"
-            fill="currentColor"></path>
-        </svg>
-        Need Help
+        class="border border-[#ffffff59] mr-[7px] rounded-[8px] font-semibold flex items-center gap-2 bg-transparent text-white pl-[0.565rem] pr-[1rem] py-2 text-sm rounded-[8px] min-w-[80px] justify-center">
+        
+        Save
       </button>
+      <a href="https://www.youtube.com/playlist?list=PLU0ltU4FmAbDQ5keQV8cmBmJQ2ejcH4zF" target="_blank"
+      rel="noopener noreferrer" class="cursor-pointer" class="flex items-center mr-[10px]">
+      <svg xmlns="http://www.w3.org/2000/svg" 
+            width="24" height="24" 
+            viewBox="0 0 24 24" 
+            fill="none" 
+            stroke="#fff" 
+            stroke-width="1" 
+            stroke-linecap="round" 
+            stroke-linejoin="round">
+
+          <circle cx="12" cy="12" r="10"></circle>
+          <path d="M9.09 9a3 3 0 1 1 5.82 1c0 2-3 2-3 4"></path>
+          <line x1="12" y1="17" x2="12" y2="17"></line>
+
+        </svg>
     </a>
-    <button (click)="toggleDropdown()"
-      class="font-semibold hidden md:flex items-center gap-2 bg-[#f2eafd] text-black pl-[0.565rem] pr-[1rem] py-2 text-sm rounded-[8px] hover:bg-gray-100 transition">
-      <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-        <path
-          d="M4.5 11.75V19a.5.5 0 0 0 .5.5h14a.5.5 0 0 0 .5-.5v-7.25a.75.75 0 1 1 1.5 0V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7.25a.75.75 0 1 1 1.5 0Zm8.323-6.19v9.69a.75.75 0 0 1-1.5 0l-.001-9.69-3.037 3.215a.751.751 0 0 1-1.062-1.06l4.318-4.495a.751.751 0 0 1 1.062 0l4.18 4.495a.749.749 0 1 1-1.06 1.06l-2.9-3.216Z"
-          fill="currentColor" fill-rule="nonzero"></path>
-      </svg>
-      Share
+      <button (click)="toggleDropdown()"
+        class="border border-[#ffffff59] mr-[7px] rounded-[8px] font-semibold flex items-center gap-2 bg-transparent text-white pl-[0.565rem] pr-[1rem] py-2 text-sm rounded-[8px] min-w-[80px] justify-center">
+        
+        Share
+      </button>
+    <!-- </a> -->
+    <button
+      class="font-semibold hidden md:flex items-center gap-2 bg-[var(--theme-color)] text-white pl-[0.565rem] pr-[1rem] py-2 text-sm rounded-[8px] hover:bg-gray-100 transition">
+      
+      Add To Cart
     </button>
 
     <!-- Dropdown Box -->

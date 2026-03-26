@@ -25496,10 +25496,12 @@
           this.fabricCanvas.on({
             'object:added': t => {
               console.log("t value is in",t)
+              
               let e = t.target,
                 i = e.price ?? 0;
 
               console.log('object:added', e, i);
+              console.log('object:added if', this.fabricCanvas);
               
               if(e && e.text){
                 document.querySelector('.fpd-group-paste-by').classList.add('fpd-hidden');
@@ -27638,6 +27640,7 @@ console.log("t:", t);
         }
 
         doAction (e) {
+          console.log("eddddddddddddddddd",e)
           if (this.fpdInstance?.currentViewInstance) {
             console.log(
               this.fpdInstance,
@@ -27663,7 +27666,7 @@ console.log("t:", t);
                 'reset_product'
               )),
                 G(e, ['click'], () => {
-                  console.log("first1");
+                  console.log("first1",e);
                   localStorage.setItem('groupTransforms', '')
                   document.querySelector('.fpd-ungroup1')?.classList.add('fpd-hidden');
                   document.querySelector('.fpd-ungroup')?.classList.remove('fpd-hidden');
@@ -27717,7 +27720,7 @@ console.log("t:", t);
                 this.fpdInstance.mainWrapper.container.querySelector(
                   '.fpd-zoom-wrapper'
                 )
-              if (t) return void t.remove()
+              //if (t) return void t.remove()
               const e = document.createElement('div')
               e.className = 'fpd-zoom-wrapper fpd-shadow-1'
               const i =
@@ -31170,13 +31173,13 @@ console.log("t:", t);
             i.querySelector('picture')
           ),
           G(i, ['click'], t => {
-            // this.fpdInstance.loadingCustomImage ||
-            //   this.fpdInstance._addGridItemToCanvas(
-            //     t.currentTarget,
-            //     {},
-            //     void 0,
-            //     !1
-            //   )
+            this.fpdInstance.loadingCustomImage ||
+              this.fpdInstance._addGridItemToCanvas(
+                t.currentTarget,
+                {},
+                void 0,
+                !1
+              )
           }),
           G(i.querySelector('.fa-trash'), 'click', t => {
             console.log('delete image', i,'jjjjjjjjj',t)
@@ -31674,7 +31677,7 @@ console.log("t:", t);
                   t.hits.length > 0 &&
                     t.hits.forEach(t => {
                       const e = $({
-                        url: t.imageURL ? t.imageURL : t.webformatURL,
+                        url: t.imageURL || t.largeImageURL || t.fullHDURL || t.webformatURL,
                         thumbnailUrl: t.webformatURL,
                         title: t.id ? t.id : t.id_hash,
                         price: tt(this.fpdInstance, this.container)
@@ -32225,6 +32228,8 @@ console.log("t:", t);
       function Qn () {
         console.log("this.fpdInstance our 32226",this.fpdInstance.getElements('all'))
         const elements = this.fpdInstance.getElements('all');
+        // this.fpdInstance.actionsBar.doAction('zoom')
+        document.querySelector('[data-action="zoom"]')?.click();
 if (!Array.isArray(elements) || !elements.length) return;
 
 /* =========================
@@ -36685,6 +36690,12 @@ function updateFPDLayersToSingleGroup(group) {
             if(t.source != ""){
               console.log("inside if",t.source);
               document.querySelector('body').classList.add('notgroup')
+              if (t.source.toLowerCase().endsWith('.svg')) {
+                  document.querySelector('body').classList.add('is-svg');
+              }
+              else{
+                  document.querySelector('body').classList.remove('is-svg');
+              }
             }
             else{
               document.querySelector('body').classList.remove('notgroup')
@@ -39386,6 +39397,7 @@ function updateFPDLayersToSingleGroup(group) {
                 copyable: true,
                 lockUniScaling: true,
                 autoSelect: true,
+                minDPI: 300,
                 title: e.title ? e.title : 'Custom Element'
               },
               i

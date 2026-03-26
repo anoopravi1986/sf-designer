@@ -242,7 +242,7 @@ export class HomeComponent implements AfterViewInit {
         $(document).on('click', '.item-data-click', (event) => {
           event.stopPropagation();
           const clickedDiv = event.currentTarget;
-
+          const uploadParent = clickedDiv.closest('[data-context="upload"]');
           console.log('You clicked:', clickedDiv);
           console.log("djjd",this.designer.currentViewInstance);
           const clothingDesignerElem = document.querySelector('#clothing-designer');
@@ -256,11 +256,14 @@ export class HomeComponent implements AfterViewInit {
           console.log("viewvalue",viewvalue, viewtitle)
           const parameter = {removable: true,positioned: true, autoSelect: true,uniScalingUnlockable: true};
           
-          // fpdvalue.addCanvasDesign(
-          //   viewvalue,
-          //   viewtitle,
-          //   parameter
-          // )
+          if(uploadParent.classList.contains('fpd-active')){
+
+            fpdvalue.addCanvasDesign(
+              viewvalue,
+              viewtitle,
+              parameter
+            )
+          }
         });
 
         $(document).on('click', '.item-data-click .fpd-three-dot-menu', (event) => {
@@ -476,6 +479,7 @@ export class HomeComponent implements AfterViewInit {
     setTimeout(() => {
 
       const btnOpacity = document.getElementById('fpd-opacity-btn');
+      const targetSection = document.querySelector('fpd-element-toolbar .fpd-sub-panel') as HTMLElement;
       const panel = document.getElementById('fpd-opacity-panel');
       const sliderOpacity = document.getElementById('fpd-opacity-range') as HTMLInputElement;
       console.log('Opacity elements:', { btnOpacity, panel, sliderOpacity });
@@ -484,10 +488,21 @@ export class HomeComponent implements AfterViewInit {
 
       // 🔹 Toggle panel
       btnOpacity.addEventListener('click', () => {
+        if (targetSection) {
+            const activeElem = targetSection.querySelector('.fpd-active');
+            
+            if (activeElem) {
+                activeElem.classList.remove('fpd-active');
+            }
+        }
         console.log('Opacity button clicked, toggling panel. Current display:', panel.style.display);
         panel.style.display =
           panel.style.display === 'block' ? 'none' : 'block';
-  
+          if (panel.style.display === 'block') {
+              btnOpacity.classList.add('fpd-active');
+          } else {
+              btnOpacity.classList.remove('fpd-active');
+          }
         // Sync slider with current object opacity
         const canvas = this.designer.currentViewInstance.fabricCanvas;
         const obj = canvas.getActiveObject();
@@ -524,6 +539,7 @@ export class HomeComponent implements AfterViewInit {
           !btnOpacity.contains(e.target)
         ) {
           panel.style.display = 'none';
+          btnOpacity.classList.remove('fpd-active');
         }
       });
     }, 5000);
@@ -1482,7 +1498,7 @@ document.getElementById('deletetext')?.addEventListener('click', () => {
       actions: {
         top: [],
         right: [],
-        left: ['undo', 'redo', 'download', 'zoom', 'reset-product'],
+        left: ['undo', 'redo', 'download','zoom', 'reset-product'],
         center: [],
       },
       selectedColor: '#f5f5f5',
