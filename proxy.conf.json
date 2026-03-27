@@ -1,0 +1,8 @@
+{
+  "/fpd": {
+    "target": "https://editor.styleflip.com",
+    "secure": true,
+    "changeOrigin": true,
+    "logLevel": "debug"
+  }
+}

@@ -127,11 +127,11 @@
         Share
       </button>
     <!-- </a> -->
-    <button
-      class="font-semibold hidden md:flex items-center gap-2 bg-[var(--theme-color)] text-white pl-[0.565rem] pr-[1rem] py-2 text-sm rounded-[8px] hover:bg-gray-100 transition">
-      
-      Add To Cart
-    </button>
+<button
+  (click)="addToCart()"
+  class="font-semibold hidden md:flex items-center gap-2 bg-[var(--theme-color)] text-white pl-[0.565rem] pr-[1rem] py-2 text-sm rounded-[8px] hover:bg-gray-100 transition">
+  Add To Cart
+</button>
 
     <!-- Dropdown Box -->
     <div *ngIf="showDropdown"

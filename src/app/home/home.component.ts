@@ -2473,7 +2473,49 @@ doesTitleMatchSearch(title: string, search: string): boolean {
 
     this.savedGrid.nativeElement.appendChild(wrapper);
   }
-
+addToCart() {
+ 
+    if (
+      this.designer &&
+      this.designer.currentViewInstance &&
+      this.designer.currentViewInstance.fabricCanvas
+    ) {
+ 
+        const canvas = this.designer.currentViewInstance.fabricCanvas;
+        const dataUrl = canvas.toDataURL({
+          format: 'png',
+          multiplier: 1,
+          enableRetinaScaling: true,
+        });
+ 
+        const product = this.designer.getProduct ? this.designer.getProduct() : {};
+        const title = (
+          this.previewButton?.nativeElement.value || ''
+        ).toString();
+        console.log('Adding to cart:', { title, product, dataUrl });
+        //console.log('Product data for cart:', this.designer.getPrintOrderData());
+ 
+        const cartItem = {
+          thumbnail: dataUrl,
+          product,
+          title,
+        };
+ 
+ 
+        var jsonString = JSON.stringify(cartItem);
+ 
+        // Example: Send to your custom PHP endpoint via AJAX
+        $.post('https://editor.styleflip.com/fpd/addtocart.php', {
+            fpd_data: jsonString
+        }, function(response) {
+            console.log('Data saved successfully');
+        });
+ 
+        this.showSuccessMessage('Design added to cart!');
+    }
+ 
+ 
+  }
   loadSavedProducts() {
     if (this.savedGrid?.nativeElement) {
       this.savedGrid.nativeElement.innerHTML = '';
