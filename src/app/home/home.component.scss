@@ -164,3 +164,90 @@
   64%,86%  {background-position:35% 65%}
   88%,100% {background-position:35% 35%}
 }
+
+
+
+/* Overlay */
+.fpd-popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(4px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 99999;
+}
+
+/* Popup Box */
+.fpd-popup-box {
+  width: 360px;
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+  animation: popupFade 0.25s ease;
+}
+
+/* Header */
+.fpd-popup-header {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 15px;
+}
+
+/* Input */
+.fpd-popup-body input {
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  font-size: 14px;
+  outline: none;
+  transition: 0.2s;
+}
+
+.fpd-popup-body input:focus {
+  border-color: #000;
+}
+
+/* Footer */
+.fpd-popup-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+/* Buttons */
+.fpd-btn-cancel {
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: none;
+  background: #eee;
+  cursor: pointer;
+}
+
+.fpd-btn-save {
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: none;
+  background: #000;
+  color: #fff;
+  cursor: pointer;
+}
+
+/* Animation */
+@keyframes popupFade {
+  from {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}

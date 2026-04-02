@@ -2347,7 +2347,7 @@ doesTitleMatchSearch(title: string, search: string): boolean {
     }
   }
   
-  saveDesign() {
+  saveDesign(customTitle?: string) {
     console.log('llllllllllllllllllllllllllll');
     if (
       this.designer &&
@@ -2369,9 +2369,13 @@ doesTitleMatchSearch(title: string, search: string): boolean {
           const product = this.designer.getProduct
             ? this.designer.getProduct()
             : {};
-          const title = (
-            this.previewButton?.nativeElement.value || ''
-          ).toString();
+          // const title = (
+          //   this.previewButton?.nativeElement.value || ''
+          // ).toString();
+
+          const title = customTitle || `Design_${Date.now()}`;
+
+          console.log('Design Title:', title,product);
 
           const savedItem = {
             thumbnail,
@@ -2402,13 +2406,36 @@ doesTitleMatchSearch(title: string, search: string): boolean {
           }
 
           this.showSuccessMessage('Design saved successfully!');
-          this.loadSavedProducts();
+          // this.loadSavedProducts();
         },
         { multiplier: scale, format: 'png', backgroundColor: 'transparent' }
       );
     } else {
       console.error('Designer or current canvas is not ready.');
     }
+  }
+  openTitlePopup() {
+
+    const popup = document.getElementById('title-popup');
+    const input = document.getElementById('design-title-input') as HTMLInputElement;
+    const btn = document.getElementById('save-title-btn');
+
+    if (!popup || !input || !btn) return;
+
+    popup.style.display = 'flex';
+
+    btn.onclick = () => {
+      const value = input.value.trim();
+
+      if (!value) {
+        alert('Please enter a title');
+        return;
+      }
+
+      popup.style.display = 'none';
+      this.saveDesign(value); // 🔥 continue save
+    };
+
   }
 
   addSavedProduct(item: { thumbnail: string; product: any; title: string }) {

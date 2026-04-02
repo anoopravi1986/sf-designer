@@ -100,11 +100,18 @@
     <!-- <a href="https://www.youtube.com/playlist?list=PLU0ltU4FmAbDQ5keQV8cmBmJQ2ejcH4zF" target="_blank"
       rel="noopener noreferrer" class="cursor-pointer"> -->
       <button
+        (click)="openTitlePopup()"
         class="border border-[#ffffff59] mr-[7px] rounded-[8px] font-semibold flex items-center gap-2 bg-transparent text-white pl-[0.565rem] pr-[1rem] py-2 text-sm rounded-[8px] min-w-[80px] justify-center">
         
         Save
       </button>
-      <a href="https://www.youtube.com/playlist?list=PLU0ltU4FmAbDQ5keQV8cmBmJQ2ejcH4zF" target="_blank"
+     
+      <button (click)="toggleDropdown()"
+        class="border border-[#ffffff59] mr-[7px] rounded-[8px] font-semibold flex items-center gap-2 bg-transparent text-white pl-[0.565rem] pr-[1rem] py-2 text-sm rounded-[8px] min-w-[80px] justify-center">
+        
+        Share
+      </button>
+       <a href="https://www.youtube.com/playlist?list=PLU0ltU4FmAbDQ5keQV8cmBmJQ2ejcH4zF" target="_blank"
       rel="noopener noreferrer" class="cursor-pointer" class="flex items-center mr-[10px]">
       <svg xmlns="http://www.w3.org/2000/svg" 
             width="24" height="24" 
@@ -121,11 +128,6 @@
 
         </svg>
     </a>
-      <button (click)="toggleDropdown()"
-        class="border border-[#ffffff59] mr-[7px] rounded-[8px] font-semibold flex items-center gap-2 bg-transparent text-white pl-[0.565rem] pr-[1rem] py-2 text-sm rounded-[8px] min-w-[80px] justify-center">
-        
-        Share
-      </button>
     <!-- </a> -->
 <button
   (click)="addToCart()"
@@ -169,7 +171,7 @@
         </button>
 
         <!-- Print -->
-        <button id="print-button" (click)="printDesign()"
+        <!-- <button id="print-button" (click)="printDesign()"
           class="flex flex-col items-center justify-center space-y-2 text-black">
           <div class="bg-white border border-gray-300 rounded-full p-3">
             <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" fill="none">
@@ -179,10 +181,10 @@
             </svg>
           </div>
           <span class="text-sm font-medium">Print</span>
-        </button>
+        </button> -->
 
         <!-- Save Design -->
-        <button id="save-button" (click)="saveDesign()"
+        <!-- <button id="save-button" (click)="saveDesign()"
           class=" flex flex-col items-center justify-center space-y-2 text-black col-span-3 sm:col-span-1">
           <div class="bg-white border border-gray-300 rounded-full p-3">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
@@ -194,7 +196,7 @@
             </svg>
           </div>
           <span class="text-sm font-medium">Save</span>
-        </button>
+        </button> -->
 
       </div>
 
@@ -319,3 +321,27 @@
 "></div>
 
 <div id="copyData" class="hidden fixed top-[40px] left-[70%] -translate-x-1/2 bg-[#333] text-white px-4 py-2 rounded-md text-sm z-[9999] transition-opacity transition-[bottom] duration-400 ease-in-out">Copied Success</div>
+
+
+
+<div id="title-popup" class="fpd-popup-overlay">
+  <div class="fpd-popup-box">
+
+    <div class="fpd-popup-header">
+      <span>Save Your Design</span>
+    </div>
+
+    <div class="fpd-popup-body">
+      <input 
+        type="text" 
+        id="design-title-input" 
+        placeholder="Enter design title..." 
+      />
+    </div>
+
+    <div class="fpd-popup-footer">
+      <button id="save-title-btn" class="fpd-btn-save">Save</button>
+    </div>
+
+  </div>
+</div>
