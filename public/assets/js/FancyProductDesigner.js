@@ -27970,7 +27970,7 @@ console.log("t:", t);
           redo: { icon: 'redo', title: 'Redo' },
           info: { icon: 'info', title: 'Info' },
           zoom: { icon: 'zoom-in', title: 'Zoom' },
-          download: { icon: 'arrow-down-to-line', title: 'Download' },
+          // download: { icon: 'arrow-down-to-line', title: 'Download' },
           'preview-lightbox': { icon: 'eye', title: 'Preview Lightbox' },
           ruler: { icon: 'ruler', title: 'Ruler' },
           'previous-view': { icon: 'fpd-icon-back', title: 'Previous View' },
