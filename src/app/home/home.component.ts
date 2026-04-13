@@ -1,4 +1,3 @@
-
 import {
   AfterViewInit,
   Component,
@@ -64,7 +63,11 @@ export class HomeComponent implements AfterViewInit {
   private savedContent: string = '';
   fontArrayStr: any;
   private searchTimeout: any;
-
+  showFacebookOptions = false;
+  private lastFacebookType: 'post' | 'message' = 'post';
+  private currentDesignId: string | null = null;
+  @ViewChild('facebookDropdown') facebookDropdownRef!: ElementRef;
+  
   constructor(
     @Inject(PLATFORM_ID) private platformId: any,
     @Inject(DOCUMENT) private document: Document,
@@ -73,6 +76,7 @@ export class HomeComponent implements AfterViewInit {
     private http: HttpClient,
     private titleService: Title
   ) {}
+  
   @ViewChild('previewButton') previewButton!: ElementRef;
   @ViewChild('savedGrid', { static: false }) savedGrid!: ElementRef;
 
@@ -139,7 +143,6 @@ export class HomeComponent implements AfterViewInit {
               }
             }
 
-            // Not found
             resolve({ categoryIndex: -1, productIndex: -1, childIndex: -1 });
           },
           error: (err) => reject(err),
@@ -275,8 +278,6 @@ export class HomeComponent implements AfterViewInit {
         })
        
       }, 300);
-
-      
     }
 
     if (isPlatformBrowser(this.platformId)) {
@@ -486,7 +487,6 @@ export class HomeComponent implements AfterViewInit {
       if (!btnOpacity || !panel || !sliderOpacity) return;
       
 
-      // 🔹 Toggle panel
       btnOpacity.addEventListener('click', () => {
         if (targetSection) {
             const activeElem = targetSection.querySelector('.fpd-active');
@@ -503,7 +503,6 @@ export class HomeComponent implements AfterViewInit {
           } else {
               btnOpacity.classList.remove('fpd-active');
           }
-        // Sync slider with current object opacity
         const canvas = this.designer.currentViewInstance.fabricCanvas;
         const obj = canvas.getActiveObject();
   
@@ -517,7 +516,6 @@ export class HomeComponent implements AfterViewInit {
         const percent = (parseFloat(sliderOpacity.value) / parseFloat(sliderOpacity.max)) * 100;
         sliderOpacity.style.setProperty('--progress', percent + '%');
       }
-      // 🔹 Change opacity live
       sliderOpacity.addEventListener('input', () => {
         updateSliderProgress();
         const canvas = this.designer.currentViewInstance.fabricCanvas;
@@ -528,7 +526,6 @@ export class HomeComponent implements AfterViewInit {
   
         canvas.requestRenderAll();
   
-        // Notify FPD layer panel
         canvas.fire('object:modified', { target: obj });
   
       });
@@ -544,6 +541,526 @@ export class HomeComponent implements AfterViewInit {
       });
     }, 5000);
   }
+async deleteUploadedImage(designId: string, closeBtn?: HTMLElement, modalDiv?: HTMLElement): Promise<boolean> {
+  // Show loading state on close button
+  if (closeBtn) {
+    const button = closeBtn as HTMLButtonElement;
+    const originalText = button.innerHTML;
+    button.innerHTML = `
+      <div style="display:inline-block;width:16px;height:16px;border:2px solid white;border-top-color:transparent;border-radius:50%;animation:spin 0.8s linear infinite;margin-right:8px;"></div>
+      Deleting...
+    `;
+    button.style.opacity = '0.7';
+    button.style.cursor = 'not-allowed';
+    button.disabled = true;
+    
+    try {
+      const response = await fetch(`https://styleflip-backend-jdm5.ithemes.xyz/api/upload/design/${designId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      const result = await response.json();
+      
+      if (result.success) {
+        console.log('Image deleted from server successfully');
+        this.showToast('Design deleted from server');
+        
+        // Restore button briefly before closing
+        button.innerHTML = '✓ Deleted!';
+        setTimeout(() => {
+          if (modalDiv) modalDiv.remove();
+        }, 500);
+        
+        return true;
+      } else {
+        console.error('Failed to delete image:', result.error);
+        button.innerHTML = originalText;
+        button.style.opacity = '1';
+        button.style.cursor = 'pointer';
+        button.disabled = false;
+        this.showToast('Failed to delete: ' + result.error);
+        return false;
+      }
+    } catch (error) {
+      console.error('Error deleting image:', error);
+      button.innerHTML = originalText;
+      button.style.opacity = '1';
+      button.style.cursor = 'pointer';
+      button.disabled = false;
+      this.showToast('Error deleting design');
+      return false;
+    }
+  } else {
+    // Original behavior without button UI update
+    try {
+      const response = await fetch(`https://styleflip-backend-jdm5.ithemes.xyz/api/upload/design/${designId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      const result = await response.json();
+      
+      if (result.success) {
+        console.log('Image deleted from server successfully');
+        this.showToast('Design deleted from server');
+        return true;
+      } else {
+        console.error('Failed to delete image:', result.error);
+        return false;
+      }
+    } catch (error) {
+      console.error('Error deleting image:', error);
+      return false;
+    }
+  }
+}
+  // ==================== SHARING FUNCTIONALITY ====================
+
+  // Share to Facebook - Opens popup immediately with loading state
+ async shareToFacebook(type: 'post' | 'message') {
+  this.lastFacebookType = type;
+  this.closeFacebookOptions();
+  
+  this.showFacebookShareModalWithLoading(type);
+  
+  try {
+    const imageBlob = await this.getCurrentDesignBlob();
+    const designTitle = this.activeImageTitle || `Design_${Date.now()}`;
+    
+    const formData = new FormData();
+    formData.append('image', imageBlob, 'design.png');
+    formData.append('title', designTitle);
+    
+    const API_URL = 'https://styleflip-backend-jdm5.ithemes.xyz/api/upload/upload';
+    
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 30000);
+    
+    const response = await fetch(API_URL, {
+      method: 'POST',
+      body: formData,
+      signal: controller.signal
+    });
+    
+    clearTimeout(timeoutId);
+    
+    if (!response.ok) {
+      throw new Error(`Upload failed with status: ${response.status}`);
+    }
+    
+    const result = await response.json();
+    
+    if (result.success) {
+      // Store the design_id for deletion
+      this.currentDesignId = result.design_id;
+      
+      const imageUrl = result.imageUrl;
+      const shareText = `Check out my custom design on Styleflip: ${designTitle}\n${imageUrl}`;
+      
+      this.updateFacebookModalWithData(shareText, imageUrl, type);
+      
+      const storageKey = this.designer.container?.id || 'fpd-saved-designs';
+      let savedList: any[] = [];
+      try {
+        savedList = JSON.parse(window.localStorage.getItem(storageKey) || '[]');
+      } catch {
+        savedList = [];
+      }
+      savedList.push({
+        thumbnail: result.imageUrl,
+        product: this.designer.getProduct ? this.designer.getProduct() : {},
+        title: designTitle,
+        imageUrl: imageUrl,
+        design_id: result.design_id
+      });
+      window.localStorage.setItem(storageKey, JSON.stringify(savedList));
+      
+    } else {
+      throw new Error(result.error || 'Failed to get image URL');
+    }
+  } catch (error) {
+    console.error('Facebook share error:', error);
+    this.updateFacebookModalWithError(error as Error);
+  }
+}
+
+showFacebookShareModalWithLoading(type: 'post' | 'message') {
+  const shareTypeText = type === 'post' ? 'Feed Post' : 'Messenger';
+  
+  const modalHtml = `
+    <div id="facebook-share-modal" style="position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.8);z-index:10000;display:flex;align-items:center;justify-content:center;">
+      <div style="background:white;border-radius:12px;padding:24px;max-width:500px;text-align:center;">
+        <h3 style="margin-bottom:16px;color:#1877F2;">Share to Facebook ${shareTypeText}</h3>
+        
+        <div id="facebook-loading" style="text-align:center;padding:20px;">
+          <div style="display:inline-block;width:40px;height:40px;border:4px solid #f3f3f3;border-top:4px solid #1877F2;border-radius:50%;animation:spin 1s linear infinite;"></div>
+          <p style="margin-top:10px;">Uploading your design...</p>
+        </div>
+        
+        <div id="facebook-content" style="display:none;">
+          <p style="margin-bottom:16px;">Your design has been uploaded! Share this link on Facebook:</p>
+          <div style="background:#f0f0f0;padding:12px;border-radius:8px;margin-bottom:16px;word-break:break-all;" id="share-text-container"></div>
+          <div style="margin-bottom:16px;">
+            <img id="share-image" src="" style="max-width:100%;max-height:200px;border-radius:8px;" />
+          </div>
+          <button id="open-facebook-${type}" style="background:#42B72A;color:white;border:none;padding:12px 24px;border-radius:8px;margin-bottom:12px;cursor:pointer;width:100%;">Open Facebook ${shareTypeText}</button>
+        </div>
+        
+        <button id="close-facebook-modal" style="background:#e74c3c;color:white;border:none;padding:8px 16px;border-radius:6px;cursor:pointer;width:100%;">Close</button>
+      </div>
+    </div>
+    <style>
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+    </style>
+  `;
+  
+  const modalDiv = document.createElement('div');
+  modalDiv.innerHTML = modalHtml;
+  document.body.appendChild(modalDiv);
+  
+  (window as any).currentFacebookModal = modalDiv;
+  
+  const closeBtn = modalDiv.querySelector('#close-facebook-modal') as HTMLButtonElement;
+  if (closeBtn) {
+    closeBtn.onclick = async () => {
+      if (this.currentDesignId) {
+        const deleted = await this.deleteUploadedImage(this.currentDesignId, closeBtn, modalDiv);
+        if (deleted) {
+          this.currentDesignId = null;
+        } else {
+          closeBtn.style.opacity = '1';
+          closeBtn.style.cursor = 'pointer';
+          closeBtn.disabled = false;
+        }
+      } else {
+        modalDiv.remove();
+        (window as any).currentFacebookModal = null;
+      }
+    };
+  }
+}
+
+updateFacebookModalWithData(shareText: string, imageUrl: string, type: 'post' | 'message') {
+  const modalDiv = (window as any).currentFacebookModal;
+  if (!modalDiv || !document.body.contains(modalDiv)) return;
+  
+  const loadingDiv = modalDiv.querySelector('#facebook-loading');
+  const contentDiv = modalDiv.querySelector('#facebook-content');
+  const shareTextContainer = modalDiv.querySelector('#share-text-container');
+  const shareImage = modalDiv.querySelector('#share-image');
+  
+  if (loadingDiv) loadingDiv.style.display = 'none';
+  if (contentDiv) contentDiv.style.display = 'block';
+  if (shareTextContainer) shareTextContainer.textContent = shareText;
+  if (shareImage) (shareImage as HTMLImageElement).src = imageUrl;
+  
+  const openBtn = modalDiv.querySelector(`#open-facebook-${type}`);
+  
+  if (openBtn) {
+    (openBtn as HTMLElement).onclick = () => {
+      if (type === 'post') {
+        const fbShareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(imageUrl)}&quote=${encodeURIComponent('Check out my custom design on Styleflip!')}`;
+        window.open(fbShareUrl, '_blank', 'width=600,height=400');
+      } else {
+        const fbMessageUrl = `https://www.facebook.com/dialog/send?link=${encodeURIComponent(imageUrl)}&app_id=703796939215127&redirect_uri=${encodeURIComponent(window.location.href)}`;
+        window.open(fbMessageUrl, '_blank', 'width=600,height=500');
+      }
+    };
+  }
+}
+
+updateFacebookModalWithError(error: Error) {
+  const modalDiv = (window as any).currentFacebookModal;
+  if (!modalDiv || !document.body.contains(modalDiv)) return;
+  
+  const loadingDiv = modalDiv.querySelector('#facebook-loading');
+  const contentDiv = modalDiv.querySelector('#facebook-content');
+  
+  if (loadingDiv) {
+    loadingDiv.innerHTML = `
+      <div style="color:#e74c3c;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="8" x2="12" y2="12"></line>
+          <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+        <p style="margin-top:10px;color:#e74c3c;">Error: ${error.message}</p>
+        <button id="retry-facebook-share" style="margin-top:10px;background:#1877F2;color:white;border:none;padding:8px 16px;border-radius:6px;cursor:pointer;">Retry</button>
+      </div>
+    `;
+    
+    const retryBtn = modalDiv.querySelector('#retry-facebook-share');
+    if (retryBtn) {
+      (retryBtn as HTMLElement).onclick = () => {
+        modalDiv.remove();
+        (window as any).currentFacebookModal = null;
+        this.shareToFacebook(this.lastFacebookType);
+      };
+    }
+  }
+  
+  if (contentDiv) contentDiv.style.display = 'none';
+}
+
+  // Share to Instagram - Opens popup immediately with loading state
+async shareToInstagram() {
+  this.closeFacebookOptions();
+  
+  this.showInstagramShareModalWithLoading();
+  
+  try {
+    const imageBlob = await this.getCurrentDesignBlob();
+    const designTitle = this.activeImageTitle || `Design_${Date.now()}`;
+    
+    const formData = new FormData();
+    formData.append('image', imageBlob, 'design.png');
+    formData.append('title', designTitle);
+    
+    const API_URL = 'https://styleflip-backend-jdm5.ithemes.xyz/api/upload/upload';
+    
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 30000);
+    
+    const response = await fetch(API_URL, {
+      method: 'POST',
+      body: formData,
+      signal: controller.signal
+    });
+    
+    clearTimeout(timeoutId);
+    
+    if (!response.ok) {
+      throw new Error(`Upload failed with status: ${response.status}`);
+    }
+    
+    const result = await response.json();
+    
+    if (result.success) {
+      // Store the design_id for deletion
+      this.currentDesignId = result.design_id;
+      
+      const imageUrl = result.imageUrl;
+      const shareText = `Check out my custom design on Styleflip: ${designTitle}\n${imageUrl}`;
+      
+      this.updateInstagramModalWithData(shareText, imageUrl);
+      
+      const storageKey = this.designer.container?.id || 'fpd-saved-designs';
+      let savedList: any[] = [];
+      try {
+        savedList = JSON.parse(window.localStorage.getItem(storageKey) || '[]');
+      } catch {
+        savedList = [];
+      }
+      savedList.push({
+        thumbnail: result.imageUrl,
+        product: this.designer.getProduct ? this.designer.getProduct() : {},
+        title: designTitle,
+        imageUrl: imageUrl,
+        design_id: result.design_id
+      });
+      window.localStorage.setItem(storageKey, JSON.stringify(savedList));
+      
+    } else {
+      throw new Error(result.error || 'Failed to get image URL');
+    }
+  } catch (error) {
+    console.error('Instagram share error:', error);
+    this.updateInstagramModalWithError(error as Error);
+  }
+}
+showInstagramShareModalWithLoading() {
+  const modalHtml = `
+    <div id="instagram-share-modal" style="position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.8);z-index:10000;display:flex;align-items:center;justify-content:center;">
+      <div style="background:white;border-radius:12px;padding:24px;max-width:500px;text-align:center;">
+        <h3 style="margin-bottom:16px;color:#E4405F;">Share to Instagram</h3>
+        
+        <div id="instagram-loading" style="text-align:center;padding:20px;">
+          <div style="display:inline-block;width:40px;height:40px;border:4px solid #f3f3f3;border-top:4px solid #E4405F;border-radius:50%;animation:spin 1s linear infinite;"></div>
+          <p style="margin-top:10px;">Uploading your design...</p>
+        </div>
+        
+        <div id="instagram-content" style="display:none;">
+          <p style="margin-bottom:16px;">
+            <strong>Note : -</strong> First, click the Copy Link button. Then, open Instagram Web and send your design using the URL.
+          </p>
+          <div style="margin-bottom:16px;">
+            <img id="instagram-share-image" src="" style="max-width:100%;max-height:200px;border-radius:8px;" />
+          </div>
+          <button id="copy-instagram-link" style="background:#E4405F;color:white;border:none;padding:12px 24px;border-radius:8px;margin-bottom:12px;cursor:pointer;width:100%;">Copy Link</button>
+          <button id="open-instagram-web" style="background:#405DE6;color:white;border:none;padding:12px 24px;border-radius:8px;margin-bottom:12px;cursor:pointer;width:100%;">Open Instagram Web</button>
+        </div>
+        
+        <button id="close-instagram-modal" style="background:#e74c3c;color:white;border:none;padding:8px 16px;border-radius:6px;cursor:pointer;width:100%;">Close</button>
+      </div>
+    </div>
+    <style>
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+    </style>
+  `;
+  
+  const modalDiv = document.createElement('div');
+  modalDiv.innerHTML = modalHtml;
+  document.body.appendChild(modalDiv);
+  
+  (window as any).currentInstagramModal = modalDiv;
+  
+  const closeBtn = modalDiv.querySelector('#close-instagram-modal') as HTMLButtonElement;
+  if (closeBtn) {
+    closeBtn.onclick = async () => {
+      if (this.currentDesignId) {
+        const deleted = await this.deleteUploadedImage(this.currentDesignId, closeBtn, modalDiv);
+        if (deleted) {
+          this.currentDesignId = null;
+        } else {
+          closeBtn.style.opacity = '1';
+          closeBtn.style.cursor = 'pointer';
+          closeBtn.disabled = false;
+        }
+      } else {
+        modalDiv.remove();
+        (window as any).currentInstagramModal = null;
+      }
+    };
+  }
+}
+
+updateInstagramModalWithData(shareText: string, imageUrl: string) {
+  const modalDiv = (window as any).currentInstagramModal;
+  if (!modalDiv || !document.body.contains(modalDiv)) return;
+  
+  const loadingDiv = modalDiv.querySelector('#instagram-loading');
+  const contentDiv = modalDiv.querySelector('#instagram-content');
+  const shareImage = modalDiv.querySelector('#instagram-share-image');
+  
+  if (loadingDiv) loadingDiv.style.display = 'none';
+  if (contentDiv) contentDiv.style.display = 'block';
+  if (shareImage) (shareImage as HTMLImageElement).src = imageUrl;
+  
+  const copyBtn = modalDiv.querySelector('#copy-instagram-link');
+  const openWebBtn = modalDiv.querySelector('#open-instagram-web');
+  
+  if (copyBtn) {
+    (copyBtn as HTMLElement).onclick = async () => {
+      await navigator.clipboard.writeText(shareText);
+      (copyBtn as HTMLElement).textContent = 'Copied!';
+      setTimeout(() => {
+        (copyBtn as HTMLElement).textContent = 'Copy Link';
+      }, 2000);
+      this.showToast('Link copied to clipboard!');
+    };
+  }
+  
+  if (openWebBtn) {
+    (openWebBtn as HTMLElement).onclick = () => {
+      window.open('https://www.instagram.com', '_blank');
+    };
+  }
+}
+
+ updateInstagramModalWithError(error: Error) {
+  const modalDiv = (window as any).currentInstagramModal;
+  if (!modalDiv || !document.body.contains(modalDiv)) return;
+  
+  const loadingDiv = modalDiv.querySelector('#instagram-loading');
+  const contentDiv = modalDiv.querySelector('#instagram-content');
+  
+  if (loadingDiv) {
+    loadingDiv.innerHTML = `
+      <div style="color:#e74c3c;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="8" x2="12" y2="12"></line>
+          <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+        <p style="margin-top:10px;color:#e74c3c;">Error: ${error.message}</p>
+        <button id="retry-instagram-share" style="margin-top:10px;background:#E4405F;color:white;border:none;padding:8px 16px;border-radius:6px;cursor:pointer;">Retry</button>
+      </div>
+    `;
+    
+    const retryBtn = modalDiv.querySelector('#retry-instagram-share');
+    if (retryBtn) {
+      (retryBtn as HTMLElement).onclick = () => {
+        modalDiv.remove();
+        (window as any).currentInstagramModal = null;
+        this.shareToInstagram();
+      };
+    }
+  }
+  
+  if (contentDiv) contentDiv.style.display = 'none';
+}
+
+  closeFacebookOptions() {
+    this.showFacebookOptions = false;
+  }
+
+  toggleFacebookOptions() {
+    this.showFacebookOptions = !this.showFacebookOptions;
+  }
+
+  @HostListener('document:click', ['$event'])
+  onClickOutsideFacebook(event: Event) {
+    if (this.facebookDropdownRef && 
+        !this.facebookDropdownRef.nativeElement.contains(event.target) &&
+        this.showFacebookOptions) {
+      this.showFacebookOptions = false;
+    }
+  }
+
+  // Get current canvas image as Blob
+  async getCurrentDesignBlob(): Promise<Blob> {
+    return new Promise((resolve, reject) => {
+      if (this.designer && this.designer.currentViewInstance && this.designer.currentViewInstance.fabricCanvas) {
+        const canvas = this.designer.currentViewInstance.fabricCanvas;
+        const htmlCanvas = canvas.getElement();
+        
+        if (htmlCanvas && htmlCanvas.toBlob) {
+          htmlCanvas.toBlob((blob: Blob | null) => {
+            if (blob) {
+              resolve(blob);
+            } else {
+              reject('Failed to convert canvas to blob');
+            }
+          }, 'image/png', 1);
+        } else {
+          const dataUrl = canvas.toDataURL({
+            format: 'png',
+            multiplier: 1,
+            enableRetinaScaling: true,
+          });
+          const blob = this.dataURLtoBlob(dataUrl);
+          resolve(blob);
+        }
+      } else {
+        reject('Designer not ready');
+      }
+    });
+  }
+
+  dataURLtoBlob(dataURL: string): Blob {
+    const arr = dataURL.split(',');
+    const mime = arr[0].match(/:(.*?);/)?.[1] || 'image/png';
+    const bstr = atob(arr[1]);
+    let n = bstr.length;
+    const u8arr = new Uint8Array(n);
+    while (n--) {
+      u8arr[n] = bstr.charCodeAt(n);
+    }
+    return new Blob([u8arr], { type: mime });
+  }
+
+  // ==================== END OF SHARING FUNCTIONALITY ====================
 
   moveBoldToPrimaryTools(): void {
     console.log('Moving Bold to Primary Tools');
@@ -748,7 +1265,6 @@ export class HomeComponent implements AfterViewInit {
           canvas.bringForward(obj);
           moveLayerRowUp(obj.id);
         } else {
-          // alert('Not possible to move above Overlay layer!');
           this.showToast('Not possible to move above Overlay layer!');
           return;
         }
@@ -757,15 +1273,8 @@ export class HomeComponent implements AfterViewInit {
         moveLayerRowUp(obj.id);
       }
 
-      /* =========================
-        🔁 IMPORTANT: sync layers
-      ========================== */
       obj.setCoords();
       console.log('✅ Layer moved up & layer panel notified 1', obj);
-      // 🔹 Fabric event (FPD listens to this)
-      // canvas.fire('object:modified', { target: obj });
-
-      // 🔹 FPD custom event (used by layer panel)
       canvas.fire('object:modified', { target: obj });
       canvas.fire('elementModify', {
         element: obj,
@@ -775,50 +1284,41 @@ export class HomeComponent implements AfterViewInit {
       canvas.requestRenderAll();
 
       console.log('✅ Layer moved up & layer panel notified');
+    });
 
+    function moveLayerRowUp(elementId: string) {
+      const list = document.querySelector('.fpd-list');
+      if (!list) return;
 
-      
-    
-});
+      const row = document.getElementById(elementId);
+      if (!row) return;
 
-function moveLayerRowUp(elementId: string) {
+      const prevRow = row.previousElementSibling;
 
-  const list = document.querySelector('.fpd-list');
-  if (!list) return;
+      if (!prevRow || prevRow.classList.contains('fpd-locked')) {
+        console.log('Cannot move above Base');
+        return;
+      }
 
-  const row = document.getElementById(elementId);
-  if (!row) return;
+      list.insertBefore(row, prevRow);
 
-  const prevRow = row.previousElementSibling;
+      console.log('✅ DOM layer moved up');
+    }
 
-  // Prevent moving above Base
-  if (!prevRow || prevRow.classList.contains('fpd-locked')) {
-    console.log('Cannot move above Base');
-    return;
-  }
+    function moveLayerRowDown(elementId: string) {
+      const list = document.querySelector('.fpd-list');
+      if (!list) return;
 
-  list.insertBefore(row, prevRow);
+      const row = document.getElementById(elementId);
+      if (!row) return;
 
-  console.log('✅ DOM layer moved up');
-}
+      const nextRow = row.nextElementSibling;
+      if (!nextRow) return;
 
-function moveLayerRowDown(elementId: string) {
+      list.insertBefore(nextRow, row);
 
-  const list = document.querySelector('.fpd-list');
-  if (!list) return;
-
-  const row = document.getElementById(elementId);
-  if (!row) return;
-
-  const nextRow = row.nextElementSibling;
-  if (!nextRow) return;
-
-  list.insertBefore(nextRow, row);
-
-  console.log('✅ DOM layer moved down');
-}
-
-
+      console.log('✅ DOM layer moved down');
+    }
 
     document.getElementById('TextMoveDown')?.addEventListener('click', () => {
       const canvas = this.designer.currentViewInstance.fabricCanvas;
@@ -837,7 +1337,6 @@ function moveLayerRowDown(elementId: string) {
           canvas.sendBackwards(obj);
           moveLayerRowDown(obj.id);
         } else {
-          // alert("Reached just above base, not moving further down.");
           this.showToast("Reached just above base, not moving further down.");
         }
       } else {
@@ -904,24 +1403,14 @@ function moveLayerRowDown(elementId: string) {
       console.log("e.currentTarget",e.currentTarget)
       const canvas = this.designer.currentViewInstance.fabricCanvas;
       const obj = canvas.getActiveObject();
-      // if (obj) {
-      //   obj.clone((cloned: any) => {
-      //     copiedObject = cloned;
-      //     console.log('Copied object:', copiedObject);
-      //     this.showToast('Copied successfully!');
-      //   });
-      // }
-
 
       if (!obj) return;
 
-      // 🔥 CURVED TEXT
       if (obj.type === 'curved-text') {
-
         copiedObject = {
           type: 'curved-text',
           params: {
-            ...obj.toObject(),   // 🔥 includes ALL FPD custom props
+            ...obj.toObject(),
           }
         };
 
@@ -930,7 +1419,6 @@ function moveLayerRowDown(elementId: string) {
         return;
       }
 
-      // 🔥 NORMAL OBJECTS (image, text, group)
       obj.clone((cloned: any) => {
         copiedObject = {
           type: obj.type,
@@ -940,6 +1428,7 @@ function moveLayerRowDown(elementId: string) {
         this.showToast('Copied successfully!');
       });
     });
+
     document.addEventListener('keydown', (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'c') {
         console.log("Ctrl+C pressed",);
@@ -950,10 +1439,8 @@ function moveLayerRowDown(elementId: string) {
         const obj = canvas.getActiveObject();
         console.log("Ctrl+C pressed, active object:", obj, obj.type);
         
-
         if (!obj) return;
 
-        // 🔥 FIX: normalize image before clone
         if (obj.type === 'image') {
           if (!Array.isArray(obj.filters)) {
             obj.filters = [];
@@ -961,7 +1448,6 @@ function moveLayerRowDown(elementId: string) {
         }
 
         obj.clone((cloned: any) => {
-          // 🔥 ALSO normalize cloned image
           if (cloned.type === 'image') {
             if (!Array.isArray(cloned.filters)) {
               cloned.filters = [];
@@ -975,87 +1461,62 @@ function moveLayerRowDown(elementId: string) {
       }
     });
 
-    // document.getElementById('pastetext')?.addEventListener('click', () => {
-    //   const canvas = this.designer.currentViewInstance.fabricCanvas;
-    //   if (copiedObject) {
-    //     this.designer.currentViewInstance.fabricCanvas.duplicateElement(
-    //       this.designer.currentElement
-    //     )
-    //     this.showToast('Paste successfully!');
-    //   }
-    // });
     document.getElementById('pastetext')?.addEventListener('click', () => {
-      
-  const view   = this.designer.currentViewInstance;
-  const canvas = view.fabricCanvas;
-  console.log("e.currentTarget copiedObjectdata",copiedObject)
-  if (!copiedObject) return;
+      const view = this.designer.currentViewInstance;
+      const canvas = view.fabricCanvas;
+      console.log("e.currentTarget copiedObjectdata",copiedObject)
+      if (!copiedObject) return;
 
-  /* -------------------------------------------------
-   * 🔥 CURVED TEXT — manual recreate (FPD safe)
-   * ------------------------------------------------- */
-  if (copiedObject.type === 'curved-text') {
+      if (copiedObject.type === 'curved-text') {
+        const zoom = canvas.getZoom();
 
-    const zoom = canvas.getZoom();
+        const params = {
+          ...copiedObject.params,
+          scaleX: (copiedObject.scaleX || 1),
+          scaleY: (copiedObject.scaleY || 1),
+          left: (copiedObject.left || 500) + 20,
+          top:  (copiedObject.top  || 500) + 20,
+          angle: copiedObject.angle || 0,
+          flipX: copiedObject.flipX || false,
+          flipY: copiedObject.flipY || false,
+          colors: copiedObject.colors || ['#000000'],
+          originX: copiedObject.originX || 'center',
+          originY: copiedObject.originY || 'center',
+          curved: true,
+          curvable: copiedObject.curvable || 1,
+          selectable: true,
+          evented: true,
+          boundingBox: 'base',
+          boundingBoxMode: 'clipping',
+          hasControls: true,
+          draggable: true,
+          resizable: true,
+          rotatable: true,
+          removable: true,
+          lockUniScaling: true,
+          scalable: true,
+          editable: true,
+        };
 
-    const params = {
-      ...copiedObject.params,
+        delete params.objects;
+        delete params.clipPath;
+        delete params.path;
 
-      // 🎯 same visual size
-      scaleX: (copiedObject.scaleX || 1),
-      scaleY: (copiedObject.scaleY || 1),
+        canvas.addElement(
+          'curvedText',
+          params.text,
+          params.text,
+          params
+        );
 
-      // 🎯 same position (+ small offset)
-      left: (copiedObject.left || 500) + 20,
-      top:  (copiedObject.top  || 500) + 20,
+        canvas.requestRenderAll();
+        this.showToast('Curved text pasted ✔');
+        return;
+      }
 
-      angle: copiedObject.angle || 0,
-      flipX: copiedObject.flipX || false,
-      flipY: copiedObject.flipY || false,
-
-      colors: copiedObject.colors || ['#000000'],
-      originX: copiedObject.originX || 'center',
-      originY: copiedObject.originY || 'center',
-      curved: true,
-      curvable: copiedObject.curvable || 1,
-      selectable: true,
-      evented: true,
-      boundingBox: 'base',
-      boundingBoxMode: 'clipping',
-      hasControls: true,
-      draggable: true,
-      resizable: true,
-      rotatable: true,
-      removable: true,
-      lockUniScaling: true,
-      scalable: true,
-      editable: true,
-    };
-
-    // ❌ remove Fabric-only junk
-    delete params.objects;
-    delete params.clipPath;
-    delete params.path;
-
-    // ✅ REAL FPD API
-    canvas.addElement(
-      'curvedText',
-      params.text,        // title
-      params.text,        // text
-      params
-    );
-
-    canvas.requestRenderAll();
-    this.showToast('Curved text pasted ✔');
-    return;
-  }
-
-  /* -------------------------------------------------
-   * ✅ NORMAL TEXT / IMAGE / GROUP
-   * ------------------------------------------------- */
-  canvas.duplicateElement(this.designer.currentElement);
-  this.showToast('Paste successfully!');
-});
+      canvas.duplicateElement(this.designer.currentElement);
+      this.showToast('Paste successfully!');
+    });
 
     document.addEventListener('keydown', (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'v') {
@@ -1069,60 +1530,54 @@ function moveLayerRowDown(elementId: string) {
         }
       }
     });
-    // Add this near your other keyboard event listeners in ngAfterViewInit()
-document.addEventListener('keydown', (e: KeyboardEvent) => {
-  // Check for Delete or Backspace key
-  if (e.key === 'Delete' || e.key === 'Backspace') {
-    // Prevent default browser behavior (like going back in history for Backspace)
-    e.preventDefault();
-    
-    const canvas = this.designer?.currentViewInstance?.fabricCanvas;
-    if (!canvas) return;
-    
-    const activeObject = canvas.getActiveObject();
-    
-    if (activeObject) {
-      // Check if it's a group of objects
-      if (activeObject.type === 'activeSelection') {
-        // Delete all selected objects in the group
-        activeObject.forEachObject((obj: any) => {
-          canvas.remove(obj);
-        });
-      } else {
-        // Delete single object
-        canvas.remove(activeObject);
-      }
-      
-      canvas.discardActiveObject();
-      canvas.requestRenderAll();
-      
-      this.showToast('Item deleted successfully!');
-    }
-  }
-});
 
-// Also add a click handler for delete button if you have one
-document.getElementById('deletetext')?.addEventListener('click', () => {
-  const canvas = this.designer?.currentViewInstance?.fabricCanvas;
-  if (!canvas) return;
-  
-  const activeObject = canvas.getActiveObject();
-  
-  if (activeObject) {
-    if (activeObject.type === 'activeSelection') {
-      activeObject.forEachObject((obj: any) => {
-        canvas.remove(obj);
-      });
-    } else {
-      canvas.remove(activeObject);
-    }
-    
-    canvas.discardActiveObject();
-    canvas.requestRenderAll();
-    
-    this.showToast('Item deleted successfully!');
-  }
-});
+    document.addEventListener('keydown', (e: KeyboardEvent) => {
+      if (e.key === 'Delete' || e.key === 'Backspace') {
+        e.preventDefault();
+        
+        const canvas = this.designer?.currentViewInstance?.fabricCanvas;
+        if (!canvas) return;
+        
+        const activeObject = canvas.getActiveObject();
+        
+        if (activeObject) {
+          if (activeObject.type === 'activeSelection') {
+            activeObject.forEachObject((obj: any) => {
+              canvas.remove(obj);
+            });
+          } else {
+            canvas.remove(activeObject);
+          }
+          
+          canvas.discardActiveObject();
+          canvas.requestRenderAll();
+          
+          this.showToast('Item deleted successfully!');
+        }
+      }
+    });
+
+    document.getElementById('deletetext')?.addEventListener('click', () => {
+      const canvas = this.designer?.currentViewInstance?.fabricCanvas;
+      if (!canvas) return;
+      
+      const activeObject = canvas.getActiveObject();
+      
+      if (activeObject) {
+        if (activeObject.type === 'activeSelection') {
+          activeObject.forEachObject((obj: any) => {
+            canvas.remove(obj);
+          });
+        } else {
+          canvas.remove(activeObject);
+        }
+        
+        canvas.discardActiveObject();
+        canvas.requestRenderAll();
+        
+        this.showToast('Item deleted successfully!');
+      }
+    });
 
     document.getElementById('letter-spacing')?.addEventListener('click', (e) => {
       console.log("e.currentTarget",e.currentTarget)
@@ -1402,7 +1857,7 @@ document.getElementById('deletetext')?.addEventListener('click', () => {
       ?.replace(/--+/g, '-');
   }
 
-  ngOnInit() {
+  async ngOnInit() {
     setTimeout(() => {
       lucide.createIcons(); 
     }, 5000);
@@ -1620,17 +2075,42 @@ document.getElementById('deletetext')?.addEventListener('click', () => {
     );
     console.log("designer is", this.designer);
     
-    fetch("https://styleflip-backend-jdm5.ithemes.xyz/api/product/getAllProducts")
-      .then((res) => res.json())
-      .then(async (data) => {
-        console.log("Large products loaded:", data);
-        await saveProducts(data);
-        const stored = await getProducts();
-        console.log("IndexedDB products:", stored);
-        this.designer.product = stored;
-        console.log(this.designer.product, "✅ Products loaded into designer");
-      })
-      .catch((err) => console.error("Error loading large products:", err));
+   // Step 1: First load from IndexedDB (immediate display)
+console.log("📀 Loading from IndexedDB first...");
+const cachedProducts = await getProducts();
+
+if (cachedProducts && cachedProducts.length > 0) {
+  console.log("✅ Loaded", cachedProducts.length, "products from IndexedDB");
+  this.designer.product = cachedProducts;
+  this.showFPDLoading(false);
+} else {
+  console.log("⚠️ No cached data, showing loader");
+  this.showFPDLoading(true);
+}
+
+// Step 2: Fetch fresh data from API (background update)
+console.log("🌐 Fetching fresh data from API...");
+fetch("https://styleflip-backend-jdm5.ithemes.xyz/api/product/getAllProducts")
+  .then((res) => res.json())
+  .then(async (freshData) => {
+    console.log("📦 Fresh API data received:", freshData.length, "products");
+    
+    // Update IndexedDB with fresh data
+    await saveProducts(freshData);
+    
+    // Update designer with fresh data
+    this.designer.product = freshData;
+    console.log("✅ Designer updated with fresh data");
+    
+    this.showFPDLoading(false);
+    
+    // Optional: Show toast notification (uncomment if you have this method)
+    // this.showToast("Products updated!");
+  })
+  .catch((err) => {
+    console.error("❌ API fetch failed:", err);
+    this.showFPDLoading(false);
+  });
 
     const slug = this.route.snapshot.paramMap.get('slug');
     const manufacturer = this.route.snapshot.paramMap.get('manufacturer');
@@ -1758,9 +2238,7 @@ document.getElementById('deletetext')?.addEventListener('click', () => {
   filterThumbnails(searchTerm: string) {
     console.log('searchTerm', searchTerm);
     
-    // Add debounce and minimum character check
     if (searchTerm.length < 2) {
-      // Show all thumbnails
       const parentDiv = document.querySelector('div[data-moduleicon="layout-panel-left"]');
       if (!parentDiv) return;
 
@@ -1783,7 +2261,6 @@ document.getElementById('deletetext')?.addEventListener('click', () => {
       console.log('title', title, 'searchTerm', searchTerm);
       const search = searchTerm.toLowerCase();
 
-      // Improved search logic - search for words, not just letters
       const titleWords = title.split(' ');
       const matches = titleWords.some(word => word.startsWith(search));
       
@@ -1791,99 +2268,83 @@ document.getElementById('deletetext')?.addEventListener('click', () => {
     });
   }
 
-filterThumbnailsP(searchTerm: string) {
-  console.log('searchTerm', searchTerm);
-  
-  // Add minimum character limit
-  if (searchTerm.length < 2) {
-    // Show all thumbnails when search is too short
-    const allThumbnails = document.querySelectorAll('.fpd-item.fpd-hover-thumbnail');
-    console.log('Showing all thumbnails (search too short)', allThumbnails.length);
-    allThumbnails.forEach((thumb: Element) => {
-      (thumb as HTMLElement).style.display = 'flex';
-    });
+  filterThumbnailsP(searchTerm: string) {
+    console.log('searchTerm', searchTerm);
     
-    // Also show all parent containers
-    document.querySelectorAll('.box-contain-text').forEach((container) => {
-      (container as HTMLElement).style.display = 'block';
-    });
-    return;
-  }
-
-  // Normalize search term
-  const search = searchTerm.toLowerCase().trim();
-  
-  // Get ALL thumbnail containers to search through
-  const containers = [
-    ...document.querySelectorAll('.fpd-grid.skins-data'),
-    ...document.querySelectorAll('.fpd-grid.ProductModule'),
-    ...document.querySelectorAll('.fpd-grid')
-  ];
-  
-  console.log('Found containers to search:', containers.length);
-   console.log('containers data ', containers);
-  
-  let totalMatches = 0;
-  let totalItems = 0;
-  
-  containers.forEach((container) => {
-    const thumbnails = container.querySelectorAll('.fpd-item.fpd-hover-thumbnail');
-    totalItems += thumbnails.length;
-      console.log('thumbnails data ', thumbnails);
-    thumbnails.forEach((thumb: Element) => {
-      const title = thumb.getAttribute('data-title')?.toLowerCase() || '';
-      const matches = this.doesTitleMatchSearch(title, search);
-        console.log('matches data ', matches);
-      if (matches) {
-        totalMatches++;
-        console.log(`Match found: "${title}" for search "${search}"`);
-      }
+    if (searchTerm.length < 2) {
+      const allThumbnails = document.querySelectorAll('.fpd-item.fpd-hover-thumbnail');
+      console.log('Showing all thumbnails (search too short)', allThumbnails.length);
+      allThumbnails.forEach((thumb: Element) => {
+        (thumb as HTMLElement).style.display = 'flex';
+      });
       
-      (thumb as HTMLElement).style.display = matches ? 'flex' : 'none';
-    });
-  });
-  
-  console.log(`Search results: ${totalMatches} matches out of ${totalItems} items for "${search}"`);
-  
-  // Handle parent containers visibility
-  document.querySelectorAll('.box-contain-text').forEach((container) => {
-    const children = container.querySelectorAll('.fpd-item');
-    const anyVisible = Array.from(children).some(
-      (child) => (child as HTMLElement).style.display !== 'none'
-    );
-    (container as HTMLElement).style.display = anyVisible ? 'block' : 'none';
-  });
-}
+      document.querySelectorAll('.box-contain-text').forEach((container) => {
+        (container as HTMLElement).style.display = 'block';
+      });
+      return;
+    }
 
-// Updated helper method for better search matching
-doesTitleMatchSearch(title: string, search: string): boolean {
-  if (!search || search.length < 2) return true;
-  
-  // Clean up the title for better matching
-  const cleanTitle = title.toLowerCase().replace(/[^\w\s-]/g, ' ');
-  
-  // Split search into individual words
-  const searchWords = search.split(/\s+/).filter(word => word.length > 0);
-  
-  // If search is a single word
-  if (searchWords.length === 1) {
-    const searchWord = searchWords[0];
+    const search = searchTerm.toLowerCase().trim();
     
-    // Check if any word in title starts with search word
-    const titleWords = cleanTitle.split(/\s+/);
-    return titleWords.some(word => word.startsWith(searchWord));
+    const containers = [
+      ...document.querySelectorAll('.fpd-grid.skins-data'),
+      ...document.querySelectorAll('.fpd-grid.ProductModule'),
+      ...document.querySelectorAll('.fpd-grid')
+    ];
+    
+    console.log('Found containers to search:', containers.length);
+     console.log('containers data ', containers);
+    
+    let totalMatches = 0;
+    let totalItems = 0;
+    
+    containers.forEach((container) => {
+      const thumbnails = container.querySelectorAll('.fpd-item.fpd-hover-thumbnail');
+      totalItems += thumbnails.length;
+        console.log('thumbnails data ', thumbnails);
+      thumbnails.forEach((thumb: Element) => {
+        const title = thumb.getAttribute('data-title')?.toLowerCase() || '';
+        const matches = this.doesTitleMatchSearch(title, search);
+          console.log('matches data ', matches);
+        if (matches) {
+          totalMatches++;
+          console.log(`Match found: "${title}" for search "${search}"`);
+        }
+        
+        (thumb as HTMLElement).style.display = matches ? 'flex' : 'none';
+      });
+    });
+    
+    console.log(`Search results: ${totalMatches} matches out of ${totalItems} items for "${search}"`);
+    
+    document.querySelectorAll('.box-contain-text').forEach((container) => {
+      const children = container.querySelectorAll('.fpd-item');
+      const anyVisible = Array.from(children).some(
+        (child) => (child as HTMLElement).style.display !== 'none'
+      );
+      (container as HTMLElement).style.display = anyVisible ? 'block' : 'none';
+    });
   }
-  
-  // If search has multiple words (like "head phone")
-  // Check if ALL search words appear in the title (in any order)
-  return searchWords.every(searchWord => {
-    // Check if any word in title starts with this search word
-    const titleWords = cleanTitle.split(/\s+/);
-    return titleWords.some(titleWord => titleWord.startsWith(searchWord));
-  });
-}
 
-// Helper method to preview the design
+  doesTitleMatchSearch(title: string, search: string): boolean {
+    if (!search || search.length < 2) return true;
+    
+    const cleanTitle = title.toLowerCase().replace(/[^\w\s-]/g, ' ');
+    
+    const searchWords = search.split(/\s+/).filter(word => word.length > 0);
+    
+    if (searchWords.length === 1) {
+      const searchWord = searchWords[0];
+      
+      const titleWords = cleanTitle.split(/\s+/);
+      return titleWords.some(word => word.startsWith(searchWord));
+    }
+    
+    return searchWords.every(searchWord => {
+      const titleWords = cleanTitle.split(/\s+/);
+      return titleWords.some(titleWord => titleWord.startsWith(searchWord));
+    });
+  }
 
   previewImage: string = '';
   showPreviewModal: boolean = false;
@@ -1991,8 +2452,6 @@ doesTitleMatchSearch(title: string, search: string): boolean {
         }
       }
     };
-
-    // console.log(variables, 'Shopify login payload:', payload);
 
     this.http
       .post<any>(
@@ -2305,6 +2764,7 @@ doesTitleMatchSearch(title: string, search: string): boolean {
   }
 
   dowloadButton() {
+    this.closeFacebookOptions();
     console.log('Download button clicked', this.designer.actionsBar);
     this.designer.actionsBar.doAction('download');
   }
@@ -2369,9 +2829,6 @@ doesTitleMatchSearch(title: string, search: string): boolean {
           const product = this.designer.getProduct
             ? this.designer.getProduct()
             : {};
-          // const title = (
-          //   this.previewButton?.nativeElement.value || ''
-          // ).toString();
 
           const title = customTitle || `Design_${Date.now()}`;
 
@@ -2406,7 +2863,6 @@ doesTitleMatchSearch(title: string, search: string): boolean {
           }
 
           this.showSuccessMessage('Design saved successfully!');
-          // this.loadSavedProducts();
         },
         { multiplier: scale, format: 'png', backgroundColor: 'transparent' }
       );
@@ -2414,8 +2870,8 @@ doesTitleMatchSearch(title: string, search: string): boolean {
       console.error('Designer or current canvas is not ready.');
     }
   }
+  
   openTitlePopup() {
-
     const popup = document.getElementById('title-popup');
     const input = document.getElementById('design-title-input') as HTMLInputElement;
     const btn = document.getElementById('save-title-btn');
@@ -2433,9 +2889,8 @@ doesTitleMatchSearch(title: string, search: string): boolean {
       }
 
       popup.style.display = 'none';
-      this.saveDesign(value); // 🔥 continue save
+      this.saveDesign(value);
     };
-
   }
 
   addSavedProduct(item: { thumbnail: string; product: any; title: string }) {
@@ -2500,49 +2955,44 @@ doesTitleMatchSearch(title: string, search: string): boolean {
 
     this.savedGrid.nativeElement.appendChild(wrapper);
   }
-addToCart() {
- 
+
+  addToCart() {
     if (
       this.designer &&
       this.designer.currentViewInstance &&
       this.designer.currentViewInstance.fabricCanvas
     ) {
+      const canvas = this.designer.currentViewInstance.fabricCanvas;
+      const dataUrl = canvas.toDataURL({
+        format: 'png',
+        multiplier: 1,
+        enableRetinaScaling: true,
+      });
  
-        const canvas = this.designer.currentViewInstance.fabricCanvas;
-        const dataUrl = canvas.toDataURL({
-          format: 'png',
-          multiplier: 1,
-          enableRetinaScaling: true,
-        });
+      const product = this.designer.getProduct ? this.designer.getProduct() : {};
+      const title = (
+        this.previewButton?.nativeElement.value || ''
+      ).toString();
+      console.log('Adding to cart:', { title, product, dataUrl });
  
-        const product = this.designer.getProduct ? this.designer.getProduct() : {};
-        const title = (
-          this.previewButton?.nativeElement.value || ''
-        ).toString();
-        console.log('Adding to cart:', { title, product, dataUrl });
-        //console.log('Product data for cart:', this.designer.getPrintOrderData());
+      const cartItem = {
+        thumbnail: dataUrl,
+        product,
+        title,
+      };
  
-        const cartItem = {
-          thumbnail: dataUrl,
-          product,
-          title,
-        };
+      var jsonString = JSON.stringify(cartItem);
  
+      $.post('https://editor.styleflip.com/fpd/addtocart.php', {
+        fpd_data: jsonString
+      }, function(response) {
+        console.log('Data saved successfully');
+      });
  
-        var jsonString = JSON.stringify(cartItem);
- 
-        // Example: Send to your custom PHP endpoint via AJAX
-        $.post('https://editor.styleflip.com/fpd/addtocart.php', {
-            fpd_data: jsonString
-        }, function(response) {
-            console.log('Data saved successfully');
-        });
- 
-        this.showSuccessMessage('Design added to cart!');
+      this.showSuccessMessage('Design added to cart!');
     }
- 
- 
   }
+
   loadSavedProducts() {
     if (this.savedGrid?.nativeElement) {
       this.savedGrid.nativeElement.innerHTML = '';
@@ -2649,6 +3099,7 @@ addToCart() {
     }
   }
 }
+
 function moveLayerRowUp(elementId: string) {
   const list = document.querySelector('.fpd-list');
   if (!list) return;

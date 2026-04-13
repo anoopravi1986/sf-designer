@@ -27973,7 +27973,7 @@ console.log("t:", t);
           // download: { icon: 'arrow-down-to-line', title: 'Download' },
           'preview-lightbox': { icon: 'eye', title: 'Preview Lightbox' },
           ruler: { icon: 'ruler', title: 'Ruler' },
-          'previous-view': { icon: 'fpd-icon-back', title: 'Previous View' },
+          // 'previous-view': { icon: 'fpd-icon-back', title: 'Previous View' },
           'next-view': { icon: 'fpd-icon-forward', title: 'Next View' },
           'guided-tour': { icon: 'fpd-icon-guided-tour', title: 'Guided Tour' },
           'qr-code': { icon: 'qr-code', title: 'QR-Code' },
