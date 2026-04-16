@@ -660,7 +660,7 @@ async deleteUploadedImage(designId: string, closeBtn?: HTMLElement, modalDiv?: H
       this.currentDesignId = result.design_id;
       
       const imageUrl = result.imageUrl;
-      const shareText = `Check out my custom design on Styleflip: ${designTitle}\n${imageUrl}`;
+      const shareText = `${imageUrl}`;
       
       this.updateFacebookModalWithData(shareText, imageUrl, type);
       
@@ -848,7 +848,7 @@ async shareToInstagram() {
       this.currentDesignId = result.design_id;
       
       const imageUrl = result.imageUrl;
-      const shareText = `Check out my custom design on Styleflip: ${designTitle}\n${imageUrl}`;
+      const shareText = `${imageUrl}`;
       
       this.updateInstagramModalWithData(shareText, imageUrl);
       
