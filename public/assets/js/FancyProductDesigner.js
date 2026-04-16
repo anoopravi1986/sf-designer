@@ -27716,6 +27716,12 @@ console.log("t:", t);
                 !this.fpdInstance.currentViewInstance.fabricCanvas.snapToGrid),
                 this.fpdInstance.currentViewInstance.fabricCanvas.renderAll()
             else if ('zoom' === e) {
+              let zoomWrapper = this.fpdInstance.mainWrapper.container.querySelector('.fpd-zoom-wrapper');
+
+              if (zoomWrapper) {
+                  // ✅ Already exists → do nothing OR return
+                  return;
+              }
               const t =
                 this.fpdInstance.mainWrapper.container.querySelector(
                   '.fpd-zoom-wrapper'

@@ -1953,7 +1953,7 @@ updateInstagramModalWithData(shareText: string, imageUrl: string) {
       actions: {
         top: [],
         right: [],
-        left: ['undo', 'redo', 'download','zoom', 'reset-product'],
+        left: ['undo', 'redo', 'download','zoom', 'reset-product','preview-lightbox'],
         center: [],
       },
       selectedColor: '#f5f5f5',
@@ -2076,41 +2076,41 @@ updateInstagramModalWithData(shareText: string, imageUrl: string) {
     console.log("designer is", this.designer);
     
    // Step 1: First load from IndexedDB (immediate display)
-console.log("📀 Loading from IndexedDB first...");
-const cachedProducts = await getProducts();
+    console.log("📀 Loading from IndexedDB first...");
+    const cachedProducts = await getProducts();
 
-if (cachedProducts && cachedProducts.length > 0) {
-  console.log("✅ Loaded", cachedProducts.length, "products from IndexedDB");
-  this.designer.product = cachedProducts;
-  this.showFPDLoading(false);
-} else {
-  console.log("⚠️ No cached data, showing loader");
-  this.showFPDLoading(true);
-}
+    if (cachedProducts && cachedProducts.length > 0) {
+      console.log("✅ Loaded", cachedProducts.length, "products from IndexedDB");
+      this.designer.product = cachedProducts;
+      this.showFPDLoading(false);
+    } else {
+      console.log("⚠️ No cached data, showing loader");
+      this.showFPDLoading(true);
+    }
 
-// Step 2: Fetch fresh data from API (background update)
-console.log("🌐 Fetching fresh data from API...");
-fetch("https://styleflip-backend-jdm5.ithemes.xyz/api/product/getAllProducts")
-  .then((res) => res.json())
-  .then(async (freshData) => {
-    console.log("📦 Fresh API data received:", freshData.length, "products");
-    
-    // Update IndexedDB with fresh data
-    await saveProducts(freshData);
-    
-    // Update designer with fresh data
-    this.designer.product = freshData;
-    console.log("✅ Designer updated with fresh data");
-    
-    this.showFPDLoading(false);
-    
-    // Optional: Show toast notification (uncomment if you have this method)
-    // this.showToast("Products updated!");
-  })
-  .catch((err) => {
-    console.error("❌ API fetch failed:", err);
-    this.showFPDLoading(false);
-  });
+    // Step 2: Fetch fresh data from API (background update)
+    console.log("🌐 Fetching fresh data from API...");
+    fetch("https://styleflip-backend-jdm5.ithemes.xyz/api/product/getAllProducts")
+      .then((res) => res.json())
+      .then(async (freshData) => {
+        console.log("📦 Fresh API data received:", freshData.length, "products");
+        
+        // Update IndexedDB with fresh data
+        await saveProducts(freshData);
+        
+        // Update designer with fresh data
+        this.designer.product = freshData;
+        console.log("✅ Designer updated with fresh data");
+        
+        this.showFPDLoading(false);
+        
+        // Optional: Show toast notification (uncomment if you have this method)
+        // this.showToast("Products updated!");
+      })
+      .catch((err) => {
+        console.error("❌ API fetch failed:", err);
+        this.showFPDLoading(false);
+      });
 
     const slug = this.route.snapshot.paramMap.get('slug');
     const manufacturer = this.route.snapshot.paramMap.get('manufacturer');
@@ -2183,6 +2183,30 @@ fetch("https://styleflip-backend-jdm5.ithemes.xyz/api/product/getAllProducts")
       this.showLoginPopup = false;
     }
     this.loadDesigns();
+
+
+    document.addEventListener(
+    'click',
+    (event: any) => {
+
+          const target = event.target?.closest('[data-action="preview-lightbox"]');
+
+          if (!target) return;
+
+          // ❌ Stop FPD default behavior
+          event.preventDefault();
+          event.stopPropagation();
+          event.stopImmediatePropagation();
+
+          console.log('Custom Preview Triggered');
+
+          // ✅ Call your function
+          this.preview();
+
+        },
+        true // 🔥 capture phase (important)
+      );
+
   }
   
   bottomMenu() {
@@ -2350,12 +2374,18 @@ fetch("https://styleflip-backend-jdm5.ithemes.xyz/api/product/getAllProducts")
   showPreviewModal: boolean = false;
   
   preview() {
+    if (document.getElementById('fpd-preview-modal')) {
+      console.log('Preview already open');
+      return;
+    }
     if (
       this.designer &&
       this.designer.currentViewInstance &&
       this.designer.currentViewInstance.fabricCanvas
     ) {
+
       const canvas = this.designer.currentViewInstance.fabricCanvas;
+
       const dataUrl = canvas.toDataURL({
         format: 'png',
         multiplier: 1,
@@ -2366,9 +2396,12 @@ fetch("https://styleflip-backend-jdm5.ithemes.xyz/api/product/getAllProducts")
       image.src = dataUrl;
 
       image.onload = () => {
+
         const previewDiv = document.createElement('div');
+        previewDiv.id = 'fpd-preview-modal'; // 🔥 unique ID
+
         previewDiv.style.background = `url(${image.src})`;
-        previewDiv.style.height = '90vh';
+        previewDiv.style.height = '100vh';
         previewDiv.style.width = '100%';
         previewDiv.style.backgroundSize = 'contain';
         previewDiv.style.backgroundRepeat = 'no-repeat';
@@ -2379,8 +2412,10 @@ fetch("https://styleflip-backend-jdm5.ithemes.xyz/api/product/getAllProducts")
         previewDiv.style.left = '0';
         previewDiv.style.backgroundColor = '#fff';
 
+        // ❌ Close Button
         const closeButton = document.createElement('button');
         closeButton.innerText = '✖';
+
         closeButton.style.position = 'absolute';
         closeButton.style.top = '20px';
         closeButton.style.right = '20px';
@@ -2395,7 +2430,9 @@ fetch("https://styleflip-backend-jdm5.ithemes.xyz/api/product/getAllProducts")
 
         previewDiv.appendChild(closeButton);
         document.body.appendChild(previewDiv);
+
       };
+
     } else {
       console.error('Designer or current canvas is not ready.');
     }
@@ -2890,10 +2927,14 @@ fetch("https://styleflip-backend-jdm5.ithemes.xyz/api/product/getAllProducts")
 
       popup.style.display = 'none';
       this.saveDesign(value);
+      setTimeout(() => {
+        this.loadSavedProducts();
+      }, 100);
     };
   }
 
   addSavedProduct(item: { thumbnail: string; product: any; title: string }) {
+    console.log("item data",item)
     const wrapper = document.createElement('div');
     wrapper.className = 'fpd-item saved-design';
     wrapper.style.position = 'relative';
@@ -2952,8 +2993,8 @@ fetch("https://styleflip-backend-jdm5.ithemes.xyz/api/product/getAllProducts")
         })
       );
     });
-
-    this.savedGrid.nativeElement.appendChild(wrapper);
+    console.log("dddddddd",this)
+    this.savedGrid?.nativeElement.appendChild(wrapper);
   }
 
   addToCart() {
