@@ -11,7 +11,7 @@
         }
       },
       "root": "",
-      "zone": "false",
+      "zone": false,
       "sourceRoot": "src",
       "prefix": "app",
       "architect": {
@@ -41,6 +41,14 @@
           },
           "configurations": {
             "production": {
+              "optimization": {
+                "scripts": true,
+                "styles": {
+                  "minify": true,
+                  "inlineCritical": false
+                },
+                "fonts": false
+              },
               "budgets": [
                 {
                   "type": "initial",
