@@ -791,3 +791,184 @@ fpd-element-toolbar[data-fabric-type=image] {
   }
 }
 
+@media (max-width: 768px) {
+
+  .fpd-navigation {
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0;
+    width: 100%;
+    background: #fff;
+    display: flex !important;
+    justify-content: space-around;
+    align-items: center;
+    z-index: 99999;
+    border-top: 1px solid #ddd;
+    padding: 8px 0;
+    overflow-x: auto;
+  }
+
+  .fpd-nav-item {
+    display: flex !important;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-width: 70px;
+    font-size: 11px;
+  }
+
+  .fpd-nav-item span {
+    margin-top: 4px;
+  }
+
+  .fpd-main-wrapper,
+  .fpd-module-content {
+    padding-bottom: 90px !important;
+  }
+}
+@media (max-width: 768px) {
+.fpd-container.fpd-sidebar.fpd-layout-small.fpd-module-visible .fpd-module-content{
+  display: block !important; height: 947px !important;
+  }
+  }
+@media (max-width: 768px) {
+
+  .fpd-main-wrapper {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: flex-start !important;
+    padding-top: 80px !important;
+  }
+
+  .fpd-product-stage {
+    height: 700px !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: flex-start !important;
+    position: relative !important;
+  }
+
+  .fpd-view-stage {
+    width: 100% !important;
+    height: 680px !important;
+    min-width: unset !important;
+    transform: scale(1.15) !important;
+    transform-origin: top center !important;
+    margin-top: 20px !important;
+  }
+
+  /* Zoom Center */
+  div.fpd-container .fpd-zoom-wrapper {
+    position: absolute !important;
+    bottom: 120px !important;
+    left: 50% !important;
+    right: auto !important;
+    transform: translateX(-50%) !important;
+    z-index: 99 !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+  }
+
+
+}
+
+@media (max-width: 768px) {
+
+  .fpd-views-inside-left fpd-views-nav {
+    position: absolute !important;
+    bottom: 80px !important;
+    left: 50% !important;
+    right: auto !important;
+    transform: translateX(-50%) !important;
+    z-index: 9999 !important;
+
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+  }
+
+}
+
+
+
+  /* Mobile mein sirf icons dikhao - disabled icons bhi dikhao */
+@media (max-width: 768px) {
+
+  /* File label hide */
+  fpd-actions-menu .fpd-dropdown-btn .fpd-label {
+    display: none !important;
+  }
+
+  /* Button ke andar ka text/span hide */
+  fpd-actions-menu .fpd-dropdown-menu .fpd-btn span,
+  fpd-actions-menu .fpd-dropdown-menu .fpd-btn .fpd-btn-label {
+    display: none !important;
+  }
+
+  /* Sirf icons - BOLD banane ka naya tarika */
+  fpd-actions-menu .fpd-dropdown-menu .fpd-btn i,
+  fpd-actions-menu .fpd-dropdown-menu .fpd-btn .fpd-icon {
+    margin: 0 !important;
+    font-size: 22px !important;  /* size badhaya */
+    display: inline-block !important;
+    /* Bold banane ke liye */
+    transform: scale(1.1) !important;
+    transform-origin: center !important;
+    /* Stroke effect */
+    -webkit-text-stroke: 1px currentColor !important;
+    text-stroke: 1px currentColor !important;
+    /* Extra thickness */
+    filter: drop-shadow(0 0 0.5px currentColor) !important;
+  }
+
+  /* Disabled buttons */
+  fpd-actions-menu .fpd-dropdown-menu .fpd-btn.fpd-disabled,
+  fpd-actions-menu .fpd-dropdown-menu .fpd-btn[disabled],
+  fpd-actions-menu .fpd-dropdown-menu .fpd-btn.fpd-state-disabled {
+    display: inline-flex !important;
+    opacity: 1 !important;
+    pointer-events: none !important;
+  }
+
+  /* Normal buttons */
+  fpd-actions-menu .fpd-dropdown-menu .fpd-btn {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 8px !important;
+    min-width: auto !important;
+    width: auto !important;
+  }
+
+  /* Dropdown menu inline */
+  fpd-actions-menu .fpd-dropdown-menu {
+    position: static !important;
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+    gap: 4px !important;
+    box-shadow: none !important;
+    background: transparent !important;
+    padding: 0 !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  /* Dropdown button background hataye */
+  fpd-actions-menu .fpd-dropdown-btn {
+    background: transparent !important;
+    padding: 4px !important;
+    border: none !important;
+    box-shadow: none !important;
+  }
+
+  /* Disabled icons bhi bold */
+  fpd-actions-menu .fpd-dropdown-menu .fpd-btn.fpd-disabled i,
+  fpd-actions-menu .fpd-dropdown-menu .fpd-btn.fpd-disabled .fpd-icon {
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+}
