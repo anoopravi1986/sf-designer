@@ -16,7 +16,7 @@ body.sfdesigner-main{font-family:'Nunito Sans';font-weight: 400;}fpd-main-bar{he
 .fpd-saved-designs .fpd-grid{grid-template-columns: repeat(2, 1fr);
     gap: 5px;.fpd-item{border: none;}}
 div.fpd-container fpd-actions-bar{
-    background: #000;
+    background: #fff;
     @media only screen and (min-width: 1400px){
       flex-direction: column;
     }
@@ -893,7 +893,6 @@ fpd-element-toolbar[data-fabric-type=image] {
 
 
 
-  /* Mobile mein sirf icons dikhao - disabled icons bhi dikhao */
 @media (max-width: 768px) {
 
   /* File label hide */
@@ -907,20 +906,22 @@ fpd-element-toolbar[data-fabric-type=image] {
     display: none !important;
   }
 
-  /* Sirf icons - BOLD banane ka naya tarika */
+  /* Sirf icons - BOLD + BLACK color */
   fpd-actions-menu .fpd-dropdown-menu .fpd-btn i,
   fpd-actions-menu .fpd-dropdown-menu .fpd-btn .fpd-icon {
     margin: 0 !important;
-    font-size: 22px !important;  /* size badhaya */
+    font-size: 22px !important;
     display: inline-block !important;
-    /* Bold banane ke liye */
+   
     transform: scale(1.1) !important;
     transform-origin: center !important;
-    /* Stroke effect */
+   
     -webkit-text-stroke: 1px currentColor !important;
     text-stroke: 1px currentColor !important;
-    /* Extra thickness */
+   
     filter: drop-shadow(0 0 0.5px currentColor) !important;
+  
+    color: #000000 !important;
   }
 
   /* Disabled buttons */
@@ -928,8 +929,14 @@ fpd-element-toolbar[data-fabric-type=image] {
   fpd-actions-menu .fpd-dropdown-menu .fpd-btn[disabled],
   fpd-actions-menu .fpd-dropdown-menu .fpd-btn.fpd-state-disabled {
     display: inline-flex !important;
-    opacity: 1 !important;
+    opacity: 0.5 !important;  /* Disabled mein thoda light */
     pointer-events: none !important;
+  }
+  
+  /* Disabled icons ka color thoda light black */
+  fpd-actions-menu .fpd-dropdown-menu .fpd-btn.fpd-disabled i,
+  fpd-actions-menu .fpd-dropdown-menu .fpd-btn.fpd-disabled .fpd-icon {
+    color: #666666 !important;
   }
 
   /* Normal buttons */
@@ -937,35 +944,36 @@ fpd-element-toolbar[data-fabric-type=image] {
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
-    padding: 8px !important;
+    padding: 5px !important;
     min-width: auto !important;
     width: auto !important;
   }
 
-  /* Dropdown menu inline */
+  /* Dropdown menu inline - BACKGROUND WHITE */
   fpd-actions-menu .fpd-dropdown-menu {
     position: static !important;
     display: flex !important;
     flex-direction: row !important;
     flex-wrap: wrap !important;
-    gap: 4px !important;
-    box-shadow: none !important;
-    background: transparent !important;
-    padding: 0 !important;
+    gap: 1px !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;  /* thoda shadow for depth */
+    background: #ffffff !important;  /* BACKGROUND WHITE */
+    padding: 4px !important;
     visibility: visible !important;
     opacity: 1 !important;
     transform: none !important;
+    border-radius: 8px !important;  /* rounded corners */
   }
 
   /* Dropdown button background hataye */
   fpd-actions-menu .fpd-dropdown-btn {
     background: transparent !important;
-    padding: 4px !important;
+    padding: 1px !important;
     border: none !important;
     box-shadow: none !important;
   }
 
-  /* Disabled icons bhi bold */
+  /* Ensure icons in disabled state are visible */
   fpd-actions-menu .fpd-dropdown-menu .fpd-btn.fpd-disabled i,
   fpd-actions-menu .fpd-dropdown-menu .fpd-btn.fpd-disabled .fpd-icon {
     opacity: 1 !important;
