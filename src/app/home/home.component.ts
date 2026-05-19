@@ -149,7 +149,35 @@ export class HomeComponent implements AfterViewInit {
         });
     });
   }
+// Mobile share dropdown toggle ke liye
+showMobileShareDropdown = false;
 
+toggleMobileShare() {
+  this.showMobileShareDropdown = !this.showMobileShareDropdown;
+  console.log('Mobile share toggled:', this.showMobileShareDropdown);
+}
+
+closeMobileShare() {
+  this.showMobileShareDropdown = false;
+}
+
+@HostListener('document:click', ['$event'])
+onClickOutsideMobileShare(event: Event) {
+  setTimeout(() => {
+    if (this.showMobileShareDropdown) {
+      const target = event.target as HTMLElement;
+      const shareButton = document.querySelector('.share-mobile-btn');
+      const shareDropdown = document.querySelector('.mobile-share-dropdown');
+      
+      if (shareDropdown && !shareDropdown.contains(target) && !shareButton?.contains(target)) {
+        this.showMobileShareDropdown = false;
+      }
+    }
+  }, 100);
+}
+goBack() {
+  window.history.back(); 
+}
   ngAfterViewInit() {
     if (isPlatformBrowser(this.platformId)) {
       const fontArrayStr: any[] = [];

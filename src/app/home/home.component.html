@@ -3,9 +3,8 @@
 
   <!-- Back Button -->
   <button
-    class="border border-[#ffffff59] rounded-[8px] font-semibold flex items-center gap-2 bg-transparent text-white pl-[0.565rem] pr-[1rem] py-2 text-sm min-w-[80px] justify-center hover:bg-white/10 transition">
-    
-    Back
+    class="border border-[#ffffff59] rounded-[8px] font-semibold flex items-center gap-2 bg-transparent pl-[0.565rem] pr-[1rem] py-2 text-sm min-w-[80px] justify-center hover:bg-white/10 transition">
+
   </button>
 
 </div>
@@ -21,8 +20,145 @@
       alt="StyleflipLogo" 
       class="max-w-[240px] h-auto mx-auto fixed left-0"
     /> -->
-<div
-  class="md:fixed top-[3px] left-0 w-[120px] bg-transparent z-50 flex items-center justify-between gap-4 px-4 md:h-[50px] text-sm">
+
+<!-- ==================== MOBILE HEADER WITH UNDO/REDO IN HEADER ==================== -->
+<div class="md:hidden fixed top-0 left-0 right-0 z-50 bg-[#0d1216] px-2 py-2 flex items-center justify-between" style="height: 56px;">
+  
+  <!-- Left: Back Button -->
+  <button class="w-9 h-9 rounded-full flex items-center justify-center bg-transparent text-white hover:bg-white/10 transition"
+          (click)="goBack()">
+    <i data-lucide="arrow-left" class="w-5 h-5"></i>
+  </button>
+
+  <!-- Center: Active Design Title -->
+  <div class="flex-1 px-2 text-center">
+    <div class="text-white text-sm font-semibold truncate max-w-[150px] mx-auto">
+      {{activeImageTitle}}
+    </div>
+  </div>
+
+  <!-- Right: All Action Icons -->
+  <div class="flex items-center gap-0.5">
+    
+    <!-- Save -->
+    <button (click)="openTitlePopup()" class="w-9 h-9 rounded-full flex items-center justify-center text-white hover:bg-white/10 transition">
+      <i data-lucide="save" class="w-5 h-5"></i>
+    </button>
+
+    <!-- Undo -->
+    <button (click)="designer?.actionsBar?.doAction('undo')" class="w-9 h-9 rounded-full flex items-center justify-center text-white hover:bg-white/10 transition">
+      <i data-lucide="undo-2" class="w-5 h-5"></i>
+    </button>
+
+    <!-- Redo -->
+    <button (click)="designer?.actionsBar?.doAction('redo')" class="w-9 h-9 rounded-full flex items-center justify-center text-white hover:bg-white/10 transition">
+      <i data-lucide="redo-2" class="w-5 h-5"></i>
+    </button>
+
+    <!-- Share - Mobile Working -->
+    <div class="relative">
+      <button (click)="toggleMobileShare(); $event.stopPropagation()" class="share-mobile-btn w-9 h-9 rounded-full flex items-center justify-center text-white hover:bg-white/10 transition">
+        <i data-lucide="share-2" class="w-5 h-5"></i>
+      </button>
+      
+      <!-- Mobile Share Dropdown -->
+      <div *ngIf="showMobileShareDropdown" 
+           class="mobile-share-dropdown absolute right-0 top-11 w-48 bg-white rounded-lg shadow-xl py-2 z-[9999]"
+           style="background: white;">
+        <button (click)="shareToFacebook('post'); closeMobileShare()" 
+                class="w-full px-4 py-3 text-left text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-3">
+          <svg class="w-5 h-5 text-[#1877F2]" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M22.675 0h-21.35c-.732 0-1.325.593-1.325 1.325v21.351c0 .731.593 1.324 1.325 1.324h11.495v-9.294h-3.128v-3.622h3.128v-2.671c0-3.1 1.893-4.788 4.659-4.788 1.325 0 2.463.099 2.795.143v3.24l-1.918.001c-1.504 0-1.795.715-1.795 1.763v2.313h3.587l-.467 3.622h-3.12v9.293h6.116c.73 0 1.323-.593 1.323-1.325v-21.35c0-.732-.593-1.325-1.325-1.325z"/>
+          </svg>
+          <span>Facebook Feed</span>
+        </button>
+        <button (click)="shareToFacebook('message'); closeMobileShare()" 
+                class="w-full px-4 py-3 text-left text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-3">
+          <svg class="w-5 h-5 text-[#0084FF]" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M20 2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h4l4 4 4-4h4c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/>
+          </svg>
+          <span>Facebook Messenger</span>
+        </button>
+        <button (click)="shareToInstagram(); closeMobileShare()" 
+                class="w-full px-4 py-3 text-left text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-3">
+          <svg class="w-5 h-5 text-[#E4405F]" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069z"/>
+          </svg>
+          <span>Instagram</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Add to Cart -->
+    <button (click)="addToCart()" class="w-9 h-9 rounded-full flex items-center justify-center bg-[var(--theme-color)] text-white hover:opacity-80 transition">
+      <i data-lucide="shopping-cart" class="w-5 h-5"></i>
+    </button>
+
+    <!-- 3-dot Menu -->
+    <div class="relative">
+      <button id="mobile-three-dots-btn" class="w-9 h-9 rounded-full flex items-center justify-center text-white hover:bg-white/10 transition">
+        <i data-lucide="more-vertical" class="w-5 h-5"></i>
+      </button>
+      
+      <div id="mobile-extra-menu" class="absolute right-0 top-11 w-44 bg-white rounded-lg shadow-xl py-2 z-[9999] hidden">
+        <button class="extra-option w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-3">
+          <i data-lucide="expand" class="w-4 h-4"></i> <span>Resize</span>
+        </button>
+        <button class="extra-option w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-3">
+          <i data-lucide="pen-tool" class="w-4 h-4"></i> <span>Editing</span>
+        </button>
+        <button class="extra-option w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-3">
+          <i data-lucide="help-circle" class="w-4 h-4"></i> <span>Help</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- User Profile -->
+    <div class="min-w-[32px] w-[32px] h-[32px] rounded-full bg-[var(--theme-color)] text-white flex items-center justify-center font-semibold text-sm cursor-pointer ml-1" 
+         (click)="openLoginPopup()">
+      {{ initialLetter }}
+    </div>
+  </div>
+</div>
+
+<!-- CSS to hide FPD's default undo/redo menu on mobile -->
+<style>
+  @media (max-width: 768px) {
+    /* FPD ke actions menu ko hide karo - kyuki humne header me daal diya */
+    fpd-actions-menu {
+      display: none !important;
+    }
+  }
+</style>
+
+<!-- Mobile 3-dot menu toggle script -->
+<script>
+  (function() {
+    if (typeof lucide !== 'undefined') {
+      lucide.createIcons();
+    }
+    
+    const threeDotsBtn = document.getElementById('mobile-three-dots-btn');
+    const extraMenu = document.getElementById('mobile-extra-menu');
+    
+    if (threeDotsBtn && extraMenu) {
+      threeDotsBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        extraMenu.classList.toggle('hidden');
+      });
+      
+      document.addEventListener('click', (e) => {
+        if (!threeDotsBtn.contains(e.target) && !extraMenu.contains(e.target)) {
+          extraMenu.classList.add('hidden');
+        }
+      });
+    }
+  })();
+</script>
+
+
+<!-- ==================== ORIGINAL MOBILE ELEMENTS (KEEPING FOR COMPATIBILITY - HIDDEN) ==================== -->
+<div class="md:hidden hidden">
   <button
     class="fixed right-0 md:relative md:right-auto flex md:hidden items-center gap-2 text-left bg-transparent text-white px-1.5 py-1.5 text-lg text-[1rem] rounded hover:bg-white-500 transition top-[8px] z-[9]"
     (click)="showBox()">
@@ -37,6 +173,33 @@
     (click)="openLoginPopup()">
     {{ initialLetter }}
   </div>
+
+  <div
+    class="box flex gap-2 flex-col md:hidden fixed z-[99] top-0 bottom-0 mt-0 left-0 right-0 p-4 bg-gray-700 border border-gray-300 rounded shadow"
+    *ngIf="isBoxVisible">
+      <button
+        class="border border-[#ffffff59] mr-[7px] rounded-[8px] font-semibold flex items-center gap-2 bg-transparent text-white pl-[0.565rem] pr-[1rem] py-2 text-sm rounded-[8px] min-w-[180px] justify-center">
+        Save
+      </button>
+  </div>
+</div>
+
+<div
+  class="md:fixed top-[3px] left-0 w-[120px] bg-transparent z-50 flex items-center justify-between gap-4 px-4 md:h-[50px] text-sm">
+  <button
+    class="fixed right-0 md:relative md:right-auto flex md:hidden items-center gap-2 text-left bg-transparent text-white px-1.5 py-1.5 text-lg text-[1rem] rounded hover:bg-white-500 transition top-[8px] z-[9]"
+    (click)="showBox()">
+    <i data-lucide="menu" class="w-6 h-6"></i>
+  </button>
+  <div
+    class="md:hidden fixed z-[99] bg-transparent text-white px-5 py-2 rounded w-[300px] text-sm truncate overflow-hidden whitespace-nowrap font-semibold pr-0">
+    {{activeImageTitle}}
+  </div>
+  <!-- <div
+    class="md:hidden fixed z-[99] top-[7px] right-[45px] md:relative md:top-auto md:right-auto min-w-[38px] w-[38px] h-[38px] max-h-10 rounded-full bg-[var(--theme-color)] text-white flex items-center justify-center font-semibold text-lg cursor-pointer"
+    (click)="openLoginPopup()">
+    {{ initialLetter }}
+  </div> -->
 
   <div
     class="box flex gap-2 flex-col md:hidden fixed z-[99] top-0 bottom-0 mt-0 left-0 right-0 p-4 bg-gray-700 border border-gray-300 rounded shadow"
