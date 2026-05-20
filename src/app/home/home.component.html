@@ -22,17 +22,17 @@
     /> -->
 
 <!-- ==================== MOBILE HEADER WITH UNDO/REDO IN HEADER ==================== -->
-<div class="md:hidden fixed top-0 left-0 right-0 z-50 bg-[#0d1216] px-2 py-2 flex items-center justify-between" style="height: 56px;">
+<div class="md:hidden fixed top-0 left-0 right-0 z-50 px-2 py-2 flex items-center justify-between" style="height: 56px; background: white;">
   
   <!-- Left: Back Button -->
-  <button class="w-9 h-9 rounded-full flex items-center justify-center bg-transparent text-white hover:bg-white/10 transition"
+  <button class="w-9 h-9 rounded-full flex items-center justify-center bg-transparent hover:bg-black/5 transition"
           (click)="goBack()">
-    <i data-lucide="arrow-left" class="w-5 h-5"></i>
+    <i data-lucide="arrow-left" class="w-5 h-5" style="color: black;"></i>
   </button>
 
   <!-- Center: Active Design Title -->
   <div class="flex-1 px-2 text-center">
-    <div class="text-white text-sm font-semibold truncate max-w-[150px] mx-auto">
+    <div class="text-sm font-semibold truncate max-w-[150px] mx-auto" style="color: black;">
       {{activeImageTitle}}
     </div>
   </div>
@@ -41,24 +41,16 @@
   <div class="flex items-center gap-0.5">
     
     <!-- Save -->
-    <button (click)="openTitlePopup()" class="w-9 h-9 rounded-full flex items-center justify-center text-white hover:bg-white/10 transition">
-      <i data-lucide="save" class="w-5 h-5"></i>
+    <button (click)="openTitlePopup()" class="w-9 h-9 rounded-full flex items-center justify-center hover:bg-black/5 transition">
+      <i data-lucide="save" class="w-5 h-5" style="color: black;"></i>
     </button>
 
-    <!-- Undo -->
-    <button (click)="designer?.actionsBar?.doAction('undo')" class="w-9 h-9 rounded-full flex items-center justify-center text-white hover:bg-white/10 transition">
-      <i data-lucide="undo-2" class="w-5 h-5"></i>
-    </button>
-
-    <!-- Redo -->
-    <button (click)="designer?.actionsBar?.doAction('redo')" class="w-9 h-9 rounded-full flex items-center justify-center text-white hover:bg-white/10 transition">
-      <i data-lucide="redo-2" class="w-5 h-5"></i>
-    </button>
+  
 
     <!-- Share - Mobile Working -->
     <div class="relative">
-      <button (click)="toggleMobileShare(); $event.stopPropagation()" class="share-mobile-btn w-9 h-9 rounded-full flex items-center justify-center text-white hover:bg-white/10 transition">
-        <i data-lucide="share-2" class="w-5 h-5"></i>
+      <button (click)="toggleMobileShare(); $event.stopPropagation()" class="share-mobile-btn w-9 h-9 rounded-full flex items-center justify-center hover:bg-black/5 transition">
+        <i data-lucide="share-2" class="w-5 h-5" style="color: black;"></i>
       </button>
       
       <!-- Mobile Share Dropdown -->
@@ -90,14 +82,14 @@
     </div>
 
     <!-- Add to Cart -->
-    <button (click)="addToCart()" class="w-9 h-9 rounded-full flex items-center justify-center bg-[var(--theme-color)] text-white hover:opacity-80 transition">
-      <i data-lucide="shopping-cart" class="w-5 h-5"></i>
+    <button (click)="addToCart()" class="w-9 h-9 rounded-full flex items-center justify-center transition" style="background: var(--theme-color);">
+      <i data-lucide="shopping-cart" class="w-5 h-5" style="color: white;"></i>
     </button>
 
     <!-- 3-dot Menu -->
     <div class="relative">
-      <button id="mobile-three-dots-btn" class="w-9 h-9 rounded-full flex items-center justify-center text-white hover:bg-white/10 transition">
-        <i data-lucide="more-vertical" class="w-5 h-5"></i>
+      <button id="mobile-three-dots-btn" class="w-9 h-9 rounded-full flex items-center justify-center hover:bg-black/5 transition">
+        <i data-lucide="more-vertical" class="w-5 h-5" style="color: black;"></i>
       </button>
       
       <div id="mobile-extra-menu" class="absolute right-0 top-11 w-44 bg-white rounded-lg shadow-xl py-2 z-[9999] hidden">
@@ -114,7 +106,8 @@
     </div>
 
     <!-- User Profile -->
-    <div class="min-w-[32px] w-[32px] h-[32px] rounded-full bg-[var(--theme-color)] text-white flex items-center justify-center font-semibold text-sm cursor-pointer ml-1" 
+    <div class="min-w-[32px] w-[32px] h-[32px] rounded-full flex items-center justify-center font-semibold text-sm cursor-pointer ml-1" 
+         style="background: var(--theme-color); color: white;" 
          (click)="openLoginPopup()">
       {{ initialLetter }}
     </div>
