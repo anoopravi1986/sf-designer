@@ -2146,3 +2146,32 @@ fpd-element-toolbar[data-fabric-type=image] {
     visibility: visible !important;
   }
 }
+
+@media (max-width: 768px) {
+  .fpd-btn.fpd-tooltip[aria-label="Redo"] {
+    position: fixed;
+    right: 213px;
+    top: -3px;
+    z-index: 99;
+  }
+}
+
+@media (max-width: 768px) {
+  .fpd-btn.fpd-tooltip[aria-label="Undo"] {
+    position: fixed;
+    right: 178px;
+    top: -3px;
+    z-index:99;
+  }
+}
+
+// @media (max-width: 768px) {
+//   .fpd-btn.fpd-tooltip[aria-label="Reset"] {
+//     position: fixed;
+//     left: 0px;
+//     right:119px;
+//     top: 0;
+//     z-index: 99;
+//     bottom: -527px;
+//   }
+// }
