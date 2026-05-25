@@ -2162,7 +2162,7 @@ fpd-element-toolbar[data-fabric-type=image] {
     z-index:99;
   }
 
-  .fpd-btn[aria-label="Reset"]{
+  .fpd-container fpd-actions-bar .fpd-dropdown-menu>.fpd-btn[aria-label="Reset"]{
     position: fixed;
     bottom: 66px;
     left: -57px;
@@ -2170,7 +2170,7 @@ fpd-element-toolbar[data-fabric-type=image] {
     margin: auto;
     z-index: 99;
   }
-  .fpd-btn[aria-label="Preview"]{
+  .fpd-container fpd-actions-bar .fpd-dropdown-menu>.fpd-btn[aria-label="Preview"]{
         position: fixed;
     bottom: 66px;
     left: 26px;
