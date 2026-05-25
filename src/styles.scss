@@ -2150,18 +2150,42 @@ fpd-element-toolbar[data-fabric-type=image] {
 @media (max-width: 768px) {
   .fpd-btn.fpd-tooltip[aria-label="Redo"] {
     position: fixed;
-    right: 213px;
+    right: 13.5rem;
     top: -3px;
     z-index: 99;
   }
-}
 
-@media (max-width: 768px) {
   .fpd-btn.fpd-tooltip[aria-label="Undo"] {
     position: fixed;
-    right: 178px;
+    right: 9.9rem;
     top: -3px;
     z-index:99;
+  }
+
+  .fpd-btn[aria-label="Reset"]{
+    position: fixed;
+    bottom: 66px;
+    left: -57px;
+    right: 0;
+    margin: auto;
+    z-index: 99;
+  }
+  .fpd-btn[aria-label="Preview"]{
+        position: fixed;
+    bottom: 66px;
+    left: 26px;
+    right: 0;
+    margin: auto;
+    z-index: 99;
+  }
+  div[data-pos="left"] .fpd-dropdown-menu .fpd-btn[aria-label="Zoom"]{
+    display: none !important;
+  }
+  .fpd-wrapper.fpd-layout-small fpd-actions-bar{
+    height: 0;
+  }
+  .fpd-container.fpd-sidebar.fpd-layout-small fpd-main-wrapper{
+    padding-top: 30px;
   }
 }
 
