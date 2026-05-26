@@ -2445,8 +2445,8 @@ updateInstagramModalWithData(shareText: string, imageUrl: string) {
         closeButton.innerText = '✖';
 
         closeButton.style.position = 'absolute';
-        closeButton.style.top = '20px';
-        closeButton.style.right = '20px';
+        closeButton.style.top = '90px';
+        closeButton.style.right = '50px';
         closeButton.style.fontSize = '24px';
         closeButton.style.background = 'transparent';
         closeButton.style.border = 'none';
