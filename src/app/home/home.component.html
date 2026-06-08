@@ -48,39 +48,52 @@
 
   
 
-    <!-- Share - Mobile Working -->
-    <div class="relative">
-      <button (click)="toggleMobileShare(); $event.stopPropagation()" class="share-mobile-btn w-9 h-9 rounded-full flex items-center justify-center hover:bg-black/5 transition">
-        <i data-lucide="share-2" class="w-5 h-5" style="color: black;"></i>
+<!-- Share - Mobile Working -->
+<div class="relative">
+  <button (click)="toggleMobileShare(); $event.stopPropagation()" class="share-mobile-btn w-9 h-9 rounded-full flex items-center justify-center hover:bg-black/5 transition">
+    <i data-lucide="share-2" class="w-5 h-5" style="color: black;"></i>
+  </button>
+  
+  <!-- Mobile Share Dropdown with Close Button -->
+  <div *ngIf="showMobileShareDropdown" 
+       class="mobile-share-dropdown absolute right-0 top-11 w-64 bg-white rounded-lg shadow-xl z-[9999]"
+       style="background: white;">
+    
+    <!-- Header with title and close button -->
+    <div class="flex items-center justify-between px-4 py-3 border-b border-gray-100">
+      <span class="text-sm font-semibold text-gray-800">Share Design</span>
+      <button (click)="closeMobileShare(); $event.stopPropagation()" 
+              class="w-6 h-6 rounded-full flex items-center justify-center hover:bg-gray-100 transition">
+        <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
       </button>
-      
-      <!-- Mobile Share Dropdown -->
-      <div *ngIf="showMobileShareDropdown" 
-           class="mobile-share-dropdown absolute right-0 top-11 w-48 bg-white rounded-lg shadow-xl py-2 z-[9999]"
-           style="background: white;">
-        <button (click)="shareToFacebook('post'); closeMobileShare()" 
-                class="w-full px-4 py-3 text-left text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-3">
-          <svg class="w-5 h-5 text-[#1877F2]" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M22.675 0h-21.35c-.732 0-1.325.593-1.325 1.325v21.351c0 .731.593 1.324 1.325 1.324h11.495v-9.294h-3.128v-3.622h3.128v-2.671c0-3.1 1.893-4.788 4.659-4.788 1.325 0 2.463.099 2.795.143v3.24l-1.918.001c-1.504 0-1.795.715-1.795 1.763v2.313h3.587l-.467 3.622h-3.12v9.293h6.116c.73 0 1.323-.593 1.323-1.325v-21.35c0-.732-.593-1.325-1.325-1.325z"/>
-          </svg>
-          <span>Facebook Feed</span>
-        </button>
-        <button (click)="shareToFacebook('message'); closeMobileShare()" 
-                class="w-full px-4 py-3 text-left text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-3">
-          <svg class="w-5 h-5 text-[#0084FF]" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M20 2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h4l4 4 4-4h4c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/>
-          </svg>
-          <span>Facebook Messenger</span>
-        </button>
-        <button (click)="shareToInstagram(); closeMobileShare()" 
-                class="w-full px-4 py-3 text-left text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-3">
-          <svg class="w-5 h-5 text-[#E4405F]" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069z"/>
-          </svg>
-          <span>Instagram</span>
-        </button>
-      </div>
     </div>
+    
+    <!-- Share options -->
+    <button (click)="shareToFacebook('post'); closeMobileShare()" 
+            class="w-full px-4 py-3 text-left text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-3">
+      <svg class="w-5 h-5 text-[#1877F2]" fill="currentColor" viewBox="0 0 24 24">
+        <path d="M22.675 0h-21.35c-.732 0-1.325.593-1.325 1.325v21.351c0 .731.593 1.324 1.325 1.324h11.495v-9.294h-3.128v-3.622h3.128v-2.671c0-3.1 1.893-4.788 4.659-4.788 1.325 0 2.463.099 2.795.143v3.24l-1.918.001c-1.504 0-1.795.715-1.795 1.763v2.313h3.587l-.467 3.622h-3.12v9.293h6.116c.73 0 1.323-.593 1.323-1.325v-21.35c0-.732-.593-1.325-1.325-1.325z"/>
+      </svg>
+      <span>Facebook Feed</span>
+    </button>
+    <button (click)="shareToFacebook('message'); closeMobileShare()" 
+            class="w-full px-4 py-3 text-left text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-3">
+      <svg class="w-5 h-5 text-[#0084FF]" fill="currentColor" viewBox="0 0 24 24">
+        <path d="M20 2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h4l4 4 4-4h4c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/>
+      </svg>
+      <span>Facebook Messenger</span>
+    </button>
+    <button (click)="shareToInstagram(); closeMobileShare()" 
+            class="w-full px-4 py-3 text-left text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-3">
+      <svg class="w-5 h-5 text-[#E4405F]" fill="currentColor" viewBox="0 0 24 24">
+        <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069z"/>
+      </svg>
+      <span>Instagram</span>
+    </button>
+  </div>
+</div>
 
     <!-- Add to Cart -->
     <button (click)="addToCart()" class="w-9 h-9 rounded-full flex items-center justify-center transition" style="background: var(--theme-color);">
@@ -88,7 +101,7 @@
     </button>
 
     <!-- 3-dot Menu -->
-    <div class="relative">
+    <!-- <div class="relative">
       <button id="mobile-three-dots-btn" class="w-9 h-9 rounded-full flex items-center justify-center hover:bg-black/5 transition">
         <i data-lucide="more-vertical" class="w-5 h-5" style="color: black;"></i>
       </button>
@@ -104,7 +117,7 @@
           <i data-lucide="help-circle" class="w-4 h-4"></i> <span>Help</span>
         </button>
       </div>
-    </div>
+    </div> -->
 
     <!-- User Profile -->
     <!-- <div class="min-w-[32px] w-[32px] h-[32px] rounded-full flex items-center justify-center font-semibold text-sm cursor-pointer ml-1" 
@@ -503,20 +516,29 @@
 <div id="title-popup" class="fpd-popup-overlay">
   <div class="fpd-popup-box">
 
-    <!-- <div class="fpd-popup-header">
-      <span>Save Your Design</span>
-    </div> -->
+    <!-- Header with title and close button (just like Share dropdown) -->
+    <div class="flex items-center justify-between px-4 py-3 border-b border-gray-100">
+      <span class="text-sm font-semibold text-gray-800">Save Your Design</span>
+      <button id="close-title-popup-btn" 
+              class="w-6 h-6 rounded-full flex items-center justify-center hover:bg-gray-100 transition"
+              style="background: transparent; border: none; cursor: pointer;">
+        <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </button>
+    </div>
 
-    <div class="fpd-popup-body">
+    <div class="fpd-popup-body" style="padding: 16px;">
       <input 
         type="text" 
         id="design-title-input" 
         placeholder="Enter design title..." 
+        style="width: 100%; padding: 10px 12px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 14px; box-sizing: border-box;"
       />
     </div>
 
-    <div class="fpd-popup-footer">
-      <button id="save-title-btn" class="fpd-btn-save">Save</button>
+    <div class="fpd-popup-footer" style="padding: 12px 16px; border-top: 1px solid #e5e7eb; display: flex; justify-content: flex-end;">
+      <button id="save-title-btn" class="fpd-btn-save" style="background: var(--theme-color); color: white; border: none; padding: 8px 20px; border-radius: 8px; font-weight: 600; cursor: pointer;">Save</button>
     </div>
 
   </div>

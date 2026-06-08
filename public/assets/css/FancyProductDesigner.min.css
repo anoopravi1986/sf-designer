@@ -2398,10 +2398,10 @@ fpd-main-bar .fpd-navigation>.fpd-nav-item.fpd-active:before {
 .fpd-container.fpd-sidebar.fpd-layout-small fpd-main-bar>.fpd-close {
     display: none;
     width: 100%;
-    font-size: 18px;
-    text-align: center;
+    font-size: 23px;
+    text-align: right;
     position: absolute;
-    top: 0;
+    top: 10px;
     right: 0;
     left: auto;
     bottom: auto;

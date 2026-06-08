@@ -2940,7 +2940,7 @@ updateInstagramModalWithData(shareText: string, imageUrl: string) {
     const popup = document.getElementById('title-popup');
     const input = document.getElementById('design-title-input') as HTMLInputElement;
     const btn = document.getElementById('save-title-btn');
-
+ const closeBtn = document.getElementById('close-title-popup-btn');
     if (!popup || !input || !btn) return;
 
     popup.style.display = 'flex';
@@ -2959,6 +2959,20 @@ updateInstagramModalWithData(shareText: string, imageUrl: string) {
         this.loadSavedProducts();
       }, 100);
     };
+     if (closeBtn) {
+    closeBtn.onclick = () => {
+      popup.style.display = 'none';
+      input.value = '';
+    };
+  }
+
+  // 👇 OPTIONAL: Click outside to close
+  popup.onclick = (e) => {
+    if (e.target === popup) {
+      popup.style.display = 'none';
+      input.value = '';
+    }
+  };
   }
 
   addSavedProduct(item: { thumbnail: string; product: any; title: string }) {

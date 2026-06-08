@@ -2150,7 +2150,7 @@ fpd-element-toolbar[data-fabric-type=image] {
 @media (max-width: 768px) {
   .fpd-btn.fpd-tooltip[aria-label="Redo"] {
     position: fixed;
-    right: 13.5rem;
+    right: 6.9rem;
     top: -3px;
     z-index: 99;
   }
@@ -2162,7 +2162,7 @@ fpd-element-toolbar[data-fabric-type=image] {
     z-index:99;
   }
 
-  .fpd-btn[aria-label="Reset"]{
+ .fpd-container fpd-actions-bar .fpd-dropdown-menu>.fpd-btn[aria-label="Reset"]{
     position: fixed;
     bottom: 66px;
     left: -57px;
@@ -2170,7 +2170,7 @@ fpd-element-toolbar[data-fabric-type=image] {
     margin: auto;
     z-index: 99;
   }
-  .fpd-btn[aria-label="Preview"]{
+  .fpd-container fpd-actions-bar .fpd-dropdown-menu>.fpd-btn[aria-label="Preview"]{
         position: fixed;
     bottom: 66px;
     left: 26px;
@@ -2189,13 +2189,9 @@ fpd-element-toolbar[data-fabric-type=image] {
   }
 }
 
-// @media (max-width: 768px) {
-//   .fpd-btn.fpd-tooltip[aria-label="Reset"] {
-//     position: fixed;
-//     left: 0px;
-//     right:119px;
-//     top: 0;
-//     z-index: 99;
-//     bottom: -527px;
-//   }
-// }
+@media (max-width: 768px) {
+    .py-2 {
+        padding-top: 0.5rem;
+        padding-bottom: 0.9rem;
+    }
+}
