@@ -2666,7 +2666,7 @@ export class HomeComponent implements AfterViewInit {
       tagWrapperMain.className = 'relative w-full mt-2 fpd-designs-tags';
 
       const tagWrapper = document.createElement('div');
-      tagWrapper.className = 'flex gap-2 mt-2 ml-[5px] fixed md:top-[164px]';
+      tagWrapper.className = 'flex fixed md:top-[164px]';
       tagWrapper.id = 'tag-wrapper-design-tags';
 
       Array.from(allTagsSetD).forEach((tag) => {
