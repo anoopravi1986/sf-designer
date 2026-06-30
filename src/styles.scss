@@ -2195,3 +2195,13 @@ fpd-element-toolbar[data-fabric-type=image] {
         padding-bottom: 0.9rem;
     }
 }
+@media (max-width: 768px) {
+  .fpd-head.flex.items-center {
+    margin-top: 50px;
+  }
+}
+@media (max-width: 768px) {
+  #tag-wrapper-design-tags {
+    gap: 0.1rem;
+  }
+}

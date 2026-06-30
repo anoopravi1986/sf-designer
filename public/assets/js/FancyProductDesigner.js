@@ -28250,7 +28250,7 @@ console.log("t:", t);
           console.log('Remove Add Back')
           // alert('Check')
         }
-        selectCategory () {
+      selectCategory () {
           let t =
             arguments.length > 0 && void 0 !== arguments[0] ? arguments[0] : 0
           if (
@@ -28258,6 +28258,10 @@ console.log("t:", t);
             (this.container.querySelector('.fpd-grid').innerHTML = ''),
             this.fpdInstance.products && this.fpdInstance.products.length > 0)
           ) {
+            // ✅ FIX 1: Category switch hone par scroll top pe reset karo
+            const scrollArea = this.container.querySelector('.fpd-scroll-area')
+            if (scrollArea) scrollArea.scrollTop = 0
+
             console.log('Anoop Data old 2', this.fpdInstance.products)
             let e
             void 0 !== this.fpdInstance.products[0].category
@@ -28339,7 +28343,7 @@ console.log("t:", t);
             })
         }
 
-        selectCategory () {
+      selectCategory () {
           let t =
             arguments.length > 0 && void 0 !== arguments[0] ? arguments[0] : 0
           console.log(
@@ -28355,6 +28359,10 @@ console.log("t:", t);
             this.fpdInstance.productsnew &&
               this.fpdInstance.productsnew.length > 0)
           ) {
+            // ✅ FIX 1: Category switch hone par scroll top pe reset karo
+            const scrollArea = this.container.querySelector('.fpd-scroll-area')
+            if (scrollArea) scrollArea.scrollTop = 0
+
             console.log('Anoop Data 2', this.fpdInstance.productsnew)
             let e
             void 0 !== this.fpdInstance.productsnew[0].category
@@ -30049,7 +30057,7 @@ console.log("t:", t);
         // Step 5: Create left arrow
         const leftArrow = document.createElement('button')
         leftArrow.innerHTML = `
- <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+ <svg xmlns="http://www.w3.org/2000/svg" width="50" height="40" viewBox="0 0 24 24" fill="none">
    <path fill="currentColor" d="m14.8 16.382-4.205-4.205a.25.25 0 0 1 0-.354L14.8 7.618a.75.75 0 0 0-1.06-1.06l-4.206 4.204a1.75 1.75 0 0 0 0 2.475l4.206 4.205a.75.75 0 0 0 1.06-1.06"></path>
  </svg>
 `
@@ -30060,7 +30068,7 @@ console.log("t:", t);
         // Step 6: Create right arrow
         const rightArrow = document.createElement('button')
         rightArrow.innerHTML = `
-<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+<svg xmlns="http://www.w3.org/2000/svg" width="50" height="40" viewBox="0 0 24 24" fill="none">
   <path fill="currentColor" d="m9.216 7.619 4.204 4.204a.25.25 0 0 1 0 .354l-4.204 4.204a.75.75 0 0 0 1.06 1.061l4.205-4.204a1.75 1.75 0 0 0 0-2.475l-4.204-4.205a.75.75 0 0 0-1.061 1.06"></path>
 </svg>
 `
