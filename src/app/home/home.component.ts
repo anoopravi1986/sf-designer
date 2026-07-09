@@ -67,7 +67,7 @@ export class HomeComponent implements AfterViewInit {
   private lastFacebookType: 'post' | 'message' = 'post';
   private currentDesignId: string | null = null;
   @ViewChild('facebookDropdown') facebookDropdownRef!: ElementRef;
-  
+
   constructor(
     @Inject(PLATFORM_ID) private platformId: any,
     @Inject(DOCUMENT) private document: Document,
@@ -75,8 +75,8 @@ export class HomeComponent implements AfterViewInit {
     private route: ActivatedRoute,
     private http: HttpClient,
     private titleService: Title
-  ) {}
-  
+  ) { }
+
   @ViewChild('previewButton') previewButton!: ElementRef;
   @ViewChild('savedGrid', { static: false }) savedGrid!: ElementRef;
 
@@ -149,35 +149,45 @@ export class HomeComponent implements AfterViewInit {
         });
     });
   }
-// Mobile share dropdown toggle ke liye
-showMobileShareDropdown = false;
+  // Mobile share dropdown toggle ke liye
+  showMobileShareDropdown = false;
 
-toggleMobileShare() {
-  this.showMobileShareDropdown = !this.showMobileShareDropdown;
-  console.log('Mobile share toggled:', this.showMobileShareDropdown);
-}
+  toggleMobileShare() {
+    this.showMobileShareDropdown = !this.showMobileShareDropdown;
+    console.log('Mobile share toggled:', this.showMobileShareDropdown);
+  }
 
-closeMobileShare() {
-  this.showMobileShareDropdown = false;
-}
+  closeMobileShare() {
+    this.showMobileShareDropdown = false;
+  }
 
-@HostListener('document:click', ['$event'])
-onClickOutsideMobileShare(event: Event) {
-  setTimeout(() => {
-    if (this.showMobileShareDropdown) {
-      const target = event.target as HTMLElement;
-      const shareButton = document.querySelector('.share-mobile-btn');
-      const shareDropdown = document.querySelector('.mobile-share-dropdown');
-      
-      if (shareDropdown && !shareDropdown.contains(target) && !shareButton?.contains(target)) {
-        this.showMobileShareDropdown = false;
+  @HostListener('document:click', ['$event'])
+  onClickOutsideMobileShare(event: Event) {
+    setTimeout(() => {
+      if (this.showMobileShareDropdown) {
+        const target = event.target as HTMLElement;
+        const shareButton = document.querySelector('.share-mobile-btn');
+        const shareDropdown = document.querySelector('.mobile-share-dropdown');
+
+        if (shareDropdown && !shareDropdown.contains(target) && !shareButton?.contains(target)) {
+          this.showMobileShareDropdown = false;
+        }
       }
+    }, 100);
+  }
+
+  targetBackUrl = 'https://www.styleflip.com/products/apple-macbook-13-nonunibody-custom-skins-covers';
+
+  goBack() {
+    // Current URL check kar
+    if (window.location.href.includes('http://localhost:4200/apple/macbook-13-inch-non-unibody-2006-2009')) {
+      // Live product page pe bhej
+      window.location.href = this.targetBackUrl;
+    } else {
+      // Normal back
+      window.history.back();
     }
-  }, 100);
-}
-goBack() {
-  window.history.back(); 
-}
+  }
   ngAfterViewInit() {
     if (isPlatformBrowser(this.platformId)) {
       const fontArrayStr: any[] = [];
@@ -185,15 +195,15 @@ goBack() {
       localStorage.setItem('productLoader', 'done');
 
       fetch('https://styleflip-backend-jdm5.ithemes.xyz/api/font/getAllFonts')
-      .then(res => res.json())
-      .then(data => {
-          console.log('font data is',data);
+        .then(res => res.json())
+        .then(data => {
+          console.log('font data is', data);
           this.fontArrayStr = data;
           localStorage.setItem('fontList', JSON.stringify(this.fontArrayStr));
-      })
-      .catch(err => {
-        console.error('Error fetching fonts:', err);
-      });
+        })
+        .catch(err => {
+          console.error('Error fetching fonts:', err);
+        });
 
       const storedFonts = localStorage.getItem('fontList');
       const fontData = storedFonts ? JSON.parse(storedFonts) : null;
@@ -206,16 +216,15 @@ goBack() {
         const manufacturerSlug =
           this.route.snapshot.paramMap.get('manufacturer') || '';
         const titleSlug = this.route.snapshot.paramMap.get('slug') || '';
-        
+
         console.log(
           'productIndex,categoryIndex,',
           this.reversedManufacturerSlugMap[manufacturerSlug],
           titleSlug
         );
-        
-        const pageTitle = `${
-          titleSlug.trim() ? titleSlug.replace(/-/g, '') : 'Styleflip'
-        } | ${manufacturerSlug.replace(/-/g, ' ')} - Design Your Product`;
+
+        const pageTitle = `${titleSlug.trim() ? titleSlug.replace(/-/g, '') : 'Styleflip'
+          } | ${manufacturerSlug.replace(/-/g, ' ')} - Design Your Product`;
 
         this.titleService.setTitle(pageTitle);
         let { categoryIndex, productIndex, childIndex }: any =
@@ -239,7 +248,7 @@ goBack() {
         const fpdTarget = document.getElementById('fpd-target');
         if (!fpdTarget) return;
 
-        console.log("fontssssssssssss data is",fontData)
+        console.log("fontssssssssssss data is", fontData)
 
         $(document).on('click', 'fpd-module-products .fpd-item', (event) => {
           localStorage.setItem('productIndex', '');
@@ -247,7 +256,7 @@ goBack() {
           console.log(event.currentTarget, 'click happen', event);
           const clickedTitle = $(event.currentTarget).data('title');
           console.log(clickedTitle, 'cllllllll', $(event.currentTarget));
-          
+
           const manufacturer = $(event.currentTarget).data('manufacturer');
           let ob: any;
 
@@ -275,7 +284,7 @@ goBack() {
           const clickedDiv = event.currentTarget;
           const uploadParent = clickedDiv.closest('[data-context="upload"]');
           console.log('You clicked:', clickedDiv);
-          console.log("djjd",this.designer.currentViewInstance);
+          console.log("djjd", this.designer.currentViewInstance);
           const clothingDesignerElem = document.querySelector('#clothing-designer');
           if (!clothingDesignerElem) {
             console.error('Element #clothing-designer not found.');
@@ -284,10 +293,10 @@ goBack() {
           const fpdvalue = (clothingDesignerElem as any).instance;
           const viewvalue = clickedDiv.getAttribute("data-source");
           const viewtitle = clickedDiv.getAttribute("data-title");
-          console.log("viewvalue",viewvalue, viewtitle)
-          const parameter = {removable: true,positioned: true, autoSelect: true,uniScalingUnlockable: true};
-          
-          if(uploadParent.classList.contains('fpd-active')){
+          console.log("viewvalue", viewvalue, viewtitle)
+          const parameter = { removable: true, positioned: true, autoSelect: true, uniScalingUnlockable: true };
+
+          if (uploadParent.classList.contains('fpd-active')) {
 
             fpdvalue.addCanvasDesign(
               viewvalue,
@@ -298,13 +307,13 @@ goBack() {
         });
 
         $(document).on('click', '.item-data-click .fpd-three-dot-menu', (event) => {
-            event.stopPropagation();
+          event.stopPropagation();
         });
-        
+
         $(document).on('click', '.item-data-click .delete-button', (event) => {
-            event.stopPropagation();
+          event.stopPropagation();
         })
-       
+
       }, 300);
     }
 
@@ -513,27 +522,27 @@ goBack() {
       const sliderOpacity = document.getElementById('fpd-opacity-range') as HTMLInputElement;
       console.log('Opacity elements:', { btnOpacity, panel, sliderOpacity });
       if (!btnOpacity || !panel || !sliderOpacity) return;
-      
+
 
       btnOpacity.addEventListener('click', () => {
         if (targetSection) {
-            const activeElem = targetSection.querySelector('.fpd-active');
-            
-            if (activeElem) {
-                activeElem.classList.remove('fpd-active');
-            }
+          const activeElem = targetSection.querySelector('.fpd-active');
+
+          if (activeElem) {
+            activeElem.classList.remove('fpd-active');
+          }
         }
         console.log('Opacity button clicked, toggling panel. Current display:', panel.style.display);
         panel.style.display =
           panel.style.display === 'block' ? 'none' : 'block';
-          if (panel.style.display === 'block') {
-              btnOpacity.classList.add('fpd-active');
-          } else {
-              btnOpacity.classList.remove('fpd-active');
-          }
+        if (panel.style.display === 'block') {
+          btnOpacity.classList.add('fpd-active');
+        } else {
+          btnOpacity.classList.remove('fpd-active');
+        }
         const canvas = this.designer.currentViewInstance.fabricCanvas;
         const obj = canvas.getActiveObject();
-  
+
         if (obj) {
           sliderOpacity.value = obj.opacity ?? 1;
           var percent = (parseFloat(sliderOpacity.value) / parseFloat(sliderOpacity.max)) * 100;
@@ -549,13 +558,13 @@ goBack() {
         const canvas = this.designer.currentViewInstance.fabricCanvas;
         const obj = canvas.getActiveObject();
         if (!obj) return;
-  
+
         obj.set('opacity', parseFloat(sliderOpacity.value));
-  
+
         canvas.requestRenderAll();
-  
+
         canvas.fire('object:modified', { target: obj });
-  
+
       });
 
       document.addEventListener('click', (e: any) => {
@@ -568,159 +577,174 @@ goBack() {
         }
       });
     }, 5000);
+    setTimeout(() => {
+      const backBtn = document.getElementById('backButton');
+      if (backBtn) {
+        console.log("Back button found!");
+        backBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          console.log("Back button clicked manually");
+          window.location.href = 'https://www.styleflip.com/products/apple-macbook-pro-13-with-retina-display-skins-custom-sticker-covers?variant=45181139386554';
+        });
+      } else {
+        console.log("Back button NOT found!");
+      }
+    }, 1000);
+
   }
-async deleteUploadedImage(designId: string, closeBtn?: HTMLElement, modalDiv?: HTMLElement): Promise<boolean> {
-  // Show loading state on close button
-  if (closeBtn) {
-    const button = closeBtn as HTMLButtonElement;
-    const originalText = button.innerHTML;
-    button.innerHTML = `
+  async deleteUploadedImage(designId: string, closeBtn?: HTMLElement, modalDiv?: HTMLElement): Promise<boolean> {
+    // Show loading state on close button
+    if (closeBtn) {
+      const button = closeBtn as HTMLButtonElement;
+      const originalText = button.innerHTML;
+      button.innerHTML = `
       <div style="display:inline-block;width:16px;height:16px;border:2px solid white;border-top-color:transparent;border-radius:50%;animation:spin 0.8s linear infinite;margin-right:8px;"></div>
       Deleting...
     `;
-    button.style.opacity = '0.7';
-    button.style.cursor = 'not-allowed';
-    button.disabled = true;
-    
-    try {
-      const response = await fetch(`https://styleflip-backend-jdm5.ithemes.xyz/api/upload/design/${designId}`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json'
+      button.style.opacity = '0.7';
+      button.style.cursor = 'not-allowed';
+      button.disabled = true;
+
+      try {
+        const response = await fetch(`https://styleflip-backend-jdm5.ithemes.xyz/api/upload/design/${designId}`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+          console.log('Image deleted from server successfully');
+          this.showToast('Design deleted from server');
+
+          // Restore button briefly before closing
+          button.innerHTML = '✓ Deleted!';
+          setTimeout(() => {
+            if (modalDiv) modalDiv.remove();
+          }, 500);
+
+          return true;
+        } else {
+          console.error('Failed to delete image:', result.error);
+          button.innerHTML = originalText;
+          button.style.opacity = '1';
+          button.style.cursor = 'pointer';
+          button.disabled = false;
+          this.showToast('Failed to delete: ' + result.error);
+          return false;
         }
-      });
-      
-      const result = await response.json();
-      
-      if (result.success) {
-        console.log('Image deleted from server successfully');
-        this.showToast('Design deleted from server');
-        
-        // Restore button briefly before closing
-        button.innerHTML = '✓ Deleted!';
-        setTimeout(() => {
-          if (modalDiv) modalDiv.remove();
-        }, 500);
-        
-        return true;
-      } else {
-        console.error('Failed to delete image:', result.error);
+      } catch (error) {
+        console.error('Error deleting image:', error);
         button.innerHTML = originalText;
         button.style.opacity = '1';
         button.style.cursor = 'pointer';
         button.disabled = false;
-        this.showToast('Failed to delete: ' + result.error);
+        this.showToast('Error deleting design');
         return false;
       }
-    } catch (error) {
-      console.error('Error deleting image:', error);
-      button.innerHTML = originalText;
-      button.style.opacity = '1';
-      button.style.cursor = 'pointer';
-      button.disabled = false;
-      this.showToast('Error deleting design');
-      return false;
-    }
-  } else {
-    // Original behavior without button UI update
-    try {
-      const response = await fetch(`https://styleflip-backend-jdm5.ithemes.xyz/api/upload/design/${designId}`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json'
+    } else {
+      // Original behavior without button UI update
+      try {
+        const response = await fetch(`https://styleflip-backend-jdm5.ithemes.xyz/api/upload/design/${designId}`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+          console.log('Image deleted from server successfully');
+          this.showToast('Design deleted from server');
+          return true;
+        } else {
+          console.error('Failed to delete image:', result.error);
+          return false;
         }
-      });
-      
-      const result = await response.json();
-      
-      if (result.success) {
-        console.log('Image deleted from server successfully');
-        this.showToast('Design deleted from server');
-        return true;
-      } else {
-        console.error('Failed to delete image:', result.error);
+      } catch (error) {
+        console.error('Error deleting image:', error);
         return false;
       }
-    } catch (error) {
-      console.error('Error deleting image:', error);
-      return false;
     }
   }
-}
   // ==================== SHARING FUNCTIONALITY ====================
 
   // Share to Facebook - Opens popup immediately with loading state
- async shareToFacebook(type: 'post' | 'message') {
-  this.lastFacebookType = type;
-  this.closeFacebookOptions();
-  
-  this.showFacebookShareModalWithLoading(type);
-  
-  try {
-    const imageBlob = await this.getCurrentDesignBlob();
-    const designTitle = this.activeImageTitle || `Design_${Date.now()}`;
-    
-    const formData = new FormData();
-    formData.append('image', imageBlob, 'design.png');
-    formData.append('title', designTitle);
-    
-    const API_URL = 'https://styleflip-backend-jdm5.ithemes.xyz/api/upload/upload';
-    
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 30000);
-    
-    const response = await fetch(API_URL, {
-      method: 'POST',
-      body: formData,
-      signal: controller.signal
-    });
-    
-    clearTimeout(timeoutId);
-    
-    if (!response.ok) {
-      throw new Error(`Upload failed with status: ${response.status}`);
-    }
-    
-    const result = await response.json();
-    
-    if (result.success) {
-      // Store the design_id for deletion
-      this.currentDesignId = result.design_id;
-      
-      const imageUrl = result.imageUrl;
-      const shareText = `${imageUrl}`;
-      
-      this.updateFacebookModalWithData(shareText, imageUrl, type);
-      
-      const storageKey = this.designer.container?.id || 'fpd-saved-designs';
-      let savedList: any[] = [];
-      try {
-        savedList = JSON.parse(window.localStorage.getItem(storageKey) || '[]');
-      } catch {
-        savedList = [];
-      }
-      savedList.push({
-        thumbnail: result.imageUrl,
-        product: this.designer.getProduct ? this.designer.getProduct() : {},
-        title: designTitle,
-        imageUrl: imageUrl,
-        design_id: result.design_id
-      });
-      window.localStorage.setItem(storageKey, JSON.stringify(savedList));
-      
-    } else {
-      throw new Error(result.error || 'Failed to get image URL');
-    }
-  } catch (error) {
-    console.error('Facebook share error:', error);
-    this.updateFacebookModalWithError(error as Error);
-  }
-}
+  async shareToFacebook(type: 'post' | 'message') {
+    this.lastFacebookType = type;
+    this.closeFacebookOptions();
 
-showFacebookShareModalWithLoading(type: 'post' | 'message') {
-  const shareTypeText = type === 'post' ? 'Feed Post' : 'Messenger';
-  
-  const modalHtml = `
+    this.showFacebookShareModalWithLoading(type);
+
+    try {
+      const imageBlob = await this.getCurrentDesignBlob();
+      const designTitle = this.activeImageTitle || `Design_${Date.now()}`;
+
+      const formData = new FormData();
+      formData.append('image', imageBlob, 'design.png');
+      formData.append('title', designTitle);
+
+      const API_URL = 'https://styleflip-backend-jdm5.ithemes.xyz/api/upload/upload';
+
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 30000);
+
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        body: formData,
+        signal: controller.signal
+      });
+
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        throw new Error(`Upload failed with status: ${response.status}`);
+      }
+
+      const result = await response.json();
+
+      if (result.success) {
+        // Store the design_id for deletion
+        this.currentDesignId = result.design_id;
+
+        const imageUrl = result.imageUrl;
+        const shareText = `${imageUrl}`;
+
+        this.updateFacebookModalWithData(shareText, imageUrl, type);
+
+        const storageKey = this.designer.container?.id || 'fpd-saved-designs';
+        let savedList: any[] = [];
+        try {
+          savedList = JSON.parse(window.localStorage.getItem(storageKey) || '[]');
+        } catch {
+          savedList = [];
+        }
+        savedList.push({
+          thumbnail: result.imageUrl,
+          product: this.designer.getProduct ? this.designer.getProduct() : {},
+          title: designTitle,
+          imageUrl: imageUrl,
+          design_id: result.design_id
+        });
+        window.localStorage.setItem(storageKey, JSON.stringify(savedList));
+
+      } else {
+        throw new Error(result.error || 'Failed to get image URL');
+      }
+    } catch (error) {
+      console.error('Facebook share error:', error);
+      this.updateFacebookModalWithError(error as Error);
+    }
+  }
+
+  showFacebookShareModalWithLoading(type: 'post' | 'message') {
+    const shareTypeText = type === 'post' ? 'Feed Post' : 'Messenger';
+
+    const modalHtml = `
     <div id="facebook-share-modal" style="position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.8);z-index:10000;display:flex;align-items:center;justify-content:center;">
       <div style="background:white;border-radius:12px;padding:24px;max-width:500px;text-align:center;">
         <h3 style="margin-bottom:16px;color:#1877F2;">Share to Facebook ${shareTypeText}</h3>
@@ -749,71 +773,71 @@ showFacebookShareModalWithLoading(type: 'post' | 'message') {
       }
     </style>
   `;
-  
-  const modalDiv = document.createElement('div');
-  modalDiv.innerHTML = modalHtml;
-  document.body.appendChild(modalDiv);
-  
-  (window as any).currentFacebookModal = modalDiv;
-  
-  const closeBtn = modalDiv.querySelector('#close-facebook-modal') as HTMLButtonElement;
-  if (closeBtn) {
-    closeBtn.onclick = async () => {
-      if (this.currentDesignId) {
-        const deleted = await this.deleteUploadedImage(this.currentDesignId, closeBtn, modalDiv);
-        if (deleted) {
-          this.currentDesignId = null;
+
+    const modalDiv = document.createElement('div');
+    modalDiv.innerHTML = modalHtml;
+    document.body.appendChild(modalDiv);
+
+    (window as any).currentFacebookModal = modalDiv;
+
+    const closeBtn = modalDiv.querySelector('#close-facebook-modal') as HTMLButtonElement;
+    if (closeBtn) {
+      closeBtn.onclick = async () => {
+        if (this.currentDesignId) {
+          const deleted = await this.deleteUploadedImage(this.currentDesignId, closeBtn, modalDiv);
+          if (deleted) {
+            this.currentDesignId = null;
+          } else {
+            closeBtn.style.opacity = '1';
+            closeBtn.style.cursor = 'pointer';
+            closeBtn.disabled = false;
+          }
         } else {
-          closeBtn.style.opacity = '1';
-          closeBtn.style.cursor = 'pointer';
-          closeBtn.disabled = false;
+          modalDiv.remove();
+          (window as any).currentFacebookModal = null;
         }
-      } else {
-        modalDiv.remove();
-        (window as any).currentFacebookModal = null;
-      }
-    };
+      };
+    }
   }
-}
 
-updateFacebookModalWithData(shareText: string, imageUrl: string, type: 'post' | 'message') {
-  const modalDiv = (window as any).currentFacebookModal;
-  if (!modalDiv || !document.body.contains(modalDiv)) return;
-  
-  const loadingDiv = modalDiv.querySelector('#facebook-loading');
-  const contentDiv = modalDiv.querySelector('#facebook-content');
-  const shareTextContainer = modalDiv.querySelector('#share-text-container');
-  const shareImage = modalDiv.querySelector('#share-image');
-  
-  if (loadingDiv) loadingDiv.style.display = 'none';
-  if (contentDiv) contentDiv.style.display = 'block';
-  if (shareTextContainer) shareTextContainer.textContent = shareText;
-  if (shareImage) (shareImage as HTMLImageElement).src = imageUrl;
-  
-  const openBtn = modalDiv.querySelector(`#open-facebook-${type}`);
-  
-  if (openBtn) {
-    (openBtn as HTMLElement).onclick = () => {
-      if (type === 'post') {
-        const fbShareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(imageUrl)}&quote=${encodeURIComponent('Check out my custom design on Styleflip!')}`;
-        window.open(fbShareUrl, '_blank', 'width=600,height=400');
-      } else {
-        const fbMessageUrl = `https://www.facebook.com/dialog/send?link=${encodeURIComponent(imageUrl)}&app_id=703796939215127&redirect_uri=${encodeURIComponent(window.location.href)}`;
-        window.open(fbMessageUrl, '_blank', 'width=600,height=500');
-      }
-    };
+  updateFacebookModalWithData(shareText: string, imageUrl: string, type: 'post' | 'message') {
+    const modalDiv = (window as any).currentFacebookModal;
+    if (!modalDiv || !document.body.contains(modalDiv)) return;
+
+    const loadingDiv = modalDiv.querySelector('#facebook-loading');
+    const contentDiv = modalDiv.querySelector('#facebook-content');
+    const shareTextContainer = modalDiv.querySelector('#share-text-container');
+    const shareImage = modalDiv.querySelector('#share-image');
+
+    if (loadingDiv) loadingDiv.style.display = 'none';
+    if (contentDiv) contentDiv.style.display = 'block';
+    if (shareTextContainer) shareTextContainer.textContent = shareText;
+    if (shareImage) (shareImage as HTMLImageElement).src = imageUrl;
+
+    const openBtn = modalDiv.querySelector(`#open-facebook-${type}`);
+
+    if (openBtn) {
+      (openBtn as HTMLElement).onclick = () => {
+        if (type === 'post') {
+          const fbShareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(imageUrl)}&quote=${encodeURIComponent('Check out my custom design on Styleflip!')}`;
+          window.open(fbShareUrl, '_blank', 'width=600,height=400');
+        } else {
+          const fbMessageUrl = `https://www.facebook.com/dialog/send?link=${encodeURIComponent(imageUrl)}&app_id=703796939215127&redirect_uri=${encodeURIComponent(window.location.href)}`;
+          window.open(fbMessageUrl, '_blank', 'width=600,height=500');
+        }
+      };
+    }
   }
-}
 
-updateFacebookModalWithError(error: Error) {
-  const modalDiv = (window as any).currentFacebookModal;
-  if (!modalDiv || !document.body.contains(modalDiv)) return;
-  
-  const loadingDiv = modalDiv.querySelector('#facebook-loading');
-  const contentDiv = modalDiv.querySelector('#facebook-content');
-  
-  if (loadingDiv) {
-    loadingDiv.innerHTML = `
+  updateFacebookModalWithError(error: Error) {
+    const modalDiv = (window as any).currentFacebookModal;
+    if (!modalDiv || !document.body.contains(modalDiv)) return;
+
+    const loadingDiv = modalDiv.querySelector('#facebook-loading');
+    const contentDiv = modalDiv.querySelector('#facebook-content');
+
+    if (loadingDiv) {
+      loadingDiv.innerHTML = `
       <div style="color:#e74c3c;">
         <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="12" cy="12" r="10"></circle>
@@ -824,88 +848,88 @@ updateFacebookModalWithError(error: Error) {
         <button id="retry-facebook-share" style="margin-top:10px;background:#1877F2;color:white;border:none;padding:8px 16px;border-radius:6px;cursor:pointer;">Retry</button>
       </div>
     `;
-    
-    const retryBtn = modalDiv.querySelector('#retry-facebook-share');
-    if (retryBtn) {
-      (retryBtn as HTMLElement).onclick = () => {
-        modalDiv.remove();
-        (window as any).currentFacebookModal = null;
-        this.shareToFacebook(this.lastFacebookType);
-      };
+
+      const retryBtn = modalDiv.querySelector('#retry-facebook-share');
+      if (retryBtn) {
+        (retryBtn as HTMLElement).onclick = () => {
+          modalDiv.remove();
+          (window as any).currentFacebookModal = null;
+          this.shareToFacebook(this.lastFacebookType);
+        };
+      }
     }
+
+    if (contentDiv) contentDiv.style.display = 'none';
   }
-  
-  if (contentDiv) contentDiv.style.display = 'none';
-}
 
   // Share to Instagram - Opens popup immediately with loading state
-async shareToInstagram() {
-  this.closeFacebookOptions();
-  
-  this.showInstagramShareModalWithLoading();
-  
-  try {
-    const imageBlob = await this.getCurrentDesignBlob();
-    const designTitle = this.activeImageTitle || `Design_${Date.now()}`;
-    
-    const formData = new FormData();
-    formData.append('image', imageBlob, 'design.png');
-    formData.append('title', designTitle);
-    
-    const API_URL = 'https://styleflip-backend-jdm5.ithemes.xyz/api/upload/upload';
-    
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 30000);
-    
-    const response = await fetch(API_URL, {
-      method: 'POST',
-      body: formData,
-      signal: controller.signal
-    });
-    
-    clearTimeout(timeoutId);
-    
-    if (!response.ok) {
-      throw new Error(`Upload failed with status: ${response.status}`);
-    }
-    
-    const result = await response.json();
-    
-    if (result.success) {
-      // Store the design_id for deletion
-      this.currentDesignId = result.design_id;
-      
-      const imageUrl = result.imageUrl;
-      const shareText = `${imageUrl}`;
-      
-      this.updateInstagramModalWithData(shareText, imageUrl);
-      
-      const storageKey = this.designer.container?.id || 'fpd-saved-designs';
-      let savedList: any[] = [];
-      try {
-        savedList = JSON.parse(window.localStorage.getItem(storageKey) || '[]');
-      } catch {
-        savedList = [];
-      }
-      savedList.push({
-        thumbnail: result.imageUrl,
-        product: this.designer.getProduct ? this.designer.getProduct() : {},
-        title: designTitle,
-        imageUrl: imageUrl,
-        design_id: result.design_id
+  async shareToInstagram() {
+    this.closeFacebookOptions();
+
+    this.showInstagramShareModalWithLoading();
+
+    try {
+      const imageBlob = await this.getCurrentDesignBlob();
+      const designTitle = this.activeImageTitle || `Design_${Date.now()}`;
+
+      const formData = new FormData();
+      formData.append('image', imageBlob, 'design.png');
+      formData.append('title', designTitle);
+
+      const API_URL = 'https://styleflip-backend-jdm5.ithemes.xyz/api/upload/upload';
+
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 30000);
+
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        body: formData,
+        signal: controller.signal
       });
-      window.localStorage.setItem(storageKey, JSON.stringify(savedList));
-      
-    } else {
-      throw new Error(result.error || 'Failed to get image URL');
+
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        throw new Error(`Upload failed with status: ${response.status}`);
+      }
+
+      const result = await response.json();
+
+      if (result.success) {
+        // Store the design_id for deletion
+        this.currentDesignId = result.design_id;
+
+        const imageUrl = result.imageUrl;
+        const shareText = `${imageUrl}`;
+
+        this.updateInstagramModalWithData(shareText, imageUrl);
+
+        const storageKey = this.designer.container?.id || 'fpd-saved-designs';
+        let savedList: any[] = [];
+        try {
+          savedList = JSON.parse(window.localStorage.getItem(storageKey) || '[]');
+        } catch {
+          savedList = [];
+        }
+        savedList.push({
+          thumbnail: result.imageUrl,
+          product: this.designer.getProduct ? this.designer.getProduct() : {},
+          title: designTitle,
+          imageUrl: imageUrl,
+          design_id: result.design_id
+        });
+        window.localStorage.setItem(storageKey, JSON.stringify(savedList));
+
+      } else {
+        throw new Error(result.error || 'Failed to get image URL');
+      }
+    } catch (error) {
+      console.error('Instagram share error:', error);
+      this.updateInstagramModalWithError(error as Error);
     }
-  } catch (error) {
-    console.error('Instagram share error:', error);
-    this.updateInstagramModalWithError(error as Error);
   }
-}
-showInstagramShareModalWithLoading() {
-  const modalHtml = `
+  showInstagramShareModalWithLoading() {
+    const modalHtml = `
     <div id="instagram-share-modal" style="position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.8);z-index:10000;display:flex;align-items:center;justify-content:center;">
       <div style="background:white;border-radius:12px;padding:24px;max-width:500px;text-align:center;">
         <h3 style="margin-bottom:16px;color:#E4405F;">Share to Instagram</h3>
@@ -936,75 +960,75 @@ showInstagramShareModalWithLoading() {
       }
     </style>
   `;
-  
-  const modalDiv = document.createElement('div');
-  modalDiv.innerHTML = modalHtml;
-  document.body.appendChild(modalDiv);
-  
-  (window as any).currentInstagramModal = modalDiv;
-  
-  const closeBtn = modalDiv.querySelector('#close-instagram-modal') as HTMLButtonElement;
-  if (closeBtn) {
-    closeBtn.onclick = async () => {
-      if (this.currentDesignId) {
-        const deleted = await this.deleteUploadedImage(this.currentDesignId, closeBtn, modalDiv);
-        if (deleted) {
-          this.currentDesignId = null;
+
+    const modalDiv = document.createElement('div');
+    modalDiv.innerHTML = modalHtml;
+    document.body.appendChild(modalDiv);
+
+    (window as any).currentInstagramModal = modalDiv;
+
+    const closeBtn = modalDiv.querySelector('#close-instagram-modal') as HTMLButtonElement;
+    if (closeBtn) {
+      closeBtn.onclick = async () => {
+        if (this.currentDesignId) {
+          const deleted = await this.deleteUploadedImage(this.currentDesignId, closeBtn, modalDiv);
+          if (deleted) {
+            this.currentDesignId = null;
+          } else {
+            closeBtn.style.opacity = '1';
+            closeBtn.style.cursor = 'pointer';
+            closeBtn.disabled = false;
+          }
         } else {
-          closeBtn.style.opacity = '1';
-          closeBtn.style.cursor = 'pointer';
-          closeBtn.disabled = false;
+          modalDiv.remove();
+          (window as any).currentInstagramModal = null;
         }
-      } else {
-        modalDiv.remove();
-        (window as any).currentInstagramModal = null;
-      }
-    };
+      };
+    }
   }
-}
 
-updateInstagramModalWithData(shareText: string, imageUrl: string) {
-  const modalDiv = (window as any).currentInstagramModal;
-  if (!modalDiv || !document.body.contains(modalDiv)) return;
-  
-  const loadingDiv = modalDiv.querySelector('#instagram-loading');
-  const contentDiv = modalDiv.querySelector('#instagram-content');
-  const shareImage = modalDiv.querySelector('#instagram-share-image');
-  
-  if (loadingDiv) loadingDiv.style.display = 'none';
-  if (contentDiv) contentDiv.style.display = 'block';
-  if (shareImage) (shareImage as HTMLImageElement).src = imageUrl;
-  
-  const copyBtn = modalDiv.querySelector('#copy-instagram-link');
-  const openWebBtn = modalDiv.querySelector('#open-instagram-web');
-  
-  if (copyBtn) {
-    (copyBtn as HTMLElement).onclick = async () => {
-      await navigator.clipboard.writeText(shareText);
-      (copyBtn as HTMLElement).textContent = 'Copied!';
-      setTimeout(() => {
-        (copyBtn as HTMLElement).textContent = 'Copy Link';
-      }, 2000);
-      this.showToast('Link copied to clipboard!');
-    };
-  }
-  
-  if (openWebBtn) {
-    (openWebBtn as HTMLElement).onclick = () => {
-      window.open('https://www.instagram.com', '_blank');
-    };
-  }
-}
+  updateInstagramModalWithData(shareText: string, imageUrl: string) {
+    const modalDiv = (window as any).currentInstagramModal;
+    if (!modalDiv || !document.body.contains(modalDiv)) return;
 
- updateInstagramModalWithError(error: Error) {
-  const modalDiv = (window as any).currentInstagramModal;
-  if (!modalDiv || !document.body.contains(modalDiv)) return;
-  
-  const loadingDiv = modalDiv.querySelector('#instagram-loading');
-  const contentDiv = modalDiv.querySelector('#instagram-content');
-  
-  if (loadingDiv) {
-    loadingDiv.innerHTML = `
+    const loadingDiv = modalDiv.querySelector('#instagram-loading');
+    const contentDiv = modalDiv.querySelector('#instagram-content');
+    const shareImage = modalDiv.querySelector('#instagram-share-image');
+
+    if (loadingDiv) loadingDiv.style.display = 'none';
+    if (contentDiv) contentDiv.style.display = 'block';
+    if (shareImage) (shareImage as HTMLImageElement).src = imageUrl;
+
+    const copyBtn = modalDiv.querySelector('#copy-instagram-link');
+    const openWebBtn = modalDiv.querySelector('#open-instagram-web');
+
+    if (copyBtn) {
+      (copyBtn as HTMLElement).onclick = async () => {
+        await navigator.clipboard.writeText(shareText);
+        (copyBtn as HTMLElement).textContent = 'Copied!';
+        setTimeout(() => {
+          (copyBtn as HTMLElement).textContent = 'Copy Link';
+        }, 2000);
+        this.showToast('Link copied to clipboard!');
+      };
+    }
+
+    if (openWebBtn) {
+      (openWebBtn as HTMLElement).onclick = () => {
+        window.open('https://www.instagram.com', '_blank');
+      };
+    }
+  }
+
+  updateInstagramModalWithError(error: Error) {
+    const modalDiv = (window as any).currentInstagramModal;
+    if (!modalDiv || !document.body.contains(modalDiv)) return;
+
+    const loadingDiv = modalDiv.querySelector('#instagram-loading');
+    const contentDiv = modalDiv.querySelector('#instagram-content');
+
+    if (loadingDiv) {
+      loadingDiv.innerHTML = `
       <div style="color:#e74c3c;">
         <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="12" cy="12" r="10"></circle>
@@ -1015,19 +1039,19 @@ updateInstagramModalWithData(shareText: string, imageUrl: string) {
         <button id="retry-instagram-share" style="margin-top:10px;background:#E4405F;color:white;border:none;padding:8px 16px;border-radius:6px;cursor:pointer;">Retry</button>
       </div>
     `;
-    
-    const retryBtn = modalDiv.querySelector('#retry-instagram-share');
-    if (retryBtn) {
-      (retryBtn as HTMLElement).onclick = () => {
-        modalDiv.remove();
-        (window as any).currentInstagramModal = null;
-        this.shareToInstagram();
-      };
+
+      const retryBtn = modalDiv.querySelector('#retry-instagram-share');
+      if (retryBtn) {
+        (retryBtn as HTMLElement).onclick = () => {
+          modalDiv.remove();
+          (window as any).currentInstagramModal = null;
+          this.shareToInstagram();
+        };
+      }
     }
+
+    if (contentDiv) contentDiv.style.display = 'none';
   }
-  
-  if (contentDiv) contentDiv.style.display = 'none';
-}
 
   closeFacebookOptions() {
     this.showFacebookOptions = false;
@@ -1039,9 +1063,9 @@ updateInstagramModalWithData(shareText: string, imageUrl: string) {
 
   @HostListener('document:click', ['$event'])
   onClickOutsideFacebook(event: Event) {
-    if (this.facebookDropdownRef && 
-        !this.facebookDropdownRef.nativeElement.contains(event.target) &&
-        this.showFacebookOptions) {
+    if (this.facebookDropdownRef &&
+      !this.facebookDropdownRef.nativeElement.contains(event.target) &&
+      this.showFacebookOptions) {
       this.showFacebookOptions = false;
     }
   }
@@ -1052,7 +1076,7 @@ updateInstagramModalWithData(shareText: string, imageUrl: string) {
       if (this.designer && this.designer.currentViewInstance && this.designer.currentViewInstance.fabricCanvas) {
         const canvas = this.designer.currentViewInstance.fabricCanvas;
         const htmlCanvas = canvas.getElement();
-        
+
         if (htmlCanvas && htmlCanvas.toBlob) {
           htmlCanvas.toBlob((blob: Blob | null) => {
             if (blob) {
@@ -1222,16 +1246,16 @@ updateInstagramModalWithData(shareText: string, imageUrl: string) {
     if (positionButton) {
       positionButton.addEventListener('click', (e) => {
         const target = e.currentTarget as HTMLElement;
-        console.log("target is aad",document.querySelector('.fpd-panel-position')?.classList);
+        console.log("target is aad", document.querySelector('.fpd-panel-position')?.classList);
         if (document.querySelector('.fpd-panel-position')?.classList.contains('fpd-active')) {
-          document.querySelector('fpd-element-toolbar')?.classList.remove('fpd-panel-visible','my-position');
+          document.querySelector('fpd-element-toolbar')?.classList.remove('fpd-panel-visible', 'my-position');
         }
         if (document.body.classList.contains('fpd-toolbar-transform-our')) {
           document.body.classList.remove('fpd-toolbar-transform-our');
           document.querySelector('.fpd-tool-transform')?.classList.remove('fpd-active');
         }
         var hasClass = target.classList.contains('letter-spac-active');
-        if(hasClass){
+        if (hasClass) {
           var toolbar = e.target ? (e.target as HTMLElement).closest("fpd-element-toolbar") : null;
           target.classList.remove('letter-spac-active');
           const subPanel = document.querySelector('.fpd-sub-panel');
@@ -1264,9 +1288,9 @@ updateInstagramModalWithData(shareText: string, imageUrl: string) {
         }
 
         const elementtoolbar = document.querySelector('fpd-element-toolbar');
-        console.log("djjjjj",elementtoolbar)
+        console.log("djjjjj", elementtoolbar)
         console.log("test test");
-        if(elementtoolbar){
+        if (elementtoolbar) {
           elementtoolbar.classList.add('fpd-panel-visible')
         }
       });
@@ -1275,7 +1299,7 @@ updateInstagramModalWithData(shareText: string, imageUrl: string) {
     document.getElementById('TextMoveUp')?.addEventListener('click', () => {
       const canvas = this.designer.currentViewInstance.fabricCanvas;
       const obj = canvas.getActiveObject();
-      console.log('Text Move Up clicked, active object:', obj); 
+      console.log('Text Move Up clicked, active object:', obj);
       if (!obj) return;
 
       const objects = canvas.getObjects();
@@ -1373,7 +1397,7 @@ updateInstagramModalWithData(shareText: string, imageUrl: string) {
       }
 
       canvas.requestRenderAll();
-      
+
     });
 
     const minusEl = document.getElementById('minusElement');
@@ -1426,9 +1450,9 @@ updateInstagramModalWithData(shareText: string, imageUrl: string) {
     });
 
     let copiedObject: any = null;
-    
+
     document.getElementById('copytext')?.addEventListener('click', (e) => {
-      console.log("e.currentTarget",e.currentTarget)
+      console.log("e.currentTarget", e.currentTarget)
       const canvas = this.designer.currentViewInstance.fabricCanvas;
       const obj = canvas.getActiveObject();
 
@@ -1466,7 +1490,7 @@ updateInstagramModalWithData(shareText: string, imageUrl: string) {
 
         const obj = canvas.getActiveObject();
         console.log("Ctrl+C pressed, active object:", obj, obj.type);
-        
+
         if (!obj) return;
 
         if (obj.type === 'image') {
@@ -1492,7 +1516,7 @@ updateInstagramModalWithData(shareText: string, imageUrl: string) {
     document.getElementById('pastetext')?.addEventListener('click', () => {
       const view = this.designer.currentViewInstance;
       const canvas = view.fabricCanvas;
-      console.log("e.currentTarget copiedObjectdata",copiedObject)
+      console.log("e.currentTarget copiedObjectdata", copiedObject)
       if (!copiedObject) return;
 
       if (copiedObject.type === 'curved-text') {
@@ -1503,7 +1527,7 @@ updateInstagramModalWithData(shareText: string, imageUrl: string) {
           scaleX: (copiedObject.scaleX || 1),
           scaleY: (copiedObject.scaleY || 1),
           left: (copiedObject.left || 500) + 20,
-          top:  (copiedObject.top  || 500) + 20,
+          top: (copiedObject.top || 500) + 20,
           angle: copiedObject.angle || 0,
           flipX: copiedObject.flipX || false,
           flipY: copiedObject.flipY || false,
@@ -1562,12 +1586,12 @@ updateInstagramModalWithData(shareText: string, imageUrl: string) {
     document.addEventListener('keydown', (e: KeyboardEvent) => {
       if (e.key === 'Delete' || e.key === 'Backspace') {
         e.preventDefault();
-        
+
         const canvas = this.designer?.currentViewInstance?.fabricCanvas;
         if (!canvas) return;
-        
+
         const activeObject = canvas.getActiveObject();
-        
+
         if (activeObject) {
           if (activeObject.type === 'activeSelection') {
             activeObject.forEachObject((obj: any) => {
@@ -1576,10 +1600,10 @@ updateInstagramModalWithData(shareText: string, imageUrl: string) {
           } else {
             canvas.remove(activeObject);
           }
-          
+
           canvas.discardActiveObject();
           canvas.requestRenderAll();
-          
+
           this.showToast('Item deleted successfully!');
         }
       }
@@ -1588,9 +1612,9 @@ updateInstagramModalWithData(shareText: string, imageUrl: string) {
     document.getElementById('deletetext')?.addEventListener('click', () => {
       const canvas = this.designer?.currentViewInstance?.fabricCanvas;
       if (!canvas) return;
-      
+
       const activeObject = canvas.getActiveObject();
-      
+
       if (activeObject) {
         if (activeObject.type === 'activeSelection') {
           activeObject.forEachObject((obj: any) => {
@@ -1599,22 +1623,22 @@ updateInstagramModalWithData(shareText: string, imageUrl: string) {
         } else {
           canvas.remove(activeObject);
         }
-        
+
         canvas.discardActiveObject();
         canvas.requestRenderAll();
-        
+
         this.showToast('Item deleted successfully!');
       }
     });
 
     document.getElementById('letter-spacing')?.addEventListener('click', (e) => {
-      console.log("e.currentTarget",e.currentTarget)
+      console.log("e.currentTarget", e.currentTarget)
       document.body.classList.remove('fpd-toolbar-transform-our');
       const target = e.currentTarget as HTMLElement;
-      if(document.getElementById('letter-spacing')?.classList.contains('letter-spac-active')){
+      if (document.getElementById('letter-spacing')?.classList.contains('letter-spac-active')) {
         console.log("letter-spacing is active")
         const elementtoolbar = document.querySelector('fpd-element-toolbar');
-        if(elementtoolbar){
+        if (elementtoolbar) {
           elementtoolbar.classList.remove('fpd-panel-visible')
         }
         document.getElementById('letter-spacing')?.classList.remove('letter-spac-active')
@@ -1629,7 +1653,7 @@ updateInstagramModalWithData(shareText: string, imageUrl: string) {
       subPanel.querySelectorAll(':scope > .fpd-active').forEach(el => {
         el.classList.remove('fpd-active');
       });
-      
+
       const positionPanel = subPanel.querySelector('.fpd-panel-text-size');
       if (positionPanel) {
         positionPanel.classList.add('fpd-active', 'fpd-letter-spacing-lineheight');
@@ -1637,9 +1661,9 @@ updateInstagramModalWithData(shareText: string, imageUrl: string) {
       }
 
       const elementtoolbar = document.querySelector('fpd-element-toolbar');
-      console.log("djjjjj",elementtoolbar)
+      console.log("djjjjj", elementtoolbar)
       console.log("test testsss");
-      if(elementtoolbar){
+      if (elementtoolbar) {
         elementtoolbar.classList.add('fpd-panel-visible')
       }
     });
@@ -1711,7 +1735,7 @@ updateInstagramModalWithData(shareText: string, imageUrl: string) {
       } else {
         console.warn("No data found in localStorage for key:");
       }
-      console.log("matchedData",matchedData, matchedData[0]?.design_id)
+      console.log("matchedData", matchedData, matchedData[0]?.design_id)
       if (!dataSource || !dataTitle) {
         alert('Missing design data.');
         return;
@@ -1805,7 +1829,7 @@ updateInstagramModalWithData(shareText: string, imageUrl: string) {
       const productStage = document.querySelector('.fpd-product-stage');
       const viewStage = document.querySelector('.fpd-view-stage');
       const toolbar = document.querySelector('fpd-element-toolbar');
-      
+
       const clickedInsideProductStage = productStage?.contains(event.target as Node);
       const clickedInsideViewStage = viewStage?.contains(event.target as Node);
 
@@ -1816,21 +1840,21 @@ updateInstagramModalWithData(shareText: string, imageUrl: string) {
       }
     });
 
-    document.addEventListener("click", function (e:any) {
+    document.addEventListener("click", function (e: any) {
       console.log("Document clicked", e.target, e);
       const toolbar = e.target.closest("fpd-element-toolbar");
       if (!toolbar) return;
       console.log("toolbar is", toolbar);
-     
-      if(e.target.classList.contains("fa-close")) {
+
+      if (e.target.classList.contains("fa-close")) {
         console.log("e.target is", e.target);
         const transformSpac = document.querySelector('.fpd-tool-transform');
         let transformActive = transformSpac?.classList.contains('fpd-active');
-        if(transformActive){
+        if (transformActive) {
           document.querySelector('.fpd-tool-transform')?.classList.remove('fpd-active');
         }
       }
-     
+
       if (toolbar.classList.contains("fpd-show")) {
         const target = e.target.closest("[title], [data-panel]");
         console.log("target is", target);
@@ -1843,7 +1867,7 @@ updateInstagramModalWithData(shareText: string, imageUrl: string) {
         const newClass = "my-" + value.toLowerCase().replace(/\s+/g, '-');
 
         if (toolbar) {
-          toolbar.classList.forEach((c:any) => {
+          toolbar.classList.forEach((c: any) => {
             if (c.startsWith("my-")) toolbar.classList.remove(c);
           });
         }
@@ -1852,9 +1876,9 @@ updateInstagramModalWithData(shareText: string, imageUrl: string) {
       }
       else {
         toolbar.classList.forEach((c: any) => {
-          if (c.startsWith("my-")) { 
+          if (c.startsWith("my-")) {
             console.log("removing class", c);
-            toolbar.classList.remove(c); 
+            toolbar.classList.remove(c);
           }
         });
       }
@@ -1887,9 +1911,9 @@ updateInstagramModalWithData(shareText: string, imageUrl: string) {
 
   async ngOnInit() {
     setTimeout(() => {
-      lucide.createIcons(); 
+      lucide.createIcons();
     }, 5000);
-    
+
     function openDB(): Promise<IDBDatabase> {
       return new Promise((resolve, reject) => {
         const request = indexedDB.open("FPD_DB", 1);
@@ -1946,7 +1970,7 @@ updateInstagramModalWithData(shareText: string, imageUrl: string) {
     (window as any).getProducts = getProducts.bind(this);
     const storedFonts = localStorage.getItem('fontList');
     const fontData = storedFonts ? JSON.parse(storedFonts) : null;
-    
+
     this.appOptions = {
       productsJSON: 'assets/data/products/product-categories.json',
       productsJSON1: 'assets/data/products/product-categories-new.json',
@@ -1981,7 +2005,7 @@ updateInstagramModalWithData(shareText: string, imageUrl: string) {
       actions: {
         top: [],
         right: [],
-        left: ['undo', 'redo', 'download','zoom', 'reset-product','preview-lightbox'],
+        left: ['undo', 'redo', 'download', 'zoom', 'reset-product', 'preview-lightbox'],
         center: [],
       },
       selectedColor: '#f5f5f5',
@@ -2096,14 +2120,14 @@ updateInstagramModalWithData(shareText: string, imageUrl: string) {
       lazyLoad: true,
       toolbarPlacement: 'smart',
     };
-    
+
     this.designer = new FancyProductDesigner(
       this.document.querySelector('#clothing-designer'),
       this.appOptions
     );
     console.log("designer is", this.designer);
-    
-   // Step 1: First load from IndexedDB (immediate display)
+
+    // Step 1: First load from IndexedDB (immediate display)
     console.log("📀 Loading from IndexedDB first...");
     const cachedProducts = await getProducts();
 
@@ -2122,16 +2146,16 @@ updateInstagramModalWithData(shareText: string, imageUrl: string) {
       .then((res) => res.json())
       .then(async (freshData) => {
         console.log("📦 Fresh API data received:", freshData.length, "products");
-        
+
         // Update IndexedDB with fresh data
         await saveProducts(freshData);
-        
+
         // Update designer with fresh data
         this.designer.product = freshData;
         console.log("✅ Designer updated with fresh data");
-        
+
         this.showFPDLoading(false);
-        
+
         // Optional: Show toast notification (uncomment if you have this method)
         // this.showToast("Products updated!");
       })
@@ -2144,7 +2168,7 @@ updateInstagramModalWithData(shareText: string, imageUrl: string) {
     const manufacturer = this.route.snapshot.paramMap.get('manufacturer');
     console.log(this.route.snapshot.paramMap, 'Selected slug:', slug);
     const currentUrl = this.router.url;
-    
+
     if (currentUrl.includes('savedesign')) {
       this.showFPDLoading(true);
       this.route.queryParams.subscribe(params => {
@@ -2192,19 +2216,19 @@ updateInstagramModalWithData(shareText: string, imageUrl: string) {
           });
       });
     }
-    
+
     console.log('Current URL:', currentUrl, 'local');
-    if(slug === null){
-      localStorage.setItem('selectedSlug', ''); 
+    if (slug === null) {
+      localStorage.setItem('selectedSlug', '');
     }
-    else if(slug && slug !== 'undefined') {
-      localStorage.setItem('selectedSlug', slug); 
-      localStorage.setItem('selectedManufacturer', manufacturer || 'apple'); 
+    else if (slug && slug !== 'undefined') {
+      localStorage.setItem('selectedSlug', slug);
+      localStorage.setItem('selectedManufacturer', manufacturer || 'apple');
     }
-    else{
-      localStorage.setItem('selectedSlug', 'top-face-with-slipmat'); 
+    else {
+      localStorage.setItem('selectedSlug', 'top-face-with-slipmat');
     }
-    
+
     const token = localStorage.getItem('authToken');
     if (token) {
       this.isLoggedIn = true;
@@ -2214,29 +2238,29 @@ updateInstagramModalWithData(shareText: string, imageUrl: string) {
 
 
     document.addEventListener(
-    'click',
-    (event: any) => {
+      'click',
+      (event: any) => {
 
-          const target = event.target?.closest('[data-action="preview-lightbox"]');
+        const target = event.target?.closest('[data-action="preview-lightbox"]');
 
-          if (!target) return;
+        if (!target) return;
 
-          // ❌ Stop FPD default behavior
-          event.preventDefault();
-          event.stopPropagation();
-          event.stopImmediatePropagation();
+        // ❌ Stop FPD default behavior
+        event.preventDefault();
+        event.stopPropagation();
+        event.stopImmediatePropagation();
 
-          console.log('Custom Preview Triggered');
+        console.log('Custom Preview Triggered');
 
-          // ✅ Call your function
-          this.preview();
+        // ✅ Call your function
+        this.preview();
 
-        },
-        true // 🔥 capture phase (important)
-      );
+      },
+      true // 🔥 capture phase (important)
+    );
 
   }
-  
+
   bottomMenu() {
     const sourceElement = document.getElementById('content-text');
     console.log('sourceElement', sourceElement);
@@ -2248,7 +2272,7 @@ updateInstagramModalWithData(shareText: string, imageUrl: string) {
       localStorage.setItem('valueofTitle', '');
     }
   }
-  
+
   showToast(message: string = 'Copied successfully!') {
     let toast = document.getElementById('custom-toast') as HTMLElement | null;
 
@@ -2289,7 +2313,7 @@ updateInstagramModalWithData(shareText: string, imageUrl: string) {
 
   filterThumbnails(searchTerm: string) {
     console.log('searchTerm', searchTerm);
-    
+
     if (searchTerm.length < 2) {
       const parentDiv = document.querySelector('div[data-moduleicon="layout-panel-left"]');
       if (!parentDiv) return;
@@ -2309,27 +2333,30 @@ updateInstagramModalWithData(shareText: string, imageUrl: string) {
     console.log('parentDivdata', thumbnails);
 
     thumbnails.forEach((thumb: Element) => {
-      const title = thumb.getAttribute('data-title')?.toLowerCase() || '';
+      const labelEl = thumb.querySelector('.fpd-label');
+      const title = labelEl?.getAttribute('title')?.toLowerCase()
+        || labelEl?.textContent?.trim().toLowerCase()
+        || '';
       console.log('title', title, 'searchTerm', searchTerm);
       const search = searchTerm.toLowerCase();
 
       const titleWords = title.split(' ');
       const matches = titleWords.some(word => word.startsWith(search));
-      
+
       (thumb as HTMLElement).style.display = matches ? 'flex' : 'none';
     });
   }
 
   filterThumbnailsP(searchTerm: string) {
     console.log('searchTerm', searchTerm);
-    
+
     if (searchTerm.length < 2) {
       const allThumbnails = document.querySelectorAll('.fpd-item.fpd-hover-thumbnail');
       console.log('Showing all thumbnails (search too short)', allThumbnails.length);
       allThumbnails.forEach((thumb: Element) => {
         (thumb as HTMLElement).style.display = 'flex';
       });
-      
+
       document.querySelectorAll('.box-contain-text').forEach((container) => {
         (container as HTMLElement).style.display = 'block';
       });
@@ -2337,38 +2364,48 @@ updateInstagramModalWithData(shareText: string, imageUrl: string) {
     }
 
     const search = searchTerm.toLowerCase().trim();
-    
+
     const containers = [
       ...document.querySelectorAll('.fpd-grid.skins-data'),
       ...document.querySelectorAll('.fpd-grid.ProductModule'),
       ...document.querySelectorAll('.fpd-grid')
     ];
-    
+
     console.log('Found containers to search:', containers.length);
-     console.log('containers data ', containers);
-    
+
     let totalMatches = 0;
     let totalItems = 0;
-    
+
     containers.forEach((container) => {
       const thumbnails = container.querySelectorAll('.fpd-item.fpd-hover-thumbnail');
       totalItems += thumbnails.length;
-        console.log('thumbnails data ', thumbnails);
+
       thumbnails.forEach((thumb: Element) => {
-        const title = thumb.getAttribute('data-title')?.toLowerCase() || '';
-        const matches = this.doesTitleMatchSearch(title, search);
-          console.log('matches data ', matches);
+        // 1. data-title attribute se text
+        const dataTitle = thumb.getAttribute('data-title')?.toLowerCase() || '';
+
+        // 2. .fpd-label div ke andar ka text bhi nikal lo
+        const labelEl = thumb.querySelector('.fpd-label');
+        const labelText = labelEl?.getAttribute('title')?.toLowerCase()
+          || labelEl?.textContent?.trim().toLowerCase()
+          || '';
+
+        // Dono ko combine karke match karo
+        const combinedTitle = `${dataTitle} ${labelText}`.trim();
+
+        const matches = this.doesTitleMatchSearch(combinedTitle, search);
+
         if (matches) {
           totalMatches++;
-          console.log(`Match found: "${title}" for search "${search}"`);
+          console.log(`Match found: "${combinedTitle}" for search "${search}"`);
         }
-        
+
         (thumb as HTMLElement).style.display = matches ? 'flex' : 'none';
       });
     });
-    
+
     console.log(`Search results: ${totalMatches} matches out of ${totalItems} items for "${search}"`);
-    
+
     document.querySelectorAll('.box-contain-text').forEach((container) => {
       const children = container.querySelectorAll('.fpd-item');
       const anyVisible = Array.from(children).some(
@@ -2380,18 +2417,18 @@ updateInstagramModalWithData(shareText: string, imageUrl: string) {
 
   doesTitleMatchSearch(title: string, search: string): boolean {
     if (!search || search.length < 2) return true;
-    
+
     const cleanTitle = title.toLowerCase().replace(/[^\w\s-]/g, ' ');
-    
+
     const searchWords = search.split(/\s+/).filter(word => word.length > 0);
-    
+
     if (searchWords.length === 1) {
       const searchWord = searchWords[0];
-      
+
       const titleWords = cleanTitle.split(/\s+/);
       return titleWords.some(word => word.startsWith(searchWord));
     }
-    
+
     return searchWords.every(searchWord => {
       const titleWords = cleanTitle.split(/\s+/);
       return titleWords.some(titleWord => titleWord.startsWith(searchWord));
@@ -2400,7 +2437,7 @@ updateInstagramModalWithData(shareText: string, imageUrl: string) {
 
   previewImage: string = '';
   showPreviewModal: boolean = false;
-  
+
   preview() {
     if (document.getElementById('fpd-preview-modal')) {
       console.log('Preview already open');
@@ -2465,7 +2502,7 @@ updateInstagramModalWithData(shareText: string, imageUrl: string) {
       console.error('Designer or current canvas is not ready.');
     }
   }
-  
+
   showDropdown = false;
 
   @ViewChild('dropdownWrapper') dropdownWrapper!: ElementRef;
@@ -2627,9 +2664,8 @@ updateInstagramModalWithData(shareText: string, imageUrl: string) {
 
       const tagWrapperMain = document.createElement('div');
       tagWrapperMain.className = 'relative w-full mt-2 fpd-designs-tags';
-
       const tagWrapper = document.createElement('div');
-      tagWrapper.className = 'flex gap-2 mt-2 ml-[5px] fixed md:top-[164px]';
+      tagWrapper.className = 'flex fixed md:top-[164px]';
       tagWrapper.id = 'tag-wrapper-design-tags';
 
       Array.from(allTagsSetD).forEach((tag) => {
@@ -2802,7 +2838,7 @@ updateInstagramModalWithData(shareText: string, imageUrl: string) {
       activeObject.toGroup();
       canvas.requestRenderAll();
     }
-    else{
+    else {
       alert('Please select at least 2 objects to group.jsjj');
     }
   }
@@ -2814,7 +2850,7 @@ updateInstagramModalWithData(shareText: string, imageUrl: string) {
   closeBox(): void {
     this.isBoxVisible = false;
   }
-  
+
   downloadDesign(): void {
     if ((window as any).fpdInstance?.doAction) {
       (window as any).fpdInstance.doAction('download');
@@ -2833,7 +2869,7 @@ updateInstagramModalWithData(shareText: string, imageUrl: string) {
     console.log('Download button clicked', this.designer.actionsBar);
     this.designer.actionsBar.doAction('download');
   }
-  
+
   printDesign() {
     console.log('Print Design button clicked', this.designer.actionsBar);
     if (
@@ -2871,7 +2907,7 @@ updateInstagramModalWithData(shareText: string, imageUrl: string) {
       console.error('Designer or current canvas is not ready.');
     }
   }
-  
+
   saveDesign(customTitle?: string) {
     console.log('llllllllllllllllllllllllllll');
     if (
@@ -2897,7 +2933,7 @@ updateInstagramModalWithData(shareText: string, imageUrl: string) {
 
           const title = customTitle || `Design_${Date.now()}`;
 
-          console.log('Design Title:', title,product);
+          console.log('Design Title:', title, product);
 
           const savedItem = {
             thumbnail,
@@ -2935,12 +2971,12 @@ updateInstagramModalWithData(shareText: string, imageUrl: string) {
       console.error('Designer or current canvas is not ready.');
     }
   }
-  
+
   openTitlePopup() {
     const popup = document.getElementById('title-popup');
     const input = document.getElementById('design-title-input') as HTMLInputElement;
     const btn = document.getElementById('save-title-btn');
-
+    const closeBtn = document.getElementById('close-title-popup-btn');
     if (!popup || !input || !btn) return;
 
     popup.style.display = 'flex';
@@ -2959,10 +2995,24 @@ updateInstagramModalWithData(shareText: string, imageUrl: string) {
         this.loadSavedProducts();
       }, 100);
     };
+    if (closeBtn) {
+      closeBtn.onclick = () => {
+        popup.style.display = 'none';
+        input.value = '';
+      };
+    }
+
+    // 👇 OPTIONAL: Click outside to close
+    popup.onclick = (e) => {
+      if (e.target === popup) {
+        popup.style.display = 'none';
+        input.value = '';
+      }
+    };
   }
 
   addSavedProduct(item: { thumbnail: string; product: any; title: string }) {
-    console.log("item data",item)
+    console.log("item data", item)
     const wrapper = document.createElement('div');
     wrapper.className = 'fpd-item saved-design';
     wrapper.style.position = 'relative';
@@ -3021,7 +3071,7 @@ updateInstagramModalWithData(shareText: string, imageUrl: string) {
         })
       );
     });
-    console.log("dddddddd",this)
+    console.log("dddddddd", this)
     this.savedGrid?.nativeElement.appendChild(wrapper);
   }
 
@@ -3037,27 +3087,27 @@ updateInstagramModalWithData(shareText: string, imageUrl: string) {
         multiplier: 1,
         enableRetinaScaling: true,
       });
- 
+
       const product = this.designer.getProduct ? this.designer.getProduct() : {};
       const title = (
         this.previewButton?.nativeElement.value || ''
       ).toString();
       console.log('Adding to cart:', { title, product, dataUrl });
- 
+
       const cartItem = {
         thumbnail: dataUrl,
         product,
         title,
       };
- 
+
       var jsonString = JSON.stringify(cartItem);
- 
+
       $.post('https://editor.styleflip.com/fpd/addtocart.php', {
         fpd_data: jsonString
-      }, function(response) {
+      }, function (response) {
         console.log('Data saved successfully');
       });
- 
+
       this.showSuccessMessage('Design added to cart!');
     }
   }
@@ -3125,7 +3175,7 @@ updateInstagramModalWithData(shareText: string, imageUrl: string) {
 
       for (const product of cat.products) {
         const tags = product.tags.join(', ');
-        
+
         const rawThumbnail = product.thumbnail?.trim();
         const safeThumbnail = rawThumbnail && rawThumbnail !== ''
           ? this.escapeHtml(rawThumbnail)

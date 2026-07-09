@@ -21,7 +21,7 @@
     "@angular/router": "^19.2.0",
     "@angular/ssr": "^19.2.7",
     "@apollo/client": "^3.13.8",
-    "@capacitor/android": "^8.3.3",
+    "@capacitor/android": "^8.4.0",
     "@capacitor/cli": "^8.3.4",
     "@capacitor/core": "^8.3.4",
     "@capacitor/ios": "^8.3.4",
