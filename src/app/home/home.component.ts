@@ -393,21 +393,11 @@ export class HomeComponent implements AfterViewInit {
             }
           });
 
-          mainBar.querySelectorAll('*').forEach((child) => {
-            activeObserver.observe(child, {
-              attributes: true,
-              attributeFilter: ['class'],
-            });
+          activeObserver.observe(mainBar, {
+            attributes: true,
+            attributeFilter: ['class'],
+            subtree: true,
           });
-
-          const childScanInterval = setInterval(() => {
-            mainBar.querySelectorAll('*').forEach((child) => {
-              activeObserver.observe(child, {
-                attributes: true,
-                attributeFilter: ['class'],
-              });
-            });
-          }, 1000);
         } else {
           setTimeout(waitForElements, 300);
         }
