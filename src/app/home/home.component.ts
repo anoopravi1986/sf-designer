@@ -274,7 +274,13 @@ export class HomeComponent implements AfterViewInit {
             localStorage.getItem('productLoader')
           );
           let productLoadervaalue = localStorage.getItem('productLoader');
-          if (!productLoadervaalue || productLoadervaalue != '') {
+          // 'productLoader' is set to '' by FancyProductDesigner.js while it is
+          // programmatically replaying a saved product selection on page load
+          // (see the restore sequence in FancyProductDesigner.js that dispatches
+          // synthetic clicks on '.ProductModule' items), and back to 'done' once
+          // that's finished. Only navigate for real user clicks, not synthetic
+          // ones fired during that automatic restore.
+          if (productLoadervaalue === 'done') {
             this.router.navigate([manufacturerSlug || 'apple', slug]);
           }
         });
@@ -1575,6 +1581,17 @@ export class HomeComponent implements AfterViewInit {
 
     document.addEventListener('keydown', (e: KeyboardEvent) => {
       if (e.key === 'Delete' || e.key === 'Backspace') {
+        const target = e.target as HTMLElement;
+        const isTypingField =
+          target &&
+          (target.tagName === 'INPUT' ||
+            target.tagName === 'TEXTAREA' ||
+            target.isContentEditable);
+
+        if (isTypingField) {
+          return;
+        }
+
         e.preventDefault();
 
         const canvas = this.designer?.currentViewInstance?.fabricCanvas;
@@ -2116,6 +2133,44 @@ export class HomeComponent implements AfterViewInit {
       this.appOptions
     );
     console.log("designer is", this.designer);
+
+    // Some product entries ship a locked background ("Base"/"Overlay") image
+    // whose scaleX/scaleY was authored against a different reference size than
+    // the stageWidth/stageHeight actually declared for that view (e.g. Toshiba's
+    // "Lid" products: a 1560px-wide photo scaled for a 1000x1000 stage). That
+    // makes the image wider/taller than the stage, so it bleeds off the left
+    // and right edges instead of sitting inside the frame. Since these are
+    // locked, non-interactive background layers, it's safe to shrink them to
+    // fit inside the stage (preserving aspect ratio) and re-center them right
+    // after they're added, without touching the product data itself.
+    this.designer.addEventListener('elementAdd', (evt: any) => {
+      const element = evt?.detail?.element;
+      if (!element || element.type !== 'image') return;
+      if (!element.locked && !element.adminLocked) return;
+
+      const view = this.designer.currentViewInstance;
+      const stageWidth = view?.options?.stageWidth;
+      const stageHeight = view?.options?.stageHeight;
+      if (!stageWidth || !stageHeight) return;
+
+      const boundsWidth = element.getScaledWidth();
+      const boundsHeight = element.getScaledHeight();
+      if (boundsWidth <= stageWidth && boundsHeight <= stageHeight) return;
+
+      const fitScale = Math.min(
+        stageWidth / boundsWidth,
+        stageHeight / boundsHeight
+      );
+
+      element.set({
+        scaleX: element.scaleX * fitScale,
+        scaleY: element.scaleY * fitScale,
+        left: stageWidth / 2,
+        top: stageHeight / 2,
+      });
+      element.setCoords();
+      view.fabricCanvas.requestRenderAll();
+    });
 
     // Step 1: First load from IndexedDB (immediate display)
     console.log("📀 Loading from IndexedDB first...");

@@ -28685,17 +28685,20 @@ console.log("t:", t);
           if (elementMyData) {
             if (elementMyData.style.display === 'none') {
               elementMyData.style.display = 'grid' // or "block" depending on your layout
-            } else {
+            } else if (elementMyDataMy && elementMyDataMy.querySelector('.fpd-item')) {
+              // Only drill down into the sub-grid when it already has real
+              // content (a genuine category drill-down). Previously this ran
+              // unconditionally on every plain product click too, hiding the
+              // whole visible flat products grid and revealing an empty
+              // sub-grid synchronously, right before the replace-confirmation
+              // popup opened - that's what looked like the list "reloading".
+              console.log('jaikant')
               elementMyData.style.display = 'none'
-              // Replace with your actual ID
-              if (elementMyDataMy) {
-                console.log('jaikant')
-                elementMyDataMy.style.display = 'grid' // or "block" depending on your layout
-                backbuttonStoP.style.display = 'block'
-                valueoffpdmoduleproducts.classList.add(
-                  'valueoffpdmoduleproducts-active'
-                )
-              }
+              elementMyDataMy.style.display = 'grid' // or "block" depending on your layout
+              backbuttonStoP.style.display = 'block'
+              valueoffpdmoduleproducts.classList.add(
+                'valueoffpdmoduleproducts-active'
+              )
             }
           }
           backbuttonStoP.addEventListener('click', t => {

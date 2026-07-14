@@ -2018,6 +2018,11 @@ fpd-element-toolbar[data-fabric-type=image] {
   .fpd-module-content {
     padding-bottom: 90px !important;
   }
+
+  .fpd-modal-overlay > .fpd-modal-inner {
+    width: calc(100% - 32px) !important;
+    max-width: calc(100% - 32px) !important;
+  }
 }
 
 @media (max-width: 768px) {
@@ -2370,6 +2375,8 @@ fpd-element-toolbar.fpd-smart.fpd-layout-small {
   .fpd-tools-nav {
     padding-top: 6px;
   }
+
+  
 
   /* Primary/secondary icon rows: single row, horizontal scroll instead of
      wrapping — this is what was overlapping/cramming on narrow phones. */
