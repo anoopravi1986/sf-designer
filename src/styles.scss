@@ -2297,6 +2297,16 @@ fpd-element-toolbar.fpd-smart.fpd-layout-small.fpd-panel-visible > .fpd-tools-na
   display: none !important;
 }
 
+/* .fpd-close lives directly under fpd-element-toolbar (a sibling of
+   .fpd-tools-nav, not a child of it), so hiding .fpd-tools-nav above does
+   NOT hide it — it stays pinned top-right for the life of the toolbar.
+   That left it stacked on top of .fpd-close-sub-panel whenever a sub-panel
+   (Fill/Shadow/etc.) was open, showing two close/chevron pills at once.
+   Hide it explicitly while a sub-panel is open so only one shows. */
+fpd-element-toolbar.fpd-smart.fpd-layout-small.fpd-panel-visible > .fpd-close {
+  display: none !important;
+}
+
 fpd-element-toolbar.fpd-smart.fpd-layout-small.fpd-panel-visible > .fpd-close-sub-panel {
   display: flex !important;
 }
@@ -2333,7 +2343,7 @@ fpd-element-toolbar.fpd-smart.fpd-layout-small {
      unchanged — this only swaps the glyph, not the element or its listeners. */
   .fpd-close,
   .fpd-close-sub-panel {
-    top: 10px !important;
+    top: 0px !important;
     right: 10px !important;
     left: auto !important;
     height: 34px !important;
