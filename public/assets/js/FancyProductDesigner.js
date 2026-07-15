@@ -28662,7 +28662,6 @@ console.log("t:", t);
 
         // ========== Main Click Logic ==========
         r.addEventListener('click', e => {
-          // debugger;
           localStorage.setItem('clickedTitleProdcutInside', '');
           console.log('check for fpdInstance', this.fpdInstance)
           console.log('check for Updtes', this.fpdInstance.selectProduct)
@@ -28757,7 +28756,6 @@ console.log("t:", t);
             G(confirmBtn, ['click'], () => {
               modal.remove()
               console.log('Anoop Data 5-1')
-              debugger;
               localStorage.setItem('UE', true)
               console.log(
                 'target.dataset.index',
@@ -28814,7 +28812,6 @@ console.log("t:", t);
                 }
 
                 if (t.currentViewInstance && n.length > 0) {
-                  //debugger
                   const e = t.currentViewInstance.options;
 
                   let options = z(e.customTextParameters, {
@@ -30969,7 +30966,6 @@ console.log("t:", t);
 
               loadingBar.appendChild(progress);
               a.appendChild(loadingBar);
-              //debugger
               console.log("coming there11111111111112",a)
               // Trigger transition
               requestAnimationFrame(() => {
@@ -35331,7 +35327,6 @@ console.log('✅ Normalized elements order (Base first, no duplicates):', normal
                 //       // If toolbar depends on event, trigger it manually
                 //       t.currentViewInstance.fabricCanvas.fire('selection:created', { target: activeObject });
 
-                //       // debugger
                 //       // t.selectElement(activeObj);
                 //       setTimeout(() => {
                 //         document.querySelector('fpd-element-toolbar').classList.add('fpd-show');
@@ -36408,7 +36403,6 @@ function updateFPDLayersToSingleGroup(group) {
                     document.querySelector('.fpd-tool-font-family')?.classList.remove('fpd-active');
                     document.querySelector('.fpd-panel-font-family')?.classList.remove('fpd-active');
                     document.querySelector('fpd-element-toolbar').classList.remove('my-font-family', 'fpd-panel-visible');
-                   // debugger;
                     return 0
                   }
                   else{
@@ -38279,9 +38273,20 @@ function updateFPDLayersToSingleGroup(group) {
                 }
               }
               let valueofUE = localStorage.getItem('UE')
+              let facesListed = false
               if (valueofUE === 'true') {
                 const container = document.querySelector('.ProductModuleMy')
                 console.log('nnnnnnnnnnnnnnnnnnnn', n)
+                if (container && Array.isArray(n) && n.length > 1) {
+                  facesListed = true
+                  const productModuleEl = document.querySelector('.ProductModule')
+                  const backbuttonStoP = document.getElementById('backbuttonStoP')
+                  const productsModuleEl = document.querySelector('fpd-module-products')
+                  if (productModuleEl) productModuleEl.style.display = 'none'
+                  container.style.display = 'grid'
+                  if (backbuttonStoP) backbuttonStoP.style.display = 'block'
+                  if (productsModuleEl) productsModuleEl.classList.add('valueoffpdmoduleproducts-active')
+                }
                 n.forEach((e, i) => {
                   console.log('e', e, valueofTitle)
                   if (container) {
@@ -38422,7 +38427,9 @@ function updateFPDLayersToSingleGroup(group) {
               }
               localStorage.setItem('dataskins', JSON.stringify(n))
               console.log('jjjjjjjjjj', n, this.mainOptions)
-              this.loadProduct(n, this.mainOptions.replaceInitialElements)
+              if (!facesListed) {
+                this.loadProduct(n, this.mainOptions.replaceInitialElements)
+              }
             } else {
               // n = i[this.currentProductIndex]
               console.log('coming else of value on load')
@@ -38491,9 +38498,20 @@ function updateFPDLayersToSingleGroup(group) {
                 }
               }
               let valueofUE = localStorage.getItem('UE')
+              let facesListed = false
               if (valueofUE === 'true') {
                 const container = document.querySelector('.ProductModuleMy')
                 console.log('nnnnnnnnnnnnnnnnnnnn', n)
+                if (container && Array.isArray(n) && n.length > 1) {
+                  facesListed = true
+                  const productModuleEl = document.querySelector('.ProductModule')
+                  const backbuttonStoP = document.getElementById('backbuttonStoP')
+                  const productsModuleEl = document.querySelector('fpd-module-products')
+                  if (productModuleEl) productModuleEl.style.display = 'none'
+                  container.style.display = 'grid'
+                  if (backbuttonStoP) backbuttonStoP.style.display = 'block'
+                  if (productsModuleEl) productsModuleEl.classList.add('valueoffpdmoduleproducts-active')
+                }
                 n.forEach((e, i) => {
                   console.log('e', e, valueofTitle)
                   if (container) {
@@ -38613,7 +38631,9 @@ function updateFPDLayersToSingleGroup(group) {
               }
               localStorage.setItem('dataskins', JSON.stringify(n))
               console.log('jjjjjjjjjj', n, this.mainOptions)
-              this.loadProduct(n, this.mainOptions.replaceInitialElements)
+              if (!facesListed) {
+                this.loadProduct(n, this.mainOptions.replaceInitialElements)
+              }
             } else {
               // n = i[this.currentProductIndex]
               console.log('coming else of value on load')
