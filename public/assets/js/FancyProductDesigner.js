@@ -28665,13 +28665,20 @@ console.log("t:", t);
           localStorage.setItem('clickedTitleProdcutInside', '');
           console.log('check for fpdInstance', this.fpdInstance)
           console.log('check for Updtes', this.fpdInstance.selectProduct)
-          const parentDiv = e.target.closest('div').parentElement
-          const parentDivId = parentDiv?.id
+          // This handler only ever fires for tiles inside the Products-tab
+          // grid (#ProductModule), so this must always resolve to
+          // 'ProductModule'. It used to be derived from
+          // e.target.closest('div').parentElement.id, but most of a tile's
+          // visible area (thumbnail/title/manufacturer) are child <div>s with
+          // no id, so a tap there resolved to '' while a tap on the tile's
+          // own padding resolved to 'ProductModule' - depending on exactly
+          // where the user tapped, selectProduct() would either show the
+          // face-selection grid or skip straight to loading the product.
+          const parentDivId = 'ProductModule'
           const clickedTitle = e.currentTarget.dataset.title;
           localStorage.setItem('clickedTitleProdcutInside', clickedTitle);
           localStorage.setItem('parentDivId', parentDivId)
 
-          console.log('Parent div:', parentDiv?.id)
           console.log('Anoop Data 4-ue', e, i)
 
           const elementMyData = document.querySelector('.ProductModule') // Replace with your actual ID
@@ -28730,6 +28737,8 @@ console.log("t:", t);
             )
 
             G(eBtn, ['click'], () => {
+              if (eBtn.disabled) return
+              eBtn.disabled = true
               console.log('Anoop Data 5', eBtn, i)
               console.log(i, this.currentCategoryIndex, 'cucxuusid')
               this.fpdInstance.selectProduct(i, this.currentCategoryIndex)
@@ -28754,6 +28763,8 @@ console.log("t:", t);
 
             const target = e.currentTarget
             G(confirmBtn, ['click'], () => {
+              if (confirmBtn.disabled) return
+              confirmBtn.disabled = true
               modal.remove()
               console.log('Anoop Data 5-1')
               localStorage.setItem('UE', true)
@@ -38277,7 +38288,7 @@ function updateFPDLayersToSingleGroup(group) {
               if (valueofUE === 'true') {
                 const container = document.querySelector('.ProductModuleMy')
                 console.log('nnnnnnnnnnnnnnnnnnnn', n)
-                if (container && Array.isArray(n) && n.length > 1) {
+                if (container && Array.isArray(n) && n.length >= 1) {
                   facesListed = true
                   const productModuleEl = document.querySelector('.ProductModule')
                   const backbuttonStoP = document.getElementById('backbuttonStoP')
@@ -38502,7 +38513,7 @@ function updateFPDLayersToSingleGroup(group) {
               if (valueofUE === 'true') {
                 const container = document.querySelector('.ProductModuleMy')
                 console.log('nnnnnnnnnnnnnnnnnnnn', n)
-                if (container && Array.isArray(n) && n.length > 1) {
+                if (container && Array.isArray(n) && n.length >= 1) {
                   facesListed = true
                   const productModuleEl = document.querySelector('.ProductModule')
                   const backbuttonStoP = document.getElementById('backbuttonStoP')
