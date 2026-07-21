@@ -253,6 +253,7 @@ export class HomeComponent implements AfterViewInit {
         $(document).on('click', 'fpd-module-products .fpd-item', (event) => {
           localStorage.setItem('productIndex', '');
           localStorage.setItem('categoryIndex', '');
+          localStorage.setItem('childIndex', '');
           console.log(event.currentTarget, 'click happen', event);
           const clickedTitle = $(event.currentTarget).data('title');
           console.log(clickedTitle, 'cllllllll', $(event.currentTarget));

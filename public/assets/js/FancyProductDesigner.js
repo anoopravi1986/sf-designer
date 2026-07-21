@@ -27057,6 +27057,13 @@
             e.append(this.container)
           const i = this.container.querySelector('.fpd-qr-code-color-dark')
           setTimeout(() => {
+            // If the user has already tapped a real product/face tile since
+            // this page loaded, don't replay a stale saved selection on top
+            // of whatever they're now looking at.
+            if (window.__fpdUserInteracted) {
+              window.localStorage.setItem('productLoader', 'done')
+              return
+            }
             window.localStorage.setItem('productLoader', '')
 
             let productIndex = window.localStorage.getItem('productIndex')
@@ -27105,6 +27112,14 @@
                 )
 
                 setTimeout(() => {
+                  // Same check, re-run right before the destructive steps -
+                  // the user may have clicked a real product/face tile during
+                  // the delay since the outer timeout fired.
+                  if (window.__fpdUserInteracted) {
+                    dropdownWrapper.style.display = 'block'
+                    window.localStorage.setItem('productLoader', 'done')
+                    return
+                  }
                   const dropdownArrow = document.querySelector(
                     '.fpd-product-categories .fpd-dropdown-arrow'
                   )
@@ -27124,7 +27139,7 @@
                   confirmButton?.click()
                   // setTimeout(() => {
 
-                  if (Number(childIndex)) {
+                  if (Number(childIndex) && !window.__fpdUserInteracted) {
                     const targetItem = document.querySelector(
                       `.skins-det[data-index="${childIndex}"]`
                     )
@@ -28662,6 +28677,19 @@ console.log("t:", t);
 
         // ========== Main Click Logic ==========
         r.addEventListener('click', e => {
+          // Real user tap (not a synthetic .click() from the page-load restore
+          // sequence below) - flags that the user has taken over navigation so
+          // the delayed restore steps back off instead of hijacking the view.
+          if (e.isTrusted) window.__fpdUserInteracted = true
+          // 'valueofTitle' remembers which face the user picked last, so that
+          // reopening the same product can jump straight back to it. But it
+          // must not leak into a *different* product tile click, otherwise
+          // that product skips its own face listing and tries to match a
+          // face with the previous product's face title (see the
+          // valueofTitle lookup further down) - showing whatever face
+          // happens to share that title (e.g. a generic "Overlay" face)
+          // instead of this product's face listing.
+          localStorage.setItem('valueofTitle', '');
           localStorage.setItem('clickedTitleProdcutInside', '');
           console.log('check for fpdInstance', this.fpdInstance)
           console.log('check for Updtes', this.fpdInstance.selectProduct)
@@ -33877,19 +33905,33 @@ console.log('✅ Normalized elements order (Base first, no duplicates):', normal
         t.stopPropagation(),
           this.fpdInstance.deselectElement(),
           this.fpdInstance.currentViewInstance &&
-            (this.fpdInstance.currentViewInstance.currentUploadZone = null),
-          t.currentTarget.classList.contains('fpd-active') &&
-          this.contentClosable
+            (this.fpdInstance.currentViewInstance.currentUploadZone = null)
+        const navItem = t.currentTarget
+        const isActive = navItem.classList.contains('fpd-active')
+        // Products tab: step back one level per click (face listing -> products
+        // listing) instead of just closing the panel, when the face-listing
+        // sub-grid (#backbuttonStoP / .ProductModuleMy) is currently showing.
+        const backbuttonStoP = document.getElementById('backbuttonStoP')
+        if (
+          navItem.dataset.module === 'products' &&
+          isActive &&
+          backbuttonStoP &&
+          backbuttonStoP.style.display === 'block'
+        ) {
+          backbuttonStoP.click()
+        } else {
+          isActive && this.contentClosable
             ? this.toggleContentDisplay(!1)
             : this.callModule(
-                t.currentTarget.dataset.module,
-                t.currentTarget.dataset.dynamicDesignsId
-              ),
-          this.fpdInstance.dispatchEvent(
-            new CustomEvent('navItemSelect', {
-              detail: { item: t.currentTarget }
-            })
-          )
+                navItem.dataset.module,
+                navItem.dataset.dynamicDesignsId
+              )
+        }
+        this.fpdInstance.dispatchEvent(
+          new CustomEvent('navItemSelect', {
+            detail: { item: navItem }
+          })
+        )
       }
       function Cr (t) {
         if (
@@ -38339,6 +38381,7 @@ function updateFPDLayersToSingleGroup(group) {
                     container.appendChild(r)
 
                     r.addEventListener('click', e => {
+                      if (e.isTrusted) window.__fpdUserInteracted = true
                       document.body.classList.add('popup-open-hide-body');
                       console.log('88888888', t, r)
                       console.log('fpdInstance', fpdInstance)
@@ -38564,6 +38607,7 @@ function updateFPDLayersToSingleGroup(group) {
                     container.appendChild(r)
 
                     r.addEventListener('click', e => {
+                      if (e.isTrusted) window.__fpdUserInteracted = true
                       console.log('88888888', t, r)
                       console.log('fpdInstance', fpdInstance)
                       console.log('1Anoop Data 4-1--', fpdInstance, e, r)

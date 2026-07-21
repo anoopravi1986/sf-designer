@@ -788,12 +788,32 @@ fpd-element-toolbar[data-element-type=text] .fpd-secondary-tools.fpd-scroll-area
   position: relative;
 
   .fpd-head {
-    margin-left: 15px;
+    margin-left: 42px;
   }
 
   #backbuttonStoP {
-    position: absolute;
-    top: 5px;
+    position: absolute !important;
+    top: 8px;
+    left: 4px;
+    z-index: 5;
+    width: 32px;
+    height: 32px;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    background: #fff;
+    border: 1px solid #35475a33;
+    box-shadow: 0px 1px 3px rgba(64, 87, 109, 0.15);
+    transition: background-color 0.15s ease;
+
+    svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    &:hover {
+      background: #40576d12;
+    }
   }
 }
 
@@ -2231,6 +2251,7 @@ fpd-element-toolbar[data-fabric-type=image] {
   .fpd-container.fpd-sidebar.fpd-layout-small fpd-main-wrapper{
     padding-top: 30px;
   }
+  
 }
 
 @media (max-width: 768px) {
