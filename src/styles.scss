@@ -2270,6 +2270,13 @@ fpd-element-toolbar[data-fabric-type=image] {
     // gap: 0.1rem;
   }
 }
+@media (max-width: 768px) {
+  // Category dropdown had an extra right margin the search box above it didn't,
+  // making the two boxes end at different edges. Match them up.
+  .fpd-product-categories {
+    margin-right: 0 !important;
+  }
+}
 // .text-sm {
 //     font-size: 0.875rem !important;
 //     line-height: 3.25rem !important;
