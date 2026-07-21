@@ -2649,3 +2649,23 @@ fpd-element-toolbar.fpd-smart.fpd-layout-small {
     }
   }
 }
+
+// Elements tab: drop the prev/next arrow buttons on mobile and let the
+// category tag row (Design, Retro, Vintage, ...) scroll as a swipeable slider.
+@media (max-width: 768px) {
+  fpd-module-designs .our-elements {
+    > button {
+      display: none !important;
+    }
+
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+}
