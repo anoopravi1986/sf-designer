@@ -2709,9 +2709,9 @@ export class HomeComponent implements AfterViewInit {
       let currentOffset = 0;
 
       const tagWrapperMain = document.createElement('div');
-      tagWrapperMain.className = 'relative w-full mt-2 fpd-designs-tags';
+      tagWrapperMain.className = 'relative w-full h-10 mt-2 overflow-hidden fpd-designs-tags';
       const tagWrapper = document.createElement('div');
-      tagWrapper.className = 'flex fixed md:top-[164px]';
+      tagWrapper.className = 'flex absolute inset-0 items-center';
       tagWrapper.id = 'tag-wrapper-design-tags';
 
       Array.from(allTagsSetD).forEach((tag) => {
@@ -2810,7 +2810,7 @@ export class HomeComponent implements AfterViewInit {
         tagWrapper.appendChild(tagButton);
       });
 
-      parentDiv.appendChild(tagWrapper);
+      tagWrapperMain.appendChild(tagWrapper);
 
       const leftArrow = document.createElement('button');
       leftArrow.innerHTML = `
@@ -2819,7 +2819,7 @@ export class HomeComponent implements AfterViewInit {
         </svg>
         `;
       leftArrow.className =
-        'fixed md:left-[90px] md:top-[178px] z-[9] bg-gradient-to-r from-white/0 to-white shadow p-0 rounded-full hover:bg-gray-100 disabled:hidden';
+        'absolute left-0 top-1/2 -translate-y-1/2 z-[9] bg-gradient-to-r from-white/0 to-white shadow p-0 rounded-full hover:bg-gray-100 disabled:hidden';
       leftArrow.disabled = true;
 
       const rightArrow = document.createElement('button');
@@ -2829,7 +2829,7 @@ export class HomeComponent implements AfterViewInit {
         </svg>
         `;
       rightArrow.className =
-        'fixed md:left-[380px] md:top-[210px] z-[9] mt-[-20px] -translate-y-1/2 bg-gradient-to-r from-white/0 to-white shadow p-0 rounded-full hover:bg-gray-100 disabled:hidden';
+        'absolute right-0 top-1/2 -translate-y-1/2 z-[9] bg-gradient-to-r from-white/0 to-white shadow p-0 rounded-full hover:bg-gray-100 disabled:hidden';
 
       function updateArrows() {
         const wrapperWidth = tagWrapperMain.offsetWidth;
@@ -2868,7 +2868,14 @@ export class HomeComponent implements AfterViewInit {
       tagWrapperMain.appendChild(leftArrow);
       tagWrapperMain.appendChild(rightArrow);
 
-      parentDiv.appendChild(tagWrapperMain);
+      const scrollArea = Array.from(parentDiv.children).find((el) =>
+        el.classList.contains('fpd-scroll-area')
+      );
+      if (scrollArea) {
+        parentDiv.insertBefore(tagWrapperMain, scrollArea);
+      } else {
+        parentDiv.appendChild(tagWrapperMain);
+      }
     } else {
       console.warn('Div with data-title="Productsnew" not found.');
     }
