@@ -2021,6 +2021,18 @@ fpd-element-toolbar[data-fabric-type=image] {
 
 @media (max-width: 768px) {
 
+  /* The editor page (#clothing-designer) was sizing its canvas with fixed
+     pixel heights below (700px/680px) that don't account for the real
+     viewport, so on shorter phones the layout grew past 100dvh and the
+     whole page scrolled instead of the design fitting on one screen.
+     Pin html/body to the viewport only while the editor is mounted, so
+     other routes (e.g. /privacy) keep normal page scrolling. */
+  html:has(#clothing-designer),
+  body:has(#clothing-designer) {
+    height: 100dvh !important;
+    overflow: hidden !important;
+  }
+
   .fpd-main-wrapper {
     display: flex !important;
     justify-content: center !important;
@@ -2029,7 +2041,11 @@ fpd-element-toolbar[data-fabric-type=image] {
   }
 
   .fpd-product-stage {
-    height: 700px !important;
+    /* 80px header clearance + 90px bottom nav clearance (see the
+       .fpd-main-wrapper/.fpd-module-content padding-bottom: 90px rule
+       above) so header + canvas + bottom nav together equal 100dvh. */
+    height: calc(100dvh - 80px - 90px) !important;
+    max-height: calc(100dvh - 80px - 90px) !important;
     display: flex !important;
     justify-content: center !important;
     align-items: flex-start !important;
@@ -2038,21 +2054,24 @@ fpd-element-toolbar[data-fabric-type=image] {
 
   .fpd-view-stage {
     width: 100% !important;
-    height: 680px !important;
+    height: 100% !important;
     min-width: unset !important;
     transform: scale(1.15) !important;
     transform-origin: top center !important;
-    margin-top: 20px !important;
+    margin-top: 0 !important;
   }
 
-  /* Zoom Center */
+  /* Zoom Center - pinned to the viewport (not the scaled canvas) so it
+     always stays visible just above the bottom nav bar. Sits above the
+     Reset/Preview row and the view-arrows row (see below) so none of the
+     three fixed floating controls overlap each other. */
   div.fpd-container .fpd-zoom-wrapper {
-    position: absolute !important;
-    bottom: 120px !important;
+    position: fixed !important;
+    bottom: 190px !important;
     left: 50% !important;
     right: auto !important;
     transform: translateX(-50%) !important;
-    z-index: 99 !important;
+    z-index: 9999 !important;
 
     display: flex !important;
     flex-direction: column !important;
@@ -2064,9 +2083,13 @@ fpd-element-toolbar[data-fabric-type=image] {
 
 @media (max-width: 768px) {
 
+  /* Sits directly above the Reset/Preview row (bottom: 80px, ~54px tall,
+     see the aria-label="Reset"/"Preview" rules below) so the two fixed
+     floating rows stack instead of overlapping now that this nav is
+     truly viewport-fixed instead of absolute. */
   .fpd-views-inside-left fpd-views-nav {
-    position: absolute !important;
-    bottom: 80px !important;
+    position: fixed !important;
+    bottom: 142px !important;
     left: 50% !important;
     right: auto !important;
     transform: translateX(-50%) !important;
@@ -2195,7 +2218,7 @@ fpd-element-toolbar[data-fabric-type=image] {
 
  .fpd-container fpd-actions-bar .fpd-dropdown-menu>.fpd-btn[aria-label="Reset"]{
     position: fixed;
-    bottom: 66px;
+    bottom: 80px;
     left: -57px;
     right: 0;
     margin: auto;
@@ -2203,7 +2226,7 @@ fpd-element-toolbar[data-fabric-type=image] {
   }
   .fpd-container fpd-actions-bar .fpd-dropdown-menu>.fpd-btn[aria-label="Preview"]{
         position: fixed;
-    bottom: 66px;
+    bottom: 80px;
     left: 26px;
     right: 0;
     margin: auto;
@@ -2641,6 +2664,30 @@ fpd-element-toolbar.fpd-smart.fpd-layout-small {
 
     &::-webkit-scrollbar {
       display: none;
+    }
+  }
+}
+
+// Design tab (fpd-module-productsnew, the "Designs" bottom-nav tab): same
+// treatment as the Elements tab above — drop the prev/next arrow buttons
+// on mobile and let the category tag row (Laptop, Macbook, Apple, ...)
+// scroll as a swipeable slider instead.
+@media (max-width: 768px) {
+  fpd-module-productsnew .fpd-designs-tags {
+    > button {
+      display: none !important;
+    }
+
+    #tag-wrapper-design-tags {
+      overflow-x: auto !important;
+      overflow-y: hidden !important;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+
+      &::-webkit-scrollbar {
+        display: none;
+      }
     }
   }
 }

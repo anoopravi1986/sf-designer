@@ -447,13 +447,8 @@ export class HomeComponent implements AfterViewInit {
 
       dropdownItems.forEach((item) => {
         item.addEventListener('click', () => {
-          const tagWrappertags = document.getElementById(
-            'tag-wrapper-design-tags'
-          );
-          if (tagWrappertags) {
-            tagWrappertags.remove();
-            console.log('Removed tag-wrapper-design-tags');
-          }
+          // updateTagsFromDesignModule() removes any stale .fpd-designs-tags
+          // bar itself now, so no manual cleanup is needed here.
           this.updateTagsFromDesignModule();
           console.log('Tags updated from Design Module');
         });
@@ -2706,6 +2701,17 @@ export class HomeComponent implements AfterViewInit {
     const parentDiv = document.querySelector('div[data-title="Productsnew"]');
     console.log('Anoop Data 4 parentDiv', parentDiv);
     if (parentDiv) {
+      // Each category selection called this function again to rebuild the tag
+      // row, but only ever removed the inner #tag-wrapper-design-tags list —
+      // the outer .fpd-designs-tags bar (which holds the left/right arrow
+      // buttons) was left behind and a new one inserted alongside it. That
+      // stacked one arrow bar per category click, pushing the skins grid
+      // further down each time. Remove any previous bar(s) before building
+      // the new one so only one ever exists.
+      parentDiv
+        .querySelectorAll('.fpd-designs-tags')
+        .forEach((el) => el.remove());
+
       let currentOffset = 0;
 
       const tagWrapperMain = document.createElement('div');
@@ -3184,7 +3190,7 @@ export class HomeComponent implements AfterViewInit {
     const toast = document.createElement('div');
     toast.innerText = message;
     toast.style.position = 'fixed';
-    toast.style.bottom = '30px';
+    toast.style.top = '90px';
     toast.style.left = '50%';
     toast.style.transform = 'translateX(-50%)';
     toast.style.background = '#4caf50';
