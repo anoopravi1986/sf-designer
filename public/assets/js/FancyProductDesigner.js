@@ -30414,13 +30414,6 @@ console.log("t:", t);
         // See All / See Less Button
         if (images.length > 2) {
           const toggleBtn = document.createElement('button')
-          const iconBackData = document.querySelectorAll(
-            '.icon-search-back-data'
-          )
-          console.log('dhhhhhhhhh', iconBackData)
-          iconBackData.forEach(el => {
-            el.classList.toggle('fpd-hidden')
-          })
           toggleBtn.innerText = 'See all'
           toggleBtn.classList.remove('see-less')
           toggleBtn.className =
@@ -30595,18 +30588,8 @@ console.log("t:", t);
 
               // CASE 2: No subcategories (Love)
               else {
-                if (!this.allCategories) {
-                  this.allCategories = Array.from(
-                    this.gridElem.querySelectorAll('.fpd-category')
-                  )
-                }
-
-                // Remove all other categories except current one
-                this.allCategories.forEach(cat => {
-                  if (cat !== e) cat.style.display = 'none'
-                })
-
-                // Show hidden images grid
+                // Reveal the rest of this category's images in place,
+                // leaving the other categories visible below.
                 hiddenImagesContainer.classList.remove('hidden')
                 hiddenImagesContainer.classList.add(
                   '!grid',
@@ -30617,20 +30600,8 @@ console.log("t:", t);
                   'fpd-grid'
                 )
 
-                toggleBtn.innerText = ''
-                toggleBtn.classList.add('see-less')
-                toggleBtn.innerHTML = `
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="text-[#0d1216] hover:text-blue-600 transition duration-200 cursor-pointer inline-block ml-1">
-                                        <path d="M6.9 10.996h11.596a.75.75 0 0 1 0 1.5H6.9l4.377 4.377a.75.75 0 0 1-1.061 1.06l-4.95-4.95a1.75 1.75 0 0 1 0-2.474l4.95-4.95a.75.75 0 1 1 1.06 1.06L6.9 10.996z" fill="currentColor"></path>
-                                    </svg>
-                                    `
-                const iconBackData = document.querySelectorAll(
-                  '.icon-search-back-data'
-                )
-                console.log('dhhhhhhhhh', iconBackData)
-                iconBackData.forEach(el => {
-                  el.classList.toggle('fpd-hidden')
-                })
+                toggleBtn.classList.remove('see-less')
+                toggleBtn.innerText = 'Hide'
               }
             }
 
@@ -30645,11 +30616,7 @@ console.log("t:", t);
                   this.gridElem.appendChild(cat)
                 )
               } else {
-                // Restore all categories (for Love-type)
-                this.allCategories.forEach(cat => {
-                  cat.style.display = ''
-                })
-
+                // Collapse this category's extra images back (Love-type)
                 hiddenImagesContainer.classList.add('hidden')
                 hiddenImagesContainer.classList.remove(
                   '!grid',
@@ -30658,24 +30625,9 @@ console.log("t:", t);
                   'gap-[5px]',
                   'mb-3'
                 )
-                document
-                  .getElementById('icon-search-back-data')
-                  ?.classList.add('fpd-hidden')
                 toggleBtn.innerText = 'See all'
                 toggleBtn.classList.remove('see-less')
               }
-            }
-          })
-
-          toggleBtn.addEventListener('click', () => {
-            if (toggleBtn.innerText === 'See all') {
-              const iconBackData = document.querySelectorAll(
-                '.icon-search-back-data'
-              )
-              console.log('dhhhhhhhhh', iconBackData)
-              iconBackData.forEach(el => {
-                el.classList.toggle('fpd-hidden')
-              })
             }
           })
 

@@ -863,10 +863,9 @@ fpd-module-designs {
 }
 
 .fpd-see-all.see-less {
-  position: fixed;
-  left: 84px;
-  right: auto;
-  top: 82px;
+  position: absolute;
+  right: 10px;
+  top: 10px;
 }
 
 fpd-element-toolbar[data-fabric-type="image"] .fpd-ungroup1,
