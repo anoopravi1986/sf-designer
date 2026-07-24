@@ -24688,6 +24688,7 @@
               (u.originParams = z(u.toJSON(), u.originParams)),
               (u.originParams.z = u.getZIndex()),
               this.fire('elementAdd', { element: u })
+            return u
           }
         }),
         (St.fabric.Canvas.prototype.deselectElement = function () {
@@ -28839,8 +28840,6 @@ console.log("t:", t);
             this.container
               .querySelector('.fpd-btn-add-text')
               .addEventListener('click', e => {
-                console.log('click')
-
                 let i = this.container.querySelector('textarea'),
                     n = i.value.trim()
 
@@ -28868,59 +28867,35 @@ console.log("t:", t);
                     editable: true,
                     hasControls: true,
                     evented: true,
-                    selected: false,
                     transformable: true,
-                    lockMovementX: true,
-                    isMoving: true,
                     objectCaching: false,
+                    // Position it ourselves below, right after the canvas so
+                    // it lands at the bottom instead of dead-center.
+                    autoCenter: false,
                   });
 
-                  const text = n;
-                  console.log("updated data", options)
-                  const element = t.currentViewInstance.fabricCanvas.addElement('text', n, text, options);
+                  const canvas = t.currentViewInstance.fabricCanvas;
+                  const element = canvas.addElement('text', n, n, options);
 
-                  if (element && typeof element.enterEditing === 'function') {
-                    console.log("if condition")
-                    t.currentViewInstance.fabricCanvas.setActiveObject(element);
-                    element.enterEditing(); // ✅ force edit mode
-                    t.currentViewInstance.fabricCanvas.renderAll();
-                  }
-                  else{
-                    console.log("else condition")
-                    // Get the last added object (the new text element)
-                    const objects = t.currentViewInstance.fabricCanvas.getObjects();
-                    /* objects.forEach(obj => {
-                      console.log('Type:', obj.type, 'Title:', obj.title, obj);
-                      // You can access properties like obj.left, obj.top, obj.width, obj.height, etc.
-                    }); */
+                  if (element) {
+                    // Place the new text horizontally centered near the
+                    // bottom of the stage instead of the canvas center.
+                    const stageWidth = canvas.viewOptions.stageWidth
+                    const stageHeight = canvas.viewOptions.stageHeight
+                    const bottomMargin = 100
 
-                    for (let i = objects.length - 1; i >= 0; i--) {
-                      const element = objects[i];
-                      console.log('Type:', element.type, 'Title:', element.title, element);
-                      if (element.type === 'i-text') {
-                        if (element && typeof t.currentViewInstance.fabricCanvas.setActiveObject === 'function') {
-                          console.log("Found i-text element:", element);
-                          t.currentViewInstance.fabricCanvas.setActiveObject(element);
-                          t.currentViewInstance.fabricCanvas.renderAll();
-                          break;
-                        }
-                      }
-                      // You can access properties like obj.left, obj.top, obj.width, obj.height, etc.
+                    element.setPositionByOrigin(
+                      new St.fabric.Point(stageWidth / 2, stageHeight - bottomMargin),
+                      'center',
+                      'bottom'
+                    )
+                    element.setCoords()
+
+                    canvas.setActiveObject(element)
+                    if (typeof element.enterEditing === 'function') {
+                      element.enterEditing() // force edit mode
                     }
-
-                    console.log(objects, 'objects in canvas');
-                    let element = objects[objects.length - 3];
-                    //console.log('Newly added element:', element, element.type, element.title);
-                    /*if(element.type != "i-text"){
-                      element = objects[objects.length - 4];
-                      //console.log('Newly added element:', element, element.type, element.title);
-                    }
-                    // Highlight/select the new element
-                    if (element && typeof t.currentViewInstance.fabricCanvas.setActiveObject === 'function') {
-                        t.currentViewInstance.fabricCanvas.setActiveObject(element);
-                        t.currentViewInstance.fabricCanvas.renderAll();
-                    } */
-              
+                    canvas.renderAll()
                   }
                 }
 
@@ -32241,7 +32216,10 @@ console.log("t:", t);
               t,
               ['elementAdd', 'elementRemove', 'viewSelect', 'productCreate'],
               e => {
-                t.productCreated && Wn(this, Un, Qn).call(this)
+                if (!t.productCreated) return
+                'elementAdd' === e.type && e.detail && e.detail.element
+                  ? Wn(this, Un, Qn).call(this, e.detail.element)
+                  : Wn(this, Un, Qn).call(this)
               }
             ),
             G(t, ['elementModify', 'textLinkApply'], e => {
@@ -32277,76 +32255,60 @@ console.log("t:", t);
             })
         }
       }
-      function Qn () {
-        console.log("this.fpdInstance our 32226",this.fpdInstance.getElements('all'))
+      function Qn (elementOnly) {
         const elements = this.fpdInstance.getElements('all');
-        // this.fpdInstance.actionsBar.doAction('zoom')
-        document.querySelector('[data-action="zoom"]')?.click();
-if (!Array.isArray(elements) || !elements.length) return;
+        if (!Array.isArray(elements) || !elements.length) return;
 
-/* =========================
-   1️⃣ Move Base to index 0
-========================= */
-const baseIndex = elements.findIndex(el => el?.title === 'Base');
-console.log('base Index of data is', baseIndex);
+        if (elementOnly) {
+          // Fast path for a single newly added element: avoid tearing down
+          // and rebuilding every existing row, which is what made adding a
+          // new element (e.g. "Add Text") feel slow when there were many
+          // layers already on the canvas.
+          if (elementOnly.title === 'Overlay' && !elementOnly.checkEditable())
+            return
+          if (
+            this.listElem.querySelector(
+              '.fpd-list-row[id="' + elementOnly.id + '"]'
+            )
+          )
+            return
+          const elementTitle = elementOnly.title && elementOnly.title.trim()
+          const isDuplicateTitle =
+            elementTitle &&
+            elements.some(
+              el => el !== elementOnly && el?.title?.trim() === elementTitle
+            )
+          if (isDuplicateTitle) return
+          Wn(this, Yn, Kn).call(this, elementOnly)
+          return
+        }
 
-if (baseIndex > 0) {
-  const [baseLayer] = elements.splice(baseIndex, 1);
-  elements.unshift(baseLayer);
-}
+        // Move Base to index 0
+        const baseIndex = elements.findIndex(el => el?.title === 'Base')
+        if (baseIndex > 0) {
+          const [baseLayer] = elements.splice(baseIndex, 1)
+          elements.unshift(baseLayer)
+        }
 
-/* =========================
-   2️⃣ Hide repeated titles
-========================= */
-const seenTitles = new Set();
-const normalizedElements = [];
+        // Hide repeated titles
+        const seenTitles = new Set()
+        const normalizedElements = []
+        elements.forEach(el => {
+          const title = el?.title?.trim()
+          if (title && seenTitles.has(title)) return
+          if (title) seenTitles.add(title)
+          normalizedElements.push(el)
+        })
 
-elements.forEach(el => {
-  const title = el?.title?.trim();
-
-  // If title already exists → skip (hide duplicate)
-  if (title && seenTitles.has(title)) {
-    return;
-  }
-
-  if (title) {
-    seenTitles.add(title);
-  }
-
-  normalizedElements.push(el);
-});
-
-console.log('✅ Normalized elements order (Base first, no duplicates):', normalizedElements);
-
-        // var t, e, i
-        // ;(this.listElem.innerHTML = ''),
-        //   this.fpdInstance
-        //     .getElements(this.fpdInstance.currentViewIndex, 'all', !1)
-            this.listElem.innerHTML = '';
-            normalizedElements.forEach(t => {
-              console.log(t.title,'seting up all the layers again', t, t.checkEditable());
-              
-              if(t && t.title != 'Overlay'){
-                if (!t.title || t.title === 'undefined') {
-                  console.log("coming thereeeeeeee", t)
-                  // const newTitle = `Group Text ${groupCounter}`;
-                  // groupCounter++;
-
-                  // // ✅ IMPORTANT: update title on element AND layer data
-                  // t.title = newTitle;
-
-                  // // FPD internal sync (this is what was missing)
-                  // if (typeof t.set === 'function') {
-                  //   t.set('title', newTitle);
-                  // }
-                }
-                Wn(this, Yn, Kn).call(this, t)
-              }
-              else{
-                t.checkEditable() && Wn(this, Yn, Kn).call(this, t)
-              }
-              // t.checkEditable() && Wn(this, Yn, Kn).call(this, t)
-            }),
+        var t, e, i
+        this.listElem.innerHTML = ''
+        normalizedElements.forEach(t => {
+          if (t && t.title != 'Overlay') {
+            Wn(this, Yn, Kn).call(this, t)
+          } else {
+            t.checkEditable() && Wn(this, Yn, Kn).call(this, t)
+          }
+        }),
           Hn(this, Vn) && Hn(this, Vn).dispose(),
           (t = this),
           (e = Vn),
@@ -32387,7 +32349,6 @@ console.log('✅ Normalized elements order (Base first, no duplicates):', normal
           })(t, zn(t, e, 'set'), i)
       }
       function Kn (t) {
-        console.log("setting up a layer", t,t.getType(),t.title,t.text,t.type)
         const e = document.createElement('div')
         ;(e.className = 'fpd-list-row !bg-white'), (e.id = t.id)
         let i = document.createElement('span'),
@@ -32635,7 +32596,10 @@ console.log('✅ Normalized elements order (Base first, no duplicates):', normal
               t,
               ['elementAdd', 'elementRemove', 'viewSelect', 'productCreate'],
               e => {
-                t.productCreated && rs(this, as, hs).call(this)
+                if (!t.productCreated) return
+                'elementAdd' === e.type && e.detail && e.detail.element
+                  ? rs(this, as, hs).call(this, e.detail.element)
+                  : rs(this, as, hs).call(this)
               }
             ),
             G(t, ['elementModify', 'textLinkApply'], e => {
@@ -32656,7 +32620,21 @@ console.log('✅ Normalized elements order (Base first, no duplicates):', normal
             })
         }
       }
-      function hs () {
+      function hs (elementOnly) {
+        if (elementOnly) {
+          // Fast path for a single newly added element: skip rebuilding
+          // every existing text row (each row rebuilds a full font-family
+          // dropdown, so this was the expensive part of adding text).
+          if (
+            elementOnly.checkEditable() &&
+            'text' == elementOnly.getType() &&
+            !this.listElem.querySelector(
+              '.fpd-list-row[id="' + elementOnly.id + '"]'
+            )
+          )
+            rs(this, ls, us).call(this, elementOnly)
+          return
+        }
         ;(this.listElem.innerHTML = ''),
           this.fpdInstance
             .getElements(this.fpdInstance.currentViewIndex, 'all', !1)
@@ -38140,7 +38118,23 @@ function updateFPDLayersToSingleGroup(group) {
               ).direction),
             'rtl' == this.mainOptions.textParameters.direction &&
               (this.mainOptions.textParameters.textAlign = 'right'),
-            'advanced' == this.mainOptions.cornerControlsStyle && At(),
+            'advanced' == this.mainOptions.cornerControlsStyle &&
+              (At(),
+              window.document.fonts &&
+                document.fonts
+                  .load('16px FontFPD')
+                  .then(() => {
+                    // The corner control icons (copy/delete/rotate/resize)
+                    // are drawn on the canvas with this icon font. If it
+                    // wasn't loaded yet when a control was first rendered,
+                    // the icons show up blank until something else forces
+                    // a re-render. Re-render as soon as the font is ready
+                    // so they appear immediately instead of needing extra
+                    // clicks.
+                    this.currentViewInstance &&
+                      this.currentViewInstance.fabricCanvas.renderAll()
+                  })
+                  .catch(() => {})),
             (t.classList.contains('fpd-off-canvas') ||
               t.classList.contains('fpd-topbar')) &&
               (this.mainOptions.toolbarPlacement = 'smart'),
@@ -38897,12 +38891,9 @@ function updateFPDLayersToSingleGroup(group) {
               q(this, 'beforeElementAdd', { element: t })
             },
             elementAdd: t => {
-              console.log('elementAdd', t)
               t.selected = true;
               let { element: e } = t
               if (e) {
-                console.log("dddddddddddddddddddddddddddddJJJJJJJJJJJJJJJJJJJJJJJ",e)
-                console.log(e.getType(),e.draggable, 'elementAddsss', e, e.selected)
                 // e.autoSelect = true;
                 // e.uniScalingUnlockable = true;
                 // e.selectable = true;
