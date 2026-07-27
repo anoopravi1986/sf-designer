@@ -28840,6 +28840,15 @@ console.log("t:", t);
             this.container
               .querySelector('.fpd-btn-add-text')
               .addEventListener('click', e => {
+                const addTextBtn = e.currentTarget
+
+                // Guard against double/rapid clicks: without this, an
+                // unresponsive-looking button invites extra clicks, and
+                // each one stacks another duplicate text object onto the
+                // canvas, making every next render (and the next click)
+                // progressively slower.
+                if (addTextBtn.classList.contains('fpd-loading')) return
+
                 let i = this.container.querySelector('textarea'),
                     n = i.value.trim()
 
@@ -28849,58 +28858,72 @@ console.log("t:", t);
                   i.value = n // Optional: show in the textarea too
                 }
 
-                if (t.currentViewInstance && n.length > 0) {
-                  const e = t.currentViewInstance.options;
-
-                  let options = z(e.customTextParameters, {
-                    textBox: Boolean(this.fpdInstance.mainOptions.customTextAsTextbox),
-                    resizable: 1,
-                    isCustom: 1,
-                    curvable: 1,
-                    _addToUZ: t.currentViewInstance.currentUploadZone,
-                    _calcWidth: true,
-                    colors: '#000',
-                    fontFamily: 'Lobster',
-                    fontSize: 50,
-                    removable: true,
-                    selectable: true,
-                    editable: true,
-                    hasControls: true,
-                    evented: true,
-                    transformable: true,
-                    objectCaching: false,
-                    // Position it ourselves below, right after the canvas so
-                    // it lands at the bottom instead of dead-center.
-                    autoCenter: false,
-                  });
-
-                  const canvas = t.currentViewInstance.fabricCanvas;
-                  const element = canvas.addElement('text', n, n, options);
-
-                  if (element) {
-                    // Place the new text horizontally centered near the
-                    // bottom of the stage instead of the canvas center.
-                    const stageWidth = canvas.viewOptions.stageWidth
-                    const stageHeight = canvas.viewOptions.stageHeight
-                    const bottomMargin = 100
-
-                    element.setPositionByOrigin(
-                      new St.fabric.Point(stageWidth / 2, stageHeight - bottomMargin),
-                      'center',
-                      'bottom'
-                    )
-                    element.setCoords()
-
-                    canvas.setActiveObject(element)
-                    if (typeof element.enterEditing === 'function') {
-                      element.enterEditing() // force edit mode
-                    }
-                    canvas.renderAll()
-                  }
-                }
-
-                // Clear the textarea
+                // Clear the textarea right away for the next entry.
                 i.value = ''
+
+                if (!(t.currentViewInstance && n.length > 0)) return
+
+                // Show the loading state and let the browser paint it
+                // before doing the (synchronous) work below, otherwise the
+                // spinner and the text addition happen in the same frame
+                // and the button just looks frozen until it's done.
+                addTextBtn.classList.add('fpd-loading')
+
+                requestAnimationFrame(() => {
+                  requestAnimationFrame(() => {
+                    try {
+                      const e = t.currentViewInstance.options;
+
+                      let options = z(e.customTextParameters, {
+                        textBox: Boolean(this.fpdInstance.mainOptions.customTextAsTextbox),
+                        resizable: 1,
+                        isCustom: 1,
+                        curvable: 1,
+                        _addToUZ: t.currentViewInstance.currentUploadZone,
+                        _calcWidth: true,
+                        colors: '#000',
+                        fontFamily: 'Lobster',
+                        fontSize: 50,
+                        removable: true,
+                        selectable: true,
+                        editable: true,
+                        hasControls: true,
+                        evented: true,
+                        transformable: true,
+                        objectCaching: false,
+                        // Position it ourselves below, right after the canvas so
+                        // it lands at the bottom instead of dead-center.
+                        autoCenter: false,
+                      });
+
+                      const canvas = t.currentViewInstance.fabricCanvas;
+                      const element = canvas.addElement('text', n, n, options);
+
+                      if (element) {
+                        // Place the new text horizontally centered near the
+                        // bottom of the stage instead of the canvas center.
+                        const stageWidth = canvas.viewOptions.stageWidth
+                        const stageHeight = canvas.viewOptions.stageHeight
+                        const bottomMargin = 100
+
+                        element.setPositionByOrigin(
+                          new St.fabric.Point(stageWidth / 2, stageHeight - bottomMargin),
+                          'center',
+                          'bottom'
+                        )
+                        element.setCoords()
+
+                        canvas.setActiveObject(element)
+                        if (typeof element.enterEditing === 'function') {
+                          element.enterEditing() // force edit mode
+                        }
+                        canvas.renderAll()
+                      }
+                    } finally {
+                      addTextBtn.classList.remove('fpd-loading')
+                    }
+                  })
+                })
               }),
             G(
               this.container.querySelector('textarea'),

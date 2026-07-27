@@ -187,6 +187,38 @@ div.fpd-container fpd-module-uploads .fpd-grid .fpd-loading-bar>.fpd-loading-pro
   z-index: 999999 !important;
 }
 
+// The generic .fpd-loading style paints a large background icon meant for
+// small square buttons; on this full-width button it renders oversized and
+// off-center. Override it here with a small spinner centered on the button,
+// keeping the button's own (orange) background instead of the generic one.
+.fpd-container .fpd-btn-add-text.fpd-loading {
+  background-image: none !important;
+  color: transparent !important;
+  opacity: 1 !important;
+  cursor: wait;
+  position: relative;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 18px;
+    height: 18px;
+    margin: -9px 0 0 -9px;
+    border: 2px solid rgba(255, 255, 255, 0.35);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: fpd-add-text-spin 0.6s linear infinite;
+  }
+}
+
+@keyframes fpd-add-text-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 fpd-module-uploads .fpd-item.fpd-hover-thumbnail.ts .fa-solid.fa-trash {
   display: none;
 }
