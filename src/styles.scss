@@ -192,6 +192,12 @@ div.fpd-container fpd-module-uploads .fpd-grid .fpd-loading-bar>.fpd-loading-pro
 // off-center. Override it here with a small spinner centered on the button,
 // keeping the button's own (orange) background instead of the generic one.
 .fpd-container .fpd-btn-add-text.fpd-loading {
+  // .fpd-btn has `transition: all .2s ease-out`, which would fade the
+  // label/icon out over 200ms instead of hiding it immediately - during
+  // that fade the spinner (below, not transitioned) already renders at
+  // full opacity on top of the still-visible text. Kill the transition
+  // here so the swap to spinner-only is instant.
+  transition: none !important;
   background-image: none !important;
   color: transparent !important;
   opacity: 1 !important;
