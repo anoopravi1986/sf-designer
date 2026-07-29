@@ -191,8 +191,11 @@
   </div>
 </div>
 
+<!-- ==================== DUPLICATE LEGACY MOBILE HEADER (KEEPING FOR COMPATIBILITY - HIDDEN) ====================
+     This block's transparent title label (z-[99]) was overlapping the real mobile header below (z-50),
+     silently swallowing taps on the Save button. Its own Save button has no click handler and is dead. -->
 <div
-  class="md:fixed top-[3px] left-0 w-[120px] bg-transparent z-50 flex items-center justify-between gap-4 px-4 md:h-[50px] text-sm">
+  class="hidden md:fixed top-[3px] left-0 w-[120px] bg-transparent z-50 flex items-center justify-between gap-4 px-4 md:h-[50px] text-sm">
   <button
     class="fixed right-0 md:relative md:right-auto flex md:hidden items-center gap-2 text-left bg-transparent text-white px-1.5 py-1.5 text-lg text-[1rem] rounded hover:bg-white-500 transition top-[8px] z-[9]"
     (click)="showBox()">

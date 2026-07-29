@@ -38352,6 +38352,7 @@ function updateFPDLayersToSingleGroup(group) {
                     r.addEventListener('click', e => {
                       if (e.isTrusted) window.__fpdUserInteracted = true
                       document.body.classList.add('popup-open-hide-body');
+                      try {
                       console.log('88888888', t, r)
                       console.log('fpdInstance', fpdInstance)
                       console.log('Anoop Data 4-1--', fpdInstance, e, r)
@@ -38435,10 +38436,13 @@ function updateFPDLayersToSingleGroup(group) {
                         //     fpdInstance.selectProduct(Number(target.dataset.index), this.currentCategoryIndex);
                         // });
                       }
-
+                      } catch (err) {
+                        console.error('Error while swapping product face:', err);
+                      } finally {
                       setTimeout(() => {
                         document.body.classList.remove('popup-open-hide-body');
                       }, 2000);
+                      }
                       //  const i = Array.from(r.querySelectorAll(".fpd-item")).indexOf(s);
                       // fpdInstance.selectView(i), this.reset();
                     })
