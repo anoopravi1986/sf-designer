@@ -2075,6 +2075,24 @@ fpd-element-toolbar[data-fabric-type=image] {
     display: block !important;
     height: 947px !important;
   }
+
+  /* The 947px above is a hardcoded height tuned for one specific device. On
+     shorter phones it's taller than the real viewport, so a module's scroll
+     area can extend past the visible screen with its bottom rows rendered
+     underneath the fixed .fpd-navigation bar instead of being scrollable
+     into view above it. That only actually shows up on the Elements
+     (fpd-module-designs, labelled "Elements" in the nav) and Images
+     (fpd-module-images) tabs, whose grids are tall/variable (API designs,
+     user uploads) — other tabs' content is short enough that 947px never
+     mattered, and changing their height too just adds unwanted blank space
+     (e.g. Products). So size only these two off the real viewport instead:
+     108px is this panel's fixed top offset (constant across viewport
+     heights), 90px matches the bottom clearance reserved for the nav bar
+     elsewhere in this file. */
+  .fpd-container.fpd-sidebar.fpd-layout-small.fpd-module-visible .fpd-module-content:has(> fpd-module-designs.fpd-active),
+  .fpd-container.fpd-sidebar.fpd-layout-small.fpd-module-visible .fpd-module-content:has(> fpd-module-images.fpd-active) {
+    height: calc(100dvh - 108px - 90px) !important;
+  }
 }
 
 @media (max-width: 768px) {
