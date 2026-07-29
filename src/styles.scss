@@ -1454,6 +1454,14 @@ fpd-element-toolbar[data-fabric-type="group"] {
   .extra-icon {
     display: none !important;
   }
+
+  /* Copy/paste-text-format icons only make sense for text elements. Their
+     .extra-icon children are already hidden above for image/group elements,
+     but the wrapper box itself wasn't, so it sat in the toolbar row as a
+     blank bordered gap. */
+  .extra-icon-main-div-box {
+    display: none !important;
+  }
 }
 
 fpd-element-toolbar.fpd-smart>.fpd-tools-nav>div>div.flex-plus-minus-icon {
