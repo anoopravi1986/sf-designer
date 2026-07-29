@@ -2323,7 +2323,24 @@ fpd-element-toolbar[data-fabric-type=image] {
   .fpd-container.fpd-sidebar.fpd-layout-small fpd-main-wrapper{
     padding-top: 30px;
   }
-  
+
+}
+
+@media (max-width: 768px) {
+  /* The element editor (fpd-element-toolbar, e.g. opacity/duplicate/align/
+     color/position panel) is a fixed bottom-sheet that visually sits under
+     the Undo/Redo/Preview row and the view-switcher arrows above it. Hide
+     that row + the arrows while the editor is open so nothing overlaps, and
+     let them reappear once it closes. `fpd-editor-open` is toggled on
+     <body> from home.component.ts by watching fpd-element-toolbar's
+     fpd-show class. */
+  body.fpd-editor-open .fpd-btn.fpd-tooltip[aria-label="Undo"],
+  body.fpd-editor-open .fpd-btn.fpd-tooltip[aria-label="Redo"],
+  body.fpd-editor-open .fpd-btn.fpd-tooltip[aria-label="Preview"],
+  body.fpd-editor-open .fpd-btn.fpd-tooltip[aria-label="Reset"],
+  body.fpd-editor-open .fpd-views-inside-left fpd-views-nav {
+    display: none !important;
+  }
 }
 
 @media (max-width: 768px) {

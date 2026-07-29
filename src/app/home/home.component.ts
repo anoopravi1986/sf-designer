@@ -1828,6 +1828,22 @@ export class HomeComponent implements AfterViewInit {
       observer.observe(paneldata, { attributes: true });
     }
 
+    const elementToolbarForVisibility = document.querySelector('fpd-element-toolbar');
+
+    if (elementToolbarForVisibility) {
+      const syncEditorOpenClass = () => {
+        document.body.classList.toggle(
+          'fpd-editor-open',
+          elementToolbarForVisibility.classList.contains('fpd-show')
+        );
+      };
+
+      syncEditorOpenClass();
+
+      const toolbarVisibilityObserver = new MutationObserver(syncEditorOpenClass);
+      toolbarVisibilityObserver.observe(elementToolbarForVisibility, { attributes: true, attributeFilter: ['class'] });
+    }
+
     document.addEventListener('click', function (event) {
       const productStage = document.querySelector('.fpd-product-stage');
       const viewStage = document.querySelector('.fpd-view-stage');
