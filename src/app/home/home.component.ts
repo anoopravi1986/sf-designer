@@ -100,14 +100,14 @@ export class HomeComponent implements AfterViewInit {
     productIndex: number;
     childIndex: number;
   }> {
-    console.log('🔍 Searching for:', manufacturer, productTitle);
+    ;
 
     return new Promise((resolve, reject) => {
       this.http
         .get<any[]>('https://styleflip-backend-jdm5.ithemes.xyz/api/product/getAllProducts')
         .subscribe({
           next: (data) => {
-            console.log('dddddddddddddddddddddddd', data);
+            ;
             for (
               let categoryIndex = 0;
               categoryIndex < data.length;
@@ -125,12 +125,7 @@ export class HomeComponent implements AfterViewInit {
                     this.slugify(product.title) === productTitle;
 
                   if (isMatch) {
-                    console.log('✅ Found:', {
-                      categoryIndex,
-                      productIndex: flatProductIndex,
-                      productId: product.product_id,
-                      childIndex: i,
-                    });
+                    ;
 
                     return resolve({
                       categoryIndex,
@@ -154,7 +149,7 @@ export class HomeComponent implements AfterViewInit {
 
   toggleMobileShare() {
     this.showMobileShareDropdown = !this.showMobileShareDropdown;
-    console.log('Mobile share toggled:', this.showMobileShareDropdown);
+    ;
   }
 
   closeMobileShare() {
@@ -191,13 +186,13 @@ export class HomeComponent implements AfterViewInit {
   ngAfterViewInit() {
     if (isPlatformBrowser(this.platformId)) {
       const fontArrayStr: any[] = [];
-      console.log('reset done');
+      ;
       localStorage.setItem('productLoader', 'done');
 
       fetch('https://styleflip-backend-jdm5.ithemes.xyz/api/font/getAllFonts')
         .then(res => res.json())
         .then(data => {
-          console.log('font data is', data);
+          ;
           this.fontArrayStr = data;
           localStorage.setItem('fontList', JSON.stringify(this.fontArrayStr));
         })
@@ -209,7 +204,7 @@ export class HomeComponent implements AfterViewInit {
       const fontData = storedFonts ? JSON.parse(storedFonts) : null;
 
       if (fontData) {
-        console.log('Retrieved font data:', fontData);
+        ;
       }
 
       setTimeout(async () => {
@@ -217,11 +212,7 @@ export class HomeComponent implements AfterViewInit {
           this.route.snapshot.paramMap.get('manufacturer') || '';
         const titleSlug = this.route.snapshot.paramMap.get('slug') || '';
 
-        console.log(
-          'productIndex,categoryIndex,',
-          this.reversedManufacturerSlugMap[manufacturerSlug],
-          titleSlug
-        );
+        ;
 
         const pageTitle = `${titleSlug.trim() ? titleSlug.replace(/-/g, '') : 'Styleflip'
           } | ${manufacturerSlug.replace(/-/g, ' ')} - Design Your Product`;
@@ -236,27 +227,20 @@ export class HomeComponent implements AfterViewInit {
         localStorage.setItem('categoryIndex', categoryIndex);
         localStorage.setItem('childIndex', childIndex);
 
-        console.log(
-          productIndex,
-          categoryIndex,
-          childIndex,
-          'productIndex,categoryIndex,',
-          titleSlug,
-          manufacturerSlug
-        );
+        ;
 
         const fpdTarget = document.getElementById('fpd-target');
         if (!fpdTarget) return;
 
-        console.log("fontssssssssssss data is", fontData)
+        ;
 
         $(document).on('click', 'fpd-module-products .fpd-item', (event) => {
           localStorage.setItem('productIndex', '');
           localStorage.setItem('categoryIndex', '');
           localStorage.setItem('childIndex', '');
-          console.log(event.currentTarget, 'click happen', event);
+          ;
           const clickedTitle = $(event.currentTarget).data('title');
-          console.log(clickedTitle, 'cllllllll', $(event.currentTarget));
+          ;
 
           const manufacturer = $(event.currentTarget).data('manufacturer');
           let ob: any;
@@ -269,11 +253,7 @@ export class HomeComponent implements AfterViewInit {
 
           const slug = this.slugify(clickedTitle);
           const manufacturerSlug = this.slugify(ob);
-          console.log(
-            manufacturer,
-            'mamamam',
-            localStorage.getItem('productLoader')
-          );
+          ;
           let productLoadervaalue = localStorage.getItem('productLoader');
           // 'productLoader' is set to '' by FancyProductDesigner.js while it is
           // programmatically replaying a saved product selection on page load
@@ -340,11 +320,11 @@ export class HomeComponent implements AfterViewInit {
         ) as HTMLElement;
 
         if (hideIcon && mainBar) {
-          console.log('Element found:', hideIcon, mainBar);
+          ;
 
           hideIcon.addEventListener('click', (event) => {
             event.stopPropagation();
-            console.log('click happen');
+            ;
             this.savedContent = mainBar.innerHTML;
             mainBar.style.maxWidth = '80px';
             mainBar.style.backgroundColor = '#f0f1f5';
@@ -375,9 +355,9 @@ export class HomeComponent implements AfterViewInit {
               ) {
                 const target = mutation.target as HTMLElement;
                 if (target.classList.contains('fpd-active')) {
-                  console.log('fpd-active class detected on:', target);
+                  ;
                   var activeclick = localStorage.getItem('fpdMenuClicked');
-                  console.log('activeclick', activeclick);
+                  ;
                   if (activeclick != 'true') {
                     document
                       .querySelectorAll('.fpd-popup.visible')
@@ -449,14 +429,14 @@ export class HomeComponent implements AfterViewInit {
       const dropdownItems = document.querySelectorAll(
         'fpd-module-productsnew .fpd-dropdown-list .fpd-item'
       );
-      console.log('Dropdown Items Found:', dropdownItems);
+      ;
 
       dropdownItems.forEach((item) => {
         item.addEventListener('click', () => {
           // updateTagsFromDesignModule() removes any stale .fpd-designs-tags
           // bar itself now, so no manual cleanup is needed here.
           this.updateTagsFromDesignModule();
-          console.log('Tags updated from Design Module');
+          ;
         });
       });
     }, 2000);
@@ -465,10 +445,7 @@ export class HomeComponent implements AfterViewInit {
       const checkAndHideDuplicateFpdItems = () => {
         const containers =
           this.document.querySelectorAll<HTMLElement>('.ProductModuleMy');
-        console.log(
-          '✅ Running deduplication check on containers:',
-          containers
-        );
+        ;
 
         containers.forEach((container) => {
           const items = container.querySelectorAll<HTMLElement>('.fpd-item');
@@ -494,7 +471,7 @@ export class HomeComponent implements AfterViewInit {
         const innerHtmlObserver = new MutationObserver((mutations) => {
           for (const mutation of mutations) {
             if (mutation.type === 'childList') {
-              console.log('📦 Inner HTML changed: DOM children updated');
+              ;
               checkAndHideDuplicateFpdItems();
             }
           }
@@ -518,7 +495,7 @@ export class HomeComponent implements AfterViewInit {
       const targetSection = document.querySelector('fpd-element-toolbar .fpd-sub-panel') as HTMLElement;
       const panel = document.getElementById('fpd-opacity-panel');
       const sliderOpacity = document.getElementById('fpd-opacity-range') as HTMLInputElement;
-      console.log('Opacity elements:', { btnOpacity, panel, sliderOpacity });
+      ;
       if (!btnOpacity || !panel || !sliderOpacity) return;
 
 
@@ -530,7 +507,7 @@ export class HomeComponent implements AfterViewInit {
             activeElem.classList.remove('fpd-active');
           }
         }
-        console.log('Opacity button clicked, toggling panel. Current display:', panel.style.display);
+        ;
         panel.style.display =
           panel.style.display === 'block' ? 'none' : 'block';
         if (panel.style.display === 'block') {
@@ -578,15 +555,15 @@ export class HomeComponent implements AfterViewInit {
     setTimeout(() => {
       const backBtn = document.getElementById('backButton');
       if (backBtn) {
-        console.log("Back button found!");
+        ;
         backBtn.addEventListener('click', (e) => {
           e.preventDefault();
           e.stopPropagation();
-          console.log("Back button clicked manually");
+          ;
           window.location.href = 'https://www.styleflip.com/products/apple-macbook-pro-13-with-retina-display-skins-custom-sticker-covers?variant=45181139386554';
         });
       } else {
-        console.log("Back button NOT found!");
+        ;
       }
     }, 1000);
 
@@ -615,7 +592,7 @@ export class HomeComponent implements AfterViewInit {
         const result = await response.json();
 
         if (result.success) {
-          console.log('Image deleted from server successfully');
+          ;
           this.showToast('Design deleted from server');
 
           // Restore button briefly before closing
@@ -656,7 +633,7 @@ export class HomeComponent implements AfterViewInit {
         const result = await response.json();
 
         if (result.success) {
-          console.log('Image deleted from server successfully');
+          ;
           this.showToast('Design deleted from server');
           return true;
         } else {
@@ -1113,7 +1090,7 @@ export class HomeComponent implements AfterViewInit {
   // ==================== END OF SHARING FUNCTIONALITY ====================
 
   moveBoldToPrimaryTools(): void {
-    console.log('Moving Bold to Primary Tools');
+    ;
     const targetElement = document.getElementById('boldOutside');
 
     if (targetElement) {
@@ -1244,7 +1221,7 @@ export class HomeComponent implements AfterViewInit {
     if (positionButton) {
       positionButton.addEventListener('click', (e) => {
         const target = e.currentTarget as HTMLElement;
-        console.log("target is aad", document.querySelector('.fpd-panel-position')?.classList);
+        ;
         if (document.querySelector('.fpd-panel-position')?.classList.contains('fpd-active')) {
           document.querySelector('fpd-element-toolbar')?.classList.remove('fpd-panel-visible', 'my-position');
         }
@@ -1273,7 +1250,7 @@ export class HomeComponent implements AfterViewInit {
 
         target.classList.add('letter-spac-active');
         const subPanel = document.querySelector('.fpd-sub-panel');
-        console.log("subPanel data is", subPanel)
+        ;
         if (!subPanel) return;
 
         subPanel.querySelectorAll(':scope > .fpd-active').forEach(el => {
@@ -1286,8 +1263,8 @@ export class HomeComponent implements AfterViewInit {
         }
 
         const elementtoolbar = document.querySelector('fpd-element-toolbar');
-        console.log("djjjjj", elementtoolbar)
-        console.log("test test");
+        ;
+        ;
         if (elementtoolbar) {
           elementtoolbar.classList.add('fpd-panel-visible')
         }
@@ -1297,19 +1274,19 @@ export class HomeComponent implements AfterViewInit {
     document.getElementById('TextMoveUp')?.addEventListener('click', () => {
       const canvas = this.designer.currentViewInstance.fabricCanvas;
       const obj = canvas.getActiveObject();
-      console.log('Text Move Up clicked, active object:', obj);
+      ;
       if (!obj) return;
 
       const objects = canvas.getObjects();
       const overlayObj = objects.find((o: any) => o.title === 'Overlay');
 
-      console.log('Text Move Up clicked', obj, overlayObj);
+      ;
 
       if (overlayObj) {
         const overlayIndex = objects.indexOf(overlayObj);
         const objIndex = objects.indexOf(obj);
 
-        console.log('Overlay index:', overlayIndex, 'Object index:', objIndex);
+        ;
 
         if (objIndex < overlayIndex - 1) {
           canvas.bringForward(obj);
@@ -1324,7 +1301,7 @@ export class HomeComponent implements AfterViewInit {
       }
 
       obj.setCoords();
-      console.log('✅ Layer moved up & layer panel notified 1', obj);
+      ;
       canvas.fire('object:modified', { target: obj });
       canvas.fire('elementModify', {
         element: obj,
@@ -1333,7 +1310,7 @@ export class HomeComponent implements AfterViewInit {
 
       canvas.requestRenderAll();
 
-      console.log('✅ Layer moved up & layer panel notified');
+      ;
     });
 
     function moveLayerRowUp(elementId: string) {
@@ -1346,13 +1323,13 @@ export class HomeComponent implements AfterViewInit {
       const prevRow = row.previousElementSibling;
 
       if (!prevRow || prevRow.classList.contains('fpd-locked')) {
-        console.log('Cannot move above Base');
+        ;
         return;
       }
 
       list.insertBefore(row, prevRow);
 
-      console.log('✅ DOM layer moved up');
+      ;
     }
 
     function moveLayerRowDown(elementId: string) {
@@ -1367,7 +1344,7 @@ export class HomeComponent implements AfterViewInit {
 
       list.insertBefore(nextRow, row);
 
-      console.log('✅ DOM layer moved down');
+      ;
     }
 
     document.getElementById('TextMoveDown')?.addEventListener('click', () => {
@@ -1375,7 +1352,7 @@ export class HomeComponent implements AfterViewInit {
       const obj = canvas.getActiveObject();
       if (!obj) return;
 
-      console.log("Text Move Down clicked", obj);
+      ;
 
       const baseObj = canvas.getObjects().find((o: any) => o.title === "Base");
 
@@ -1450,7 +1427,7 @@ export class HomeComponent implements AfterViewInit {
     let copiedObject: any = null;
 
     document.getElementById('copytext')?.addEventListener('click', (e) => {
-      console.log("e.currentTarget", e.currentTarget)
+      ;
       const canvas = this.designer.currentViewInstance.fabricCanvas;
       const obj = canvas.getActiveObject();
 
@@ -1464,7 +1441,7 @@ export class HomeComponent implements AfterViewInit {
           }
         };
 
-        console.log('Copied curved text params:', copiedObject);
+        ;
         this.showToast('Curved text copied!');
         return;
       }
@@ -1474,20 +1451,20 @@ export class HomeComponent implements AfterViewInit {
           type: obj.type,
           object: cloned
         };
-        console.log('Copied object:', copiedObject);
+        ;
         this.showToast('Copied successfully!');
       });
     });
 
     document.addEventListener('keydown', (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'c') {
-        console.log("Ctrl+C pressed",);
+        ;
         e.preventDefault();
 
         const canvas = this.designer.currentViewInstance.fabricCanvas;
 
         const obj = canvas.getActiveObject();
-        console.log("Ctrl+C pressed, active object:", obj, obj.type);
+        ;
 
         if (!obj) return;
 
@@ -1505,7 +1482,7 @@ export class HomeComponent implements AfterViewInit {
           }
 
           copiedObject = cloned;
-          console.log('Copied via Ctrl+C:', copiedObject);
+          ;
           this.showToast('Copied successfully!');
         });
       }
@@ -1514,7 +1491,7 @@ export class HomeComponent implements AfterViewInit {
     document.getElementById('pastetext')?.addEventListener('click', () => {
       const view = this.designer.currentViewInstance;
       const canvas = view.fabricCanvas;
-      console.log("e.currentTarget copiedObjectdata", copiedObject)
+      ;
       if (!copiedObject) return;
 
       if (copiedObject.type === 'curved-text') {
@@ -1641,11 +1618,11 @@ export class HomeComponent implements AfterViewInit {
     });
 
     document.getElementById('letter-spacing')?.addEventListener('click', (e) => {
-      console.log("e.currentTarget", e.currentTarget)
+      ;
       document.body.classList.remove('fpd-toolbar-transform-our');
       const target = e.currentTarget as HTMLElement;
       if (document.getElementById('letter-spacing')?.classList.contains('letter-spac-active')) {
-        console.log("letter-spacing is active")
+        ;
         const elementtoolbar = document.querySelector('fpd-element-toolbar');
         if (elementtoolbar) {
           elementtoolbar.classList.remove('fpd-panel-visible')
@@ -1656,7 +1633,7 @@ export class HomeComponent implements AfterViewInit {
 
       target.classList.add('letter-spac-active');
       const subPanel = document.querySelector('.fpd-sub-panel');
-      console.log("subPanel data is", subPanel)
+      ;
       if (!subPanel) return;
 
       subPanel.querySelectorAll(':scope > .fpd-active').forEach(el => {
@@ -1670,8 +1647,8 @@ export class HomeComponent implements AfterViewInit {
       }
 
       const elementtoolbar = document.querySelector('fpd-element-toolbar');
-      console.log("djjjjj", elementtoolbar)
-      console.log("test testsss");
+      ;
+      ;
       if (elementtoolbar) {
         elementtoolbar.classList.add('fpd-panel-visible')
       }
@@ -1710,7 +1687,7 @@ export class HomeComponent implements AfterViewInit {
       alert("check");
       e.stopPropagation();
       e.preventDefault();
-      console.log('Share button clicked', e);
+      ;
 
       const target = e.currentTarget as HTMLElement;
 
@@ -1734,7 +1711,7 @@ export class HomeComponent implements AfterViewInit {
 
           if (Array.isArray(parsedData)) {
             matchedData = parsedData.filter(item => item.title === dataTitle);
-            console.log("Matched Data of:", matchedData);
+            ;
           } else {
             console.error("Data is not an array:", parsedData);
           }
@@ -1744,7 +1721,7 @@ export class HomeComponent implements AfterViewInit {
       } else {
         console.warn("No data found in localStorage for key:");
       }
-      console.log("matchedData", matchedData, matchedData[0]?.design_id)
+      ;
       if (!dataSource || !dataTitle) {
         alert('Missing design data.');
         return;
@@ -1758,7 +1735,7 @@ export class HomeComponent implements AfterViewInit {
       })
         .then(response => response.json())
         .then(data => {
-          console.log('Search API Response:', data);
+          ;
 
           if (data && data.product && data.product.length > 0) {
             const firstProduct = data.product[0];
@@ -1804,7 +1781,7 @@ export class HomeComponent implements AfterViewInit {
             const hasClass = panel.classList.contains('fpd-active');
             if (!hasClass) {
               this.document.getElementById('letter-spacing')?.classList.remove('letter-spac-active');
-              console.log('Class "fpd-active" was removed from #panel-text-size-data');
+              ;
             }
           }
         }
@@ -1825,7 +1802,7 @@ export class HomeComponent implements AfterViewInit {
             const hasClass = paneldata.classList.contains('fpd-active');
             if (!hasClass) {
               this.document.getElementById('CenterTools')?.classList.remove('letter-spac-active');
-              console.log('Class "fpd-active" was removed from #panel-text-size-data');
+              ;
             }
           }
         }
@@ -1866,13 +1843,13 @@ export class HomeComponent implements AfterViewInit {
     });
 
     document.addEventListener("click", function (e: any) {
-      console.log("Document clicked", e.target, e);
+      ;
       const toolbar = e.target.closest("fpd-element-toolbar");
       if (!toolbar) return;
-      console.log("toolbar is", toolbar);
+      ;
 
       if (e.target.classList.contains("fa-close")) {
-        console.log("e.target is", e.target);
+        ;
         const transformSpac = document.querySelector('.fpd-tool-transform');
         let transformActive = transformSpac?.classList.contains('fpd-active');
         if (transformActive) {
@@ -1882,11 +1859,11 @@ export class HomeComponent implements AfterViewInit {
 
       if (toolbar.classList.contains("fpd-show")) {
         const target = e.target.closest("[title], [data-panel]");
-        console.log("target is", target);
+        ;
         if (!target) return;
 
         const value = target.getAttribute("title") || target.getAttribute("data-panel");
-        console.log("target value is", value);
+        ;
         if (!value) return;
 
         const newClass = "my-" + value.toLowerCase().replace(/\s+/g, '-');
@@ -1902,13 +1879,13 @@ export class HomeComponent implements AfterViewInit {
       else {
         toolbar.classList.forEach((c: any) => {
           if (c.startsWith("my-")) {
-            console.log("removing class", c);
+            ;
             toolbar.classList.remove(c);
           }
         });
       }
 
-      console.log("Toolbar updated with class:", toolbar.className);
+      ;
       document.body.classList.forEach(cls => {
         if (cls.startsWith('fpd-type-')) {
           document.body.classList.remove(cls);
@@ -2177,7 +2154,7 @@ export class HomeComponent implements AfterViewInit {
       this.document.querySelector('#clothing-designer'),
       this.appOptions
     );
-    console.log("designer is", this.designer);
+    ;
 
     // Some product entries ship a locked background ("Base"/"Overlay") image
     // whose scaleX/scaleY was authored against a different reference size than
@@ -2235,31 +2212,31 @@ export class HomeComponent implements AfterViewInit {
     });
 
     // Step 1: First load from IndexedDB (immediate display)
-    console.log("📀 Loading from IndexedDB first...");
+    ;
     const cachedProducts = await getProducts();
 
     if (cachedProducts && cachedProducts.length > 0) {
-      console.log("✅ Loaded", cachedProducts.length, "products from IndexedDB");
+      ;
       this.designer.product = cachedProducts;
       this.showFPDLoading(false);
     } else {
-      console.log("⚠️ No cached data, showing loader");
+      ;
       this.showFPDLoading(true);
     }
 
     // Step 2: Fetch fresh data from API (background update)
-    console.log("🌐 Fetching fresh data from API...");
+    ;
     fetch("https://styleflip-backend-jdm5.ithemes.xyz/api/product/getAllProducts")
       .then((res) => res.json())
       .then(async (freshData) => {
-        console.log("📦 Fresh API data received:", freshData.length, "products");
+        ;
 
         // Update IndexedDB with fresh data
         await saveProducts(freshData);
 
         // Update designer with fresh data
         this.designer.product = freshData;
-        console.log("✅ Designer updated with fresh data");
+        ;
 
         this.showFPDLoading(false);
 
@@ -2278,7 +2255,7 @@ export class HomeComponent implements AfterViewInit {
     const cachedElements = await getElements();
 
     if (cachedElements && cachedElements.length > 0) {
-      console.log("✅ Loaded", cachedElements.length, "element categories from IndexedDB");
+      ;
       this.designer.setupDesigns(cachedElements);
     }
 
@@ -2287,7 +2264,7 @@ export class HomeComponent implements AfterViewInit {
       .then(async (freshData) => {
         await saveElements(freshData);
         this.designer.setupDesigns(freshData);
-        console.log("✅ Designer elements updated with fresh data");
+        ;
       })
       .catch((err) => {
         console.error("❌ Elements API fetch failed:", err);
@@ -2295,7 +2272,7 @@ export class HomeComponent implements AfterViewInit {
 
     const slug = this.route.snapshot.paramMap.get('slug');
     const manufacturer = this.route.snapshot.paramMap.get('manufacturer');
-    console.log(this.route.snapshot.paramMap, 'Selected slug:', slug);
+    ;
     const currentUrl = this.router.url;
 
     if (currentUrl.includes('savedesign')) {
@@ -2304,9 +2281,9 @@ export class HomeComponent implements AfterViewInit {
         const id = params['design_id'];
         const title = params['title'];
 
-        console.log('Design Save Detected!');
-        console.log('ID:', id);
-        console.log('Title:', title);
+        ;
+        ;
+        ;
         fetch(`https://styleflip-backend-jdm5.ithemes.xyz/api/sharedproduct/search?title=${encodeURIComponent(title)}&design_id=${id}`, {
           method: 'GET',
           headers: {
@@ -2315,7 +2292,7 @@ export class HomeComponent implements AfterViewInit {
         })
           .then(response => response.json())
           .then(data => {
-            console.log("data is:", data)
+            ;
             let existing = localStorage.getItem('clothing-designer');
             let parsed = existing ? JSON.parse(existing) : [];
 
@@ -2324,7 +2301,7 @@ export class HomeComponent implements AfterViewInit {
               localStorage.setItem('clothing-designer', JSON.stringify(parsed));
             }
             const designTitleData = localStorage.getItem('clothing-designer');
-            console.log("ddddddddddddddddddAnoooooo")
+            ;
             let matchedDesign = null;
             if (designTitleData) {
               const parsedDesigns = JSON.parse(designTitleData);
@@ -2333,20 +2310,20 @@ export class HomeComponent implements AfterViewInit {
 
             if (matchedDesign) {
               setTimeout(() => {
-                console.log(matchedDesign, 'Matched Design:', this.designer);
+                ;
                 this.designer.currentViewInstance.fabricCanvas.clear();
                 this.designer.loadProduct(matchedDesign.product)
                 this.showFPDLoading(false);
                 const gridContainer = document.querySelector('.fpd-saved-designs');
               }, 10000);
             } else {
-              console.log('No matching title found in designTitleData.');
+              ;
             }
           });
       });
     }
 
-    console.log('Current URL:', currentUrl, 'local');
+    ;
     if (slug === null) {
       localStorage.setItem('selectedSlug', '');
     }
@@ -2379,7 +2356,7 @@ export class HomeComponent implements AfterViewInit {
         event.stopPropagation();
         event.stopImmediatePropagation();
 
-        console.log('Custom Preview Triggered');
+        ;
 
         // ✅ Call your function
         this.preview();
@@ -2392,12 +2369,12 @@ export class HomeComponent implements AfterViewInit {
 
   bottomMenu() {
     const sourceElement = document.getElementById('content-text');
-    console.log('sourceElement', sourceElement);
+    ;
     if (sourceElement) {
       const htmlContent = sourceElement.innerHTML;
       localStorage.setItem('savedContentText', htmlContent);
       localStorage.setItem('parentDivId', 'ProductModule');
-      console.log('Content saved to localStorage');
+      ;
       localStorage.setItem('valueofTitle', '');
     }
   }
@@ -2441,7 +2418,7 @@ export class HomeComponent implements AfterViewInit {
   }
 
   filterThumbnails(searchTerm: string) {
-    console.log('searchTerm', searchTerm);
+    ;
 
     if (searchTerm.length < 2) {
       const parentDiv = document.querySelector('div[data-moduleicon="layout-panel-left"]');
@@ -2455,18 +2432,18 @@ export class HomeComponent implements AfterViewInit {
     }
 
     const parentDiv = document.querySelector('div[data-moduleicon="layout-panel-left"]');
-    console.log('parentDiv', parentDiv);
+    ;
     if (!parentDiv) return;
 
     const thumbnails = parentDiv.querySelectorAll('.fpd-grid .fpd-item.fpd-hover-thumbnail');
-    console.log('parentDivdata', thumbnails);
+    ;
 
     thumbnails.forEach((thumb: Element) => {
       const labelEl = thumb.querySelector('.fpd-label');
       const title = labelEl?.getAttribute('title')?.toLowerCase()
         || labelEl?.textContent?.trim().toLowerCase()
         || '';
-      console.log('title', title, 'searchTerm', searchTerm);
+      ;
       const search = searchTerm.toLowerCase();
 
       const titleWords = title.split(' ');
@@ -2477,11 +2454,11 @@ export class HomeComponent implements AfterViewInit {
   }
 
   filterThumbnailsP(searchTerm: string) {
-    console.log('searchTerm', searchTerm);
+    ;
 
     if (searchTerm.length < 2) {
       const allThumbnails = document.querySelectorAll('.fpd-item.fpd-hover-thumbnail');
-      console.log('Showing all thumbnails (search too short)', allThumbnails.length);
+      ;
       allThumbnails.forEach((thumb: Element) => {
         (thumb as HTMLElement).style.display = 'flex';
       });
@@ -2500,7 +2477,7 @@ export class HomeComponent implements AfterViewInit {
       ...document.querySelectorAll('.fpd-grid')
     ];
 
-    console.log('Found containers to search:', containers.length);
+    ;
 
     let totalMatches = 0;
     let totalItems = 0;
@@ -2526,14 +2503,14 @@ export class HomeComponent implements AfterViewInit {
 
         if (matches) {
           totalMatches++;
-          console.log(`Match found: "${combinedTitle}" for search "${search}"`);
+          ;
         }
 
         (thumb as HTMLElement).style.display = matches ? 'flex' : 'none';
       });
     });
 
-    console.log(`Search results: ${totalMatches} matches out of ${totalItems} items for "${search}"`);
+    ;
 
     document.querySelectorAll('.box-contain-text').forEach((container) => {
       const children = container.querySelectorAll('.fpd-item');
@@ -2569,7 +2546,7 @@ export class HomeComponent implements AfterViewInit {
 
   preview() {
     if (document.getElementById('fpd-preview-modal')) {
-      console.log('Preview already open');
+      ;
       return;
     }
     if (
@@ -2660,7 +2637,7 @@ export class HomeComponent implements AfterViewInit {
 
   onLogin(event: Event) {
     event.preventDefault();
-    console.log('Attempting Shopify login for:', this.email);
+    ;
 
     const payload = {
       query: `
@@ -2697,7 +2674,7 @@ export class HomeComponent implements AfterViewInit {
       )
       .subscribe({
         next: (response) => {
-          console.log('Shopify login response:', response);
+          ;
           const data = response?.data?.customerAccessTokenCreate;
 
           if (data?.customerAccessToken?.accessToken) {
@@ -2708,7 +2685,7 @@ export class HomeComponent implements AfterViewInit {
             this.showLoginPopup = false;
             this.closeLoginPopup();
 
-            console.log('Shopify login success:', token);
+            ;
             this.getCustomerDetails(token);
           } else {
             const errorMsg =
@@ -2718,7 +2695,7 @@ export class HomeComponent implements AfterViewInit {
           }
         },
         error: (err) => {
-          console.log('Shopify login error:', err);
+          ;
           alert('Network error or Shopify API issue.');
         },
       });
@@ -2766,7 +2743,7 @@ export class HomeComponent implements AfterViewInit {
           const customer = res.data?.customer;
           this.firstName = res.data?.customer?.firstname || '';
           this.initialLetter = this.firstName.charAt(0).toUpperCase();
-          console.log(this.initialLetter, 'initialLetter');
+          ;
         },
         (err) => {
           console.error('Customer fetch failed', err);
@@ -2776,18 +2753,18 @@ export class HomeComponent implements AfterViewInit {
 
   updateTagsFromDesignModule() {
     const allTagsSetD = new Set();
-    console.log('Anoop Data 4 allTagsSet', allTagsSetD);
+    ;
     document.querySelectorAll('#DesignModule .fpd-item').forEach((product) => {
-      console.log('products-------929290000', product);
+      ;
       const tags = product
         .getAttribute('data-tags')
         ?.split(',')
         .map((tag) => tag.trim());
       if (tags) tags.forEach((tag) => allTagsSetD.add(tag));
     });
-    console.log('Anoop Data 4 allTagsSet---', allTagsSetD);
+    ;
     const parentDiv = document.querySelector('div[data-title="Productsnew"]');
-    console.log('Anoop Data 4 parentDiv', parentDiv);
+    ;
     if (parentDiv) {
       // Each category selection called this function again to rebuild the tag
       // row, but only ever removed the inner #tag-wrapper-design-tags list —
@@ -2980,7 +2957,7 @@ export class HomeComponent implements AfterViewInit {
     if (!canvas) return;
 
     const activeObject = canvas.getActiveObject();
-    console.log(activeObject._objects.length, 'activeObject', activeObject);
+    ;
     if (activeObject._objects.length > 1 && activeObject.type === 'activeSelection') {
       activeObject.toGroup();
       canvas.requestRenderAll();
@@ -3007,18 +2984,18 @@ export class HomeComponent implements AfterViewInit {
   }
 
   onItemClick(item: string): void {
-    console.log('Clicked:', item);
+    ;
     this.closeBox();
   }
 
   dowloadButton() {
     this.closeFacebookOptions();
-    console.log('Download button clicked', this.designer.actionsBar);
+    ;
     this.designer.actionsBar.doAction('download');
   }
 
   printDesign() {
-    console.log('Print Design button clicked', this.designer.actionsBar);
+    ;
     if (
       this.designer &&
       this.designer.currentViewInstance &&
@@ -3056,7 +3033,7 @@ export class HomeComponent implements AfterViewInit {
   }
 
   saveDesign(customTitle?: string) {
-    console.log('llllllllllllllllllllllllllll');
+    ;
     if (
       this.designer &&
       this.designer.currentViewInstance &&
@@ -3080,7 +3057,7 @@ export class HomeComponent implements AfterViewInit {
 
           const title = customTitle || `Design_${Date.now()}`;
 
-          console.log('Design Title:', title, product);
+          ;
 
           const savedItem = {
             thumbnail,
@@ -3159,7 +3136,7 @@ export class HomeComponent implements AfterViewInit {
   }
 
   addSavedProduct(item: { thumbnail: string; product: any; title: string }) {
-    console.log("item data", item)
+    ;
     const wrapper = document.createElement('div');
     wrapper.className = 'fpd-item saved-design';
     wrapper.style.position = 'relative';
@@ -3218,7 +3195,7 @@ export class HomeComponent implements AfterViewInit {
         })
       );
     });
-    console.log("dddddddd", this)
+    ;
     this.savedGrid?.nativeElement.appendChild(wrapper);
   }
 
@@ -3239,7 +3216,7 @@ export class HomeComponent implements AfterViewInit {
       const title = (
         this.previewButton?.nativeElement.value || ''
       ).toString();
-      console.log('Adding to cart:', { title, product, dataUrl });
+      ;
 
       const cartItem = {
         thumbnail: dataUrl,
@@ -3252,7 +3229,7 @@ export class HomeComponent implements AfterViewInit {
       $.post('https://editor.styleflip.com/fpd/addtocart.php', {
         fpd_data: jsonString
       }, function (response) {
-        console.log('Data saved successfully');
+        ;
       });
 
       this.showSuccessMessage('Design added to cart!');
@@ -3267,7 +3244,7 @@ export class HomeComponent implements AfterViewInit {
     let savedList: any[] = [];
     try {
       savedList = JSON.parse(window.localStorage.getItem(storageKey) || '[]');
-      console.log('Saved List:', savedList);
+      ;
     } catch {
       savedList = [];
     }
@@ -3300,7 +3277,7 @@ export class HomeComponent implements AfterViewInit {
 
     this.http.get<Category[]>(apiUrl).subscribe({
       next: (data) => {
-        console.log('Design data fetched:', data);
+        ;
         const html = this.generateHTML(data);
         const container = document.getElementById('content-text');
         if (container) {
@@ -3378,5 +3355,5 @@ function moveLayerRowUp(elementId: string) {
 
   list.insertBefore(row, prevRow);
 
-  console.log('✅ DOM layer moved up');
+  ;
 }

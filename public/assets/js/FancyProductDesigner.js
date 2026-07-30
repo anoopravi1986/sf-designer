@@ -1687,8 +1687,7 @@
             return E.enableGLFiltering &&
               E.isWebglSupported &&
               E.isWebglSupported(E.textureSize)
-              ? (console.log('max texture size: ' + E.maxTextureSize),
-                new E.WebglFilterBackend({ tileSize: E.textureSize }))
+              ? (new E.WebglFilterBackend({ tileSize: E.textureSize }))
               : E.Canvas2dFilterBackend
               ? new E.Canvas2dFilterBackend()
               : void 0
@@ -2111,10 +2110,10 @@
               // }
               if (t) {
                 var s = E.util.createImage();
-                console.log('Image created:', s);
+                ;
 
                 var r = function () {
-                  console.log('Image loaded:', s);
+                  ;
                   e && e.call(i, s, !1);
                   s = s.onload = s.onerror = null;
                 };
@@ -5776,7 +5775,6 @@
           })(e),
           (function (t) {
             localStorage.setItem('fpdInstance', '')
-            console.log('ttttttttt', t)
             ;('use strict')
             var e = t.fabric || (t.fabric = {})
             ;(e.Control = function (t) {
@@ -8221,7 +8219,7 @@
                   E.util.makeElementUnselectable(this.wrapperEl)
               },
               _applyCanvasStyle: function (t) {
-                console.log("dddddddddddddddddkakkakkak",t)
+                ;
                 // var e = this.width || t.width,
                 //   i = this.height || t.height
                 var e = (this.width || t.width) + 200; // +100px wider
@@ -15855,7 +15853,7 @@
                       this.callSuper('render', t)))
                 },
                 _splitTextIntoLines: function (t) {
-                  console.log("test t:",t);
+                  ;
                   
                   for (
                     var i = t.split(this._reNewline),
@@ -20955,7 +20953,7 @@
               // 👇 Call your API (replace with your real endpoint)
               const response = await fetch("https://styleflip-backend-jdm5.ithemes.xyz/api/image/getByUserId/70011");
               const data = await response.json();
-              console.log("Loaded items:", data);
+              ;
 
               // The uploads grid also restores a separate cache from
               // localStorage['fpd_uploaded_images'] on init (see the Ri class
@@ -20986,7 +20984,7 @@
                 // const container = document.querySelector("#items-container"); // 👈 parent element where items go
                 let container = document.querySelector(".fpd-module-content #extracontainer-data");
                 data.forEach(t => {
-                  console.log("item data of anoop",t);
+                  ;
                   const e = document.createElement("div");
                   e.className = "fpd-item fpd-hover-thumbnail ts mt-1 bg-[#f6f6f6] item-data-click";
                   e.dataset.source = t.image;
@@ -21050,7 +21048,7 @@
                 shareMenu.style.borderRadius = '8px';
                 shareMenu.style.zIndex = '9999';
                 shareMenu.style.marginTop = '-80px';
-                console.log("tttttttttttttttttttttdata",t)
+                ;
                 let title = document.createElement('h4');
                       title.textContent = t.title;
                       title.className = 'font-bold mb-1 text-capitalize text-[1rem]';
@@ -21064,7 +21062,7 @@
                           const minutes = Math.floor(diffMs / (1000 * 60));
                           const hours   = Math.floor(diffMs / (1000 * 60 * 60));
                           const days    = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-                          console.log("past date",seconds,minutes,hours,days);
+                          ;
                           if (seconds < 60) {
                             return `${seconds} sec${seconds !== 1 ? "s" : ""} ago`;
                           }
@@ -21072,7 +21070,7 @@
                             return `${minutes} min${minutes !== 1 ? "s" : ""} ago`;
                           }
                           if (hours < 24) {
-                            console.log("past date",hours);
+                            ;
                             return `${hours} hour${hours !== 1 ? "s" : ""} ago`;
                           }
                           if (days < 30) {
@@ -21081,7 +21079,7 @@
 
                           // older than a month → show full date
                           const options = { day: "numeric", month: "short", year: "numeric" };
-                          console.log("past date",past.toLocaleDateString("en-GB", options));
+                          ;
                           return `on ${past.toLocaleDateString("en-GB", options)}`;
                         }
                       }
@@ -21089,7 +21087,7 @@
                       para.className = 'mt-2';
                       let uploadedAt = t?.createdAt;
                       const timeupload = formatTimeAgo(uploadedAt);
-                      console.log("uploadedAt Time",);
+                      ;
                       para.textContent = `Uploaded by Anoop ${timeupload}`;
 
                 let buttonDonw = document.createElement('button');
@@ -21114,12 +21112,12 @@
                         <span class="fpd-icon-share"></span>
                         Share
                       `;
-                        console.log("anoop singh",e);
+                        ;
                         // 👇 finally append item into container
                         e.append(threeDot);
                         e.append(shareMenu);
                         container.append(e);
-                        console.log(container);
+                        ;
                       });
 
                       // Delete the .fpd-item element
@@ -21127,9 +21125,9 @@
                   e.stopPropagation(); // Prevent triggering the outside click close
                    const itemEl = e.target.closest('.ts'); // Adjust selector if needed
                   const title = itemEl?.getAttribute('data-title');
-                  console.log("item id",itemEl?.getAttribute('data-image-id'))
+                  ;
                   if (!title) {
-                    console.log('Title not found')
+                    ;
                     return;
                   }
 
@@ -21158,7 +21156,7 @@
                   })
                     .then(response => response.json())
                     .then(data => {
-                      console.log('Search API Response:', data);
+                      ;
 
                       // Ensure valid product data
                       if (data && Array.isArray(data.product) && data.product.length > 0) {
@@ -21232,7 +21230,7 @@
                   if (ev.target.closest(".fpd-three-dot-menu")) {
                     
                     const activeElementData = ev.target.closest('.fpd-active');
-                    console.log('Active Element Data:', activeElementData.tagName);
+                    ;
                     ev.stopPropagation();
                     if(activeElementData.tagName === 'FPD-MODULE-SAVE-LOAD'){
                       
@@ -21257,7 +21255,7 @@
                     }
                     else if(activeElementData.tagName === 'DIV'){
                       const parentItem = ev.target.closest('.fpd-item');
-                      console.log("parentItem",parentItem)
+                      ;
                       if (!parentItem) return;
 
                       const dataSource = parentItem.getAttribute('data-source');
@@ -21280,7 +21278,7 @@
                         const para = document.createElement('p');
                         para.className = 'mt-2';
                         const timeupload = formatTimeAgo(uploadedAt);
-                        console.log("uploadedAt Time",);
+                        ;
                         para.textContent = `Uploaded by Anoop ${timeupload}`; // replace with real content if needed
 
                         let buttonDonw = document.createElement('button');
@@ -21304,8 +21302,8 @@
                         buttonDel.addEventListener('click', function (e) {
                           e.stopPropagation(); // Prevent triggering the outside click close
                           if (parentItem) {
-                            console.log("parentItem", parentItem)
-                            console.log("item id",parentItem?.getAttribute('data-image-id'))
+                            ;
+                            ;
                             parentItem.remove();
                             titleInformation.remove();
                             document.body.classList.remove('photo-box-open');
@@ -21322,7 +21320,7 @@
                                   return response.json();
                                 })
                                 .then((data) => {
-                                  console.log("✅ Deleted:", data);
+                                  ;
                                 })
                                 .catch((error) => {
                                   console.error("❌ API Error:", error);
@@ -21335,7 +21333,7 @@
                           e.stopPropagation(); // Prevent triggering the outside click close
 
                           if (dataSource) {
-                            console.log("dataSource", dataSource);
+                            ;
 
                             fetch(dataSource, { mode: 'cors' }) // Add CORS handling if needed
                               .then(response => {
@@ -21398,11 +21396,11 @@
                         }, 10); // ensure it doesn’t trigger immediately
                       }
                     }
-                    console.log("Clicked three dot:", ev.target.closest(".fpd-three-dot-menu"));
+                    ;
                   }
                   else if(ev.target.closest(".download-button")) {
                     if (t.url) {
-                      console.log("dataSource", t.url);
+                      ;
 
                       fetch(t.url, { mode: 'cors' }) // Add CORS handling if needed
                         .then(response => {
@@ -21465,7 +21463,7 @@
           shareMenu.style.borderRadius = '8px';
           shareMenu.style.zIndex = '9999';
           shareMenu.style.marginTop = '-80px';
-          console.log("tttttttttttttttttttttdata",t)
+          ;
           const title = document.createElement('h4');
                 title.textContent = t.title;
                 title.className = 'font-bold mb-1 text-capitalize text-[1rem]';
@@ -21525,7 +21523,7 @@
                   const title = itemEl?.getAttribute('data-title');
 
                   if (!title) {
-                    console.log('Title not found!');
+                    ;
                     return;
                   }
 
@@ -21555,7 +21553,7 @@
                   })
                     .then(response => response.json())
                     .then(data => {
-                      console.log('Search API Response:', data);
+                      ;
 
                       // Ensure valid product data
                       if (data && Array.isArray(data.product) && data.product.length > 0) {
@@ -21607,11 +21605,11 @@
 
                 // Download the image from data-source
                 buttonDonw.addEventListener('click', function (e) {
-                  console.log("eeeeeeeeeee",e,t)
+                  ;
                   e.stopPropagation(); // Prevent triggering the outside click close
 
                   if (t.url) {
-                    console.log("dataSource", t.url);
+                    ;
 
                     fetch(t.url, { mode: 'cors' }) // Add CORS handling if needed
                       .then(response => {
@@ -21662,7 +21660,7 @@
           // Show/hide menu
           threeDot.onclick = function(ev) {
             const activeElementData = ev.target.closest('.fpd-active');
-            console.log('Active Element Data:', activeElementData.tagName);
+            ;
             ev.stopPropagation();
             if(activeElementData.tagName === 'FPD-MODULE-SAVE-LOAD'){
               
@@ -21687,7 +21685,7 @@
             }
             else if(activeElementData.tagName === 'DIV'){
               const parentItem = ev.target.closest('.fpd-item');
-              console.log("parentItem",parentItem)
+              ;
               if (!parentItem) return;
 
               const dataSource = parentItem.getAttribute('data-source');
@@ -21732,7 +21730,7 @@
                 buttonDel.addEventListener('click', function (e) {
                   e.stopPropagation(); // Prevent triggering the outside click close
                   if (parentItem) {
-                    console.log("parentItem", parentItem)
+                    ;
                     parentItem.remove();
                     titleInformation.remove();
                     document.body.classList.remove('photo-box-open');
@@ -21744,7 +21742,7 @@
                   e.stopPropagation(); // Prevent triggering the outside click close
 
                   if (dataSource) {
-                    console.log("dataSource", dataSource);
+                    ;
 
                     fetch(dataSource, { mode: 'cors' }) // Add CORS handling if needed
                       .then(response => {
@@ -22327,7 +22325,7 @@
         vt = new WeakSet()
       class bt {
         constructor (t) {
-          console.log('kkkkkkkkkkkkkkkkk', t)
+          ;
           ut(this, vt),
             ut(this, mt),
             ut(this, gt),
@@ -23797,7 +23795,7 @@
               1 == e.length ? this._onSelected(e[0]) : this._onMultiSelected(e)
             },
             'mouse:down': t => {
-              console.log('mouse down funtion', t, t.target)
+              ;
               if(t.target && t.target.text){
                 document.querySelector('.fpd-ungroup1')?.classList.add('fpd-hidden');
                 document.querySelector('.fpd-ungroup')?.classList.remove('fpd-hidden');
@@ -24415,12 +24413,6 @@
                 const i = t.indexOf(e)
                 if (-1 !== i)
                   return (
-                    console.log(
-                      'Element index ' +
-                        i +
-                        ' from elements removed, its not a valid element object!',
-                      'info'
-                    ),
                     n(),
                     !0
                   )
@@ -25465,13 +25457,13 @@
           // });
           this.fabricCanvas.on({
             'object:added': t => {
-              console.log("t value is in",t)
+              ;
               
               let e = t.target,
                 i = e.price ?? 0;
 
-              console.log('object:added', e, i);
-              console.log('object:added if', this.fabricCanvas);
+              ;
+              ;
               
               if(e && e.text){
                 document.querySelector('.fpd-group-paste-by').classList.add('fpd-hidden');
@@ -25480,7 +25472,7 @@
 
               // If object is an image, scale and center it proportionally
               if (e.type === 'image') {
-                console.log("e.title", e.title,e.width,e.height)
+                ;
                 const stageW = this.fabricCanvas.getWidth();
                 const stageH = this.fabricCanvas.getHeight();
 
@@ -25488,7 +25480,7 @@
                 const scaleH = stageH / e.height;
                 const scale = Math.min(scaleW, scaleH); // proportional scaling
                 // const scale = 0.4;
-                console.log("e.title-1", stageW,stageH,scale)
+                ;
                 e.scale(scale);
                 e.center();
                 e.setCoords();
@@ -25904,11 +25896,7 @@
               s
                 ? ((e = s[n[1]]),
                   void 0 === e &&
-                    (console.log(
-                      'FPD label not found: ' + t.dataset.defaulttext,
-                      n
-                    ),
-                    (e = t.dataset.defaulttext)))
+                    ((e = t.dataset.defaulttext)))
                 : (e = t.dataset.defaulttext)
             }
           } else e = t.dataset.defaulttext
@@ -26013,7 +26001,7 @@
               }
             ),
             this.inputElem.addEventListener('keyup', t => {
-              console.log('jjjjjjjjjjjjjjjjjjjj', t)
+              ;
               if (this.searchable) {
                 const e = t.currentTarget.value
                 this.listElem.querySelectorAll('.fpd-item').forEach(t => {
@@ -27040,7 +27028,21 @@
             let categoryIndex = window.localStorage.getItem('categoryIndex')
             let childIndex = window.localStorage.getItem('childIndex')
 
-            if (productIndex !== null && categoryIndex !== null) {
+            // getCategoryAndProductIndex() (home.component.ts) resolves to
+            // -1/-1/-1 when the current route has no specific product to
+            // restore (e.g. the base designer URL with no manufacturer/slug).
+            // -1 is still a non-null string once round-tripped through
+            // localStorage, so the old `!== null` check let this proceed,
+            // land on categoryItems[-1] (always undefined) and fall through
+            // to the "missing" warning below on every such load - which is
+            // the expected, not an error, case. Skip the whole restore
+            // attempt when there's nothing to restore.
+            if (
+              productIndex !== null &&
+              categoryIndex !== null &&
+              productIndex !== '-1' &&
+              categoryIndex !== '-1'
+            ) {
               //  this.fpdInstance.selectProduct(, );
               // Get the FPD dropdown items
               const categoryItems = document.querySelectorAll(
@@ -27057,7 +27059,7 @@
               ) {
                 const selectedItem = categoryItems[categoryIndex]
                 const categoryText = selectedItem.textContent
-                console.log("hhhhhhhhhhhhhhhhhh",selectedItem, categoryText)
+                ;
                 // 👉 Temporarily hide the dropdown UI
                 const dropdownWrapper = document.querySelector(
                   '.fpd-product-categories'
@@ -27116,7 +27118,7 @@
 
                     if (targetItem) {
                       targetItem.click()
-                      console.log('✅ Clicked on:', targetItem)
+                      ;
                     } else {
                       console.warn('❌ Item not found.')
                     }
@@ -27134,11 +27136,11 @@
 
                 setTimeout(async () => {
           const currentUrl = window.location.href;
-          console.log(currentUrl, 'Current URL');
+          ;
 
           // Only continue if URL includes "savedesign"
           if (!currentUrl.includes("savedesign")) {
-            console.log("URL does not contain 'savedesign'. Skipping image logic.");
+            ;
             return;
           }
 
@@ -27147,7 +27149,7 @@
             const idParam = new URLSearchParams(window.location.search).get("design_id");
 
             if (!titleParam) {
-              console.log("No title provided in URL");
+              ;
               return;
             }
 
@@ -27160,20 +27162,20 @@
               const parsedDesigns = JSON.parse(designTitleData);
               matchedDesign = parsedDesigns.find(i => i.title === encodedTitle);
             }
-            console.log("Fetched data of matchedDesign:", matchedDesign);
+            ;
             const elementsJSON = matchedDesign?.product[0];
             const canvas = t.currentViewInstance && t.currentViewInstance.fabricCanvas;
-            console.log("Canvas instance:", canvas);  
+            ;  
             if (!canvas) {
               console.error("Canvas not available", t);
               return;
             }
-            console.log("Elements JSON:", elementsJSON);
+            ;
             // Clear previous elements
             canvas.clear();
             canvas.loadFromJSON(elementsJSON, () => {
               canvas.renderAll();
-              console.log('Design loaded from object.');
+              ;
             });
             // const base64Image = data?.base64save;
             // if (!base64Image || typeof base64Image !== 'string' || !base64Image.startsWith('data:image')) {
@@ -27224,7 +27226,7 @@
             //   canvas.renderAll && canvas.renderAll();
             // }, { crossOrigin: 'anonymous' });
 
-            console.log("Image added to canvas.");
+            ;
           } catch (error) {
             console.error("Error fetching or rendering image:", error);
           }
@@ -27346,10 +27348,7 @@
                 300,
                 'cover'
               )
-              console.log(
-                'jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjaaa',
-                t.viewInstances[0].fabricCanvas._objects
-              )
+              ;
               t.viewInstances[0].toDataURL(
                 t => {
                   const e = this.fpdInstance.getProduct(),
@@ -27368,8 +27367,7 @@
                   ) {
                     let t = xe(this, we, Se).call(this)
                     t || (t = []),
-                      this.addSavedProduct(i),
-                      console.log('jjjjjjjjjjjjjjjjjjjjjkkk1', i)
+                      this.addSavedProduct(i)
 
                       fetch('https://styleflip-backend-jdm5.ithemes.xyz/api/sharedproduct/save', {
                         method: 'POST',
@@ -27386,17 +27384,17 @@
                       })
                         .then(res => res.json())
                         .then(response => {
-                          console.log('Saved successfully:', response);
+                          ;
                           i._id = response.product._id;
-                          console.log('t data',t)
+                          ;
                           
                         })
                         .catch(err => {
                           console.error('Error saving shared product:', err);
                         });
-                        console.log("data is",  this.fpdInstance.container.id, i)
-                        console.log("i:", i);  // 👈 Check if _id is still here
-console.log("t:", t);
+                        ;
+                        ;  // 👈 Check if _id is still here
+;
                     t.push(i),
                       window.localStorage.setItem(
                         this.fpdInstance.container.id,
@@ -27420,10 +27418,7 @@ console.log("t:", t);
             }),
             this.fpdInstance.mainOptions.saveActionBrowserStorage)
           ) {
-            console.log(
-              'dhhdhdhdhdh',
-              this.fpdInstance.mainOptions.saveActionBrowserStorage
-            )
+            ;
             let t = xe(this, we, Se).call(this)
             t &&
               t.length > 0 &&
@@ -27434,7 +27429,7 @@ console.log("t:", t);
           var i, s
         }
         addSavedProduct (t) {
-          console.log('jjjjjjjjjjjjjjjjjjjjjk', t)
+          ;
           let e = t.thumbnail || t.base64save;
           let { product: i, title: n = '' } = t;
           // let e = 
@@ -27449,14 +27444,13 @@ console.log("t:", t);
             disableDraggable: !0
           })
           return (
-            console.log('jjjjjjjjjjjjjjjjjjjjjkkk', s),
             this.fpdInstance.lazyBackgroundObserver.observe(
               s.querySelector('picture')
             ),
             (s.product = i),
             this.gridElem.append(s),
             G(s, 'click', t => {
-              console.log("first", s.product);
+              ;
               this.fpdInstance.loadProduct(s.product),
                 (this.fpdInstance.currentProductIndex = -1)
             }),
@@ -27625,14 +27619,9 @@ console.log("t:", t);
         }
 
         doAction (e) {
-          console.log("eddddddddddddddddd",e)
+          ;
           if (this.fpdInstance?.currentViewInstance) {
-            console.log(
-              this.fpdInstance,
-              'doAction',
-              e,
-              this.fpdInstance?.currentViewInstance
-            )
+            ;
             if ((this.fpdInstance.deselectElement(), 'print' === e))
               this.fpdInstance.print()
             else if ('reset-product' === e) {
@@ -27651,7 +27640,7 @@ console.log("t:", t);
                 'reset_product'
               )),
                 G(e, ['click'], () => {
-                  console.log("first1",e);
+                  ;
                   localStorage.setItem('groupTransforms', '')
                   document.querySelector('.fpd-ungroup1')?.classList.add('fpd-hidden');
                   document.querySelector('.fpd-ungroup')?.classList.remove('fpd-hidden');
@@ -27679,7 +27668,6 @@ console.log("t:", t);
                 !1),
                 this.fpdInstance.getProductDataURL(e => {
                   const i = new Image()
-                  console.log('i', i)
                   ;(i.src = e),
                     (i.onload = () => {
                       const e = t(
@@ -28075,13 +28063,13 @@ console.log("t:", t);
       }
       customElements.define('fpd-main-bar', Fet)
       // customElements.define("fpd-main-bar-dup", Fet);
-      console.log('fpd-main-bar-first', Fe)
+      ;
       class je extends HTMLElement {
         constructor () {
           super()
         }
         connectedCallback () {
-          console.log('fpd-module-products-first00000000000')
+          ;
           this.innerHTML =
             '<div data-moduleicon="book-copy" data-defaulttext="Products" data-title="Design"><div class="fpd-head"> <div class="fpd-input-back-search input-search-box !shadow-none border border-[#35475a33] border-solid !rounded-[8px] ml-[5px] w-[calc(100% - 22px)]"> <div class="fpd-back fpd-btn !bg-white"> <svg xmlns="http://www.w3.org/2000/svg" class="min-w-[24px] text-black relative top-[-2px]" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M15.2 16.34a7.5 7.5 0 1 1 1.38-1.45l4.2 4.2a1 1 0 1 1-1.42 1.41l-4.16-4.16zm-4.7.16a6 6 0 1 0 0-12 6 6 0 0 0 0 12z"></path></svg> </div> <div class="fpd-input-search"> <input type="text" class="!text-sm placeholder-gray-500 !pl-2" placeholder="Search" id="searchInput" /> <span class="fpd-icon-magnify"></span> </div> </div> </div><div class="icon-box"><i data-lucide="house"></i></div> <fpd-dropdown class="fpd-product-categories rounded-[8px] border border-[#35475a33] border-solid mt-[8px] bg-white p-2 dark:border-gray-800 dark:bg-white/[0.03] md:p-2 mr-[14px] pl-[6px] ml-[5px] w-[calc(100% - 22px)] mb-[5px]" searchable></fpd-dropdown> <div class="fpd-scroll-area"><div class="flex gap-2 ml-[5px] transition-transform duration-300 ease-in-out mb-2" id="data-info"></div> <div class="fpd-grid fpd-grid-contain fpd-padding one-tt ProductModule" id="ProductModule"><div class="searchox bg-white rounded-lg relative flex"><div id="search-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M15.2 16.34a7.5 7.5 0 1 1 1.38-1.45l4.2 4.2a1 1 0 1 1-1.42 1.41l-4.16-4.16zm-4.7.16a6 6 0 1 0 0-12 6 6 0 0 0 0 12z"></path></svg></div><div><input type="text" class="appearance-none bg-inherit border-0 box-border text-inherit font-normal min-w-[8px] outline-none w-full" /></div></div> </div> <div id="ProductModule" class="grid grid-cols-1 md:grid-cols-3 gap-4"></div><button id="backbuttonStoP" class="w-[30px] h-[30px] rounded-full p-[2px]"  style="display:none"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="text-[#0d1216] hover:text-blue-600 transition duration-200 cursor-pointer"><path d="M6.9 10.996h11.596a.75.75 0 0 1 0 1.5H6.9l4.377 4.377a.75.75 0 0 1-1.061 1.06l-4.95-4.95a1.75 1.75 0 0 1 0-2.474l4.95-4.95a.75.75 0 1 1 1.06 1.06L6.9 10.996z" fill="currentColor"></path></svg></button><div id="ProductModule" class="fpd-grid fpd-grid-contain fpd-padding one-tt skins-data ProductModuleMy"></div></div> </div>'
         }
@@ -28091,7 +28079,7 @@ console.log("t:", t);
           super()
         }
         connectedCallback () {
-          console.log('fpd-module-productsnew-first00000000000')
+          ;
           this.innerHTML =
             '<div data-moduleicon="layout-panel-left" data-defaulttext="Designs" data-title="Productsnew"><div class=""> <div class="fpd-head flex items-center"><div id="fpd-reset-button" style="display:none;"><button><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="text-[#0d1216] hover:text-blue-600 transition duration-200 cursor-pointer"><path d="M6.9 10.996h11.596a.75.75 0 0 1 0 1.5H6.9l4.377 4.377a.75.75 0 0 1-1.061 1.06l-4.95-4.95a1.75 1.75 0 0 1 0-2.474l4.95-4.95a.75.75 0 1 1 1.06 1.06L6.9 10.996z" fill="currentColor"></path></svg></button></div> <div id="searchbox-design" class="fpd-input-back-search input-search-box !shadow-none border border-[#35475a33] border-solid !rounded-[8px] ml-[5px] w-[calc(100% - 22px)]"><div class="fpd-back fpd-btn !bg-white"> <svg xmlns="http://www.w3.org/2000/svg" class="min-w-[24px] text-black relative top-[-2px]" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M15.2 16.34a7.5 7.5 0 1 1 1.38-1.45l4.2 4.2a1 1 0 1 1-1.42 1.41l-4.16-4.16zm-4.7.16a6 6 0 1 0 0-12 6 6 0 0 0 0 12z"></path></svg> </div> <div class="fpd-input-search"> <input type="text" id="searchInputs" class="!text-sm placeholder-gray-500 !pl-2" placeholder="Search" /> <span class="fpd-icon-magnify"></span> </div> </div></div> </div><div class="icon-box"><i data-lucide="house"></i></div> <fpd-dropdown class="fpd-product-categories rounded-[8px] border border-[#35475a33] border-solid mt-[8px] bg-white p-2 dark:border-gray-800 dark:bg-white/[0.03] md:p-2 mr-[14px] pl-[6px] ml-[5px] w-[calc(100% - 22px)] mb-[5px]" searchable></fpd-dropdown> <div class="fpd-scroll-area"> <div class="w-full overflow-auto [scrollbar-width:none] scrollbar-hide"><div class="flex gap-2 mt-2 ml-[5px] fixed opacity-0"><div class="border border-[#35475a33] border-solid pt-2 pb-2 pr-3 pl-3 rounded-[6px] text-sm text-[#0d1216] cursor-pointer hover:bg-[#40576d12] flex-none">Foods</div><div class="border border-[#35475a33] border-solid pt-2 pb-2 pr-3 pl-3 text-sm text-[#0d1216] rounded-[6px] cursor-pointer hover:bg-[#40576d12] flex-none">Collage</div><div class="border border-[#35475a33] border-solid pt-2 pb-2 pr-3 pl-3 text-sm text-[#0d1216] rounded-[6px] cursor-pointer hover:bg-[#40576d12] flex-none">Business</div><div class="border border-[#35475a33] border-solid pt-2 pb-2 pr-3 pl-3 text-sm text-[#0d1216] rounded-[6px] cursor-pointer hover:bg-[#40576d12] flex-none">Festival</div><div class="border border-[#35475a33] border-solid pt-2 pb-2 pr-3 pl-3 text-sm text-[#0d1216] rounded-[6px] cursor-pointer hover:bg-[#40576d12] flex-none">Heart</div></div></div><div class="fpd-grid fpd-grid-contain fpd-padding one-ttt mt-[50px]" id="DesignModule"><div class="searchox bg-white rounded-lg relative flex"><div id="search-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M15.2 16.34a7.5 7.5 0 1 1 1.38-1.45l4.2 4.2a1 1 0 1 1-1.42 1.41l-4.16-4.16zm-4.7.16a6 6 0 1 0 0-12 6 6 0 0 0 0 12z"></path></svg></div><div><input type="text" class="appearance-none bg-inherit border-0 box-border text-inherit font-normal min-w-[8px] outline-none w-full" /></div></div> </div> </div> </div>'
         }
@@ -28124,12 +28112,12 @@ console.log("t:", t);
             (i = this),
             (s = 0),
             (n = (function (t) {
-              console.log('jaikant', t)
+              ;
               var e = (function (t, e) {
-                console.log('jaikant t', t, 'jaikant e', e)
+                ;
                 if ('object' != typeof t || null === t) return t
                 var i = t[Symbol.toPrimitive]
-                console.log('jaikant i', i)
+                ;
                 if (void 0 !== i) {
                   var n = i.call(t, 'string')
                   if ('object' != typeof n) return n
@@ -28168,14 +28156,10 @@ console.log("t:", t);
                         (n.innerText = t.category),
                         n.addEventListener('click', t => {
                           localStorage.setItem('valueofTitle', '')
-                          console.log(
-                            'Anoop Data----',
-                            t,
-                            t.currentTarget.dataset.index
-                          )
+                          ;
                           const elementMyData =
                             document.querySelector('.ProductModule') // Replace with your actual ID
-                          console.log('elementMyData', elementMyData)
+                          ;
                           if (elementMyData) {
                             if (elementMyData.style.display === 'none') {
                               elementMyData.style.display = 'grid' // or
@@ -28184,7 +28168,7 @@ console.log("t:", t);
 
                           const elementMyDataMy =
                             document.querySelector('.ProductModuleMy') // Replace with your actual ID
-                          console.log('elementMyDataMy', elementMyDataMy)
+                          ;
                           const backbuttonStoP =
                             document.getElementById('backbuttonStoP')
                           const valueoffpdmoduleproducts =
@@ -28205,7 +28189,7 @@ console.log("t:", t);
                               'valueoffpdmoduleproducts-active'
                             )
                             elementMyDataMy.innerHTML = ''
-                            console.log('targetDiv', elementMyDataMy)
+                            ;
                           }
 
                           localStorage.setItem(
@@ -28213,13 +28197,13 @@ console.log("t:", t);
                             t.currentTarget.dataset.index
                           )
                           var input = document.getElementById('searchInput')
-                          console.log('Seeeeeeeeee')
+                          ;
                           if (input) {
                             input.value = ''
-                            console.log('search input', input)
+                            ;
                           }
                           this.selectCategory(t.currentTarget.dataset.index)
-                          console.log('Selected category index:', t.currentTarget.dataset.index, t.currentTarget.innerText)
+                          ;
                           localStorage.setItem('valueofTitleActiveDatais', t.currentTarget.innerText)
                         }),
                         e.append(n)
@@ -28232,7 +28216,7 @@ console.log("t:", t);
             })
         }
         removeAddBack () {
-          console.log('Remove Add Back')
+          ;
           // alert('Check')
         }
       selectCategory () {
@@ -28247,14 +28231,13 @@ console.log("t:", t);
             const scrollArea = this.container.querySelector('.fpd-scroll-area')
             if (scrollArea) scrollArea.scrollTop = 0
 
-            console.log('Anoop Data old 2', this.fpdInstance.products)
+            ;
             let e
             void 0 !== this.fpdInstance.products[0].category
               ? ((e = this.fpdInstance.products[t].products),
                 (this.container.querySelector('.fpd-dropdown-current').value =
                   this.fpdInstance.products[t].category))
               : (e = this.fpdInstance.products),
-              console.log('Anoop Data 22-1', e),
               e.forEach((t, e) => {
                 Ne(this, ze, Ue).call(this, t, e)
               })
@@ -28271,12 +28254,12 @@ console.log("t:", t);
             (i = this),
             (s = 0),
             (n = (function (t) {
-              console.log('jaikantNew', t)
+              ;
               var e = (function (t, e) {
-                console.log('jaikantNew t', t, 'jaikant e', e)
+                ;
                 if ('object' != typeof t || null === t) return t
                 var i = t[Symbol.toPrimitive]
-                console.log('jaikantNew i', i)
+                ;
                 if (void 0 !== i) {
                   var n = i.call(t, 'string')
                   if ('object' != typeof n) return n
@@ -28302,7 +28285,6 @@ console.log("t:", t);
               const e = this.container.querySelector(
                 '.fpd-dropdown-list > .fpd-scroll-area'
               )
-              console.log('Anoop Data', this.fpdInstance.productsnew)
               ;(e.innerHTML = ''),
                 this.fpdInstance.productsnew &&
                   this.fpdInstance.productsnew.length > 0 &&
@@ -28310,7 +28292,7 @@ console.log("t:", t);
                     this.fpdInstance.productsnew.length > 1 &&
                     (this.container.classList.add('fpd-categories-enabled'),
                     this.fpdInstance.productsnew.forEach((t, i) => {
-                      console.log('Anoop Data for each', t, i)
+                      ;
                       const n = document.createElement('span')
                       ;(n.className = 'fpd-item'),
                         (n.dataset.index = i),
@@ -28331,13 +28313,7 @@ console.log("t:", t);
       selectCategory () {
           let t =
             arguments.length > 0 && void 0 !== arguments[0] ? arguments[0] : 0
-          console.log(
-            'Anoop Data 1',
-            this.fpdInstance.productsnew,
-            'Anoop Data Happy',
-            this.currentCategoryIndex,
-            t
-          )
+          ;
           if (
             ((this.currentCategoryIndex = t),
             (this.container.querySelector('.fpd-grid').innerHTML = ''),
@@ -28348,14 +28324,13 @@ console.log("t:", t);
             const scrollArea = this.container.querySelector('.fpd-scroll-area')
             if (scrollArea) scrollArea.scrollTop = 0
 
-            console.log('Anoop Data 2', this.fpdInstance.productsnew)
+            ;
             let e
             void 0 !== this.fpdInstance.productsnew[0].category
               ? ((e = this.fpdInstance.productsnew[t].products),
                 (this.container.querySelector('.fpd-dropdown-current').value =
                   this.fpdInstance.productsnew[t].category))
               : (e = this.fpdInstance.productsnew),
-              console.log('Anoop Data 22', e),
               e.forEach((t, e) => {
                 Ne(this, ze, Ue).call(this, t, e)
               })
@@ -28387,11 +28362,11 @@ console.log("t:", t);
           i.nextSibling.click()
       }
       function Ue (e, i) {
-        console.log(this.fpdInstance, 'Anoop Data 3-UE', e, i)
+        ;
         localStorage.setItem('UE', false)
         localStorage.setItem('rdatasetindex', 0)
         let typecheck = localStorage.getItem('callModuleItem')
-        console.log('Anoop Data 3-UE typecheck', typecheck)
+        ;
 
         if (typecheck === 'products') {
           const savedSubcategories = JSON.parse(
@@ -28400,12 +28375,7 @@ console.log("t:", t);
           const fpdgroupedcategoriesnumber =
             localStorage.getItem('fpd-grouped-categories-number') || '0'
           const dataInfoElement = document.getElementById('data-info')
-          console.log(
-            'Anoop Data 6',
-            savedSubcategories,
-            dataInfoElement,
-            fpdgroupedcategoriesnumber
-          )
+          ;
           const selectedIndex = fpdgroupedcategoriesnumber
           if (dataInfoElement && savedSubcategories[selectedIndex]) {
             const subcategoriesString =
@@ -28442,33 +28412,28 @@ console.log("t:", t);
 
                   div.classList.add('active');
                   // alert(`You clicked on: ${sub}`)
-                  console.log('Anoop Data 7', e, event, sub)
+                  ;
                   // const filteredData = e.filter(item => item.subcategorytype === sub);
 
                   const productContainer = document.getElementById('ProductModule')
-                  console.log(productContainer, 'Filtered Data:')
+                  ;
 
                   if (productContainer) {
                     const items = productContainer.querySelectorAll('.fpd-item')
-                    console.log('Jaishree Data 8', items)
+                    ;
                     items.forEach(item => {
                       // Always reset visibility
                       item.style.display = 'block'
-                      console.log('Jaishree Data 8-1', item)
+                      ;
                       const subcategoryType =
                         item.getAttribute('data-subcategorytype') || ''
-                      console.log('Jaishree Data 8-2', subcategoryType, sub)
+                      ;
                       // Hide if it doesn't match
                       if (subcategoryType !== sub) {
-                        console.log(
-                          'Jaishree Data 8-3',
-                          item,
-                          'does not match',
-                          sub
-                        )
+                        ;
                         item.style.display = 'none'
                       } else {
-                        console.log('Jaishree Data 8-3', item, 'match', sub)
+                        ;
                         item.style.display = 'flex'
                       }
                     })
@@ -28511,7 +28476,7 @@ console.log("t:", t);
 
               leftArrow.onclick = () => {
                 const tag = flexWrapper.querySelector('div')
-                console.log('tag', tag)
+                ;
                 if (tag) {
                   const scrollAmount = tag.offsetWidth * 2 + 16
                   currentOffset += scrollAmount
@@ -28521,7 +28486,7 @@ console.log("t:", t);
 
               rightArrow.onclick = () => {
                 const tag = flexWrapper.querySelector('div')
-                console.log('tag', tag)
+                ;
                 if (tag) {
                   const scrollAmount = tag.offsetWidth * 2 + 16
                   currentOffset -= scrollAmount
@@ -28548,9 +28513,9 @@ console.log("t:", t);
           }
         }
 
-        console.log('ttttttttttttttttttttttttt', t)
-        console.log('daaaaaaaaaaaaaaaaaajjj',e)
-        console.log('daaaaaaaaaaaaaaaaaa',e[0])
+        ;
+        ;
+        ;
         localStorage.setItem('definet', t)
         let n = e[0].productThumbnail ? e[0].productThumbnail : e[0].thumbnail,
           s = e[0].productTitle ? e[0].productTitle : e[0].title,
@@ -28626,9 +28591,9 @@ console.log("t:", t);
 
         // Toggle popup on dot click
         dotMenu.addEventListener('click', event => {
-          console.log('Dot menu clicked', event)
+          ;
           const parent = event.currentTarget.closest('.fpd-active')
-          console.log('Parent Element:', parent)
+          ;
           event.stopPropagation()
           localStorage.setItem('fpdMenuClicked', 'true')
           popup.classList.toggle('visible')
@@ -28661,8 +28626,8 @@ console.log("t:", t);
           // instead of this product's face listing.
           localStorage.setItem('valueofTitle', '');
           localStorage.setItem('clickedTitleProdcutInside', '');
-          console.log('check for fpdInstance', this.fpdInstance)
-          console.log('check for Updtes', this.fpdInstance.selectProduct)
+          ;
+          ;
           // This handler only ever fires for tiles inside the Products-tab
           // grid (#ProductModule), so this must always resolve to
           // 'ProductModule'. It used to be derived from
@@ -28677,7 +28642,7 @@ console.log("t:", t);
           localStorage.setItem('clickedTitleProdcutInside', clickedTitle);
           localStorage.setItem('parentDivId', parentDivId)
 
-          console.log('Anoop Data 4-ue', e, i)
+          ;
 
           const elementMyData = document.querySelector('.ProductModule') // Replace with your actual ID
           const backbuttonStoP = document.getElementById('backbuttonStoP')
@@ -28685,7 +28650,7 @@ console.log("t:", t);
           const valueoffpdmoduleproducts = document.querySelector(
             'fpd-module-products'
           )
-          console.log('valueoffpdmoduleproducts', valueoffpdmoduleproducts)
+          ;
           if (elementMyData) {
             if (elementMyData.style.display === 'none') {
               elementMyData.style.display = 'grid' // or "block" depending on your layout
@@ -28696,7 +28661,7 @@ console.log("t:", t);
               // whole visible flat products grid and revealing an empty
               // sub-grid synchronously, right before the replace-confirmation
               // popup opened - that's what looked like the list "reloading".
-              console.log('jaikant')
+              ;
               elementMyData.style.display = 'none'
               elementMyDataMy.style.display = 'grid' // or "block" depending on your layout
               backbuttonStoP.style.display = 'block'
@@ -28737,13 +28702,13 @@ console.log("t:", t);
             G(eBtn, ['click'], () => {
               if (eBtn.disabled) return
               eBtn.disabled = true
-              console.log('Anoop Data 5', eBtn, i)
-              console.log(i, this.currentCategoryIndex, 'cucxuusid')
+              ;
+              ;
               this.fpdInstance.selectProduct(i, this.currentCategoryIndex)
               n.remove()
             })
           } else {
-            console.log('99999999', t)
+            ;
             const modal = t(
               this.fpdInstance.translator.getTranslation(
                 'modules',
@@ -28764,13 +28729,9 @@ console.log("t:", t);
               if (confirmBtn.disabled) return
               confirmBtn.disabled = true
               modal.remove()
-              console.log('Anoop Data 5-1')
+              ;
               localStorage.setItem('UE', true)
-              console.log(
-                'target.dataset.index',
-                target.dataset.index,
-                this.currentCategoryIndex
-              )
+              ;
               this.fpdInstance.selectProduct(
                 Number(target.dataset.index),
                 this.currentCategoryIndex
@@ -28802,10 +28763,6 @@ console.log("t:", t);
             (this.fpdInstance = t),
             (this.container = document.createElement('fpd-module-text')),
             e.append(this.container),
-            console.log(
-              'fpd-module-text-first',
-              this.container.querySelector('.fpd-btn')
-            ),
             this.container
               .querySelector('.fpd-btn-add-text')
               .addEventListener('click', e => {
@@ -28944,14 +28901,14 @@ console.log("t:", t);
               tempDiv.innerHTML = savedContent
 
               const categoryBlocks = tempDiv.querySelectorAll('.fpd-category')
-              console.log('Anoop Data 8--1--1', categoryBlocks)
+              ;
 
               // ✅ Add this before `categoryBlocks.forEach(...)`
               const allTagsSet = new Set()
 
               // Gather all unique tags from all products
               document.querySelectorAll('.fpd-producttext').forEach(product => {
-                console.log('products-------92929', product)
+                ;
                 const tags = product
                   .getAttribute('data-tags')
                   ?.split(',')
@@ -29098,11 +29055,11 @@ console.log("t:", t);
                     .querySelectorAll('.fpd-tag-btn')
                     .forEach(btn => btn.classList.remove('!bg-[#40576d12]'))
                   tagButton.classList.add('!bg-[#40576d12]')
-                  console.log('selectTag', selectedTag)
+                  ;
                   document
                     .querySelectorAll('.fpd-item.fpd-itemimg')
                     .forEach(productEl => {
-                      console.log('tags', productEl)
+                      ;
                       const tags = productEl.getAttribute('data-tags') || ''
                       productEl.style.display = tags.includes(selectedTag)
                         ? 'block'
@@ -29136,8 +29093,8 @@ console.log("t:", t);
               function updateArrows () {
                 const wrapperWidth = targetContainermain.offsetWidth
                 const contentWidth = tagContainerText.scrollWidth
-                console.log('wrapperWidth', wrapperWidth)
-                console.log('contentWidth', contentWidth) 
+                ;
+                ; 
                 // Prevent scrolling beyond bounds
                 if (currentOffset > 0) currentOffset = 0
                 if (Math.abs(currentOffset) >= contentWidth - wrapperWidth) {
@@ -29156,7 +29113,7 @@ console.log("t:", t);
               // Scroll left
               leftArrow.onclick = () => {
                 const tag = tagContainerText.querySelector('button')
-                console.log('tag', tag)
+                ;
                 if (tag) {
                   const scrollAmount = tag.offsetWidth * 2 + 16
                   currentOffset += scrollAmount
@@ -29167,7 +29124,7 @@ console.log("t:", t);
               // Scroll right
               rightArrow.onclick = () => {
                 const tag = tagContainerText.querySelector('button')
-                console.log(tagContainerText, 'tag', tag)
+                ;
                 if (tag) {
                   const scrollAmount = tag.offsetWidth * 2 + 16
                   currentOffset -= scrollAmount
@@ -29177,7 +29134,7 @@ console.log("t:", t);
               
 
               searchInput.addEventListener('input', () => {
-                console.log('enter happen')
+                ;
                 const query = searchInput.value.toLowerCase()
                 document.querySelectorAll('.fpd-itemimg').forEach(el => {
                   const title =
@@ -29283,7 +29240,7 @@ console.log("t:", t);
                       e.stopPropagation();
                       e.preventDefault();
                       const parentActive = dotBtn.closest('.fpd-module-content');
-                      console.log('Parent Active Element:', parentActive);
+                      ;
                       if (parentActive) {
                         parentActive.classList.add('backdrop-test');
                       }
@@ -29491,15 +29448,15 @@ console.log("t:", t);
                           fabricCanvas.add(group)
                           fabricCanvas.setActiveObject(group)
                           fabricCanvas.requestRenderAll()
-                          console.log("fffffff", this.fpdInstance)
+                          ;
                           const elements = this.fpdInstance.getElements(this.fpdInstance.currentViewIndex, 'all', false)
-                          console.log("All elements in current view:", elements);
+                          ;
 
                           // loop through and check
                           elements.forEach(el => {
-                            console.log("Element:", el.title, el.fpdType, el, el._objects);
+                            ;
                             if(el._objects){
-                              console.log("el._objects",el._objects.length)
+                              ;
                               // Find the layers list container
                               const layersList = document.querySelector('fpd-module-manage-layers .fpd-list');
 
@@ -29543,7 +29500,7 @@ console.log("t:", t);
                                     // Remove the row from the panel
                                     newRow.remove();
 
-                                    console.log(`Removed element & row for: ${el.title}`);
+                                    ;
                                   });
                                 }
                                 // 🔹 Lock button
@@ -29553,10 +29510,10 @@ console.log("t:", t);
                                     el.selectable = !el.selectable; // toggle lock
                                     if (el.selectable) {
                                       lockBtn.innerHTML = `<span class="fpd-icon-unlocked"></span>`;
-                                      console.log(`${el.title} unlocked`);
+                                      ;
                                     } else {
                                       lockBtn.innerHTML = `<span class="fpd-icon-locked"></span>`;
-                                      console.log(`${el.title} locked`);
+                                      ;
                                     }
                                     canvas.requestRenderAll();
                                   });
@@ -29568,26 +29525,26 @@ console.log("t:", t);
                                     el.visible = !el.visible; // toggle visibility
                                     if (el.visible) {
                                       visibleBtn.innerHTML = `<span class="fa-solid fa-eye"></span>`;
-                                      console.log(`${el.title} is visible`);
+                                      ;
                                     } else {
                                       visibleBtn.innerHTML = `<span class="fa-solid fa-eye-slash"></span>`;
-                                      console.log(`${el.title} is hidden`);
+                                      ;
                                     }
                                     canvas.requestRenderAll();
                                   });
                                 }
 
-                                console.log("Custom row added to layers panel ✅");
+                                ;
                               } else {
                                 console.warn("Layers list not found in DOM ❌");
                               }
 
                             }
                             if (el.title === "Base") {
-                              console.log("This is the Base element", el);
+                              ;
                             }
                           });
-                          console.log("djjjjjjjjj", this.fpdInstance.modules)
+                          ;
                           
                         //  this.fpdInstance.currentViewInstance.fabricCanvas.fire('elementAdd', { element: group });
 
@@ -29734,12 +29691,11 @@ console.log("t:", t);
             e.append(this.container),
             i && (this.container.dataset.dynamicDesignsId = i),
             (this.headElem = this.container.querySelector('.fpd-head')),
-            (this.gridElem = this.container.querySelector('.fpd-grid')),
-            console.log('jddddddddddddddddddddd', this)
+            (this.gridElem = this.container.querySelector('.fpd-grid'))
           this.headElem
             .querySelector('.fpd-input-search input')
             .addEventListener('keyup', t => {
-              console.log('ennnnnnnnnnnn')
+              ;
               const input = t.currentTarget
               const items = this.gridElem.querySelectorAll('.fpd-item')
               const categories = this.gridElem.querySelectorAll('.fpd-category')
@@ -29781,7 +29737,7 @@ console.log("t:", t);
             })
           let n = !1
           G(t, ['designsSet'], e => {
-            console.log('designsSet', e)
+            ;
             if (n) return
             n = !0
             const i = t.designs
@@ -29911,14 +29867,14 @@ console.log("t:", t);
                 els.style.setProperty('opacity', '1')
               }
               els.addEventListener('click', () => {
-                console.log('Element clicked:', els)
+                ;
               })
             }
             document.querySelectorAll('.my-tag-element').forEach(tag => {
               tag.classList.remove('!bg-[#40576d12]')
             })
             tagDiv.classList.add('!bg-[#40576d12]')
-            console.log('cccjdjjdj jd dj')
+            ;
             const matchedDesigns = []
 
             this.fpdInstance.designs.forEach(group => {
@@ -29931,9 +29887,9 @@ console.log("t:", t);
               }
             })
 
-            console.log('Tag clicked:', tag)
-            console.log('Matched designs:', matchedDesigns)
-            console.log('Tag clicked:', tag, this.fpdInstance.designs)
+            ;
+            ;
+            ;
 
             document
               .querySelectorAll('.fpd-category.fpd-item-group')
@@ -29950,7 +29906,7 @@ console.log("t:", t);
 
             const maindiv = document.createElement('div')
             maindiv.className = 'flex flex-wrap'
-            console.log('maindivfirst.innerHTML', maindivfirst.innerHTML)
+            ;
 
             maindivfirst.innerHTML = ''
             matchedDesigns.forEach(design => {
@@ -29977,28 +29933,21 @@ console.log("t:", t);
               div.appendChild(picture)
 
               div.addEventListener('click', event => {
-                console.log('Element clicked 1:', event)
+                ;
                 const current = event.currentTarget
-                console.log('current', current, 'event', event)
+                ;
                 const i = Array.from(
                   this.gridElem.querySelectorAll('.fpd-item')
                 ).indexOf(current)
                 const n = Ke(this, si)[i]
 
                 if (current.classList.contains('image-element')) {
-                  console.log('current', current.dataset)
+                  ;
                   const dataSource = current.dataset.source
                   const dataTitle = current.dataset.title
                   const parameters = current.parameters || {}
 
-                  console.log(
-                    'parameters',
-                    parameters,
-                    'this.fpdInstance',
-                    this.fpdInstance,
-                    'parameter',
-                    e
-                  )
+                  ;
                   this.fpdInstance.addCanvasDesign(
                     dataSource,
                     dataTitle,
@@ -30041,7 +29990,7 @@ console.log("t:", t);
             els.addEventListener('click', () => {
               els.style.setProperty('opacity', '0')
               els.classList.add('fpd-hidden')
-              console.log('Element clicked:', els)
+              ;
               document.querySelectorAll('.main-div-first').forEach(divss => {
                 divss.remove()
               })
@@ -30085,7 +30034,7 @@ console.log("t:", t);
         function updateArrows () {
           const wrapperWidth = container.offsetWidth
           const contentWidth = flexWrapper.scrollWidth
-          console.log('wrapperWidth1', container, 'contentWidth1', flexWrapper)
+          ;
           // Prevent scrolling beyond bounds
           if (currentOffset > 0) currentOffset = 0
           if (Math.abs(currentOffset) >= contentWidth - wrapperWidth) {
@@ -30104,7 +30053,7 @@ console.log("t:", t);
         // Scroll left
         leftArrow.onclick = () => {
           const tag = flexWrapper.querySelector('div')
-          console.log('leftArrow clicked', tag)
+          ;
           if (tag) {
             const scrollAmount = tag.offsetWidth * 2 + 16
             currentOffset += scrollAmount
@@ -30115,7 +30064,7 @@ console.log("t:", t);
         // Scroll right
         rightArrow.onclick = () => {
           const tag = flexWrapper.querySelector('div')
-          console.log('right clicked', tag)
+          ;
           if (tag) {
             const scrollAmount = tag.offsetWidth * 2 + 16
             currentOffset -= scrollAmount
@@ -30316,7 +30265,7 @@ console.log("t:", t);
           // Toggle visibility and close others
           dots.addEventListener('click', e => {
             e.stopPropagation()
-            console.log('event', e)
+            ;
             // Close all other tooltips
             allTooltips.forEach(tip => {
               if (tip !== tooltip) {
@@ -30324,10 +30273,10 @@ console.log("t:", t);
               }
             })
             const parent = e.currentTarget.closest('.fpd-active')
-            console.log('parentContaines', parent)
+            ;
             if (parent) {
               parent.classList.toggle('backdrop-test')
-              console.log('hdhdh')
+              ;
               localStorage.setItem('fpdMenuClicked', 'true')
             }
 
@@ -30354,28 +30303,21 @@ console.log("t:", t);
           div.addEventListener('click', event => {
             // document.querySelector('fpd-element-toolbar')?.classList.add('fpd-show');
             // document.querySelector('.fpd-ungroup1')?.classList.add('fpd-hidden');
-            console.log('Element clicked 2:', event)
+            ;
             const current = event.currentTarget
-            console.log('current', current, 'event', event)
+            ;
             const i = Array.from(
               this.gridElem.querySelectorAll('.fpd-item')
             ).indexOf(current)
             const n = Ke(this, si)[i]
 
             if (current.classList.contains('image-element')) {
-              console.log('current', current.dataset)
+              ;
               const dataSource = current.dataset.source
               const dataTitle = current.dataset.title
               const parameters = current.parameters || {}
 
-              console.log(
-                'parameters',
-                parameters,
-                'this.fpdInstance',
-                this.fpdInstance,
-                'parameter',
-                e
-              )
+              ;
               this.fpdInstance.addCanvasDesign(
                 dataSource,
                 dataTitle,
@@ -30420,13 +30362,13 @@ console.log("t:", t);
               // CASE 1: t has subcategories (Humans)
               if (t.category && Array.isArray(t.category)) {
                 this.gridElem.innerHTML = ''
-                console.log('this.allCategories', this.gridElem)
+                ;
                 // Add back button
                 const backBtn = document.createElement('button')
                 backBtn.innerText = '← Back'
                 backBtn.className = 'block mb-3 ml-auto text-blue-600 underline'
                 backBtn.addEventListener('click', () => {
-                  console.log('this.gridElem', this.gridElem, 'Japp')
+                  ;
                   this.gridElem.innerHTML = ''
                   //   this.allCategories.forEach((cat) => this.gridElem.appendChild(cat));
                   const seenTitles = new Set()
@@ -30440,7 +30382,7 @@ console.log("t:", t);
                   uniqueCategories.forEach(cat =>
                     this.gridElem.appendChild(cat)
                   )
-                  console.log('uniqueCategories', uniqueCategories)
+                  ;
                 })
                 this.gridElem.appendChild(backBtn)
 
@@ -30504,7 +30446,7 @@ console.log("t:", t);
                       backBtn.className =
                         'block mb-3 ml-auto text-blue-600 underline'
                       backBtn.addEventListener('click', () => {
-                        console.log('2 back btn')
+                        ;
                         this.gridElem.innerHTML = ''
                         //   this.allCategories.forEach((cat) => this.gridElem.appendChild(cat));
                         const seenTitles = new Set()
@@ -30520,7 +30462,7 @@ console.log("t:", t);
                         uniqueCategories.forEach(cat =>
                           this.gridElem.appendChild(cat)
                         )
-                        console.log('uniqueCategories', uniqueCategories)
+                        ;
                         // Re-render all subcategories under the parent category (Humans)
                         //   toggleBtn.click(); // simulate original "See All" to return to subcategory preview
                       })
@@ -30658,7 +30600,7 @@ console.log("t:", t);
           (i.parameters = t.parameters),
           i.addEventListener('click', t => {
             const e = t.currentTarget
-            console.log('e.parameters', e.parameters)
+            ;
             this.fpdInstance.addCanvasDesign(
               e.dataset.source,
               e.dataset.title,
@@ -30913,7 +30855,7 @@ console.log("t:", t);
 
             // Prevent duplicate bars
             if (!a.querySelector('.fpd-loading-bar')) {
-              console.log("coming there1111111111111", a)
+              ;
               a.classList.add('fpd-loading');
 
               // Create the loading bar and progress manually for more control
@@ -30927,7 +30869,7 @@ console.log("t:", t);
 
               loadingBar.appendChild(progress);
               a.appendChild(loadingBar);
-              console.log("coming there11111111111112",a)
+              ;
               // Trigger transition
               requestAnimationFrame(() => {
                 progress.style.width = '100%';
@@ -30935,27 +30877,27 @@ console.log("t:", t);
 
               // Remove after 10 seconds
               setTimeout(() => {
-                console.log("coming there1111111111111")
+                ;
                 a.classList.remove('fpd-loading');
                 loadingBar.remove();
               }, 10000);
             }
           } else {
-            console.log("coming to else of loading ");
+            ;
             var l;
             a.classList.remove('fpd-loading');
 
             const loadingBar = a.querySelector('.fpd-loading-bar');
             if (loadingBar) loadingBar.remove();
 
-            console.log('r', r, 't.name', t.name, 'a', a);
+            ;
             xi(this, Li, Ui).call(this, s, t.name);
             xi(this, Fi, Gi).call(this, a, e);
             Ci(this, Ei, ((l = wi(this, Ei)), ++l));
           }
 
           const o = new Image()
-          console.log('sssssssssssssssssssssssss0', o)
+          ;
           // if(o){
           //   const loadingBar = document.querySelector('.fpd-loading-bar');
           //   if (loadingBar) {
@@ -30987,7 +30929,7 @@ console.log("t:", t);
                   const stillLoading = fpdItem.classList.contains('fpd-loading');
 
                   if (!stillLoading) {
-                    console.log('✅ .fpd-loading removed from .fpd-item.fpd-hover-thumbnail.ts');
+                    ;
 
                     // Remove loading bar
                     const loadingBar = fpdItem.querySelector('.fpd-loading-bar');
@@ -31009,7 +30951,7 @@ console.log("t:", t);
             const s = i.currentTarget
             let r = s.height,
               o = s.width
-            console.log('tttttttttttttttttttt1r', r)
+            ;
             if (et(this.fpdInstance, o, r))
               if (FancyProductDesigner.uploadsToServer) {
                 const i = new FormData()
@@ -31021,16 +30963,15 @@ console.log("t:", t);
                 i.append('userId', 70011)
                 i.append('title', t.name)
                 const s = new XMLHttpRequest()
-                console.log('tttttttttttttttttttt1s', s)
                 ;(s.responseType = 'json'),
                   (s.onreadystatechange = t => {
-                    console.log('tttttttttttttttttttt', t)
+                    ;
                     if (s.readyState === XMLHttpRequest.DONE) {
                       const t = s.status
-                      console.log('tttttttttttttttttttt1', t)
+                      ;
                       if (0 === t || (t >= 200 && t < 400)) {
                         const t = s.response
-                        console.log('tttttttttttttttttttt2', t, a)
+                        ;
                         a.classList.remove('fpd-loading')
                         var i
                         t.image_src &&
@@ -31046,7 +30987,7 @@ console.log("t:", t);
                     }
                   }),
                   (s.upload.onprogress = t => {
-                    console.log('tttttttttt', t)
+                    ;
                     let e = t.total,
                       i = t.loaded,
                       n = parseInt((100 * i) / e)
@@ -31070,7 +31011,7 @@ console.log("t:", t);
                   Ci(this, Ei, ((l = wi(this, Ei)), ++l))
               }
             else {
-              console.log('success', a)
+              ;
               a.classList.remove('fpd-loading')
               a.remove(),
                 (this.fpdInstance.currentViewInstance.currentUploadZone = null)
@@ -31161,7 +31102,7 @@ console.log("t:", t);
               )
           }),
           G(i.querySelector('.fa-trash'), 'click', t => {
-            console.log('delete image', i,'jjjjjjjjj',t)
+            ;
             t.stopPropagation(), t.preventDefault()
             const e = Array.from(this.gridElem.children).indexOf(i)
             i.remove()
@@ -31315,13 +31256,13 @@ console.log("t:", t);
           document.body.appendChild(t)
       }
       function nn (t) {
-        console.log('ddddddddddddddddddddd', t)
+        ;
         'connected' === t.status &&
           (X(this.container, ['fpd-facebook-logged-in']),
           FB.api('/me/albums?fields=name,count,id', t => {
-            console.log('ddddddddddddddddddddd----1', t)
+            ;
             const e = t.data
-            console.log('ddddddddddddddddddddd----', e)
+            ;
             e &&
               e.forEach(t => {
                 const e = document.createElement('span')
@@ -31646,7 +31587,7 @@ console.log("t:", t);
             Vt({
               url: s,
               onSuccess: t => {
-                console.log('ttttttttttttttttttttttt', t)
+                ;
                 X(this.loader, ['fpd-hidden']),
                   t.hits.length > 0 &&
                     t.hits.forEach(t => {
@@ -31657,24 +31598,16 @@ console.log("t:", t);
                         price: tt(this.fpdInstance, this.container)
                       })
 
-                      console.log('ttttttttttttttttttttttt1', e)
+                      ;
                       G(e, ['click'], t => {
-                        console.log(
-                          e,
-                          'image click on load',
-                          t,
-                          '99',
-                          this.fpdInstance,
-                          this.fpdInstance.currentViewInstance
-                        )
+                        ;
                         this.fpdInstance.addCanvasDesign(
                           t.srcElement.dataset.source,
                           t.srcElement.dataset.title
                         )
                         this.fpdInstance.loadingCustomImage ||
                           this.fpdInstance._addGridItemToCanvas(t.currentTarget)
-                      }),
-                        console.log('image click on load --', e)
+                      })
                       this.gridElem.append(e),
                         this.fpdInstance.lazyBackgroundObserver.observe(
                           e.querySelector('picture')
@@ -31683,7 +31616,7 @@ console.log("t:", t);
                   (this.loadingStack = !1)
               },
               onError: t => {
-                console.log('ttttttttttt', t)
+                ;
                 X(this.loader, ['fpd-hidden'])
               }
             })
@@ -31764,13 +31697,12 @@ console.log("t:", t);
                     })(t, Sn(t, e, 'get'))
                   })(this, Tn) ||
                   (Cn(this, Tn, !0),
-                  console.log('jjjjjjjjjjjjjjjjjjjjjj', i),
                   i.classList.add('fpd-loading'),
                   Ut({
                     url: t.mainOptions.aiService.serverURL,
                     body: { service: 'text2Img', prompt: this.inputElem.value },
                     onSuccess: e => {
-                      console.log('ddddddddddddddddddddddd', e)
+                      ;
                       e && e.images
                         ? (wn(this, An, kn).call(this, e.images),
                           e.images.forEach(t => {
@@ -31964,7 +31896,7 @@ console.log("t:", t);
                     s.setColor(t.sRGBHex)
                   })
                   .catch(t => {
-                    console.log(t)
+                    ;
                   })
               })
           }
@@ -32861,7 +32793,7 @@ console.log("t:", t);
                   'Sure?'
                 )),
                   G(s, 'click', () => {
-                    console.log('Anoop Data 5-2', e, i)
+                    ;
                     vs(this, ws, 0),
                       vs(this, Cs, e.elements.length),
                       (this.fpdInstance.globalCustomElements = []),
@@ -33162,7 +33094,7 @@ console.log("t:", t);
       window.FPDNamesNumbersModule = Ns
       class qs extends EventTarget {
         constructor (t, e, i) {
-          console.log('jjjjjjjjjjjjjjjjjjjjs', i)
+          ;
           
           let n
           if ((super(), 'products' === i)) n = new We(t, e)
@@ -33354,7 +33286,7 @@ console.log("t:", t);
             Qs(this, 'currentModules', []),
             (this.fpdInstance = t)
           const e = t.container
-          console.log('constructor', e)
+          ;
           if (
             ((this.container = document.createElement('fpd-main-bar')),
             t.mainOptions.mainBarContainer && !t.mainOptions.modalMode)
@@ -33451,14 +33383,14 @@ console.log("t:", t);
               this.fpdInstance.translator.translateArea($s(this, nr))
         }
         callModule (t) {
-          console.log('Call Module', t)
+          ;
           localStorage.setItem('fpdMenuClicked', 'false')
           let e,
             i =
               arguments.length > 1 && void 0 !== arguments[1]
                 ? arguments[1]
                 : null
-          console.log('eeeeeeeeeeee', e)
+          ;
           if (
             (Z(this.navElem.querySelectorAll('.fpd-nav-item'), ['fpd-active']),
             Z(Array.from(this.contentElem.children), ['fpd-active']),
@@ -33477,7 +33409,7 @@ console.log("t:", t);
                 ['fpd-active']
               )
           else {
-            console.log('Call Module else', t)
+            ;
             localStorage.setItem('callModuleItem', t)
             e = X(
               this.navElem.querySelector(
@@ -33485,7 +33417,7 @@ console.log("t:", t);
               ),
               ['fpd-active']
             )
-            console.log('Designer products else t', t)
+            ;
             const i = this.contentElem.querySelector('fpd-module-' + t)
             X(i, ['fpd-active']),
               'text' == t && i.querySelector('textarea').focus()
@@ -33497,7 +33429,7 @@ console.log("t:", t);
             )
         }
         callSecondary (t) {
-          console.log('Designer products else')
+          ;
           Z(this.navElem.querySelectorAll('.fpd-nav-item'), ['fpd-active']),
             X(this.secContent.querySelector('.fpd-' + t), ['fpd-active']),
             X(
@@ -33519,7 +33451,7 @@ console.log("t:", t);
           )
         }
         toggleContentDisplay () {
-          console.log('Designer products toglle')
+          ;
           let t =
             !(arguments.length > 0 && void 0 !== arguments[0]) || arguments[0]
           Z(
@@ -33563,7 +33495,7 @@ console.log("t:", t);
         }
         updateContentWrapper () {
           const t = this.fpdInstance.container
-          console.log('Update Content Wrapper', t)
+          ;
           localStorage.setItem('UE', false)
 
           this.toggleContentDisplay(!1),
@@ -33632,14 +33564,14 @@ console.log("t:", t);
         setup () {
           let t =
             arguments.length > 0 && void 0 !== arguments[0] ? arguments[0] : []
-          console.log('Designer products 0-t', t)
+          ;
           this.currentModules = []
           let e = this.fpdInstance.mainOptions.initialActiveModule
             ? this.fpdInstance.mainOptions.initialActiveModule
             : ''
-          console.log('Designer products 0-e', e)
+          ;
           const i = this.container.querySelector('.fpd-navigation')
-          console.log('Designer products 0', i)
+          ;
           0 != t.length || this.fpdInstance.mainOptions.editorMode
             ? 1 != t.length ||
               this.fpdInstance.container.classList.contains('fpd-topbar') ||
@@ -33657,26 +33589,22 @@ console.log("t:", t);
                 t.push(e)
               }),
             t.forEach(t => {
-              console.log('000000000000000000', t)
+              ;
               /* if(t == "productsnew"){
                                 console.log(this.contentElem, "000000000000000000---->if",t, this.fpdInstance)
                                 t = "products";
                                 console.log(this.contentElem, "000000000000000000---->if1",t, this.fpdInstance)
                             } */
               let e = ''
-              console.log(
-                this.fpdInstance.currentViewInstance,
-                'FpD instance-----9w999',
-                this.fpdInstance
-              )
+              ;
 
-              console.log('Content Elem', this.contentElem)
+              ;
               const n = new qs(this.fpdInstance, this.contentElem, t)
 
-              console.log('111111111111111', n, t)
+              ;
               if (!n.moduleInstance || !n.configs) return
               this.currentModules.push(t)
-              console.log('222222222222222t', t)
+              ;
               const s = document.createElement('div')
               s.classList.add('fpd-nav-item'),
                 (s.dataset.module = t),
@@ -33690,14 +33618,14 @@ console.log("t:", t);
                       url: n.configs.icon,
                       onSuccess: t => {
                         r.innerHTML = t
-                        console.log('aaaaaaaaaaaaat', t)
+                        ;
                       },
                       onError: t => {
-                        console.log('eeeeeeeeeeeet', t)
+                        ;
                       }
                     }),
                     fetch(a.url).then(t => {
-                      console.log('tttttttt', t)
+                      ;
                       t.ok
                         ? t.text().then(t => {
                             a.onSuccess && a.onSuccess(t)
@@ -33708,12 +33636,10 @@ console.log("t:", t);
                     }))
                   : r.setAttribute('data-lucide', n.configs.icon),
                 s.append(r),
-                console.log('anoop'),
-                console.log('s', s),
                 n.configs.langKeys)
               ) {
                 const t = n.configs.langKeys
-                console.log('hhhhhhhhhhhhhhhh', t)
+                ;
                 e = this.fpdInstance.translator.getTranslation(
                   t[0],
                   t[1],
@@ -33744,7 +33670,7 @@ console.log("t:", t);
                   s.setAttribute(t, e)
             })
           const n = i.querySelector(`[data-module="${e}"]`)
-          console.log('Designer products 1', n)
+          ;
           if (
             (!this.contentClosable && n && n.click(),
             (this.uploadZoneContent = this.secContent.querySelector(
@@ -33876,7 +33802,7 @@ console.log("t:", t);
       function Sr () {
         const t = this.fpdInstance.currentViewInstance,
           e = t.options.customAdds
-        console.log('Anoop Data 4', t, e)
+        ;
         J(
           document.querySelectorAll(
             '.fpd-nav-item[data-module^="designs"], fpd-module-designs'
@@ -34567,10 +34493,10 @@ console.log("t:", t);
                 this.fpdInstance.viewsNav.doPricing(i)
             }
             G(s.querySelector('picture'), 'click', e => {
-              console.log('ffffffffffffff', t)
-              console.log('ffffffffffffff', e)
-              console.log('ffffffffffffffsssss', s)
-              console.log('this.gridElem', this.gridElem)
+              ;
+              ;
+              ;
+              ;
               const i = Array.from(
                 this.gridElem.querySelectorAll('.fpd-item')
               ).indexOf(s)
@@ -34607,7 +34533,7 @@ console.log("t:", t);
         const i = lt(Number(t), this.fpdInstance.viewsNav.unitFormat),
           n = lt(Number(e), this.fpdInstance.viewsNav.unitFormat)
         let s = this.fpdInstance.viewsNav.calcPageOptions(i, n)
-        console.log('coming here')
+        ;
         this.fpdInstance.addView({
           title: t + 'x' + e,
           thumbnail: '',
@@ -34930,7 +34856,7 @@ console.log("t:", t);
                 'keyup',
                 t => {
                   const i = t.currentTarget.value
-                  console.log(i, 'keyup', t)
+                  ;
                   e.querySelectorAll('.fpd-item').forEach(t => {
                     0 == i.length
                       ? t.classList.remove('fpd-hidden')
@@ -34987,7 +34913,7 @@ console.log("t:", t);
               'smart' == this.currentPlacement && this.toggle(!1)
             }),
             G(t, 'elementModify', t => {
-              console.log("jjjjjjjjjjjjjjjjjjjjj", t)
+              ;
               const elementtypedata = t.currentTarget.currentViewInstance.fabricCanvas.getActiveObject();
               if (elementtypedata) {
                 let updated = false;
@@ -35005,14 +34931,14 @@ console.log("t:", t);
                 }
 
                 if (updated) {
-                  console.log("updated",updated)
+                  ;
                   elementtypedata.setCoords();
                   t.currentTarget.currentViewInstance.fabricCanvas.requestRenderAll();
 
                   // 🔹 Update related fpd-range-slider inputs
                   document.querySelectorAll(".fpd-panel-transform fpd-range-slider").forEach(slider => {
                     const control = slider.dataset.control; // e.g. "shadowOffsetY", "scaleX", "scaleY"
-                    console.log("Updating slider for control:", control);
+                    ;
                     if (control === "scaleX") {
                       // slider.setAttribute("value", 1);
                       slider.querySelector(".fpd-slider-number").value = 1;
@@ -35026,24 +34952,21 @@ console.log("t:", t);
                     }
                   });
 
-                  console.log("Scale fixed and synced with sliders:", {
-                    scaleX: elementtypedata.scaleX,
-                    scaleY: elementtypedata.scaleY
-                  });
+                  ;
                 }
               }
               const elementtypedatatype = elementtypedata?.type;
-              console.log("elementtypedata", elementtypedata?.type, "elementtypedatatype", elementtypedata?.title)
-              console.log("anoop",elementtypedata, elementtypedatatype)
+              ;
+              ;
               const { options: e } = t.detail
-              console.log(e, 'elementModify', t.detail,  "----------",e.fontSize)
+              ;
               if (elementtypedatatype === 'group') {
-                console.log("group", t.detail.options)
+                ;
                 localStorage.setItem("topvalueforgroup", t.detail.options.top);
                 const activeGroup = t.detail.activeObject;
                 let groupId = elementtypedata.title;
                 groupId = (elementtypedata.title || "").toString().replace(/\s+/g, "_")
-                console.log("groupId", groupId,activeGroup);
+                ;
                 let allTransforms = {};
                 const raw = localStorage.getItem("groupTransforms");
                 if (raw) {
@@ -35080,14 +35003,14 @@ console.log("t:", t);
                 allTransforms[groupId] = savedTransforms;
                 localStorage.setItem("groupTransforms", JSON.stringify(allTransforms));
 
-                console.log(`Saved transforms for group ${groupId}:`, savedTransforms);
+                ;
 
               }
               else{
                 localStorage.setItem("groupTransforms", '');
               }
 
-              console.log("hdddddddddddddddddd",this.navElem.querySelector('.fpd-tool-text-size > input').value)
+              ;
               void 0 !== e.fontSize &&
                 (Kr(this, pa, Pa).call(this, 'fontSize', e.fontSize),
                 (this.navElem.querySelector(
@@ -35240,7 +35163,7 @@ console.log("t:", t);
                     })
                 } else if ('flip-x' == i || 'flip-y' == i) {
                   const e = {}
-                  console.log("flip-x or flip-y is clicked", e);
+                  ;
                   'flip-x' == i
                     ? (e.flipX = !t.currentElement.flipX)
                     : (e.flipY = !t.currentElement.flipY),
@@ -35266,12 +35189,12 @@ console.log("t:", t);
               this.subPanel.querySelectorAll('.fpd-curved-options > span'),
               'click',
               e => {
-                console.log("e",e)
+                ;
                 const allSpans = this.subPanel.querySelectorAll('.fpd-sub-panel .fpd-panel-curved-text .fpd-curved-options > span');
                 allSpans.forEach(span => span.classList.remove('fpd-active'));
                 e.currentTarget.classList.add('fpd-active');
                 const valueoftext = e.currentTarget.getAttribute('data-value');
-                console.log("Clicked span data-value:", valueoftext);
+                ;
                 // if(valueoftext === 'curved') {
                 //   const activeObj = t.currentViewInstance.fabricCanvas;
                 //   const activeObject = activeObj?.getActiveObject();
@@ -35314,7 +35237,7 @@ console.log("t:", t);
                 if (valueoftext === 'curved') {
                   const fabricCanvas = t.currentViewInstance.fabricCanvas;
                   const activeObject = fabricCanvas.getActiveObject();
-                  console.log("fabricCanvas", fabricCanvas, "activeObject", activeObject);
+                  ;
                   if (activeObject) {
                     // Add custom property "curvable"
                     // activeObject.set({
@@ -35400,7 +35323,7 @@ console.log("t:", t);
                     fabricCanvas.add(curvedText);
                     fabricCanvas.setActiveObject(curvedText);
                     fabricCanvas.requestRenderAll();
-                    console.log(activeObject.length, "curvedText", curvedText);
+                    ;
                     // t.currentViewInstance.fabricCanvas.setActiveObject(activeObject);
                     //       t.currentViewInstance.fabricCanvas.renderAll();
                     //  for (let i = activeObject.length - 1; i >= 0; i--) {
@@ -35440,7 +35363,7 @@ console.log("t:", t);
                       document.querySelector('.fpd-tool-transform').classList.add('fpd-active');
                     }
 
-                    console.log("Curvable property applied:", activeObject);
+                    ;
 
                     // Optional: notify canvas listeners
                     fabricCanvas.fire('object:modified', { target: activeObject });
@@ -35455,13 +35378,10 @@ console.log("t:", t);
                     ? (n.curved = !1)
                     : ((n.curved = !0),
                       (n.curveReverse = 'curveReverse' == i.dataset.value)),
-                      console.log("n data is", n),
-                    t.currentViewInstance.fabricCanvas.setElementOptions(n),
-                    // Kr(this, ca, Aa).call(this, n)
-                     console.log("curved text is clicked",t.currentViewInstance, "options", n);
+                    t.currentViewInstance.fabricCanvas.setElementOptions(n);
                     
                     const activeElementOptions = t.currentViewInstance.fabricCanvas._objects.find(obj => obj.type === 'curved-text');
-                    console.log("activeElementOptions", activeElementOptions);
+                    ;
   
                     // const fabricCanvas = t.currentViewInstance.fabricCanvas;
                     // console.log("fabricCanvas", fabricCanvas);
@@ -35532,7 +35452,7 @@ console.log("t:", t);
               //   t.currentViewInstance.fabricCanvas.setElementOptions(i),
               //   t.deselectElement()
               const currentEl = t.currentElement;
-              console.log("currentEl", this.fpdInstance);
+              ;
               this.fpdInstance.actionsBar.doAction('reset-product')
               
             }),
@@ -35541,7 +35461,7 @@ console.log("t:", t);
               
               G(this.navElem.querySelector('.fpd-ungroup'), 'click', e => {
                 let groupCounter = 1;
-  console.log('Group button clicked');
+  ;
 
   const fabricCanvas = this.fpdInstance.currentViewInstance?.fabricCanvas;
   if (!fabricCanvas) return;
@@ -35630,7 +35550,7 @@ console.log("t:", t);
     obj.objectCaching = false;
   });
 
-  console.log("group infornation of data us", group)
+  ;
   group.setCoords();
   updateFPDLayersToSingleGroup(group);
   fabricCanvas.requestRenderAll();
@@ -35695,7 +35615,7 @@ console.log("t:", t);
   }
   fabricCanvas.discardActiveObject();
 
-  console.log('Text grouping completed successfully (POSITION PRESERVED)', group);
+  ;
 });
 
 let toastElement = null;
@@ -35741,24 +35661,24 @@ function showToast(message, duration = 3000) {
 
 
 function updateFPDLayersToSingleGroup(group) {
-  console.log("group data is", group);
+  ;
   const layersList = document.querySelector(
     'fpd-module-manage-layers .fpd-list'
   );
   if (!layersList) return;
 
   const groupTitle = group.title || 'Grouped Text';
-  console.log("group data is", groupTitle);
+  ;
   /* ============================
      REMOVE CHILD TEXT LAYERS
   ============================ */
   layersList.querySelectorAll('.fpd-list-row').forEach(row => {
-    console.log("row data of list row is",row)
+    ;
     const label =
       row.querySelector('.fpd-cell-1 textarea')?.value?.trim() ||
       row.querySelector('.fpd-cell-1')?.innerText?.trim() ||
       '';
-    console.log("label data",row,"is",label);
+    ;
     // hide text layers that belong to the group
     if (
       label &&
@@ -35767,7 +35687,7 @@ function updateFPDLayersToSingleGroup(group) {
       row.remove();
     }
   });
-  console.log("group data is a", layersList);
+  ;
   /* ============================
      CHECK IF GROUP LAYER EXISTS
   ============================ */
@@ -35810,7 +35730,7 @@ function updateFPDLayersToSingleGroup(group) {
     this?.fpdInstance?.currentViewInstance?.fabricCanvas ||
   window?.fpdInstance?.currentViewInstance?.fabricCanvas;
 
-    console.log("current instance",t.currentViewInstance)
+    ;
   // t.currentViewInstance.fabricCanvas.removeElement(t.currentElement)
 
   const removeBtn = groupRow.querySelector('.fpd-remove-element');
@@ -35819,8 +35739,8 @@ function updateFPDLayersToSingleGroup(group) {
 
   if (removeBtn) {
     removeBtn.onclick = () => {
-      console.log(t.currentElement, "canvas data", canvas);
-      console.log("current instance",t.currentViewInstance)
+      ;
+      ;
       t.currentViewInstance.fabricCanvas.removeElement(group);
       groupRow.remove();
     };
@@ -35839,7 +35759,7 @@ function updateFPDLayersToSingleGroup(group) {
   if (visibleBtn) {
     visibleBtn.onclick = () => {
       const view = t.currentViewInstance;
-      console.log("group",group);
+      ;
   if (!view || !group) return;
 
   // 🔑 Get FPD element attached to fabric object
@@ -35853,20 +35773,20 @@ function updateFPDLayersToSingleGroup(group) {
   // ✅ Toggle visibility on FPD element
   element.visible = !element.visible;
 
-  console.log("vt",element.visible);
+  ;
   // ✅ Sync visibility to fabric object
   group.set('visible', element.visible);
 
   // ✅ Force FPD + Fabric refresh
   view.fabricCanvas.requestRenderAll();
   view.updateLayers?.(); // safe optional call
-   console.log("vt1",visibleBtn.innerHTML);
+   ;
   // ✅ Update UI icon
   visibleBtn.innerHTML = element.visible
     ? `<span class="fa-solid fa-eye"></span>`
     : `<span class="fa-solid fa-eye-slash"></span>`;
     };
-      console.log("vt2",visibleBtn.innerHTML);
+      ;
   }
 }
 
@@ -35879,10 +35799,10 @@ function updateFPDLayersToSingleGroup(group) {
                 if (!fabricCanvas) return;
 
                 const activeObj = fabricCanvas.getActiveObject();
-                console.log('Copy triggered', activeObj, 'Type', activeObj?.type);
+                ;
 
                 if (activeObj.type === 'image') {
-                    console.log('Copying image safely',activeObj);
+                    ;
                     
                     // 🔒 Backup filters
                     const originalFilters = activeObj.filters;
@@ -35910,7 +35830,7 @@ function updateFPDLayersToSingleGroup(group) {
                         width: activeObj.width,
                         height: activeObj.height
                       };
-                      console.log('✅ Image copied safely',copiedImage);
+                      ;
                       t.showToast?.('Image copied');
 
                       // 🔁 Restore original filters
@@ -35927,7 +35847,7 @@ function updateFPDLayersToSingleGroup(group) {
                   activeObj.clone(cloned => {
                     copiedGroup = cloned;
                     copiedImage = null;
-                    console.log('Group copied successfully', copiedGroup);
+                    ;
                   });
                 }
               });
@@ -35946,7 +35866,7 @@ function updateFPDLayersToSingleGroup(group) {
               function placeAboveBase(canvas, obj) {
                 const objects = canvas.getObjects();
                 const baseIndex = objects.findIndex(o => o.title === 'Base');
-                console.log(objects,"object baseindix",baseIndex)
+                ;
                 if (baseIndex !== -1) {
                   canvas.moveTo(obj, baseIndex + 1);
                 }
@@ -35968,7 +35888,7 @@ function updateFPDLayersToSingleGroup(group) {
 
               G(this.navElem.querySelector('.fpd-group-paste-by'), 'click', e => {
                 const fabricCanvas = this.fpdInstance.currentViewInstance?.fabricCanvas;
-                console.log("click function call", copiedGroup, copiedImage, fabricCanvas);
+                ;
                 if (!fabricCanvas) return;
 
                 // ❌ Nothing copied
@@ -35980,13 +35900,13 @@ function updateFPDLayersToSingleGroup(group) {
                   🖼 IMAGE PASTE (SAFE)
                 ========================== */
                 if (copiedImage) {
-                  console.log("copiedImage",copiedImage)
+                  ;
                   const viewInstancesss = this.fpdInstance.currentViewInstance;
                   const fabricCanvas = this.fpdInstance.currentViewInstance.fabricCanvas;
                   const zoom = fabricCanvas.getZoom();
 
                   const tData = copiedImage.__originalTransform || {};
-                  console.log('📌 Original transform:', tData, 'Canvas zoom:', zoom,'ins',viewInstancesss);
+                  ;
 
                   // Prevent Fabric filter crash
                   copiedImage.filters = Array.isArray(copiedImage.filters)
@@ -35994,7 +35914,7 @@ function updateFPDLayersToSingleGroup(group) {
                     : [];
 
                   copiedImage.clone(clonedObj => {
-                    console.log("scalX and scaleY",tData.scaleX,tData.scaleY);
+                    ;
                     clonedObj.set({
                       scaleX: tData.scaleX || 1,
                       scaleY: tData.scaleY || 1,
@@ -36043,7 +35963,7 @@ function updateFPDLayersToSingleGroup(group) {
                     })
 
                     fabricCanvas.moveTo(clonedObj, fabricCanvas.getObjects().length - 1);
-                    console.log("clonedObj data is",clonedObj)
+                    ;
                     clonedObj.setPositionByOrigin(
                       { x: tData.left, y: tData.top },
                       clonedObj.originX,
@@ -36062,14 +35982,7 @@ function updateFPDLayersToSingleGroup(group) {
                     
                     fabricCanvas.requestRenderAll();
 
-                    console.log('✅ Image pasted with TRUE original size', {
-                      left: clonedObj.left,
-                      top: clonedObj.top,
-                      scaleX: clonedObj.scaleX,
-                      scaleY: clonedObj.scaleY,
-                      width: clonedObj.width,
-                      height: clonedObj.height
-                    });
+                    ;
 
                     // this.showToast?.('Image pasted successfully 🖼️');
                   });
@@ -36080,7 +35993,7 @@ function updateFPDLayersToSingleGroup(group) {
                   🔹 GROUP PASTE
                 ========================== */
                 else if (copiedGroup) {
-                  console.log("copied group coming");
+                  ;
                   copiedGroup.clone(clonedObj => {
 
                     clonedObj.set({
@@ -36136,12 +36049,12 @@ function updateFPDLayersToSingleGroup(group) {
 
 
           G(this.navElem.querySelector('.fpd-ungroup1'), 'click', e => {
-            console.log('Ungroup triggered');
+            ;
             const canvas = t.currentViewInstance.fabricCanvas;
 
             let canvastitle = canvas.getActiveObject()?.title || '';
             canvastitle = canvastitle.toString().replace(/\s+/g, "_");
-            console.log('Canvas title:', canvastitle);
+            ;
 
             const initialZoom = canvas.getZoom();
             const activeObj = canvas.getActiveObject();
@@ -36155,7 +36068,7 @@ function updateFPDLayersToSingleGroup(group) {
             // Load group-level transforms from localStorage
             const groupTransforms = JSON.parse(localStorage.getItem("groupTransforms") || "{}");
             const savedGroupTransform = groupTransforms[canvastitle] || null;
-            console.log("Loaded group transform:", savedGroupTransform);
+            ;
 
             // Load saved props array for text objects
             const savedPropsArray = JSON.parse(localStorage.getItem('propstext') || '[]');
@@ -36170,7 +36083,7 @@ function updateFPDLayersToSingleGroup(group) {
             let lastFontSize = null;
 
             activeObj._objects.forEach((obj, index) => {
-              console.log("obj data", obj)
+              ;
               const props = savedPropsArray[index];
               if (!props) return;
 
@@ -36189,7 +36102,7 @@ function updateFPDLayersToSingleGroup(group) {
               let scaleX, scaleY, flipX, flipY, left, top;
 
               if (savedGroupTransform) {
-                console.log("data of ungroup text",savedGroupTransform);
+                ;
                 // let topvalueforgroup = window.localStorage.getItem('topvalueforgroup')
                 left = savedGroupTransform.left ?? 500;
                 top =  savedGroupTransform.top ?? 500;
@@ -36198,16 +36111,16 @@ function updateFPDLayersToSingleGroup(group) {
                 flipX  = savedGroupTransform.flipX ?? obj.flipX ?? props.flipX ?? false;
                 flipY  = savedGroupTransform.flipY ?? obj.flipY ?? props.flipY ?? false;
               } else {
-                console.log("coming to else of obj", obj)
+                ;
                 top = obj.top || 500;
                 left = obj.left || 500;
                 scaleX = obj.scaleX  || 1;
                 scaleY = obj.scaleY || 1;
                 flipX  = obj.flipX || props.flipX || false;
                 flipY  = obj.flipY || props.flipY || false;
-                console.log("coming to else of obj 1", obj, obj.scaleX * initialZoom)
+                ;
               }
-              console.log(scaleX, scaleY, "value of scaleX and scaleY 1")
+              ;
               // 👉 If not the first object, adjust top relative to previous object
               if (index > 0 && lastTop !== null && lastFontSize !== null) {
                 top = lastTop + lastFontSize; // place it below previous
@@ -36215,7 +36128,7 @@ function updateFPDLayersToSingleGroup(group) {
 
               const fontSize = props.textSize || obj.fontSize || 120;
               const elementType = props.curved ? 'curvedText' : 'text';
-              console.log(scaleX, scaleY, "value of scaleX and scaleY")
+              ;
               const restoredText = t.currentViewInstance.fabricCanvas.addElement(
                 elementType,
                 savedTitle || objectText, // title
@@ -36280,7 +36193,7 @@ function updateFPDLayersToSingleGroup(group) {
               t.deselectElement();
             }
 
-            console.log('Ungrouping completed successfully.');
+            ;
             document.querySelector('.fpd-ungroup1')?.classList.add('fpd-hidden');
             document.querySelector('.fpd-ungroup')?.classList.remove('fpd-hidden');
             document.querySelector('.fpd-group-copy-by')?.classList.add('fpd-hidden');
@@ -36294,7 +36207,7 @@ function updateFPDLayersToSingleGroup(group) {
             )
           }),
             G(this.navElem.querySelector('.fpd-tool-remove'), 'click', e => {
-              console.log("remove clicked", e, t)
+              ;
                localStorage.setItem('fpd-upload-image-going-to', false);
               //document.querySelector('.fpd-ungroup1')?.classList.add('fpd-hidden');
               //document.querySelector('.fpd-ungroup')?.classList.remove('fpd-hidden');
@@ -36314,8 +36227,8 @@ function updateFPDLayersToSingleGroup(group) {
               }
             ),
             G(this.navElem.querySelector('.fpd-tool-remove-bg'), 'click', e => {
-              console.log('remove bg clicked',e, t)
-              console.log("dgga",t.mainOptions.aiService)
+              ;
+              ;
               let i = t.currentElement
               t.deselectElement(),
                 t.toggleSpinner(
@@ -36352,7 +36265,7 @@ function updateFPDLayersToSingleGroup(group) {
               'click',
               t => {
                 const e = t.currentTarget
-                console.log("click data", e, e.classList[0],e.classList, e.className, e.classList.value)
+                ;
                 if (e.classList.contains('fpd-tool-transform')) {
                   document.body.classList.add('fpd-toolbar-transform-our');
                   if (e.classList.contains('fpd-active')) {
@@ -36375,9 +36288,9 @@ function updateFPDLayersToSingleGroup(group) {
                 }
 
                 if (e.classList.contains('fpd-tool-font-family') ) {
-                  console.log("active calsss", e.classList.value)
+                  ;
                   if(e.classList.contains('fpd-active')){
-                    console.log(document.querySelector('.fpd-panel-font-family').classList, 'data ayau')
+                    ;
                     document.querySelector('.fpd-tool-font-family')?.classList.remove('fpd-active');
                     document.querySelector('.fpd-panel-font-family')?.classList.remove('fpd-active');
                     document.querySelector('fpd-element-toolbar').classList.remove('my-font-family', 'fpd-panel-visible');
@@ -36397,7 +36310,7 @@ function updateFPDLayersToSingleGroup(group) {
                         document.body.classList.remove('fpd-toolbar-transform-our');
                   }
                   if(e.classList.contains('fpd-active')){
-                    console.log("text size customize clicked inside", e.classList);
+                    ;
                     document.querySelector('.fpd-tool-color')?.classList.remove('fpd-active');
                     document.querySelector('.fpd-panel-color')?.classList.remove('fpd-active');
                     document.querySelector('fpd-element-toolbar').classList.remove('my-color', 'fpd-panel-visible');
@@ -36405,18 +36318,18 @@ function updateFPDLayersToSingleGroup(group) {
                   }
                 }
                 else if(e.classList.contains('fpd-tool-text-size-customize')){
-                  console.log("text size customize clicked", e.classList);
+                  ;
                   if (document.body.classList.contains('fpd-toolbar-transform-our')) {
                         document.body.classList.remove('fpd-toolbar-transform-our');
                     }
                   document.body.classList.add('fpd-tools-custom-data')
                   const panel = document.getElementById('panel-text-size-data');
-                  console.log("panel data check",panel);
+                  ;
                   if (panel?.classList.contains('fpd-letter-spacing-lineheight')) {
                     panel.classList.remove('fpd-letter-spacing-lineheight');
                   }
                   if(e.classList.contains('fpd-active')){
-                     console.log("text size customize clicked inside", e.classList);
+                     ;
                     document.querySelector('.fpd-tool-text-size-customize')?.classList.remove('fpd-active');
                     document.querySelector('#panel-text-size-data')?.classList.remove('fpd-active');
                     document.querySelector('fpd-element-toolbar').classList.remove('my-text-size', 'fpd-panel-visible');
@@ -36424,13 +36337,13 @@ function updateFPDLayersToSingleGroup(group) {
                   }
                 }
                 else{ 
-                    console.log("coming to else");
+                    ;
                     setTimeout(() => {
 
                       if (document.body.classList.contains('fpd-toolbar-transform-our') && !document.querySelector('.fpd-tool-transform')?.classList.contains('fpd-active')) {
-                          console.log("coming to if",document.querySelector('.fpd-tool-transform').classList);
+                          ;
                           document.body.classList.remove('fpd-toolbar-transform-our');
-                          console.log("coming to else if");
+                          ;
                       }
                     },1000)
                     document.body.classList.remove('fpd-font-family-active');
@@ -36516,7 +36429,7 @@ function updateFPDLayersToSingleGroup(group) {
           )
       }
       function ya (t) {
-        console.log("hhhhhhhhhhhhhhhhhhh",t)
+        ;
         let e =
           !(arguments.length > 1 && void 0 !== arguments[1]) || arguments[1]
         const i = this.navElem.querySelectorAll('.fpd-tools-nav .fpd-tool-' + t)
@@ -36675,9 +36588,9 @@ function updateFPDLayersToSingleGroup(group) {
             }
           })
           r.append(a);
-            console.log(r,"eeee",a, "sjjs",t);
+            ;
             if(t.source != ""){
-              console.log("inside if",t.source);
+              ;
               document.querySelector('body').classList.add('notgroup')
               if (t.source.toLowerCase().endsWith('.svg')) {
                   document.querySelector('body').classList.add('is-svg');
@@ -36689,7 +36602,7 @@ function updateFPDLayersToSingleGroup(group) {
             else{
               document.querySelector('body').classList.remove('notgroup')
             }
-            console.log("eeee1111",e)
+            ;
             Kr(this, ia, ya).call(this, 'color'),
             Kr(this, sa, wa).call(this, 'color', 'fill', !0),
             Kr(this, sa, wa).call(
@@ -36718,7 +36631,6 @@ function updateFPDLayersToSingleGroup(group) {
             }
           })),
           Jr(this, $r).append(e),
-          console.log("eeee1",e),
           Kr(this, ia, ya).call(this, 'color'),
           Kr(this, sa, wa).call(this, 'color', 'fill', !0))
         let i = Boolean(
@@ -36748,14 +36660,13 @@ function updateFPDLayersToSingleGroup(group) {
             'transform',
             'flip',
             Boolean(i || t.__editorMode)
-          )),
-          console.log("eeee1113",t);
+          ));
           if(t.source == undefined){
-              console.log("inside if",t.source);
+              ;
               document.querySelector('body').classList.remove('notgroup')
             }
             else{
-              console.log("inside else",t.source);
+              ;
               document.querySelector('body').classList.add('notgroup')
             }
           (t.draggable || t.zChangeable || t.__editorMode) &&
@@ -36773,7 +36684,6 @@ function updateFPDLayersToSingleGroup(group) {
               'align',
               Boolean(t.draggable || t.__editorMode)
             )),
-            console.log("eeee1114",e),
           'text' === t.getType() && (t.editable || t.__editorMode)
             ? (Kr(this, ia, ya).call(this, 'edit-text'),
               Kr(this, ia, ya).call(
@@ -36781,7 +36691,6 @@ function updateFPDLayersToSingleGroup(group) {
                 'text-size',
                 Boolean(t.resizable || t.__editorMode) && !t.widthFontSize
               ),
-              console.log("eeee11115",e),
               Kr(this, ia, ya).call(this, 'font-family'),
               Kr(this, ia, ya).call(this, 'text-format'),
               t.curvable &&
@@ -38099,12 +38008,12 @@ function updateFPDLayersToSingleGroup(group) {
         setupProducts () {
           let t =
             arguments.length > 0 && void 0 !== arguments[0] ? arguments[0] : []
-          console.log('setupProductsOld--', t);
+          ;
           const groupedCategories = t.map(item => ({
             category: item.category,
             subcategory: item.subcategory
           }));
-          console.log('groupedCategories', groupedCategories);
+          ;
           // Save to localStorage
           localStorage.setItem('fpd-grouped-categories', '');
           localStorage.setItem('fpd-grouped-categories', JSON.stringify(groupedCategories));
@@ -38115,8 +38024,7 @@ function updateFPDLayersToSingleGroup(group) {
                     this.addProduct(e, t.category)
                   })
                 : this.addProduct(t)
-            }),
-            console.log('setupProductsOldBefore', this.products)
+            })
           if (typeof window !== 'undefined') {
             //   let loc =  window.localStorage.getitem('indexofProduct');
             //   console.log(loc,'locccccccc')
@@ -38124,12 +38032,12 @@ function updateFPDLayersToSingleGroup(group) {
 
           // this.mainOptions.loadFirstProductInStage && t.length > 0 ? this.selectProduct(0) : this.toggleSpinner(!1),
           q(this, 'productsSet', {})
-          console.log('setupProductsOld', this.products)
+          ;
         }
         setupProductsNew () {
           let t =
             arguments.length > 0 && void 0 !== arguments[0] ? arguments[0] : []
-          console.log('setupProductsNew---111', t), (this.productsnew = [])
+          (this.productsnew = [])
 
           t.forEach(tItem => {
             const category = tItem.category
@@ -38156,28 +38064,23 @@ function updateFPDLayersToSingleGroup(group) {
             }
           })
 
-          console.log('setupProductsNewLastAfter ✅', this.productsnew)
-          console.log(
-            'setupProductsNewLastBefore000',
-            this.productsnew,
-            this.container
-          ),
-            this.mainOptions.loadFirstProductInStage && t.length > 0
+          ;
+          this.mainOptions.loadFirstProductInStage && t.length > 0
               ? this.selectProduct(0)
               : this.toggleSpinner(!1),
             q(this, 'productsSet', {})
 
           this.productsnew = t
-          console.log('setupProductsNewLast', this.productsnew, t)
+          ;
         }
 
         setupDesigns (t) {
           ;(this.designs = t), q(this, 'designsSet', {})
         }
         addProductNew (t, e) {
-          console.log('addProductanoo1', t, e)
+          ;
           var i = Ao(this, _o, Uo).call(this, e)
-          console.log('addProductanoo1222', i)
+          ;
           void 0 === e
             ? this.productsnew.push(t)
             : (!1 === i &&
@@ -38187,7 +38090,7 @@ function updateFPDLayersToSingleGroup(group) {
             q(this, 'productAddNew', { views: t, category: e, catIndex: i })
         }
         addProduct (t, e) {
-          console.log('addProductanoo', t, e)
+          ;
           var i = Ao(this, _o, Uo).call(this, e)
           void 0 === e
             ? this.products.push(t)
@@ -38199,7 +38102,7 @@ function updateFPDLayersToSingleGroup(group) {
         }
 
         selectProduct (t, e) {
-          console.log('selectProduct ye wala', t, e, this.container)
+          ;
           const fpdInstance = this.container.instance
           // Store to variable
           // this.fpdInstance = fpdInstance;
@@ -38210,17 +38113,12 @@ function updateFPDLayersToSingleGroup(group) {
           }
           // this.currentCategoryIndex = e;
           this.currentProductIndex = t
-          console.log(
-            this.currentCategoryIndex,
-            this.currentProductIndex,
-            'FPD Instance-->',
-            fpdInstance
-          )
+          ;
           let i
           const savedId = localStorage.getItem('parentDivId')
-          console.log(this.currentProductIndex, 'selectProduct--1--1-', savedId)
+          ;
           if (savedId === 'ProductModule') {
-            console.log('ciiiiiiiiiiiiiiiiiisksks-----')
+            ;
             To(this, Io, To(this, Oo, 0)),
               (this.currentCategoryIndex =
                 void 0 === e ? this.currentCategoryIndex : e),
@@ -38234,43 +38132,35 @@ function updateFPDLayersToSingleGroup(group) {
               t < 0
                 ? (this.currentProductIndex = 0)
                 : t > i.length - 1 && (this.currentProductIndex = i.length - 1)
-            console.log(
-              'daaaaaaaaaaaaataa of i',
-              i,
-              this.currentProductIndex,
-              i.length
-            )
+            ;
             const n = i[this.currentProductIndex]
             // const n = i[0];
             let valueofTitle = localStorage.getItem('valueofTitle')
-            console.log('valueofTitle', valueofTitle)
+            ;
             if (
               valueofTitle === null ||
               valueofTitle === 'undefined' ||
               valueofTitle === ''
             ) {
-              console.log(
-                'coming if of value on load0000w02',
-                this.currentProductIndex
-              )
+              ;
               const n = i[this.currentProductIndex]
-              console.log('coming if inside', n, i[this.currentProductIndex])
+              ;
 
-              console.log('daaaaaaaaaaaaataa of n', n)
+              ;
 
-              console.log('selectProduct ye kya', n, this.mainOptions)
+              ;
               if (n.length > 1) {
                 if (valueofTitle === null || valueofTitle === 'undefined') {
-                  console.log('coming 0')
+                  ;
                 } else {
-                  console.log('vjesjsj', valueofTitle)
+                  ;
                 }
               }
               let valueofUE = localStorage.getItem('UE')
               let facesListed = false
               if (valueofUE === 'true') {
                 const container = document.querySelector('.ProductModuleMy')
-                console.log('nnnnnnnnnnnnnnnnnnnn', n)
+                ;
                 if (container && Array.isArray(n) && n.length >= 1) {
                   facesListed = true
                   const productModuleEl = document.querySelector('.ProductModule')
@@ -38282,7 +38172,7 @@ function updateFPDLayersToSingleGroup(group) {
                   if (productsModuleEl) productsModuleEl.classList.add('valueoffpdmoduleproducts-active')
                 }
                 n.forEach((e, i) => {
-                  console.log('e', e, valueofTitle)
+                  ;
                   if (container) {
                     let n = e.thumbnail,
                       s = e.title ? e.title : e.productTitle,
@@ -38325,13 +38215,13 @@ function updateFPDLayersToSingleGroup(group) {
                       if (e.isTrusted) window.__fpdUserInteracted = true
                       document.body.classList.add('popup-open-hide-body');
                       try {
-                      console.log('88888888', t, r)
-                      console.log('fpdInstance', fpdInstance)
-                      console.log('Anoop Data 4-1--', fpdInstance, e, r)
+                      ;
+                      ;
+                      ;
                       let valueofTitleActiveDatais = window.localStorage.getItem('valueofTitleActiveDatais');
-                      console.log('valueofTitleActiveDatais', valueofTitleActiveDatais)
+                      ;
                       let clickedTitleProdcutInside = window.localStorage.getItem('clickedTitleProdcutInside');
-                      console.log("clickedTitleProdcutInside",clickedTitleProdcutInside)
+                      ;
                       let valueofTitle = e?.srcElement.dataset.title;
                       const matchedProducts = fpdInstance.products.filter(product => {
                         return product.category === valueofTitleActiveDatais;
@@ -38343,9 +38233,9 @@ function updateFPDLayersToSingleGroup(group) {
                           item?.title === valueofTitle
                         );
 
-                      console.log(matchedProductsdata, 'Matched Products:', matchedProducts);
-                      console.log('Sorted Products:', sortedProducts);
-                      console.log('valueofTitle', valueofTitle)
+                      ;
+                      ;
+                      ;
                       localStorage.setItem('valueofTitle', valueofTitle)
                       // e = sortedProducts ? sortedProducts : e;
                       if (
@@ -38368,12 +38258,7 @@ function updateFPDLayersToSingleGroup(group) {
                         )
 
                         G(eBtn, ['click'], () => {
-                          console.log(
-                            'Anoop Data 5....',
-                            fpdInstance,
-                            i,
-                            this.currentCategoryIndex
-                          )
+                          ;
                           fpdInstance.selectProduct(
                             i,
                             this.currentCategoryIndex
@@ -38381,11 +38266,7 @@ function updateFPDLayersToSingleGroup(group) {
                           n.remove()
                         })
                       } else {
-                        console.log(
-                          'coming to else',
-                          this.currentCategoryIndex,
-                          r.dataset.index
-                        )
+                        ;
                         localStorage.setItem('rdatasetindex', r.dataset.index)
                         fpdInstance.selectProduct(
                           Number(r.dataset.index),
@@ -38425,32 +38306,32 @@ function updateFPDLayersToSingleGroup(group) {
                 })
               }
               localStorage.setItem('dataskins', JSON.stringify(n))
-              console.log('jjjjjjjjjj', n, this.mainOptions)
+              ;
               if (!facesListed) {
                 this.loadProduct(n, this.mainOptions.replaceInitialElements)
               }
             } else {
               // n = i[this.currentProductIndex]
-              console.log('coming else of value on load')
+              ;
               const flatArray = i.flat() // Flatten the nested structure
-              console.log(valueofTitle, 'coming else inside 1', flatArray)
+              ;
               let clickedTitleProdcutInside = window.localStorage.getItem('clickedTitleProdcutInside');
               p = [flatArray.find(
                     item =>
                       item.title === valueofTitle &&
                       item.productTitle === clickedTitleProdcutInside
                   )];
-              console.log('coming else inside', p)
+              ;
               if (p[0] === undefined || p[0] === null) {
                 p = [flatArray.find(item => item.productTitle === valueofTitle)]
-                console.log('coming else inside one', p)
+                ;
               }
               // p = this.sortedProducts ? this.sortedProducts : p;
-              console.log("first2");
+              ;
               this.loadProduct(p, this.mainOptions.replaceInitialElements)
             }
           } else if (savedId === 'DesignModule') {
-            console.log('ciiiiiiiiiiiiiiiiiisksks-----k')
+            ;
             To(this, Io, To(this, Oo, 0)),
               (this.currentCategoryIndex =
                 void 0 === e ? this.currentCategoryIndex : e),
@@ -38464,43 +38345,35 @@ function updateFPDLayersToSingleGroup(group) {
               t < 0
                 ? (this.currentProductIndex = 0)
                 : t > i.length - 1 && (this.currentProductIndex = i.length - 1)
-            console.log(
-              'daaaaaaaaaaaaataa of i of DM',
-              i,
-              this.currentProductIndex,
-              i.length
-            )
+            ;
             const n = i[this.currentProductIndex]
             // const n = i[0];
             let valueofTitle = localStorage.getItem('valueofTitle')
-            console.log('valueofTitle', valueofTitle)
+            ;
             if (
               valueofTitle === null ||
               valueofTitle === 'undefined' ||
               valueofTitle === ''
             ) {
-              console.log(
-                'coming if of value on load0000w02',
-                this.currentProductIndex
-              )
+              ;
               const n = i[this.currentProductIndex]
-              console.log('coming if inside', n, i[this.currentProductIndex])
+              ;
 
-              console.log('daaaaaaaaaaaaataa of n', n)
+              ;
 
-              console.log('selectProduct ye kya', n, this.mainOptions)
+              ;
               if (n.length > 1) {
                 if (valueofTitle === null || valueofTitle === 'undefined') {
-                  console.log('coming 0')
+                  ;
                 } else {
-                  console.log('vjesjsj', valueofTitle)
+                  ;
                 }
               }
               let valueofUE = localStorage.getItem('UE')
               let facesListed = false
               if (valueofUE === 'true') {
                 const container = document.querySelector('.ProductModuleMy')
-                console.log('nnnnnnnnnnnnnnnnnnnn', n)
+                ;
                 if (container && Array.isArray(n) && n.length >= 1) {
                   facesListed = true
                   const productModuleEl = document.querySelector('.ProductModule')
@@ -38512,7 +38385,7 @@ function updateFPDLayersToSingleGroup(group) {
                   if (productsModuleEl) productsModuleEl.classList.add('valueoffpdmoduleproducts-active')
                 }
                 n.forEach((e, i) => {
-                  console.log('e', e, valueofTitle)
+                  ;
                   if (container) {
                     let n = e.thumbnail,
                       s = e.title ? e.title : e.productTitle,
@@ -38553,11 +38426,11 @@ function updateFPDLayersToSingleGroup(group) {
 
                     r.addEventListener('click', e => {
                       if (e.isTrusted) window.__fpdUserInteracted = true
-                      console.log('88888888', t, r)
-                      console.log('fpdInstance', fpdInstance)
-                      console.log('1Anoop Data 4-1--', fpdInstance, e, r)
+                      ;
+                      ;
+                      ;
                       let valueofTitle = e?.srcElement.dataset.title
-                      console.log('valueofTitle', valueofTitle)
+                      ;
                       localStorage.setItem('valueofTitle', valueofTitle)
                       if (
                         (e.preventDefault(),
@@ -38579,12 +38452,7 @@ function updateFPDLayersToSingleGroup(group) {
                         )
 
                         G(eBtn, ['click'], () => {
-                          console.log(
-                            'Anoop Data 5....',
-                            fpdInstance,
-                            i,
-                            this.currentCategoryIndex
-                          )
+                          ;
                           fpdInstance.selectProduct(
                             i,
                             this.currentCategoryIndex
@@ -38592,11 +38460,7 @@ function updateFPDLayersToSingleGroup(group) {
                           n.remove()
                         })
                       } else {
-                        console.log(
-                          'coming to else',
-                          this.currentCategoryIndex,
-                          r.dataset.index
-                        )
+                        ;
                         localStorage.setItem('rdatasetindex', r.dataset.index)
                         fpdInstance.selectProduct(
                           Number(r.dataset.index),
@@ -38630,25 +38494,25 @@ function updateFPDLayersToSingleGroup(group) {
                 })
               }
               localStorage.setItem('dataskins', JSON.stringify(n))
-              console.log('jjjjjjjjjj', n, this.mainOptions)
+              ;
               if (!facesListed) {
                 this.loadProduct(n, this.mainOptions.replaceInitialElements)
               }
             } else {
               // n = i[this.currentProductIndex]
-              console.log('coming else of value on load')
+              ;
               const flatArray = i.flat() // Flatten the nested structure
-              console.log(valueofTitle, 'coming else inside 1', flatArray)
+              ;
               p = [flatArray.find(item => item.title === valueofTitle)]
-              console.log('coming else inside', p)
+              ;
               if (p[0] === undefined || p[0] === null) {
                 p = [flatArray.find(item => item.productTitle === valueofTitle)]
-                console.log('coming else inside one', p)
+                ;
               }
               this.loadProduct(p, this.mainOptions.replaceInitialElements)
             }
           } else {
-            console.log('ciiiiiiiiiiiiiiiiiisksks')
+            ;
             To(this, Io, To(this, Oo, 0)),
               (this.currentCategoryIndex =
                 void 0 === e ? this.currentCategoryIndex : e),
@@ -38663,12 +38527,12 @@ function updateFPDLayersToSingleGroup(group) {
                 ? (this.currentProductIndex = 0)
                 : t > i.length - 1 && (this.currentProductIndex = i.length - 1)
             const n = i[this.currentProductIndex]
-            console.log('selectProduct ye no', n, this.mainOptions)
+            ;
             this.loadProduct(n, this.mainOptions.replaceInitialElements)
           }
         }
         loadProduct (t) {
-          console.log('addView-1', t)
+          ;
           let valueofdataindex
           // let e = arguments.length > 1 && void 0 !== arguments[1] && arguments[1],
           //     i = arguments.length > 2 && void 0 !== arguments[2] && arguments[2];
@@ -38725,7 +38589,7 @@ function updateFPDLayersToSingleGroup(group) {
             this.fixedElements = this.getFixedElements()
             this.reset()
 
-            console.log('🛠️ Loaded Product Array:', t)
+            ;
 
             const targetTitleOfUrl = localStorage.getItem('selectedSlug')
             let matchedIndex = 0;
@@ -38733,15 +38597,15 @@ function updateFPDLayersToSingleGroup(group) {
               for (let i = 0; i < t.length; i++) {
                 const productTitle = t[i].title?.toLowerCase().trim();
                 const compareTitle = targetTitleOfUrl.replace(/-/g, ' ').toLowerCase().trim();;
-                console.log("productTitle", productTitle, "compareTitle", compareTitle);
+                ;
                 if (productTitle === compareTitle) {
-                  console.log('Matched Product Title:', i);
+                  ;
                   matchedIndex = i;
                   break;
                 }
               }
             }
-            console.log('Matched Index:', matchedIndex, 'for Title:', targetTitleOfUrl);
+            ;
             localStorage.setItem('rdatasetindex', matchedIndex.toString());
 
 
@@ -38778,16 +38642,12 @@ function updateFPDLayersToSingleGroup(group) {
             // ✅ Load specific view from localStorage (if available)
             const viewIndexRaw = localStorage.getItem('rdatasetindex')
             const viewIndex = parseInt(viewIndexRaw, 10)
-            console.log('viewIndexRawvlaue', viewIndex)
+            ;
             if (!isNaN(viewIndex) && t[viewIndex]) {
-              console.log(
-                `✅ Loading view index ${viewIndex} from localStorage`
-              )
+              ;
               this.addView(t[viewIndex])
             } else {
-              console.log(
-                `ℹ️ No valid index in localStorage. Loading default view.`
-              )
+              ;
               this.addView(t[0])
             }
 
@@ -38797,7 +38657,7 @@ function updateFPDLayersToSingleGroup(group) {
         }
 
         addView (t) {
-          console.log('addView', t)
+          ;
           let e = {}
           Ht.relevantOptions.forEach(t => {
             let i = this.mainOptions[t]
@@ -38850,7 +38710,7 @@ function updateFPDLayersToSingleGroup(group) {
                 // e.selectable = true;
                 if(e.getType() == 'text') {e.removable = true}
                 if (e.getType() == 'image' & e.draggable == '0') {
-                  console.log('image draggable', e.draggable);
+                  ;
                   const scaleX = e.canvas.width / e.width;
                   const scaleY = e.canvas.width / e.height;
                   const scale = Math.min(scaleX, scaleY);
@@ -38984,7 +38844,7 @@ function updateFPDLayersToSingleGroup(group) {
                 t &&
                   t.elements &&
                   t.elements.forEach(t => {
-                    console.log('colorLinking', this.viewInstances[t.viewIndex])
+                    ;
                     if (e.id != t.id) {
                       const i = this.viewInstances[
                         t.viewIndex
@@ -39414,8 +39274,8 @@ function updateFPDLayersToSingleGroup(group) {
           })
         }
         addCanvasDesign (t, e) {
-          console.log('addCanvasDesign', t, e)
-          console.log('e.parameters', e.parameters)
+          ;
+          ;
           let i =
             arguments.length > 2 && void 0 !== arguments[2] ? arguments[2] : {}
           this.currentViewInstance &&
@@ -39437,11 +39297,6 @@ function updateFPDLayersToSingleGroup(group) {
               i
             )),
             document.querySelector('.fpd-ungroup1').classList.add('fpd-hidden'),
-            console.log(
-              i,
-              'addCanvasDesign--1',
-              this.currentViewInstance.options.customImageParameters
-            ),
             (i.isCustom = !0),
             this.currentViewInstance.currentUploadZone &&
               (i._addToUZ = this.currentViewInstance.currentUploadZone),
@@ -39829,14 +39684,14 @@ function updateFPDLayersToSingleGroup(group) {
       }
       async function Wo () {
         // const savedJson = localStorage.getItem('fpdProductsJSON');
-        console.log("Fetching from IndexedDB---")
+        ;
         const savedJson = await getProducts("Products");
-        console.log("Loaded from IndexedDB:", savedJson);
+        ;
         // this.mainOptions.productsJSON = JSON.parse(savedJson);
         this.mainOptions.productsJSON = Array.isArray(savedJson) || typeof savedJson === "object"
         ? savedJson
         : JSON.parse(savedJson);
-        console.log("this.mainOptions.productsJSON",this.mainOptions.productsJSON)
+        ;
         q(this, 'ready', {}),
           (this.warningsWrapper =
             this.container.querySelector('.fpd-warnings')),
@@ -39846,7 +39701,7 @@ function updateFPDLayersToSingleGroup(group) {
               : Vt({
                   url: this.mainOptions.productsJSON,
                   onSuccess: t => {
-                    console.log('setupProducts-----', t)
+                    ;
                     const processed = []
 
                     t.forEach(item => {
@@ -39871,10 +39726,7 @@ function updateFPDLayersToSingleGroup(group) {
                     // Save to localStorage
                     localStorage.setItem('fpd-category-subcategories',JSON.stringify(processed))
 
-                    console.log(
-                      'Processed category-subcategory pairs:',
-                      processed
-                    )
+                    ;
 
                     const grouped = {}
 
@@ -39888,7 +39740,7 @@ function updateFPDLayersToSingleGroup(group) {
                     })
 
                     // Convert grouped object to desired array
-                    console.log("grouped data is",grouped)
+                    ;
                     const result = Object.entries(grouped).map(
                       ([category, subcategories]) => ({
                         category,
@@ -39898,7 +39750,7 @@ function updateFPDLayersToSingleGroup(group) {
 
                     // Save to localStorage if needed
 
-                    console.log('Final grouped output:', result)
+                    ;
                     // localStorage.setItem('fpd-grouped-categories',JSON.stringify(result))
                     localStorage.setItem('fpd-grouped-categories-number', 0)
                     this.setupProducts(t)
@@ -39909,15 +39761,14 @@ function updateFPDLayersToSingleGroup(group) {
                         this.mainOptions.productsJSON
                     )
                   }
-                })),
-          console.log('jjjjjjjjjjjt', this.mainOptions.productsJSON1)
+                }))
         this.mainOptions.productsJSON1 &&
           ('object' == typeof this.mainOptions.productsJSON1
             ? this.setupProductsNew(this.mainOptions.productsJSON1)
             : Vt({
                 url: this.mainOptions.productsJSON1,
                 onSuccess: t => {
-                  console.log('setupProductsNew-----', t)
+                  ;
                   const processed = []
 
                   t.forEach(item => {
@@ -39945,10 +39796,7 @@ function updateFPDLayersToSingleGroup(group) {
                     JSON.stringify(processed)
                   )
 
-                  console.log(
-                    'Processed category-subcategory pairs:',
-                    processed
-                  )
+                  ;
 
                   const grouped = {}
 
@@ -39971,7 +39819,7 @@ function updateFPDLayersToSingleGroup(group) {
 
                   // Save to localStorage if needed
 
-                  console.log('Final grouped output:', result)
+                  ;
                   // localStorage.setItem('fpd-grouped-categories',JSON.stringify(result))
                   localStorage.setItem('fpd-grouped-categories-number', 0)
                   this.setupProductsNew(t)
@@ -39989,7 +39837,7 @@ function updateFPDLayersToSingleGroup(group) {
               : Vt({
                   url: this.mainOptions.designsJSON,
                   onSuccess: t => {
-                    console.log('uuuuuuuuuuuuu', t)
+                    ;
                     // const allTags = t.forEach(categoryObj => {
                     //     const tags = categoryObj.designs.flatMap(d => d.tags);
                     //     const uniqueTags = [...new Set(tags)];
@@ -39999,7 +39847,7 @@ function updateFPDLayersToSingleGroup(group) {
                       categoryObj.designs.flatMap(d => d.tags)
                     )
                     const uniqueAllTags = [...new Set(allTags)]
-                    console.log('uniqueTags', uniqueAllTags)
+                    ;
                     localStorage.setItem(
                       'fpd-designs-tags',
                       JSON.stringify(uniqueAllTags)
@@ -40351,7 +40199,6 @@ function updateFPDLayersToSingleGroup(group) {
                     ) / t.width
                   ;(r = Math.ceil(r)),
                     (r = r > 4 ? 4 : r),
-                    console.log('AI SuperRes - Scale:', r),
                     this.deselectElement(),
                     this.toggleSpinner(
                       !0,
