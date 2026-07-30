@@ -1366,6 +1366,14 @@ fpd-element-toolbar[data-element-type=text] fpd-dropdown {
   min-height: 27px;
 }
 
+// Font list popup (shows fonts like "Lobster") opens far too short by
+// default (vendor CSS caps .fpd-dropdown-list at 100px/200px). Scope the
+// taller height to just the font-family dropdown so other dropdowns
+// (color, categories, etc.) keep their original size.
+.fpd-tool-font-family fpd-dropdown .fpd-dropdown-list {
+  max-height: 45vh !important;
+}
+
 fpd-element-toolbar[data-element-type=text] #textAlignCust.fpd-hidden {
   margin-top: 0;
   margin-bottom: 0;
@@ -2752,8 +2760,20 @@ fpd-element-toolbar.fpd-smart.fpd-layout-small {
     font-size: 13px;
   }
 
+  /* Font-family search panel (mobile bottom sheet) only — scoped to
+     .fpd-panel-font-family specifically (not the shared .fpd-sub-panel >
+     div.fpd-active rule) so no other sub-panel (color, size, etc.) is
+     affected. */
+  .fpd-panel-font-family.fpd-active {
+    padding: 16px !important;
+    padding-top: 18px !important;
+    gap: 6px;
+    height: 283px;
+  }
+
   .fpd-panel-font-family .fpd-fonts-list {
-    max-height: 45vh;
+    max-height: none;
+    height: 100%;
   }
 
   /* Destructive action reads as destructive */
