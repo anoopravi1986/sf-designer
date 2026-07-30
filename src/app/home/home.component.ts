@@ -2001,6 +2001,14 @@ export class HomeComponent implements AfterViewInit {
       editorMode: false,
       smartGuides: true,
       imageEditor: true,
+      // Elements/Designs thumbnails load as plain <img> (no crossOrigin), so
+      // the browser caches them as opaque. When the same URL is then loaded
+      // onto the fabric canvas with crossOrigin:'anonymous', some browsers
+      // serve that opaque cache entry and throw a CORS error even though the
+      // server sends Access-Control-Allow-Origin fine. This appends a
+      // cache-busting timestamp to the canvas load request so it bypasses
+      // the stale non-CORS cache entry instead of colliding with it.
+      imageLoadTimestamp: true,
       customTextParameters: {
         colors: false,
         removable: true,

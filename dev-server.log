@@ -3,21 +3,7 @@
 > ng serve
 
 [1m[33mProject 'designer-angular' contains extension with invalid name (zone).[39m[22m
-[1m[33mComponent HMR has been enabled.
-If you encounter application reload issues, you can manually reload the page to bypass HMR and/or disable this feature with the `--no-hmr` command line option.
-Please consider reporting any issues you encounter here: https://github.com/angular/angular-cli/issues
-[39m[22m
-[33m❯[39m Building...
-[32m✔[39m Building...
-[1mInitial chunk files[22m[2m | [22m[1mNames[22m        [2m | [22m [1mRaw size[22m
-[32mmain.js[39m            [2m | [22m[2mmain[22m         [2m | [22m[36m318.82 kB[39m[2m | [22m
-[32mstyles.css[39m         [2m | [22m[2mstyles[22m       [2m | [22m[36m180.40 kB[39m[2m | [22m
-[32mpolyfills.js[39m       [2m | [22m[2mpolyfills[22m    [2m | [22m [36m90.20 kB[39m[2m | [22m
-
-[1m [22m                  [2m | [22m[1mInitial total[22m[2m | [22m[1m589.41 kB[22m
-
-Application bundle generation complete. [11.850 seconds]
-
-Watch mode enabled. Watching for file changes...
-NOTE: Raw file sizes do not reflect development server per-request transformations.
-  [32m➜[39m  [1mLocal[22m:   [36mhttp://localhost:[1m4200[22m/[39m
+ [1mPort 4200 is already in use.
+Would you like to use a different port?[22m [2m(Y/n)[22m[47G
+[?25h[1m[31mAn unhandled exception occurred: Port 4200 is already in use. Use '--port' to specify a different port.
+See "C:\Users\vidhema\AppData\Local\Temp\ng-uWQr6C\angular-errors.log" for further details.[39m[22m
