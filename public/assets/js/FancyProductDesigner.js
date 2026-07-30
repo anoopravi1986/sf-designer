@@ -20748,7 +20748,6 @@
         return !!j.CSS_UNIT.exec(t)
       }
       let itemsLoaded = false;
-      localStorage.setItem('fpd-upload-image',false)
       const N = t => '[object Object]' === Object.prototype.toString.call(t),
         H = (t, e) => {
           if (t && 'object' == typeof t) {
@@ -20916,17 +20915,8 @@
           return t
         },
         $ = function () {
-          console.log("aurrrrrrrrrrrrrrrr",arguments)
           let t =
             arguments.length > 0 && void 0 !== arguments[0] ? arguments[0] : {}
-            console.log(t,'tttttPPPP');
-            var uploadCheck = localStorage.getItem('fpd-upload-image')
-            console.log('uploadCheck', uploadCheck)
-            if(uploadCheck === true || uploadCheck === 'true'){
-              console.log('uploadCheck inside if', uploadCheck)
-              uploadFilesToAPI(t);
-            }
-            console.log('hhhhhhhhhhhhhhhhhhhhhhhhh', t.currentViewInstance)
           if (!t.url) return
           const e = document.createElement('div');
           (e.className = 'fpd-item fpd-hover-thumbnail ts mt-1 bg-[#f6f6f6] item-data-click'),
@@ -20958,51 +20948,6 @@
             trash.className = 'fa-solid fa-trash';
             e.append(trash);
           }
-          function uploadFilesToAPI(files) {
-             // 👈 generate once per upload
-            console.log("Uploading files for userId:", files);
-            if(files.url){
-              const userId = 70011; 
-              const formData = new FormData();
-              let reqBody = {
-                userId: userId, // 👤 random userI d
-                title: files.title, // 🏷 titl
-                image : files.url // 🖼 file
-              }
-
-
-              try {
-                  fetch("https://styleflip-backend-jdm5.ithemes.xyz/api/image/add", {
-                    method: "POST",
-                    headers: {
-                      "Content-Type": "application/json", // 👈 must include
-                    },
-                    body: JSON.stringify(reqBody),
-                  })
-                  .then((response) => {
-                    if (!response.ok) {
-                      throw new Error("Failed to upload image");
-                    }
-                    return response.json();
-                  })
-                  .then((data) => {
-                    console.log("✅ Image saved:", data);
-
-                    // Save URL to localStorage for FPD
-                    let uploaded = JSON.parse(localStorage.getItem("fpd_uploaded_images")) || [];
-                    uploaded.push({ url: data.url, title: file.name });
-                    localStorage.setItem("fpd_uploaded_images", JSON.stringify(uploaded));
-                  })
-                  .catch((error) => {
-                    console.error("❌ Upload error:", error);
-                  });
-                } catch (error) {
-                  console.error("❌ Unexpected error:", error);
-                }
-
-            }
-          }
-          
           async function loadItems() {
             if (itemsLoaded) return; // prevent double calls
             itemsLoaded = true;
@@ -21011,6 +20956,30 @@
               const response = await fetch("https://styleflip-backend-jdm5.ithemes.xyz/api/image/getByUserId/70011");
               const data = await response.json();
               console.log("Loaded items:", data);
+
+              // The uploads grid also restores a separate cache from
+              // localStorage['fpd_uploaded_images'] on init (see the Ri class
+              // constructor further down), independent of the backend. That
+              // meant images deleted from the database kept reappearing,
+              // since nothing ever pruned the local cache. Now that the DB is
+              // the source of truth (this fetch), reconcile the cache against
+              // it: drop any cached entry whose URL the API no longer
+              // returns. If the API returns no images, this empties the
+              // cache entirely.
+              try {
+                const validUrls = new Set(
+                  Array.isArray(data) ? data.map(item => item.image) : []
+                );
+                const cachedRaw = window.localStorage.getItem('fpd_uploaded_images');
+                if (cachedRaw) {
+                  const cached = JSON.parse(cachedRaw);
+                  const stillValid = cached.filter(item => validUrls.has(item.url));
+                  window.localStorage.setItem('fpd_uploaded_images', JSON.stringify(stillValid));
+                }
+              } catch (e) {
+                console.error('❌ Failed to reconcile fpd_uploaded_images cache:', e);
+              }
+
               if(data.length > 0){
 
                 // assuming API response looks like: [{ url, title, thumbnailUrl, disableDraggable, disablePrice, price, removable }, ...]
@@ -30817,10 +30786,6 @@ console.log("t:", t);
               t.preventDefault(), n.click()
             }),
             G(n, 'change', t => {
-              const files = t.currentTarget.files;
-              console.log("files",files);
-              // ✅ Call your API
-              uploadFilesToAPIImage(files);
               xi(this, ki, Ni).call(this, t.currentTarget.files)
             }),
             G(i, ['dragover', 'dragleave'], t => {
@@ -30839,7 +30804,19 @@ console.log("t:", t);
             G(t, 'productCreate', t => {
               Ci(this, Ai, !1)
             }),
-            K() && window.localStorage.getItem('fpd_uploaded_images'))
+            // This used to also re-render every item cached in
+            // localStorage['fpd_uploaded_images'] into this.gridElem here.
+            // loadItems() (in the shared item-creator scope above) already
+            // renders the same user's uploads from the backend
+            // (/api/image/getByUserId) into the sibling #extracontainer-data
+            // grid in the same scroll area - so every image ended up shown
+            // twice (once from this local cache, once from the API fetch).
+            // The API is the source of truth (see the cache-reconciliation
+            // added to loadItems()), so this local re-render is disabled -
+            // always false, so the block below never runs, while the click/
+            // change/drag listeners registered above (unaffected by this)
+            // still work as before.
+            false)
           ) {
             const t = JSON.parse(
               window.localStorage.getItem('fpd_uploaded_images')
@@ -30858,9 +30835,6 @@ console.log("t:", t);
                 'fpd_uploaded_images',
                 JSON.stringify(t)
               )
-          }
-          function uploadFilesToAPIImage(){
-            localStorage.setItem('fpd-upload-image',true)
           }
         }
       }
@@ -30928,10 +30902,8 @@ console.log("t:", t);
         const i = this.fpdInstance.mainOptions,
           s = new FileReader()
         ;(s.onload = s => {
-          console.log('sssssssssssssssssssssssss', s)
           const r = s.currentTarget.result,
             a = xi(this, Bi, Yi).call(this, r, t.name)
-          console.log('sssssssssssssssssssssssssrrr', r)
           if (FancyProductDesigner.uploadsToServer) {
             if (!i.fileServerURL) {
               a?.remove();
@@ -31041,8 +31013,13 @@ console.log("t:", t);
             if (et(this.fpdInstance, o, r))
               if (FancyProductDesigner.uploadsToServer) {
                 const i = new FormData()
-                console.log('tttttttttttttttttttt1i', i)
-                i.append('images[]', t)
+                // Field name/extra fields must match the backend's multer
+                // config: upload.single("image") on /api/image/upload, plus
+                // userId/title so the Image document it saves (alongside the
+                // S3 upload) validates - the Image schema requires userId.
+                i.append('image', t)
+                i.append('userId', 70011)
+                i.append('title', t.name)
                 const s = new XMLHttpRequest()
                 console.log('tttttttttttttttttttt1s', s)
                 ;(s.responseType = 'json'),
@@ -31206,18 +31183,13 @@ console.log("t:", t);
         )
       }
       function Gi (t, e) {
-        if (!wi(this, Ai) && this.fpdInstance.mainOptions.autoFillUploadZones) {
-          const e = wi(this, Ii)[wi(this, Ei)]
-            ? wi(this, Ii)[wi(this, Ei)]
-            : null
-          e &&
-            this.fpdInstance._addGridItemToCanvas(
-              t,
-              { _addToUZ: e.uz },
-              e.viewIndex,
-              !1
-            )
-        } else e && this.fpdInstance._addGridItemToCanvas(t, {}, void 0, !1)
+        // Used to auto-place the first uploaded file straight onto the
+        // canvas here (via _addGridItemToCanvas). That meant the image ended
+        // up added twice whenever the user then also clicked the new
+        // thumbnail themselves - the normal, expected way to place any grid
+        // item (designs/products work the same way: click-to-add only, no
+        // auto-add). Dropped so upload only populates the grid; clicking the
+        // thumbnail is the single way an image reaches the canvas.
         wi(this, Ei) == wi(this, Oi) - 1 && Ci(this, Ai, !0)
       }
       function qi (t, e) {

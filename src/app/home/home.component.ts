@@ -286,31 +286,37 @@ export class HomeComponent implements AfterViewInit {
           }
         });
 
-        $(document).on('click', '.item-data-click', (event) => {
+        // Designs items (pi() in FancyProductDesigner.js) and freshly-
+        // uploaded-this-session items (Yi()) each get their own native
+        // click-to-add-to-canvas listener attached directly on the element
+        // when it's created - a broad document-level handler for every
+        // .item-data-click used to duplicate that (fixed by removing it).
+        // But items restored from the backend (loadItems(), fetched from
+        // /api/image/getByUserId into #extracontainer-data) are built with
+        // plain document.createElement calls that never attach any click
+        // listener at all - so those never had a *redundant* handler, they
+        // had *no* handler, and clicking them silently did nothing. Scope a
+        // handler to just that container so only the items missing a native
+        // listener are covered; addCanvasDesign() adds directly via
+        // fabricCanvas.addElement (no re-upload round trip), unlike
+        // _addGridItemToCanvas's default path which - for items outside
+        // Yi()'s explicit-no-download call - re-uploads the already-hosted
+        // S3 image through fileServerURL again before adding it, which is
+        // both slow and now fails outright since our /api/image/upload
+        // route only accepts an actual file, not a { url } reference.
+        $(document).on('click', '#extracontainer-data .item-data-click', (event) => {
           event.stopPropagation();
-          const clickedDiv = event.currentTarget;
-          const uploadParent = clickedDiv.closest('[data-context="upload"]');
-          console.log('You clicked:', clickedDiv);
-          console.log("djjd", this.designer.currentViewInstance);
+          const clickedDiv = event.currentTarget as HTMLElement;
           const clothingDesignerElem = document.querySelector('#clothing-designer');
           if (!clothingDesignerElem) {
             console.error('Element #clothing-designer not found.');
             return;
           }
           const fpdvalue = (clothingDesignerElem as any).instance;
-          const viewvalue = clickedDiv.getAttribute("data-source");
-          const viewtitle = clickedDiv.getAttribute("data-title");
-          console.log("viewvalue", viewvalue, viewtitle)
+          const source = clickedDiv.getAttribute('data-source');
+          const title = clickedDiv.getAttribute('data-title');
           const parameter = { removable: true, positioned: true, autoSelect: true, uniScalingUnlockable: true };
-
-          if (uploadParent.classList.contains('fpd-active')) {
-
-            fpdvalue.addCanvasDesign(
-              viewvalue,
-              viewtitle,
-              parameter
-            )
-          }
+          fpdvalue.addCanvasDesign(source, title, parameter);
         });
 
         $(document).on('click', '.item-data-click .fpd-three-dot-menu', (event) => {
@@ -1935,12 +1941,15 @@ export class HomeComponent implements AfterViewInit {
 
     function openDB(): Promise<IDBDatabase> {
       return new Promise((resolve, reject) => {
-        const request = indexedDB.open("FPD_DB", 1);
+        const request = indexedDB.open("FPD_DB", 2);
 
         request.onupgradeneeded = (event: any) => {
           const db = event.target.result;
           if (!db.objectStoreNames.contains("products")) {
             db.createObjectStore("products", { keyPath: "id", autoIncrement: true });
+          }
+          if (!db.objectStoreNames.contains("elements")) {
+            db.createObjectStore("elements", { keyPath: "id", autoIncrement: true });
           }
         };
 
@@ -1954,10 +1963,10 @@ export class HomeComponent implements AfterViewInit {
       });
     }
 
-    async function saveProducts(data: any[]) {
+    async function saveToStore(storeName: string, data: any[]) {
       const db = await openDB();
-      const tx = db.transaction("products", "readwrite");
-      const store = tx.objectStore("products");
+      const tx = db.transaction(storeName, "readwrite");
+      const store = tx.objectStore(storeName);
 
       store.clear();
 
@@ -1974,17 +1983,22 @@ export class HomeComponent implements AfterViewInit {
       });
     }
 
-    async function getProducts(): Promise<any[]> {
+    async function getFromStore(storeName: string): Promise<any[]> {
       const db = await openDB();
       return new Promise((resolve, reject) => {
-        const tx = db.transaction("products", "readonly");
-        const store = tx.objectStore("products");
+        const tx = db.transaction(storeName, "readonly");
+        const store = tx.objectStore(storeName);
         const request = store.getAll();
 
         request.onsuccess = () => resolve(request.result);
         request.onerror = () => reject(request.error);
       });
     }
+
+    const saveProducts = (data: any[]) => saveToStore("products", data);
+    const getProducts = () => getFromStore("products");
+    const saveElements = (data: any[]) => saveToStore("elements", data);
+    const getElements = () => getFromStore("elements");
 
     (window as any).getProducts = getProducts.bind(this);
     const storedFonts = localStorage.getItem('fontList');
@@ -1993,7 +2007,13 @@ export class HomeComponent implements AfterViewInit {
     this.appOptions = {
       productsJSON: 'assets/data/products/product-categories.json',
       productsJSON1: 'assets/data/products/product-categories-new.json',
-      designsJSON: 'https://styleflip-backend-jdm5.ithemes.xyz/api/element/getAllElements',
+      // Points at the bundled local snapshot instead of the live API so the
+      // Elements tab has something to render immediately on construction
+      // (like productsJSON below). The real/fresh data is loaded from
+      // IndexedDB cache (instant) and then the live API (background) right
+      // after construction - see the designer.setupDesigns() calls below,
+      // mirroring the products cache-then-refresh pattern.
+      designsJSON: 'assets/data/designs/design-categories.json',
       langJSON: 'assets/data/langs/default.json',
       stageWidth: 2500,
       stageHeight: 700,
@@ -2118,7 +2138,12 @@ export class HomeComponent implements AfterViewInit {
           },
         },
       ],
-      fileServerURL: 'https://file.handler.php.stageprojects.xyz/',
+      // Replaces the old third-party file.handler.php.stageprojects.xyz relay
+      // with our own backend's S3 upload route (POST /api/image/upload,
+      // multer-s3 -> styleflip-bucket, returns { image_src, filename }).
+      // TODO: point this at the deployed backend URL before shipping - this
+      // is the local dev server (node backend running on :4000) for now.
+      fileServerURL: 'http://localhost:4000/api/image/upload',
       uploadZone: {
         useDataURL: true,
       },
@@ -2166,9 +2191,26 @@ export class HomeComponent implements AfterViewInit {
     this.designer.addEventListener('elementAdd', (evt: any) => {
       const element = evt?.detail?.element;
       if (!element || element.type !== 'image') return;
+
+      // Product mockups can have a "topped" (or upload-zone) layer meant to
+      // always render above everything else (e.g. a laptop's keyboard/bezel
+      // overlay, so an uploaded design reads as sitting under the glass
+      // instead of pasted on top of it). The vendor canvas already re-asserts
+      // that ordering via _bringToppedElementsToFront() on its own
+      // 'object:added' fabric event, but for a freshly-uploaded image that
+      // reorder wasn't taking effect until the user separately clicked/
+      // selected the element (which happens to trigger the same reorder via
+      // a different vendor code path). Call it again here, unconditionally,
+      // so newly added images land in the correct stacking order immediately
+      // rather than needing a click to "fix" it.
+      const view = this.designer.currentViewInstance;
+      if (view?.fabricCanvas?._bringToppedElementsToFront) {
+        view.fabricCanvas._bringToppedElementsToFront();
+        view.fabricCanvas.requestRenderAll();
+      }
+
       if (!element.locked && !element.adminLocked) return;
 
-      const view = this.designer.currentViewInstance;
       const stageWidth = view?.options?.stageWidth;
       const stageHeight = view?.options?.stageHeight;
       if (!stageWidth || !stageHeight) return;
@@ -2227,6 +2269,28 @@ export class HomeComponent implements AfterViewInit {
       .catch((err) => {
         console.error("❌ API fetch failed:", err);
         this.showFPDLoading(false);
+      });
+
+    // Elements tab (fpd-module-designs): same cache-first-then-refresh
+    // treatment as products above. Without this, every visit re-downloads
+    // and re-parses the full getAllElements payload before the Elements
+    // grid can render anything, even though it rarely changes between visits.
+    const cachedElements = await getElements();
+
+    if (cachedElements && cachedElements.length > 0) {
+      console.log("✅ Loaded", cachedElements.length, "element categories from IndexedDB");
+      this.designer.setupDesigns(cachedElements);
+    }
+
+    fetch("https://styleflip-backend-jdm5.ithemes.xyz/api/element/getAllElements")
+      .then((res) => res.json())
+      .then(async (freshData) => {
+        await saveElements(freshData);
+        this.designer.setupDesigns(freshData);
+        console.log("✅ Designer elements updated with fresh data");
+      })
+      .catch((err) => {
+        console.error("❌ Elements API fetch failed:", err);
       });
 
     const slug = this.route.snapshot.paramMap.get('slug');

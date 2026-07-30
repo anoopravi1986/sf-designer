@@ -2830,3 +2830,75 @@ fpd-element-toolbar.fpd-smart.fpd-layout-small {
     }
   }
 }
+
+// Images tab source-selector row (Upload / Pixabay / Instagram / Facebook
+// icons, fpd-module-images .fpd-module-tabs). The vendor markup wraps this
+// row plus the actual upload panel (.fpd-module-tabs-content) together in a
+// flex-column div that vendor CSS sizes to height:100% (fpd-module-content
+// grandchild rule), with no flex-basis protection on either child. When the
+// upload panel's own content (grid/scroll area) is tall, the flex column
+// shrinks the icon row along with it and the row's ancestor
+// (.fpd-module-content{overflow:hidden}) clips whatever no longer fits —
+// on mobile that shows up as the icon row losing height and the icon glyphs
+// (esp. taller ones like the Facebook/Instagram icon-font glyphs) getting
+// visually cut off, sitting on inconsistent per-icon backgrounds since only
+// the active tab had an explicit background (see div.fpd-active rule near
+// the top of this file). Give the row a protected, fixed-content height
+// (flex: 0 0 auto so it can never be asked to shrink) and let the panel
+// below do the shrinking/scrolling instead, plus give every icon its own
+// consistently-sized pill background instead of just the active one.
+@media (max-width: 768px) {
+  fpd-module-images .fpd-module-tabs {
+    flex: 0 0 auto !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 30px;
+    height: auto !important;
+    min-height: 48px;
+    // Reserve room on the right for .fpd-close (absolutely positioned at
+    // right:10px/top:10px over this row) so the last pill never sits under it.
+   padding: 18px 0px 19px 8px !important;
+    background: #fff;
+    border-bottom: 1px solid #eee;
+    overflow: visible !important;
+  }
+
+  // flex:1 so the tabs share the full row width evenly instead of clumping
+  // to the left with empty space where .fpd-close used to have its silent
+  // reserved gap (see padding-right above, now explicit).
+  fpd-module-images .fpd-module-tabs > div {
+    flex: 1 1 0 !important;
+    width: auto;
+    max-width: 46px;
+    height: 38px;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    padding: 0 !important;
+    margin: 0;
+    border-radius: 10px;
+    background: #f6f6f6;
+    font-size: 17px;
+    line-height: 1;
+    overflow: visible;
+    outline: none !important;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  // Active tab: a light tint of the theme color instead of a solid block,
+  // since the icon glyph itself already renders in the theme color (see the
+  // unscoped `.fpd-module-tabs>div.fpd-active span:before` rule above in this
+  // file) - a solid dark fill behind an already-colored icon read as a stray
+  // black border/box around it rather than a highlight.
+  fpd-module-images .fpd-module-tabs > div.fpd-active {
+    background: #fdece4 !important;
+    border-bottom: none !important;
+  }
+
+  fpd-module-images .fpd-module-tabs-content {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
+  }
+}
