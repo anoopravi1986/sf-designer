@@ -495,9 +495,105 @@ export class HomeComponent implements AfterViewInit {
       const targetSection = document.querySelector('fpd-element-toolbar .fpd-sub-panel') as HTMLElement;
       const panel = document.getElementById('fpd-opacity-panel');
       const sliderOpacity = document.getElementById('fpd-opacity-range') as HTMLInputElement;
+      const opacityToolbarEl = btnOpacity?.closest('fpd-element-toolbar') as HTMLElement | null;
       ;
       if (!btnOpacity || !panel || !sliderOpacity) return;
 
+      // Text elements show the opacity icon inline with Bold/Italic/Underline/
+      // Align (that row's own tools-group) instead of its own standalone row
+      // above the toolbar, which is still used for image/shape elements. Move
+      // the button node itself between the two homes whenever the selected
+      // element type flips; the panel stays where it is since it always opens
+      // as a full-width bottom sheet regardless of where its trigger button
+      // lives (see the .fpd-opacity-open rules in styles.scss).
+      const opacityOriginalParent = btnOpacity.parentElement;
+      const textFormatGroup = document.getElementById('CenterTools')?.parentElement as HTMLElement | null;
+
+      const placeOpacityButton = () => {
+        const elementType = opacityToolbarEl?.getAttribute('data-element-type');
+        if (elementType === 'text' && textFormatGroup) {
+          if (btnOpacity.parentElement !== textFormatGroup) {
+            textFormatGroup.appendChild(btnOpacity);
+          }
+        } else if (opacityOriginalParent && btnOpacity.parentElement !== opacityOriginalParent) {
+          opacityOriginalParent.insertBefore(btnOpacity, panel);
+        }
+      };
+
+      placeOpacityButton();
+
+      if (opacityToolbarEl) {
+        new MutationObserver(placeOpacityButton).observe(opacityToolbarEl, {
+          attributes: true,
+          attributeFilter: ['data-element-type'],
+        });
+      }
+
+      // On mobile, the panel is shown as a bottom-sheet in place of the
+      // toolbar's icon row (see the .fpd-opacity-open rules in
+      // styles.scss), same as every other tool panel. Desktop keeps the
+      // panel's original floating-card display toggle.
+      const closeOpacityPanel = () => {
+        panel.style.display = 'none';
+        btnOpacity.classList.remove('fpd-active');
+        opacityToolbarEl?.classList.remove('fpd-opacity-open');
+      };
+
+      function updateSliderProgress() {
+        const percent = (parseFloat(sliderOpacity.value) / parseFloat(sliderOpacity.max)) * 100;
+        sliderOpacity.style.setProperty('--progress', percent + '%');
+        const valueLabel = document.getElementById('fpd-opacity-value');
+        if (valueLabel) {
+          valueLabel.textContent = String(Math.round(percent));
+        }
+      }
+
+      const setOpacityValue = (value: number) => {
+        value = Math.min(1, Math.max(0, value));
+        sliderOpacity.value = value.toFixed(2);
+        updateSliderProgress();
+        const canvas = this.designer.currentViewInstance.fabricCanvas;
+        const obj = canvas.getActiveObject();
+        if (!obj) return;
+        obj.set('opacity', value);
+        canvas.requestRenderAll();
+        canvas.fire('object:modified', { target: obj });
+      };
+
+      // Mobile-only: centered bold "Opacity" title, a right-aligned +/-
+      // stepper below it, and a slider that spans the full sheet width (see
+      // styles.scss for the matching layout), and let text elements use
+      // this flyout instead of the vendor's inline Transparency slider in
+      // the Fill tab (see the [data-element-type="text"] override there).
+      // Desktop markup/behaviour is untouched.
+      if (
+        window.matchMedia('(max-width: 768px)').matches &&
+        !panel.querySelector('.fpd-opacity-stepper-row')
+      ) {
+        const existingLabel = panel.querySelector('span.fpd-label');
+        existingLabel?.classList.add('fpd-opacity-panel-title');
+
+        const stepperRow = document.createElement('div');
+        stepperRow.className = 'fpd-opacity-stepper-row';
+        const stepper = document.createElement('div');
+        stepper.className = 'fpd-opacity-stepper';
+        stepper.innerHTML = `
+          <button type="button" class="fpd-opacity-minus" aria-label="Decrease opacity">&minus;</button>
+          <span id="fpd-opacity-value" class="fpd-opacity-value">100</span>
+          <button type="button" class="fpd-opacity-plus" aria-label="Increase opacity">+</button>
+        `;
+        stepperRow.appendChild(stepper);
+        panel.insertBefore(stepperRow, sliderOpacity);
+
+        stepperRow.querySelector('.fpd-opacity-minus')?.addEventListener('click', (e) => {
+          e.stopPropagation();
+          setOpacityValue(parseFloat(sliderOpacity.value) - 0.01);
+        });
+        stepperRow.querySelector('.fpd-opacity-plus')?.addEventListener('click', (e) => {
+          e.stopPropagation();
+          setOpacityValue(parseFloat(sliderOpacity.value) + 0.01);
+        });
+      }
 
       btnOpacity.addEventListener('click', () => {
         if (targetSection) {
@@ -512,22 +608,19 @@ export class HomeComponent implements AfterViewInit {
           panel.style.display === 'block' ? 'none' : 'block';
         if (panel.style.display === 'block') {
           btnOpacity.classList.add('fpd-active');
+          opacityToolbarEl?.classList.add('fpd-opacity-open');
         } else {
           btnOpacity.classList.remove('fpd-active');
+          opacityToolbarEl?.classList.remove('fpd-opacity-open');
         }
         const canvas = this.designer.currentViewInstance.fabricCanvas;
         const obj = canvas.getActiveObject();
 
         if (obj) {
           sliderOpacity.value = obj.opacity ?? 1;
-          var percent = (parseFloat(sliderOpacity.value) / parseFloat(sliderOpacity.max)) * 100;
-          sliderOpacity.style.setProperty('--progress', percent + '%');
+          updateSliderProgress();
         }
       });
-      function updateSliderProgress() {
-        const percent = (parseFloat(sliderOpacity.value) / parseFloat(sliderOpacity.max)) * 100;
-        sliderOpacity.style.setProperty('--progress', percent + '%');
-      }
       sliderOpacity.addEventListener('input', () => {
         updateSliderProgress();
         const canvas = this.designer.currentViewInstance.fabricCanvas;
@@ -547,8 +640,7 @@ export class HomeComponent implements AfterViewInit {
           !panel.contains(e.target) &&
           !btnOpacity.contains(e.target)
         ) {
-          panel.style.display = 'none';
-          btnOpacity.classList.remove('fpd-active');
+          closeOpacityPanel();
         }
       });
     }, 5000);

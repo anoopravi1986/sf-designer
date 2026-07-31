@@ -2676,27 +2676,154 @@ fpd-element-toolbar.fpd-smart.fpd-layout-small {
     line-height: -1px !important;
   }
 
-  /* The opacity flyout (#fpd-opacity-btn's popup) was written for the old
-     floating-pill toolbar and opens "top: 45px" down from the toolbar's own
-     top edge. Now that the toolbar is a bottom-docked sheet, that offset
-     lands at/past the bottom of the viewport, so the slider opened
-     off-screen instead of visibly popping up. Anchor it above the toolbar
-     instead, so it opens up into the canvas area where there's room. */
-  #fpd-opacity-panel.fpd-opacity-panel {
-    top: auto !important;
-    bottom: calc(100% + 8px) !important;
-    left: 10px !important;
-    span.fpd-label {
+  /* The Opacity flyout used to be an absolutely-positioned card floating
+     above the toolbar — every other tool (Fill, Stroke, Font, Color, etc.)
+     instead opens as a bottom-up sheet that replaces the icon row and grows
+     the toolbar upward. home.component.ts toggles a `.fpd-opacity-open`
+     class on the toolbar in lockstep with showing/hiding the panel; while
+     that class is present, hide the rest of .fpd-tools-nav and let the
+     panel sit in normal flow full-width, so it behaves the same way. */
+  &.fpd-opacity-open .fpd-tools-nav {
+    /* With every other child hidden below, .fpd-tools-nav would otherwise
+       shrink-wrap to the one remaining child's intrinsic width instead of
+       staying the toolbar's full width — force it back to a plain
+       full-width block so the panel has an unambiguous 100% to size against. */
     display: block !important;
-  font-size: 15px !important;     
-    font-weight: 600;     
-    color: #485563;
-    margin: 0 0 15px 0;
+    width: 100% !important;
+
+    > *:not(#fpd-opacity-panel) {
+      display: none !important;
+    }
   }
 
-  input#fpd-opacity-range {
-    display: block;
+  &.fpd-opacity-open #fpd-opacity-panel.fpd-opacity-panel {
+    display: block !important;
+    position: static !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    left: auto !important;
+    right: auto !important;
+    top: auto !important;
+    bottom: auto !important;
+    box-shadow: none !important;
+    margin: 0 !important;
   }
+
+  #fpd-opacity-panel.fpd-opacity-panel {
+    border-radius: 14px;
+    /* No horizontal padding at the panel level — the title/stepper rows
+       carry their own side padding below, but the slider is left free to
+       stretch the full sheet width. */
+    padding: 0px 0 16px !important;
+
+    /* Title + stepper are added by home.component.ts only on mobile (see
+       the fpd-opacity-panel-title / fpd-opacity-stepper-row block there).
+       Style them here so this stays a styling-only change scoped to
+       .fpd-layout-small. */
+    span.fpd-label.fpd-opacity-panel-title {
+      display: block !important;
+      width: 100%;
+      text-align: center;
+      font-size: 18px !important;
+      font-weight: 700;
+      color: #1f2937;
+      margin: 0 0 10px 0 !important;
+      padding: 20px 16px;
+    }
+
+    .fpd-opacity-stepper-row {
+      display: flex;
+      justify-content: flex-end;
+      padding: 0 16px;
+      margin: 0 0 10px 0;
+    }
+
+    .fpd-opacity-stepper {
+      display: flex;
+      align-items: center;
+      gap: 30px;
+      margin-bottom: 20px;
+
+      button {
+        width: 32px;
+        height: 32px;
+        border: 1px solid #e3e5e9;
+        border-radius: 50%;
+        background: #fff;
+        color: #485563;
+        font-size: 18px;
+        line-height: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        padding: 0;
+      }
+
+      .fpd-opacity-value {
+        min-width: 32px;
+        text-align: center;
+        font-size: 16px;
+        font-weight: 600;
+        color: #1f2937;
+      }
+    }
+
+    /* Fallback layout for when the title/stepper markup above hasn't been
+       injected (e.g. panel queried before the mobile check runs) — keeps
+       the original plain label + slider look. */
+    > span.fpd-label:not(.fpd-opacity-panel-title) {
+      display: block !important;
+      font-size: 15px !important;
+      font-weight: 600;
+      color: #485563;
+      margin: 0 0 15px 0;
+      padding: 0 16px;
+    }
+
+    input#fpd-opacity-range {
+      display: block;
+      width: 80% !important;
+      margin-left: 30px;
+    }
+  }
+
+  /* Text elements hide #fpd-opacity-btn everywhere by default (see the
+     non-mobile rule elsewhere in this file) and fall back to the vendor's
+     inline "Transparency" slider inside the Color > Fill tab, which isn't
+     styled for the mobile bottom-sheet and renders cramped. On mobile, show
+     the same Opacity flyout used by image/shape elements instead, and hide
+     the inline fallback so it isn't duplicated. */
+  &[data-element-type="text"] {
+    #fpd-opacity-btn {
+      display: inline-flex !important;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Once JS (home.component.ts) reparents #fpd-opacity-btn into the
+       Bold/Italic/Underline/Align row's own tools-group, match its 32x32
+       boxed-icon look instead of the oversized standalone-row sizing above
+       (that sizing still applies as-is for image/shape elements, which keep
+       the button in its original spot). */
+    .fpd-tools-group.flex > #fpd-opacity-btn {
+      flex: 0 0 32px;
+      width: 32px !important;
+      height: 32px;
+      margin: 0 !important;
+      padding: 0;
+      border: 1px solid rgba(53, 71, 90, 0.2);
+      border-radius: 7px;
+      box-sizing: border-box;
+
+      svg {
+        width: 18px !important;
+      }
+    }
+
+    .fpd-tool-fill-opacity:not(#fpd-opacity-panel) {
+      display: none !important;
+    }
   }
 
   /* Sub-panels (color / size / font / transform / position / effects, etc.).
@@ -2746,7 +2873,8 @@ fpd-element-toolbar.fpd-smart.fpd-layout-small {
 
   .fpd-tools-group,
   .fpd-btn-group {
-    gap: 6px;
+    gap: 7px;
+    margin-left: 35px;
 
     > * {
       min-height: 40px;
