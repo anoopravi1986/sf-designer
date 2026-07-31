@@ -3079,12 +3079,6 @@ export class HomeComponent implements AfterViewInit {
             savedList.push(savedItem);
             window.localStorage.setItem(storageKey, JSON.stringify(savedList));
 
-            const saveLoadModule = this.designer['moduleInstance_save-load'];
-            if (saveLoadModule?.addSavedProduct) {
-              saveLoadModule.addSavedProduct(savedItem);
-            } else {
-              this.loadSavedProducts();
-            }
           }
 
           if (product) {
