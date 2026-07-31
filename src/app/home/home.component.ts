@@ -3078,6 +3078,13 @@ export class HomeComponent implements AfterViewInit {
             }
             savedList.push(savedItem);
             window.localStorage.setItem(storageKey, JSON.stringify(savedList));
+
+            const saveLoadModule = this.designer['moduleInstance_save-load'];
+            if (saveLoadModule?.addSavedProduct) {
+              saveLoadModule.addSavedProduct(savedItem);
+            } else {
+              this.loadSavedProducts();
+            }
           }
 
           if (product) {
@@ -3115,9 +3122,6 @@ export class HomeComponent implements AfterViewInit {
 
       popup.style.display = 'none';
       this.saveDesign(value);
-      setTimeout(() => {
-        this.loadSavedProducts();
-      }, 100);
     };
     if (closeBtn) {
       closeBtn.onclick = () => {
