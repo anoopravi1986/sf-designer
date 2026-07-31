@@ -174,12 +174,12 @@ export class HomeComponent implements AfterViewInit {
   targetBackUrl = 'https://www.styleflip.com/products/apple-macbook-13-nonunibody-custom-skins-covers';
 
   goBack() {
-    // Current URL check kar
+    
     if (window.location.href.includes('http://localhost:4200/apple/macbook-13-inch-non-unibody-2006-2009')) {
-      // Live product page pe bhej
+      
       window.location.href = this.targetBackUrl;
     } else {
-      // Normal back
+     
       window.history.back();
     }
   }
@@ -2120,7 +2120,7 @@ export class HomeComponent implements AfterViewInit {
       // multer-s3 -> styleflip-bucket, returns { image_src, filename }).
       // TODO: point this at the deployed backend URL before shipping - this
       // is the local dev server (node backend running on :4000) for now.
-      fileServerURL: 'http://localhost:4000/api/image/upload',
+      fileServerURL: 'https://styleflip-backend-jdm5.ithemes.xyz/api/image/upload',
       uploadZone: {
         useDataURL: true,
       },
