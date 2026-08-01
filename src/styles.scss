@@ -445,13 +445,18 @@ span.fpd-icon-align-vertical-middle:before {
   }
 
   fpd-element-toolbar .fpd-sub-panel>div.fpd-active.fpd-panel-position {
-    position: fixed;
+    // Was `position: fixed` with only a `margin-left: 270px` hack and no
+    // `top` — that drops it out of the (already correctly positioned)
+    // .fpd-sub-panel parent's flow entirely, so it floats wherever the
+    // browser's fixed-position fallback lands instead of docking under the
+    // toolbar like every other sub-panel (color, font-family, transform...)
+    // does. Let it stay in-flow inside .fpd-sub-panel (position: absolute;
+    // left: 0; top: 46px;) so it's anchored the same way as its siblings.
     background: #fff;
     max-width: 300px;
     height: 90px;
     border-radius: 7px;
     border: 1px solid #e5e5e5;
-    margin-left: 270px;
     box-shadow: 0 0 10px rgba(110, 111, 114, .22);
 
     .fpd-tool-position-align {
@@ -630,6 +635,16 @@ span.fpd-icon-align-vertical-middle:before {
     }
   }
 
+  // The 350px cap above assumes a panel (color/font-family/etc.) replaces
+  // the icon row entirely. For text elements the icon row stays visible
+  // alongside the panel (see fpd-panel-visible>.fpd-tools-nav below), so
+  // squeezing the whole toolbar into 350px clips its icons on the right
+  // instead of showing them. Let the text toolbar keep its normal
+  // content-fit width even while a panel (e.g. Position) is open.
+  fpd-element-toolbar[data-element-type="text"].fpd-smart.fpd-show.fpd-panel-visible {
+    max-width: calc(100% - 441px);
+  }
+
 }
 
 #data-info .fpd-designs-tags {
@@ -756,6 +771,19 @@ fpd-element-toolbar .fpd-tools-nav .fpd-panel-text-format {
   max-width: 198px;
 }
 
+// The icon row inside .fpd-panel-text-format (Bold/Italic/Underline/
+// Text-Transform/Letter-spacing/Text-Align/Position) needs ~273px, but the
+// 198px cap above is narrower than that. Since the row doesn't wrap or
+// clip, it overflows past the box's right edge and lands on top of the
+// adjacent #SecondaryIconBoxHeader row, overlapping its Transform icon
+// (fpd-icon-align-vertical-middle over fpd-icon-transform). Give desktop
+// enough room to fit the row instead of overflowing into the next box.
+@media only screen and (min-width: 991px) {
+  fpd-element-toolbar .fpd-tools-nav .fpd-panel-text-format {
+    max-width: none;
+  }
+}
+
 // icon bold
 .fpd-tools-group div.active svg path,
 .fpd-tools-group div.active svg .cls-1 {
@@ -770,6 +798,21 @@ fpd-element-toolbar .fpd-tools-nav .fpd-panel-text-format {
 div.fpd-tools-group div#TextMoveUp svg,
 div.fpd-tools-group div#TextMoveDown svg {
   min-width: 20px;
+}
+
+// The Move Up/Move Down <svg> icons ship without width/height attributes
+// (unlike every sibling icon in the toolbar), so `min-width: 20px` above
+// never actually caps them — they render at the browser's intrinsic SVG
+// size and blow out of the toolbar row, overlapping the row above it.
+// Mobile never shows this because .fpd-layout-small has its own
+// `svg { width/height: 32px !important }` catch-all; give desktop an
+// equivalent real cap instead of just a min-width.
+@media only screen and (min-width: 991px) {
+  div.fpd-tools-group div#TextMoveUp svg,
+  div.fpd-tools-group div#TextMoveDown svg {
+    width: 20px;
+    height: 20px;
+  }
 }
 
 fpd-element-toolbar[data-element-type=text] .fpd-secondary-tools.fpd-scroll-area div#TextMoveUp,
@@ -1178,6 +1221,17 @@ fpd-element-toolbar.fpd-smart.fpd-show.fpd-panel-visible {
 
 fpd-element-toolbar[data-element-type="text"] .fpd-sub-panel {
   max-width: 226px;
+}
+
+// The Top/Middle/Bottom/Left/Center/Right align grid inside
+// .fpd-panel-position needs ~300px (3 columns) to lay out in the 2 rows
+// its fixed height:90px assumes. Squeezed into the 226px cap above, it
+// wraps to 3 rows and the extra row gets clipped. Widen just this panel's
+// wrapper back to 300px on desktop.
+@media only screen and (min-width: 991px) {
+  fpd-element-toolbar[data-element-type="text"] .fpd-sub-panel:has(>.fpd-panel-position.fpd-active) {
+    max-width: 300px;
+  }
 }
 
 .fpd-sub-panel {
