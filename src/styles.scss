@@ -2898,6 +2898,13 @@ fpd-element-toolbar.fpd-smart.fpd-layout-small {
     width: 100%;
     max-width: 100% !important;
     max-height: 62vh;
+    // Flex column so the Transform panel + curved-text panel combo below
+    // (both visible together while the Transform tool is open) can be
+    // reordered with `order` to match the desktop layout (Rotate/Scale/Flip
+    // above the curve-style options), instead of falling back to plain DOM
+    // order. Doesn't affect the normal case of a single .fpd-active panel.
+    display: flex;
+    flex-direction: column;
 
     > div.fpd-active {
       padding: 16px !important;
@@ -2967,6 +2974,45 @@ fpd-element-toolbar.fpd-smart.fpd-layout-small {
     svg path,
     svg rect {
       fill: #e0393a !important;
+    }
+  }
+
+  /* Transform panel: Scale-X, Flip Horizontal/Vertical and the curved-text
+     (ABCD) options are shown on desktop via the equivalent
+     .fpd-toolbar-transform-our rule (see the min-width: 991px media query
+     above) but that rule never applied below 991px, so mobile only ever
+     showed the Rotate slider. Mirror it here for the mobile bottom sheet. */
+  .fpd-panel-transform.fpd-active {
+    order: 1;
+
+    .fpd-tool-scaleX,
+    .fpd-tool-flip {
+      display: flex !important;
+      pointer-events: auto !important;
+    }
+
+    .fpd-tool-flip {
+      gap: 8px;
+
+      > div {
+        flex: 1;
+      }
+    }
+  }
+
+  // .fpd-panel-curved-text isn't the vendor's ".fpd-active" panel here (it's
+  // forced visible as a sibling of the active Transform panel, see above), so
+  // it never picks up the padding/gap that ">div.fpd-active" grants above —
+  // give it its own so it doesn't sit flush against the sheet's drag-handle/
+  // close button, and `order: 2` puts it after Transform (it comes earlier
+  // in the vendor's DOM, which without this would stack it on top instead).
+  body.fpd-toolbar-transform-our & .fpd-panel-curved-text {
+    display: block;
+    order: 2;
+    padding: 16px !important;
+
+    .fpd-curved-options {
+      margin-bottom: 14px;
     }
   }
 }

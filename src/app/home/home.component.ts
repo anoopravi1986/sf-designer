@@ -486,6 +486,7 @@ export class HomeComponent implements AfterViewInit {
       }
 
       this.moveBoldToPrimaryTools()
+      this.fixRotateAroundCenter()
     }, 3000);
     createIcons({ icons });
 
@@ -2006,6 +2007,39 @@ export class HomeComponent implements AfterViewInit {
         document.body.classList.add(typeClass);
       }
     });
+  }
+
+  // The Transform panel's Rotate control sets fabric's `angle` directly
+  // (FancyProductDesigner.js's setElementOptions does a plain e.set()), and
+  // every fabric object defaults to originX/originY 'left'/'top'. Unlike
+  // dragging the on-canvas rotate handle — which fabric internally pivots
+  // around the object's center — setting `angle` that way spins the element
+  // around its top-left corner instead. Re-anchor the object to its previous
+  // center after every change so the Rotate slider/number input visually
+  // pivots around the center too, regardless of the object's origin.
+  fixRotateAroundCenter(): void {
+    const recenterAfterAngleChange = (target: EventTarget | null) => {
+      const el = target as HTMLElement | null;
+      if (!el || !el.closest('[data-control="angle"]')) return;
+
+      const canvas = this.designer?.currentViewInstance?.fabricCanvas;
+      const obj = canvas?.getActiveObject();
+      if (!obj) return;
+
+      const center = obj.getCenterPoint();
+      // Deferred so it runs after the vendor's own listener (registered
+      // directly on the input/slider) has already applied the new angle —
+      // our listener is capture-phase so it fires first and can only grab
+      // the pre-change center, not correct the post-change position yet.
+      setTimeout(() => {
+        obj.setPositionByOrigin(center, obj.originX, obj.originY);
+        obj.setCoords();
+        canvas.requestRenderAll();
+      }, 0);
+    };
+
+    document.addEventListener('input', (e) => recenterAfterAngleChange(e.target), true);
+    document.addEventListener('change', (e) => recenterAfterAngleChange(e.target), true);
   }
 
   slugify(title: string): string {
