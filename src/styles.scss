@@ -1614,19 +1614,7 @@ fpd-module-images .fpd-three-dot-menu {
 }
 
 // fpd-element-toolbar.fpd-layout-large.my-font-family .fpd-close-sub-panel, fpd-element-toolbar.fpd-layout-large.my-color .fpd-close-sub-panel{    position: fixed;left: 421px;top: 87px;right: auto;box-shadow: none;z-index: 100;    padding: 0;min-width: 13px;}
-.fpd-pos-data-sec {
-  .fpd-panel-tabs {
-    display: none !important;
-  }
-
-  .fpd-panel-tabs-content {
-    div[data-id="align"] {
-      display: block;
-    }
-  }
-}
-
-// Css added by Anoop for Font Family 
+// Css added by Anoop for Font Family
 .fpd-font-item-container {
   display: flex;
   flex-direction: column;

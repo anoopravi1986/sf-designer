@@ -1352,6 +1352,20 @@ export class HomeComponent implements AfterViewInit {
         const positionPanel = subPanel.querySelector('.fpd-panel-position');
         if (positionPanel) {
           positionPanel.classList.add('fpd-active', 'fpd-pos-data-sec');
+
+          // The vendor toolbar hides the Align/Arrange tab spans (and the
+          // tab header itself) between renders and only re-shows them from
+          // its own selection-render pass. Since we're opening this panel
+          // directly instead of going through that pass, force both tabs
+          // (and their header) visible here too, otherwise Arrange can be
+          // stuck hidden from a previous render.
+          positionPanel.querySelectorAll('.fpd-panel-tabs, .fpd-panel-tabs [data-tab]').forEach(el => {
+            el.classList.remove('fpd-hidden');
+          });
+
+          if (!positionPanel.querySelector('.fpd-panel-tabs [data-tab].fpd-active')) {
+            (positionPanel.querySelector('.fpd-panel-tabs [data-tab]') as HTMLElement | null)?.click();
+          }
         }
 
         const elementtoolbar = document.querySelector('fpd-element-toolbar');

@@ -36498,6 +36498,7 @@ function updateFPDLayersToSingleGroup(group) {
       }
       function Oa (t) {
         let e
+        try {
         if (
           (Kr(this, ga, _a).call(this),
           Z(this.container, ['fpd-type-image']),
@@ -36589,7 +36590,7 @@ function updateFPDLayersToSingleGroup(group) {
           })
           r.append(a);
             ;
-            if(t.source != ""){
+            if(t.source){
               ;
               document.querySelector('body').classList.add('notgroup')
               if (t.source.toLowerCase().endsWith('.svg')) {
@@ -36676,13 +36677,13 @@ function updateFPDLayersToSingleGroup(group) {
               this,
               'position',
               'arrange',
-              Boolean(t.zChangeable || t.__editorMode)
+              true
             ),
             Kr(this, sa, wa).call(
               this,
               'position',
               'align',
-              Boolean(t.draggable || t.__editorMode)
+              true
             )),
           'text' === t.getType() && (t.editable || t.__editorMode)
             ? (Kr(this, ia, ya).call(this, 'edit-text'),
@@ -36815,6 +36816,13 @@ function updateFPDLayersToSingleGroup(group) {
           }),
           (this.container.dataset.fabricType = t.type),
           (this.container.dataset.elementType = t.getType())
+        } catch (err) {
+          console.error('[FPD toolbar render error]', err)
+        }
+        this.subPanel.querySelectorAll('.fpd-panel-tabs').forEach(t => {
+          const e = t.querySelectorAll('[data-tab]:not(.fpd-hidden)')
+          J(t, ['fpd-hidden'], e.length <= 1)
+        })
       }
       function ka () {
         if (
