@@ -454,10 +454,24 @@ span.fpd-icon-align-vertical-middle:before {
     // left: 0; top: 46px;) so it's anchored the same way as its siblings.
     background: #fff;
     max-width: 300px;
-    height: 90px;
+    // Was a fixed `height: 90px`, sized back when the Align/Arrange tab
+    // headers were hidden via display:none (.fpd-pos-data-sec) and only
+    // the Align grid's own height counted. Now that both tabs render
+    // normally, 90px is shorter than tabs-header + 2-row Align grid, so
+    // .fpd-panel-tabs-content (height:100% + overflow:auto) clips content
+    // and shows an internal scrollbar. min-height keeps the box from
+    // looking cramped on the 1-row Arrange tab while letting it grow to
+    // fit the taller Align tab instead of scrolling.
+    min-height: 90px;
     border-radius: 7px;
     border: 1px solid #e5e5e5;
     box-shadow: 0 0 10px rgba(110, 111, 114, .22);
+
+    .fpd-panel-tabs-content.fpd-scroll-area {
+      height: auto;
+      max-height: none;
+      overflow: visible;
+    }
 
     .fpd-tool-position-align {
       margin-bottom: 0;
