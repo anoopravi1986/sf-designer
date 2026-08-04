@@ -2584,7 +2584,7 @@ fpd-element-toolbar.fpd-smart.fpd-layout-small {
   }
 
   .fpd-primary-tools {
-    gap: 4px;
+    gap: 14px;
 
     > div {
       flex: 0 0 auto !important;
@@ -2617,6 +2617,73 @@ fpd-element-toolbar.fpd-smart.fpd-layout-small {
       border: 2px solid rgba(0, 0, 0, 0.1);
       margin-left: 4px;
     }
+
+  }
+
+  /* Bold/Italic/Underline/aA(TextTransform)/letter-spacing/Align group.
+     Markup-wise this is NOT inside .fpd-primary-tools — the vendor renders
+     it as its own sibling block (.fpd-panel-text-format > .fpd-tools-group
+     .flex), which is why nesting this selector under .fpd-primary-tools
+     above never matched anything. Base (desktop-shared) sizing at line
+     ~1077 packs these into plain 32x32 boxes with a 6px gap and no border,
+     which reads as cramped/inconsistent next to the font family/size/color
+     row above it. Mirror the secondary-tools row's box/icon sizing (below)
+     so both rows look and feel consistent on mobile — same box size, same
+     icon size, icon centered in the box.
+     Icons here are a mix of inline <svg> (Bold/Italic/Underline/letter-
+     spacing, several with their own inline width/height) and plain <span>
+     glyphs (TextTransform's span class is "dd fpd-icon-text-transform tts"
+     — doesn't start with "fpd-icon-", so a [class^="fpd-icon-"] selector
+     silently misses it). Target svg/span generically instead so every icon
+     in the group ends up the same size.
+     The vendor default (.fpd-tools-group base rule) also sets
+     `flex-flow: row wrap`, so once these boxes/gap grow past the available
+     width the group silently wraps onto a second line and gets clipped by
+     the card's rounded corner instead of just scrolling. Force it to stay
+     a single row — the outer .fpd-tools-nav already scrolls horizontally,
+     so this rides along as its own strip. */
+  .fpd-tools-group.flex {
+    /* A later, more generic rule (`.fpd-tools-group, .fpd-btn-group { margin-left:
+       35px }`, meant for indenting sub-panel button groups like the
+       Transform panel's Flip buttons) also matches this element because it
+       carries the plain .fpd-tools-group class too. Client-tested/confirmed
+       spacing in DevTools: 64px left margin lines the row up under the
+       primary-tools row above, 7px gap between icons. */
+    margin-left: 64px !important;
+    flex-wrap: nowrap !important;
+    gap: 7px !important;
+
+    > div {
+      flex: 0 0 auto !important;
+      min-width: 52px !important;
+      height: 52px !important;
+      margin: 0 !important;
+      padding: 0 8px !important;
+      border: 1px solid #e3e5e9 !important;
+      border-radius: 12px !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      box-sizing: border-box;
+      transition: background-color 0.15s ease;
+
+      svg {
+        width: 32px !important;
+        height: 32px !important;
+        min-width: 32px !important;
+        margin: 0 auto;
+      }
+
+      span {
+        font-size: 28px !important;
+        margin: 0 auto !important;
+      }
+    }
+
+    > div.fpd-active {
+      background: #e8576d1a;
+      border-color: #e8576d1a;
+    }
   }
 
 
@@ -2627,7 +2694,7 @@ fpd-element-toolbar.fpd-smart.fpd-layout-small {
        letting it scroll — force it back to a scrollable slider here. */
     overflow-x: auto !important;
     overflow-y: hidden !important;
-    gap: 8px;
+    gap: 10px;
     padding: 4px 14px 8px;
 
     > div {
@@ -2857,23 +2924,39 @@ fpd-element-toolbar.fpd-smart.fpd-layout-small {
       justify-content: center;
     }
 
-    /* Once JS (home.component.ts) reparents #fpd-opacity-btn into the
-       Bold/Italic/Underline/Align row's own tools-group, match its 32x32
-       boxed-icon look instead of the oversized standalone-row sizing above
-       (that sizing still applies as-is for image/shape elements, which keep
-       the button in its original spot). */
-    .fpd-tools-group.flex > #fpd-opacity-btn {
-      flex: 0 0 32px;
-      width: 32px !important;
-      height: 32px;
+    /* Row default (align-items: stretch) let each child's box stretch to
+       the row's height, but only .fpd-tool-color centered its own content
+       — the font-family dropdown, size stepper and opacity icon were each
+       landing at a different vertical position instead of lining up.
+       Center everything on the row's cross-axis instead. Scoped to text
+       elements only so the image/shape primary-tools row is untouched. */
+    .fpd-primary-tools {
+      align-items: center !important;
+    }
+
+    /* JS (home.component.ts) reparents #fpd-opacity-btn into the font
+       family/size/color row, between the size stepper and the color
+       swatch — give it the same square bordered box treatment as the
+       Size stepper (.flex-plus-minus-icon, border: 1px solid rgba(53,71,
+       90,0.2); border-radius: 7px at line ~1334) instead of the oversized
+       standalone-row sizing above (that sizing still applies as-is for
+       image/shape elements, which keep the button in its original spot). */
+    .fpd-primary-tools > #fpd-opacity-btn {
+      display: flex !important;
+      align-items: center;
+      justify-content: center;
+      flex: 0 0 40px !important;
+      width: 40px !important;
+      height: 40px !important;
       margin: 0 !important;
-      padding: 0;
+      padding: 0 !important;
       border: 1px solid rgba(53, 71, 90, 0.2);
       border-radius: 7px;
       box-sizing: border-box;
 
       svg {
-        width: 18px !important;
+        width: 22px !important;
+        height: 22px !important;
       }
     }
 

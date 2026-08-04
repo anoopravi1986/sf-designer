@@ -509,10 +509,22 @@ export class HomeComponent implements AfterViewInit {
       // lives (see the .fpd-opacity-open rules in styles.scss).
       const opacityOriginalParent = btnOpacity.parentElement;
       const textFormatGroup = document.getElementById('CenterTools')?.parentElement as HTMLElement | null;
+      const primaryTools = opacityToolbarEl?.querySelector('.fpd-primary-tools') as HTMLElement | null;
+      const colorTool = primaryTools?.querySelector('.fpd-tool-color') as HTMLElement | null;
+      const isMobileLayout = () => window.matchMedia('(max-width: 768px)').matches;
 
+      // On mobile, the button moves up into the font family/size/color row
+      // (between the size stepper and the color swatch) instead of tagging
+      // along at the end of the Bold/Italic/Underline/Align row — client
+      // wanted it grouped with the other quick controls up top. Desktop
+      // keeps the original tools-group placement untouched.
       const placeOpacityButton = () => {
         const elementType = opacityToolbarEl?.getAttribute('data-element-type');
-        if (elementType === 'text' && textFormatGroup) {
+        if (elementType === 'text' && isMobileLayout() && primaryTools && colorTool) {
+          if (btnOpacity.nextElementSibling !== colorTool || btnOpacity.parentElement !== primaryTools) {
+            primaryTools.insertBefore(btnOpacity, colorTool);
+          }
+        } else if (elementType === 'text' && textFormatGroup) {
           if (btnOpacity.parentElement !== textFormatGroup) {
             textFormatGroup.appendChild(btnOpacity);
           }
@@ -529,6 +541,8 @@ export class HomeComponent implements AfterViewInit {
           attributeFilter: ['data-element-type'],
         });
       }
+
+      window.addEventListener('resize', placeOpacityButton);
 
       // On mobile, the panel is shown as a bottom-sheet in place of the
       // toolbar's icon row (see the .fpd-opacity-open rules in
