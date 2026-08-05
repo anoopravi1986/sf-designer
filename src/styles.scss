@@ -2561,36 +2561,71 @@ fpd-element-toolbar.fpd-smart.fpd-layout-small {
     padding-top: 6px;
   }
 
-  
+  /* .fpd-panel-text-format (row 2's direct parent) is capped at max-width:
+     198px everywhere below desktop (see line ~784) — a leftover from when
+     this row's icons had fixed 52px sizing and were *meant* to overflow
+     past that box on purpose. Now that the icons inside shrink to fit
+     (flex: 1 1 0 below), that same 198px cap just squeezes the whole row
+     into a narrow strip on the left with empty space beside it. Let it use
+     the full row width on mobile so the shrink-to-fit sizing has real room
+     to work with. */
+  .fpd-panel-text-format {
+    max-width: 100% !important;
+    width: 100%;
+    box-sizing: border-box;
+  }
 
-  /* Primary/secondary icon rows: single row, horizontal scroll instead of
-     wrapping — this is what was overlapping/cramming on narrow phones. */
-  .fpd-primary-tools,
+  /* Secondary icon row (crop/rotate/layer/duplicate/etc): single row,
+     horizontal scroll instead of wrapping — this is what was overlapping/
+     cramming on narrow phones, and works well as a swipeable strip since
+     every item here is a plain equal-size icon. */
   .fpd-secondary-tools.fpd-scroll-area {
     display: flex !important;
     flex-wrap: nowrap !important;
-    overflow-x: auto;
+    overflow-x: auto !important;
     overflow-y: hidden;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
+    padding-right: 14px;
 
     &::-webkit-scrollbar {
       display: none;
     }
   }
 
+  /* Font-family/size/color row: unlike the row above, this mixes a text
+     dropdown with icon buttons, and a scrollable strip here previously hid
+     the color swatch off-screen with no visual hint to swipe. Instead of
+     scrolling, shrink the one item that can afford to shrink (the font-
+     family dropdown, already capped at max-width:130px above) so the whole
+     row always fits in one line — on every iPhone width from SE up to Pro
+     Max — with nothing scrolled off and nothing clipped. */
   .fpd-primary-tools {
-    gap: 14px;
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    overflow: visible !important;
+    gap: 10px;
+    padding: 0 4px;
+    box-sizing: border-box;
+    width: 100%;
 
     > div {
       flex: 0 0 auto !important;
-      padding: 8px 14px !important;
+      min-width: 0 !important;
+      padding: 8px 10px !important;
       border-radius: 10px;
       transition: background-color 0.15s ease;
     }
 
     > div.fpd-active {
       background: #e8576d1a;
+    }
+
+    /* The one item allowed to shrink — everything else keeps its natural
+       compact size (flex: 0 0 auto above). */
+    .fpd-tool-font-family {
+      flex: 1 1 0 !important;
+      min-width: 44px !important;
     }
 
     /* .fpd-tool-color is the one primary-tool that isn't hidden for image
@@ -2602,6 +2637,7 @@ fpd-element-toolbar.fpd-smart.fpd-layout-small {
       display: flex !important;
       align-items: center;
       justify-content: center;
+      flex: 0 0 auto !important;
     }
 
     .fpd-current-fill {
@@ -2635,26 +2671,43 @@ fpd-element-toolbar.fpd-smart.fpd-layout-small {
      The vendor default (.fpd-tools-group base rule) also sets
      `flex-flow: row wrap`, so once these boxes/gap grow past the available
      width the group silently wraps onto a second line and gets clipped by
-     the card's rounded corner instead of just scrolling. Force it to stay
-     a single row — the outer .fpd-tools-nav already scrolls horizontally,
-     so this rides along as its own strip. */
+     the card's rounded corner instead of just scrolling.
+     Fixed 52px boxes never fit all 7 icons on narrow phones (iPhone SE/X
+     up through 14/15 all fail past a point) — a scrollable strip was tried
+     here and backfired (WebKit rendered the row empty), so instead every
+     icon shrinks evenly (flex: 1 1 0) to whatever width the screen actually
+     has, guaranteeing a single row with nothing scrolled off or clipped on
+     any iPhone size. */
   .fpd-tools-group.flex {
-    /* A later, more generic rule (`.fpd-tools-group, .fpd-btn-group { margin-left:
-       35px }`, meant for indenting sub-panel button groups like the
-       Transform panel's Flip buttons) also matches this element because it
-       carries the plain .fpd-tools-group class too. Client-tested/confirmed
-       spacing in DevTools: 64px left margin lines the row up under the
-       primary-tools row above, 7px gap between icons. */
-    margin-left: 64px !important;
+    /* The 64px indent (lining this row up under the primary-tools row
+       above) isn't affordable once every pixel of width is needed to fit
+       7 icons on a narrow screen — dropped in favor of fitting. */
+    margin-left: 0 !important;
     flex-wrap: nowrap !important;
-    gap: 7px !important;
+    gap: 4px !important;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0 4px;
+    /* The actual bug: a vendor rule (fpd-element-toolbar.fpd-smart>
+       .fpd-tools-nav>div>div{flex:0}) matches this exact element (it's a
+       div two levels under .fpd-tools-nav) and sets flex-grow:0 plus
+       flex-basis:0%. Once flex-basis is anything other than auto, the
+       width property above is completely ignored for sizing — confirmed
+       by forcing an inline width:350px!important in a live debug build
+       and seeing zero effect. That's why this row rendered as a narrow
+       ~128px content-sized clump instead of filling the row: it was never
+       actually being sized by width at all. Overriding flex-grow/basis
+       directly (not just width) is what actually makes it fill the row. */
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
 
     > div {
-      flex: 0 0 auto !important;
-      min-width: 52px !important;
-      height: 52px !important;
+      flex: 1 1 0 !important;
+      min-width: 0 !important;
+      width: auto !important;
+      height: 48px !important;
       margin: 0 !important;
-      padding: 0 8px !important;
+      padding: 0 !important;
       border: 1px solid #e3e5e9 !important;
       border-radius: 12px !important;
       display: flex !important;
@@ -2662,16 +2715,17 @@ fpd-element-toolbar.fpd-smart.fpd-layout-small {
       justify-content: center !important;
       box-sizing: border-box;
       transition: background-color 0.15s ease;
+      overflow: hidden;
 
       svg {
-        width: 32px !important;
-        height: 32px !important;
-        min-width: 32px !important;
+        width: 22px !important;
+        height: 22px !important;
+        min-width: 0 !important;
         margin: 0 auto;
       }
 
       span {
-        font-size: 28px !important;
+        font-size: 18px !important;
         margin: 0 auto !important;
       }
     }
@@ -2750,7 +2804,37 @@ fpd-element-toolbar.fpd-smart.fpd-layout-small {
       height: 32px !important;
       min-width: 32px !important;
     }
-    
+
+    /* Bold/Italic/Underline/Align icons get moved into this row on mobile
+       (see mergeTextFormatIntoSecondaryTools() in home.component.ts) so
+       they share this row's working slider instead of sitting in their own
+       stacked row above it. Two of them need the same handling this row's
+       own icons already get above, now that they're physically inside it:
+       - #TextTransform's span is "dd fpd-icon-text-transform tts", which
+         doesn't start with "fpd-icon-" so the span[class^="fpd-icon-"]
+         rule above silently skips it — target it by id instead.
+       - #CenterTools/#textAlignCust are wrapper divs with the real
+         clickable target nested one level deeper; without this they'd
+         render as a tiny icon floating inside an otherwise-empty 52px box. */
+    #TextTransform span {
+      font-size: 28px !important;
+      line-height: 1 !important;
+    }
+
+    #CenterTools,
+    #textAlignCust {
+      padding: 0;
+
+      > div {
+        flex: 1 1 auto;
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+    }
   }
 
   /* Copy-group/paste-group is only meaningful for grouped elements; for a

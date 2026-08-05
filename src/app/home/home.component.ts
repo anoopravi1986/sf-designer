@@ -486,6 +486,7 @@ export class HomeComponent implements AfterViewInit {
       }
 
       this.moveBoldToPrimaryTools()
+      this.mergeTextFormatIntoSecondaryTools()
       this.fixRotateAroundCenter()
     }, 3000);
     createIcons({ icons });
@@ -2021,6 +2022,44 @@ export class HomeComponent implements AfterViewInit {
         document.body.classList.add(typeClass);
       }
     });
+  }
+
+  // Mobile "Add Text" toolbar had two separate icon rows stacked above each
+  // other: the Bold/Italic/Underline/Align group, then the crop/rotate/
+  // layer/duplicate group below it (the one with a working horizontal
+  // slider). Client wants both merged into that one slider instead of two
+  // stacked rows. Moving the actual icon nodes (not cloning) keeps their
+  // already-bound click listeners working — CSS alone can't do this since
+  // the two rows are separate sibling containers, not nested. Only affects
+  // mobile layout; on a wider viewport the icons move back to their
+  // original row so desktop is untouched.
+  mergeTextFormatIntoSecondaryTools(): void {
+    const textFormatGroup = document.getElementById('CenterTools')?.parentElement as HTMLElement | null;
+    const originalPanel = textFormatGroup?.closest('.fpd-panel-text-format') as HTMLElement | null;
+    const secondaryTools = document.getElementById('SecondaryIconBoxHeader') as HTMLElement | null;
+
+    if (!textFormatGroup || !originalPanel || !secondaryTools) return;
+
+    const icons = Array.from(textFormatGroup.children) as HTMLElement[];
+    if (!icons.length) return;
+
+    const isMobileLayout = () => window.matchMedia('(max-width: 768px)').matches;
+
+    const placeTextFormatIcons = () => {
+      if (isMobileLayout()) {
+        if (icons[0].parentElement !== secondaryTools) {
+          const insertionPoint = secondaryTools.firstElementChild;
+          icons.forEach((icon) => secondaryTools.insertBefore(icon, insertionPoint));
+          originalPanel.style.display = 'none';
+        }
+      } else if (icons[0].parentElement !== textFormatGroup) {
+        icons.forEach((icon) => textFormatGroup.appendChild(icon));
+        originalPanel.style.display = '';
+      }
+    };
+
+    placeTextFormatIcons();
+    window.addEventListener('resize', placeTextFormatIcons);
   }
 
   // The Transform panel's Rotate control sets fabric's `angle` directly

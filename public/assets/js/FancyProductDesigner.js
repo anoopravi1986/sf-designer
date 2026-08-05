@@ -37672,6 +37672,8 @@ function updateFPDLayersToSingleGroup(group) {
             ))
       }
       function mo () {
+        if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches)
+          return
         const t = document.body
         let e
         ;(e = document.createElement('div')),
