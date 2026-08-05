@@ -7,7 +7,157 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
 
-  
+  <!-- On-screen debug console: catches JS errors/warnings/unhandled promise
+       rejections and shows them in a floating panel, so crashes/freezes on
+       a real device (no Xcode/Safari inspector attached) can be seen and
+       screenshotted directly instead of guessed at. Loaded first, before
+       any other script, so it can catch errors during startup too. Remove
+       once the real-device crash investigation is done. -->
+  <script>
+  (function () {
+    var MAX_LOGS = 200;
+    var logs = [];
+    var panel, listEl, toggleBtn, countEl;
+    var errorCount = 0;
+
+    function escapeHtml(s) {
+      return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    function render() {
+      if (!listEl) return;
+      listEl.innerHTML = logs.map(function (l) {
+        var color = l.type === 'error' ? '#ff5555' : l.type === 'warn' ? '#ffcc00' : '#7fdc7f';
+        return '<div style="color:' + color + ';margin-bottom:4px;">[' + l.time + '] ' + escapeHtml(l.msg) + '</div>';
+      }).join('');
+      listEl.scrollTop = listEl.scrollHeight;
+    }
+
+    function push(type, msg) {
+      var time = new Date().toTimeString().slice(0, 8);
+      logs.push({ type: type, msg: msg, time: time });
+      if (logs.length > MAX_LOGS) logs.shift();
+      if (type === 'error') {
+        errorCount++;
+        if (countEl) {
+          countEl.style.display = 'flex';
+          countEl.textContent = errorCount > 99 ? '99+' : String(errorCount);
+        }
+        if (toggleBtn) toggleBtn.style.background = '#a30000';
+      }
+      render();
+    }
+
+    function createUI() {
+      toggleBtn = document.createElement('div');
+      toggleBtn.textContent = 'JS';
+      toggleBtn.style.cssText =
+        'position:fixed;bottom:100px;right:12px;z-index:2147483647;' +
+        'background:#1e1e1e;color:#fff;width:42px;height:42px;border-radius:50%;' +
+        'display:flex;align-items:center;justify-content:center;' +
+        'font:11px/1 monospace;box-shadow:0 2px 8px rgba(0,0,0,.4);opacity:.85;';
+
+      countEl = document.createElement('span');
+      countEl.style.cssText =
+        'position:absolute;top:-4px;right:-4px;background:#e0393a;color:#fff;' +
+        'border-radius:50%;min-width:16px;height:16px;font-size:10px;display:none;' +
+        'align-items:center;justify-content:center;padding:0 3px;font-family:sans-serif;';
+      toggleBtn.appendChild(countEl);
+
+      panel = document.createElement('div');
+      panel.style.cssText =
+        'position:fixed;left:0;right:0;bottom:0;height:45vh;background:rgba(20,20,20,.97);' +
+        'z-index:2147483647;display:none;flex-direction:column;';
+
+      var header = document.createElement('div');
+      header.style.cssText =
+        'display:flex;justify-content:space-between;align-items:center;padding:8px 12px;' +
+        'background:#000;color:#fff;font:12px sans-serif;flex:0 0 auto;';
+
+      var title = document.createElement('span');
+      title.textContent = 'Debug Console';
+      header.appendChild(title);
+
+      var btnWrap = document.createElement('span');
+      var clearBtn = document.createElement('span');
+      clearBtn.textContent = 'Clear';
+      clearBtn.style.cssText = 'margin-right:16px;cursor:pointer;';
+      clearBtn.addEventListener('click', function () {
+        logs = [];
+        errorCount = 0;
+        countEl.style.display = 'none';
+        toggleBtn.style.background = '#1e1e1e';
+        render();
+      });
+      var hideBtn = document.createElement('span');
+      hideBtn.textContent = 'Close';
+      hideBtn.style.cssText = 'cursor:pointer;';
+      hideBtn.addEventListener('click', function () {
+        panel.style.display = 'none';
+      });
+      btnWrap.appendChild(clearBtn);
+      btnWrap.appendChild(hideBtn);
+      header.appendChild(btnWrap);
+      panel.appendChild(header);
+
+      listEl = document.createElement('div');
+      listEl.style.cssText =
+        'flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:8px 12px;' +
+        'white-space:pre-wrap;word-break:break-word;font:10px/1.4 monospace;color:#7fdc7f;';
+      panel.appendChild(listEl);
+
+      toggleBtn.addEventListener('click', function () {
+        panel.style.display = panel.style.display === 'none' ? 'flex' : 'none';
+        errorCount = 0;
+        countEl.style.display = 'none';
+        toggleBtn.style.background = '#1e1e1e';
+      });
+
+      document.documentElement.appendChild(toggleBtn);
+      document.documentElement.appendChild(panel);
+      render();
+    }
+
+    window.addEventListener('error', function (e) {
+      var msg = e.message || 'Unknown error';
+      if (e.filename) {
+        msg += ' @ ' + e.filename.split('/').pop() + ':' + e.lineno + ':' + e.colno;
+      }
+      if (e.error && e.error.stack) {
+        msg += '\n' + e.error.stack;
+      }
+      push('error', msg);
+    });
+
+    window.addEventListener('unhandledrejection', function (e) {
+      var reason = e.reason;
+      var msg = 'Unhandled rejection: ' + (reason && reason.message ? reason.message : String(reason));
+      if (reason && reason.stack) msg += '\n' + reason.stack;
+      push('error', msg);
+    });
+
+    var origLog = console.log, origWarn = console.warn, origError = console.error;
+    console.log = function () {
+      origLog.apply(console, arguments);
+      push('log', Array.prototype.slice.call(arguments).join(' '));
+    };
+    console.warn = function () {
+      origWarn.apply(console, arguments);
+      push('warn', Array.prototype.slice.call(arguments).join(' '));
+    };
+    console.error = function () {
+      origError.apply(console, arguments);
+      push('error', Array.prototype.slice.call(arguments).join(' '));
+    };
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', createUI);
+    } else {
+      createUI();
+    }
+  })();
+  </script>
+
   <!-- The CSS for the plugin itself - required -->
   <link rel="stylesheet" type="text/css" href="assets/css/FancyProductDesigner.min.css" />
 

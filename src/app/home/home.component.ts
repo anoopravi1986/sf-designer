@@ -469,11 +469,16 @@ export class HomeComponent implements AfterViewInit {
 
       if (productModule) {
         const innerHtmlObserver = new MutationObserver((mutations) => {
-          for (const mutation of mutations) {
-            if (mutation.type === 'childList') {
-              ;
-              checkAndHideDuplicateFpdItems();
-            }
+          // A single render pass (e.g. a grid populating with many items)
+          // batches many childList mutations into one callback invocation.
+          // Calling the full re-scan once per mutation record here (instead
+          // of once per invocation) turned every batch of N DOM insertions
+          // into N full .fpd-item re-scans — an O(n^2) cost that was cheap
+          // enough to hide on the simulator's desktop CPU but heavy enough
+          // to freeze/hang real devices while grids were populating.
+          const hasChildListChange = mutations.some((mutation) => mutation.type === 'childList');
+          if (hasChildListChange) {
+            checkAndHideDuplicateFpdItems();
           }
         });
 

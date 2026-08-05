@@ -34914,6 +34914,7 @@
             }),
             G(t, 'elementModify', t => {
               ;
+              if (!t.currentTarget || !t.currentTarget.currentViewInstance || !t.currentTarget.currentViewInstance.fabricCanvas) return;
               const elementtypedata = t.currentTarget.currentViewInstance.fabricCanvas.getActiveObject();
               if (elementtypedata) {
                 let updated = false;
