@@ -25,7 +25,10 @@
     }
 
     function render() {
-      if (!listEl) return;
+      // Rebuilding the whole log list's innerHTML on every single log/error
+      // call is wasted work while the panel is closed (the common case) —
+      // skip it here and catch up once when the panel is actually opened.
+      if (!listEl || !panel || panel.style.display === 'none') return;
       listEl.innerHTML = logs.map(function (l) {
         var color = l.type === 'error' ? '#ff5555' : l.type === 'warn' ? '#ffcc00' : '#7fdc7f';
         return '<div style="color:' + color + ';margin-bottom:4px;">[' + l.time + '] ' + escapeHtml(l.msg) + '</div>';
@@ -51,11 +54,16 @@
     function createUI() {
       toggleBtn = document.createElement('div');
       toggleBtn.textContent = 'JS';
+      // Left-edge, vertically centered: the bottom-right corner is where
+      // FPD's own toolbar controls (color swatch, delete/duplicate icons,
+      // the whole secondary-tools row) live, and a fixed overlay sitting on
+      // top of them was swallowing taps meant for those buttons. The left
+      // canvas margin has no interactive controls in this app's layouts.
       toggleBtn.style.cssText =
-        'position:fixed;bottom:100px;right:12px;z-index:2147483647;' +
-        'background:#1e1e1e;color:#fff;width:42px;height:42px;border-radius:50%;' +
+        'position:fixed;top:50%;left:6px;transform:translateY(-50%);z-index:2147483647;' +
+        'background:#1e1e1e;color:#fff;width:36px;height:36px;border-radius:50%;' +
         'display:flex;align-items:center;justify-content:center;' +
-        'font:11px/1 monospace;box-shadow:0 2px 8px rgba(0,0,0,.4);opacity:.85;';
+        'font:10px/1 monospace;box-shadow:0 2px 8px rgba(0,0,0,.4);opacity:.7;';
 
       countEl = document.createElement('span');
       countEl.style.cssText =
@@ -111,6 +119,7 @@
         errorCount = 0;
         countEl.style.display = 'none';
         toggleBtn.style.background = '#1e1e1e';
+        if (panel.style.display === 'flex') render();
       });
 
       document.documentElement.appendChild(toggleBtn);

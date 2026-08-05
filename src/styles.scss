@@ -2746,6 +2746,15 @@ fpd-element-toolbar.fpd-smart.fpd-layout-small {
     overflow-y: hidden !important;
     gap: 10px;
     padding: 4px 14px 8px;
+    /* Promote this row to its own GPU-composited layer so WebKit can pan it
+       by translating an already-rasterized layer instead of repainting the
+       whole strip's ~20 bordered/rounded icon boxes on every scroll frame —
+       real iPhones (weaker GPU/less compositor headroom than the desktop
+       simulator) were janking specifically while swipe-scrolling this row. */
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+    will-change: scroll-position;
+    backface-visibility: hidden;
 
     > div {
       flex: 0 0 auto !important;
