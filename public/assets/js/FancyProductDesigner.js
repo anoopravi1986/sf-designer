@@ -34914,6 +34914,7 @@
             }),
             G(t, 'elementModify', t => {
               ;
+              if (!t.currentTarget || !t.currentTarget.currentViewInstance || !t.currentTarget.currentViewInstance.fabricCanvas) return;
               const elementtypedata = t.currentTarget.currentViewInstance.fabricCanvas.getActiveObject();
               if (elementtypedata) {
                 let updated = false;
@@ -37672,6 +37673,8 @@ function updateFPDLayersToSingleGroup(group) {
             ))
       }
       function mo () {
+        if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches)
+          return
         const t = document.body
         let e
         ;(e = document.createElement('div')),
