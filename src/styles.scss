@@ -2749,7 +2749,7 @@ fpd-element-toolbar.fpd-smart.fpd-layout-small {
     overflow-x: auto !important;
     overflow-y: hidden !important;
     gap: 10px;
-    padding: 4px 14px 8px;
+    padding: 4px 2px 8px;
     /* Promote this row to its own GPU-composited layer so WebKit can pan it
        by translating an already-rasterized layer instead of repainting the
        whole strip's ~20 bordered/rounded icon boxes on every scroll frame —
@@ -2858,25 +2858,102 @@ fpd-element-toolbar.fpd-smart.fpd-layout-small {
     display: none !important;
   }
 
-  /* For non-text elements (image/shape/group) .fpd-tools-nav lays the
-     primary- and secondary-tools rows out side by side on one line instead
-     of stacking them, and as flex children they don't shrink below their
-     content width by default — they just grow past the screen edge and
-     the outer .fpd-tools-nav silently absorbs the overflow instead of the
-     visible icon row itself scrolling. Let the row shrink to the space
-     it's actually given so its own overflow-x: auto above can kick in. */
+  /* For non-text elements (image/shape/group), the color swatch
+     (.fpd-primary-tools) used to sit pinned outside the scrollable
+     secondary-tools strip (magic-wand/crop/layers/etc), so only part of
+     the row was swipeable. Make .fpd-tools-nav itself the single scroll
+     container so the whole row — color swatch included — is one
+     continuous slider, and let primary-/secondary-tools sit inline inside
+     it at their natural size instead of each managing their own
+     shrink/scroll behaviour. */
   &:not([data-element-type="text"]) {
+    /* Vendor CSS already sets flex-direction: row for image/shape's
+       .fpd-tools-nav (and .fpd-scroll-area already gives it overflow:auto)
+       — only add the axis-specific/scrollbar-hiding pieces here so this
+       stays additive instead of re-declaring display/flex-wrap and risking
+       a specificity tie with the unrelated rule that hides .fpd-tools-nav
+       (display: none) while a sub-panel is open. */
     .fpd-tools-nav {
-      overflow: visible !important;
+      overflow-x: auto !important;
+      overflow-y: hidden;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      /* Even spacing between every top-level item in the row (opacity
+         icon, color swatch, crop/layers/align) — matches the 10px gap
+         .fpd-secondary-tools already uses between its own icons, so the
+         whole strip reads as one consistently-spaced row. */
+      gap: 10px;
+      margin-left: 13px;
+      /* .fpd-secondary-tools carries its own 4px/8px top/bottom padding
+         around its 52px icon boxes (so its own total height is 64px),
+         while #fpd-opacity-btn/.fpd-primary-tools are exactly 52px with
+         none — with the row's default cross-axis alignment (stretch),
+         those fixed-height items were pinned to the top of the taller
+         row instead of matching the vertical position of the secondary
+         icons. Centering the whole row makes every box land at the same
+         height regardless of each child's own padding. */
+      align-items: center !important;
+
+      &::-webkit-scrollbar {
+        display: none;
+      }
     }
 
     .fpd-secondary-tools.fpd-scroll-area {
-      flex: 1 1 auto !important;
+      flex: 0 0 auto !important;
+      overflow: visible !important;
       min-width: 0 !important;
     }
 
     .fpd-primary-tools {
-      flex: 0 1 auto !important;
+      flex: 0 0 auto !important;
+      overflow: visible !important;
+      min-width: 0 !important;
+      /* The base .fpd-primary-tools rule (above) sets width: 100% for the
+         text font-family/size/color row — here it only holds the color
+         swatch, and left at 100% it would claim the whole scroll
+         container's width by itself, shoving the rest of the row (crop/
+         layers/etc) off-screen behind an empty gap. */
+      width: auto !important;
+      /* .fpd-tools-nav's own gap (above) now spaces this from its
+         neighbours — its own padding/gap (meant for a multi-icon text row)
+         would just add uneven extra space around this row's one icon. */
+      padding: 0 !important;
+      gap: 0 !important;
+    }
+
+    /* #fpd-opacity-btn is a third direct child of .fpd-tools-nav (a plain
+       sibling of primary-/secondary-tools, not nested in either) that was
+       left out of the flex: 0 0 auto treatment above — as the one item
+       still using the flexbox default (flex-shrink: 1), it absorbed 100%
+       of the row's shrinking once primary-/secondary-tools refused to
+       shrink, which collapsed it down to near-zero width instead of
+       leaving it to the row's new horizontal scroll. */
+    #fpd-opacity-btn {
+      flex: 0 0 auto !important;
+    }
+
+    /* Give the opacity icon and the color swatch the same bordered-box
+       treatment .fpd-secondary-tools already gives crop/layers/align, so
+       every icon in the row reads as one consistent set instead of two
+       boxed icons floating loose next to boxed ones. */
+    #fpd-opacity-btn,
+    .fpd-tool-color {
+      min-width: 52px !important;
+      height: 52px !important;
+      margin: 0 !important;
+      padding: 0 8px !important;
+      border: 1px solid #e3e5e9;
+      border-radius: 12px;
+      box-sizing: border-box;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+    }
+
+    #fpd-opacity-btn svg {
+      width: 32px !important;
+      height: 32px !important;
       min-width: 0 !important;
     }
   }
@@ -3297,6 +3374,9 @@ fpd-element-toolbar.fpd-smart.fpd-layout-small {
 // below do the shrinking/scrolling instead, plus give every icon its own
 // consistently-sized pill background instead of just the active one.
 @media (max-width: 768px) {
+
+  
+
   fpd-module-images .fpd-module-tabs {
     flex: 0 0 auto !important;
     display: flex !important;
