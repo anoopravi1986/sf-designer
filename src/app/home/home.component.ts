@@ -581,12 +581,13 @@ export class HomeComponent implements AfterViewInit {
         canvas.fire('object:modified', { target: obj });
       };
 
-      // Mobile-only: centered bold "Opacity" title, a right-aligned +/-
-      // stepper below it, and a slider that spans the full sheet width (see
-      // styles.scss for the matching layout), and let text elements use
-      // this flyout instead of the vendor's inline Transparency slider in
-      // the Fill tab (see the [data-element-type="text"] override there).
-      // Desktop markup/behaviour is untouched.
+      // Mobile-only: centered bold "Opacity" title with a close (X) button,
+      // a second row with the "Opacity" label on the left and the +/-
+      // stepper on the right, and a slider that spans the full sheet width
+      // (see styles.scss for the matching layout), and let text elements
+      // use this flyout instead of the vendor's inline Transparency slider
+      // in the Fill tab (see the [data-element-type="text"] override
+      // there). Desktop markup/behaviour is untouched.
       if (
         window.matchMedia('(max-width: 768px)').matches &&
         !panel.querySelector('.fpd-opacity-stepper-row')
@@ -594,8 +595,27 @@ export class HomeComponent implements AfterViewInit {
         const existingLabel = panel.querySelector('span.fpd-label');
         existingLabel?.classList.add('fpd-opacity-panel-title');
 
+        if (existingLabel && existingLabel.parentElement === panel) {
+          const titleRow = document.createElement('div');
+          titleRow.className = 'fpd-opacity-title-row';
+          panel.insertBefore(titleRow, existingLabel);
+          titleRow.appendChild(existingLabel);
+
+          const closeBtn = document.createElement('button');
+          closeBtn.type = 'button';
+          closeBtn.className = 'fpd-opacity-close';
+          closeBtn.setAttribute('aria-label', 'Close');
+          closeBtn.innerHTML = '&times;';
+          closeBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            closeOpacityPanel();
+          });
+          titleRow.appendChild(closeBtn);
+        }
+
         const stepperRow = document.createElement('div');
         stepperRow.className = 'fpd-opacity-stepper-row';
+        stepperRow.innerHTML = `<span class="fpd-opacity-row-label">Opacity</span>`;
         const stepper = document.createElement('div');
         stepper.className = 'fpd-opacity-stepper';
         stepper.innerHTML = `

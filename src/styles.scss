@@ -1889,6 +1889,10 @@ fpd-element-toolbar[data-element-type="image"] .fpd-tool-advanced-editing {
   border-radius: 10px;
   outline: none;
   cursor: pointer;
+  /* Without this, dragging the thumb toward the low end reads to iOS/the
+     webview as a horizontal pan and gets hijacked as a screen swipe
+     instead of continuing to move the slider. */
+  touch-action: none;
 
   /* Default background */
   background: linear-gradient(to right,
@@ -2924,37 +2928,80 @@ fpd-element-toolbar.fpd-smart.fpd-layout-small {
   #fpd-opacity-panel.fpd-opacity-panel {
     border-radius: 14px;
     /* No horizontal padding at the panel level — the title/stepper rows
-       carry their own side padding below, but the slider is left free to
-       stretch the full sheet width. */
-    padding: 0px 0 16px !important;
+       carry their own side padding below, and the slider now carries its
+       own bottom margin, so the panel itself only needs a small buffer. */
+    padding: 0px 0 8px !important;
 
     /* Title + stepper are added by home.component.ts only on mobile (see
        the fpd-opacity-panel-title / fpd-opacity-stepper-row block there).
        Style them here so this stays a styling-only change scoped to
        .fpd-layout-small. */
+    .fpd-opacity-title-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      width: 100%;
+      padding: 20px 16px;
+      margin: 0 0 10px 0;
+    }
+
     span.fpd-label.fpd-opacity-panel-title {
       display: block !important;
-      width: 100%;
       text-align: center;
       font-size: 18px !important;
       font-weight: 700;
       color: #1f2937;
-      margin: 0 0 10px 0 !important;
-      padding: 20px 16px;
+      margin: 0 !important;
+      padding: 0;
+    }
+
+    .fpd-opacity-close {
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 24px;
+      height: 24px;
+      border: none;
+      background: transparent;
+      color: #485563;
+      font-size: 22px;
+      line-height: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      padding: 0;
     }
 
     .fpd-opacity-stepper-row {
-      display: flex;
-      justify-content: flex-end;
+      display: flex !important;
+      flex-direction: row !important;
+      flex-wrap: nowrap !important;
+      align-items: center !important;
+      justify-content: space-between !important;
+      width: 100%;
       padding: 0 16px;
-      margin: 0 0 10px 0;
+      margin: 0 0 32px 0;
+    }
+
+    .fpd-opacity-row-label {
+      display: inline-block !important;
+      width: auto !important;
+      text-align: left;
+      font-size: 16px;
+      font-weight: 500;
+      color: #485563;
     }
 
     .fpd-opacity-stepper {
-      display: flex;
+      display: flex !important;
+      flex: 0 0 auto !important;
+      width: auto !important;
       align-items: center;
       gap: 30px;
-      margin-bottom: 20px;
+      margin-bottom: 0;
 
       button {
         width: 32px;
@@ -2995,8 +3042,8 @@ fpd-element-toolbar.fpd-smart.fpd-layout-small {
 
     input#fpd-opacity-range {
       display: block;
-      width: 80% !important;
-      margin-left: 30px;
+      width: calc(100% - 56px) !important;
+      margin: 0 28px 20px !important;
     }
   }
 
