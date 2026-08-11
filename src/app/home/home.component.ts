@@ -320,7 +320,7 @@ export class HomeComponent implements AfterViewInit {
     // reintroducing that hover dependency.
     document.addEventListener('click', (e: any) => {
       const item = e.target?.closest?.('.fpd-item');
-      if (item?.querySelector(':scope > .fpd-dot-menu, :scope > .fpd-three-dot-menu')) {
+      if (item?.querySelector(':scope > .fpd-dot-menu, :scope > .fpd-three-dot-menu, :scope > .fpd-elements-dot-menu')) {
         item.classList.add('fpd-dot-menu-tapped');
       }
     });

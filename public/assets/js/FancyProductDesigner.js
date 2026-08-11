@@ -30220,8 +30220,15 @@
           // Create dot menu trigger
           const dots = document.createElement('div')
           dots.innerHTML = '⋯'
+          // Was `hidden group-hover:block` (Tailwind's :hover-only reveal) —
+          // on iOS that made the first tap on the item just resolve the
+          // hover state (revealing dots) instead of firing its click, so
+          // adding the element needed a second tap. Visibility is now
+          // driven by .fpd-dot-menu-tapped (toggled on real tap, see
+          // home.component.ts / styles.scss) instead of :hover, same fix
+          // already applied to .fpd-dot-menu elsewhere.
           dots.className =
-            'absolute top-0 right-0 z-10 hidden px-2 text-lg font-bold text-black rounded-full cursor-pointer top-1 right-1 bg-opacity-40 group-hover:block'
+            'fpd-elements-dot-menu absolute top-0 right-0 z-10 px-2 text-lg font-bold text-black rounded-full cursor-pointer top-1 right-1 bg-opacity-40'
 
           // Tooltip container
           const tooltip = document.createElement('div')
