@@ -310,6 +310,21 @@ export class HomeComponent implements AfterViewInit {
       }, 300);
     }
 
+    // Products/Designs/Elements grid items (.fpd-item) each carry a
+    // .fpd-dot-menu / .fpd-three-dot-menu that's only meant to appear once
+    // the item's been tapped (see the .fpd-dot-menu-tapped rules in
+    // styles.scss) rather than permanently, or via CSS :hover — hover-only
+    // reveals are what caused the iOS "first tap resolves hover, second
+    // tap actually clicks" bug on these grids in the first place. Toggling
+    // a class here on tap keeps the menu hidden by default without
+    // reintroducing that hover dependency.
+    document.addEventListener('click', (e: any) => {
+      const item = e.target?.closest?.('.fpd-item');
+      if (item?.querySelector(':scope > .fpd-dot-menu, :scope > .fpd-three-dot-menu')) {
+        item.classList.add('fpd-dot-menu-tapped');
+      }
+    });
+
     if (isPlatformBrowser(this.platformId)) {
       const waitForElements = () => {
         const hideIcon = this.document.querySelector(

@@ -24583,7 +24583,7 @@
               ;(!e.includes('.cloudfront.net/') &&
                 !this.viewOptions.imageLoadTimestamp) ||
                 this.proxyFileServer ||
-                n.searchParams.append('t', i),
+                ('object' == typeof n && n.searchParams.append('t', i)),
                 'object' == typeof n && (n = n.toString()),
                 St.fabric.loadSVGFromURL(n, (e, i) => {
                   var n = e ? St.fabric.util.groupSVGElements(e, i) : null
@@ -24612,6 +24612,7 @@
                 : ((i = V(e) ? new URL(this.proxyFileServer + e) : e),
                   this.viewOptions.imageLoadTimestamp &&
                     !this.proxyFileServer &&
+                    'object' == typeof i &&
                     i.searchParams.append('t', n),
                   'object' == typeof i && (i = i.toString())),
                 new St.fabric.Image.fromURL(

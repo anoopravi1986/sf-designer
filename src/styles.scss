@@ -3431,3 +3431,62 @@ fpd-element-toolbar.fpd-smart.fpd-layout-small {
     -webkit-overflow-scrolling: touch;
   }
 }
+
+/* REVERTED — raising .fpd-loader-wrapper and .fpd-modal-overlay above
+   .fpd-draggable-dialog's z-index (1000000) was meant to fix the loading
+   spinner / "Yes please" confirm popup being invisible behind the still-
+   open product/element dialog. Instead it broke product selection
+   entirely and made the confirm popup surface on unrelated taps (Elements
+   tab), so it's backed out here until a safer fix is found — see chat
+   history for the investigation. Do not reapply without testing on a real
+   device first. */
+
+/* iOS Safari/WKWebView auto-zooms the whole page on focus of any text
+   input/select/textarea styled under 16px, with no automatic zoom-out —
+   the user is left stuck zoomed in until they manage to pinch back out
+   manually. The vendor markup sets the font-family picker
+   (input.fpd-dropdown-current) and every module's search box
+   (.fpd-input-search input — Products/Designs/Elements/Add Text all use
+   the same markup) to Tailwind's !text-sm (14px), which is exactly this
+   trap. Bump them to the 16px floor so focusing them can't trigger it. */
+@media (max-width: 768px) {
+  fpd-dropdown > input.fpd-dropdown-current,
+  .fpd-input-search input {
+    font-size: 16px !important;
+  }
+}
+
+/* Products/Designs/Elements grid items only visually change on :hover
+   (vendor dims the thumbnail to 0.8 opacity; our own .fpd-dot-menu /
+   .fpd-three-dot-menu go from display:none to display:block). iOS Safari
+   treats any element whose appearance changes on hover as needing a
+   "probe" tap to resolve that hover state first, and only fires the real
+   click on a second tap — the first tap just reveals the dot menu (or, on
+   the next attempt, opens it), and the actual open/add action needs a
+   second tap on top of that. This was previously scoped to
+   `@media (hover: none)`, but that query doesn't reliably report as
+   matching in this Capacitor WKWebView, so the override silently never
+   applied and the original :hover rules stayed in charge. Drop the media
+   query — unconditionally strip the hover-only appearance change on every
+   platform (a lost desktop hover-preview nicety is a fair trade for touch
+   actually working), and drive the dot menu's visibility purely from the
+   `.fpd-dot-menu-tapped` class toggled by an actual tap (see
+   home.component.ts) instead of :hover. */
+.fpd-container .fpd-grid > .fpd-item:hover > img,
+.fpd-container .fpd-grid > .fpd-item:hover > picture,
+.fpd-container .fpd-grid > .fpd-item > img,
+.fpd-container .fpd-grid > .fpd-item > picture {
+  opacity: 1 !important;
+}
+
+.fpd-dot-menu,
+fpd-module-images .fpd-item .fpd-three-dot-menu,
+fpd-module-save-load .fpd-item .fpd-three-dot-menu {
+  display: none !important;
+}
+
+.fpd-item.fpd-dot-menu-tapped .fpd-dot-menu,
+fpd-module-images .fpd-item.fpd-dot-menu-tapped .fpd-three-dot-menu,
+fpd-module-save-load .fpd-item.fpd-dot-menu-tapped .fpd-three-dot-menu {
+  display: block !important;
+}
