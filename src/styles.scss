@@ -1881,6 +1881,17 @@ fpd-element-toolbar[data-element-type="image"] .fpd-tool-advanced-editing {
 }
 
 
+/* fpd-range-slider is the vendor's generic slider component — used for
+   stroke width, letter-spacing, line-height and other tool sliders, same
+   underlying <input type="range"> as #fpd-opacity-range below. Without
+   touch-action:none here too, dragging any of those toward either edge
+   reads to iOS/WKWebView as a horizontal pan and gets hijacked as a
+   screen swipe instead of continuing to move the slider — same bug as
+   the opacity slider had, just not yet reported for these. */
+.fpd-container fpd-range-slider input[type="range"] {
+  touch-action: none;
+}
+
 #fpd-opacity-range {
   -webkit-appearance: none;
   appearance: none;
@@ -2540,9 +2551,13 @@ fpd-element-toolbar.fpd-smart.fpd-layout-small {
     top: 0px !important;
     right: 10px !important;
     left: auto !important;
-    height: 34px !important;
-    width: 34px !important;
-    min-width: 34px !important;
+    /* Was 34px — under Apple's 44pt minimum touch-target guideline, which
+       matches the reported "takes 3-4 taps to actually close" complaint
+       (most of those taps were just missing the button). 48px gives
+       comfortable margin above the minimum. */
+    height: 48px !important;
+    width: 48px !important;
+    min-width: 48px !important;
     border-radius: 50% !important;
     background: #f2f3f5 !important;
     box-shadow: none !important;
@@ -2553,7 +2568,7 @@ fpd-element-toolbar.fpd-smart.fpd-layout-small {
 
     .fa-solid.fa-close {
       color: #485563;
-      font-size: 24px;
+      font-size: 26px;
 
       &:before {
         content: "\f078"; // fa-chevron-down
@@ -2878,6 +2893,17 @@ fpd-element-toolbar.fpd-smart.fpd-layout-small {
       overflow-y: hidden;
       -webkit-overflow-scrolling: touch;
       scrollbar-width: none;
+      /* .fpd-secondary-tools used to be the actual scroll container, and a
+         separate fix (see its own comment below) gave *it* GPU-compositing
+         hints because real iPhones were janking on the swipe otherwise —
+         it's .fpd-tools-nav that scrolls now instead (so the color swatch
+         can be part of the same strip), but those hints never got carried
+         over to it. Without them this row scrolls fine once and then
+         stutters/sticks on real devices, same symptom as before. */
+      transform: translateZ(0);
+      -webkit-transform: translateZ(0);
+      will-change: scroll-position;
+      backface-visibility: hidden;
       /* Even spacing between every top-level item in the row (opacity
          icon, color swatch, crop/layers/align) — matches the 10px gap
          .fpd-secondary-tools already uses between its own icons, so the
@@ -2983,6 +3009,17 @@ fpd-element-toolbar.fpd-smart.fpd-layout-small {
        full-width block so the panel has an unambiguous 100% to size against. */
     display: block !important;
     width: 100% !important;
+    /* .fpd-tools-nav is made horizontally scrollable elsewhere (for the
+       image/shape icon row) via overflow-x:auto + -webkit-overflow-
+       scrolling:touch — that rule isn't scoped to skip this state, so it's
+       still active here even though there's nothing left to scroll (every
+       sibling below is hidden). A scroll-touch container with no content
+       to scroll is exactly the kind of thing iOS can end up routing the
+       opacity slider's own drag gesture into instead of the slider,
+       making it unresponsive to touch. Nothing needs to scroll while the
+       panel is open, so turn it off outright. */
+    overflow-x: visible !important;
+    -webkit-overflow-scrolling: auto !important;
 
     > *:not(#fpd-opacity-panel) {
       display: none !important;
@@ -3432,31 +3469,21 @@ fpd-element-toolbar.fpd-smart.fpd-layout-small {
   }
 }
 
-/* .fpd-modal-overlay's z-index is intentionally left at vendor default —
-   raising it earlier broke product selection, most likely because the
-   "Yes please" confirm popup has no dismiss handler for tapping its dark
-   background, so it can be abandoned mid-session and left stuck in the
-   DOM; elevating a stuck instance with no pointer-events fallback then
-   blocks every tap underneath it. See chat history for that regression.
-   Do not raise .fpd-modal-overlay's z-index without fixing that dismiss
-   gap first.
-
-   .fpd-loader-wrapper doesn't have that risk — its hidden state
-   (body .fpd-hidden, vendor CSS) sets both display:none AND
-   pointer-events:none !important, so even if it were ever left visible by
-   mistake it couldn't swallow taps the way the modal did. Tapping a
-   design/element to add it to canvas shows this loading overlay while the
-   image downloads, but its vendor z-index (100, relative to
-   .fpd-container) is nowhere near the Elements/Add Image dialog's
-   (.fpd-draggable-dialog: 1000000) — on mobile that dialog is a near-
-   fullscreen sheet, so the spinner renders completely hidden behind it.
-   The tap silently does nothing for as long as the image takes to load
-   (slow on real device networks, unnoticeable on fast desktop/dev
-   connections) before the element finally appears, with no feedback in
-   between — which reads as "nothing happened, so I tapped again." */
-.fpd-container .fpd-loader-wrapper {
-  z-index: 1000001 !important;
-}
+/* REVERTED (2nd time) — neither .fpd-modal-overlay's nor .fpd-loader-
+   wrapper's z-index should be raised above .fpd-draggable-dialog's
+   1000000 without solid evidence first. The modal-overlay attempt broke
+   product selection outright (see earlier chat history). The loader-
+   wrapper attempt was theorized safe (its hidden state includes
+   pointer-events:none), but shortly after re-applying it the user
+   reported the editor freezing/becoming unresponsive after a couple of
+   edits and the opacity slider not responding to touch on real iPhone —
+   which is exactly what a loader instance stuck visible at z-index
+   1000001 (above nearly everything) would cause, pointer-events:none or
+   not, if it's ever toggled in a way that leaves display:none off even
+   briefly. Do not reapply without profiling data (a Safari Web Inspector
+   Timeline recording) confirming the actual cause first — two rounds of
+   "plausible in theory, broke something in practice" is enough to not
+   trust this one on theory alone anymore. */
 
 /* iOS Safari/WKWebView auto-zooms the whole page on focus of any text
    input/select/textarea styled under 16px, with no automatic zoom-out —
@@ -3468,7 +3495,11 @@ fpd-element-toolbar.fpd-smart.fpd-layout-small {
    trap. Bump them to the 16px floor so focusing them can't trigger it. */
 @media (max-width: 768px) {
   fpd-dropdown > input.fpd-dropdown-current,
-  .fpd-input-search input {
+  .fpd-input-search input,
+  /* The font-family panel's own font-search box (separate input from the
+     dropdown-current one above, "toolbar.font_family_search" placeholder)
+     — same !text-sm (14px) trap, just missed the first pass. */
+  .fpd-panel-font-family input {
     font-size: 16px !important;
   }
 }

@@ -1388,9 +1388,15 @@ export class HomeComponent implements AfterViewInit {
             el.classList.remove('fpd-active');
           });
           if (toolbar) {
-            toolbar.classList.forEach((c: any) => {
-              if (toolbar && c.startsWith("my-")) toolbar.classList.remove(c);
-            });
+            // classList is a live collection — removing an item mid-forEach
+            // shifts the remaining indices and silently skips the next
+            // one (same bug already fixed for the other toolbar class-
+            // sync handler below). Snapshot first so every "my-*" class
+            // actually gets cleared.
+            const staleMyClasses = Array.from(toolbar.classList as DOMTokenList).filter((c: any) => (c as string).startsWith('my-'));
+            if (staleMyClasses.length) {
+              toolbar.classList.remove(...staleMyClasses);
+            }
           }
 
           return;
@@ -2005,54 +2011,38 @@ export class HomeComponent implements AfterViewInit {
     });
 
     document.addEventListener("click", function (e: any) {
-      ;
       const toolbar = e.target.closest("fpd-element-toolbar");
       if (!toolbar) return;
-      ;
 
       if (e.target.classList.contains("fa-close")) {
-        ;
-        const transformSpac = document.querySelector('.fpd-tool-transform');
-        let transformActive = transformSpac?.classList.contains('fpd-active');
-        if (transformActive) {
-          document.querySelector('.fpd-tool-transform')?.classList.remove('fpd-active');
-        }
+        document.querySelector('.fpd-tool-transform.fpd-active')?.classList.remove('fpd-active');
+      }
+
+      // classList is a live collection — removing an item mid-forEach
+      // shifts the remaining indices and silently skips the next one, so
+      // a toolbar that picked up more than one stale "my-*" class in the
+      // same tap only ever got the first removed. Snapshot to a plain
+      // array first so every match actually gets cleared, instead of
+      // "my-*" classes slowly accumulating on the toolbar over a session.
+      const staleMyClasses = Array.from(toolbar.classList as DOMTokenList).filter((c: any) => (c as string).startsWith('my-'));
+      if (staleMyClasses.length) {
+        toolbar.classList.remove(...staleMyClasses);
       }
 
       if (toolbar.classList.contains("fpd-show")) {
         const target = e.target.closest("[title], [data-panel]");
-        ;
         if (!target) return;
 
         const value = target.getAttribute("title") || target.getAttribute("data-panel");
-        ;
         if (!value) return;
 
-        const newClass = "my-" + value.toLowerCase().replace(/\s+/g, '-');
-
-        if (toolbar) {
-          toolbar.classList.forEach((c: any) => {
-            if (c.startsWith("my-")) toolbar.classList.remove(c);
-          });
-        }
-
-        toolbar.classList.add(newClass);
-      }
-      else {
-        toolbar.classList.forEach((c: any) => {
-          if (c.startsWith("my-")) {
-            ;
-            toolbar.classList.remove(c);
-          }
-        });
+        toolbar.classList.add("my-" + value.toLowerCase().replace(/\s+/g, '-'));
       }
 
-      ;
-      document.body.classList.forEach(cls => {
-        if (cls.startsWith('fpd-type-')) {
-          document.body.classList.remove(cls);
-        }
-      });
+      const staleTypeClasses = Array.from(document.body.classList as DOMTokenList).filter((c: any) => (c as string).startsWith('fpd-type-'));
+      if (staleTypeClasses.length) {
+        document.body.classList.remove(...staleTypeClasses);
+      }
 
       const typeClass = toolbar.className
         .split(' ')
