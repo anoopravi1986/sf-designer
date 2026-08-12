@@ -45,10 +45,14 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<!-- TEMP (local dev over LAN) — remove before shipping. Scoped to
+	     private-network/loopback addresses only, not a blanket ATS bypass. -->
 	<key>NSAppTransportSecurity</key>
 	<dict>
-		<key>NSAllowsArbitraryLoads</key>
+		<key>NSAllowsLocalNetworking</key>
 		<true/>
 	</dict>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>Used during development to load the app from a local dev server.</string>
 </dict>
 </plist>

@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
+import 'package:webview_flutter_wkwebview/webview_flutter_wkwebview.dart';
 
-// URL of the Angular dev server (`ng serve`), exposed via an ngrok tunnel.
-// Using a tunnel instead of the LAN IP avoids Wi-Fi client/AP isolation
-// issues (common on mobile hotspot/dongle networks) since both the Mac
-// and the phone only need internet access, not direct LAN reachability.
-// This URL changes every time ngrok restarts — update it when that happens.
-const String kDevServerUrl = 'https://1383-2401-4900-1c7b-330f-b071-384d-38c5-efe6.ngrok-free.app';
+// TEMP (local dev over LAN) — revert to the Netlify URL before shipping.
+const String kSiteUrl = 'http://192.168.1.83:4200/';
 
 void main() {
   runApp(const MyApp());
@@ -53,12 +50,23 @@ class _WebViewHomePageState extends State<WebViewHomePage> {
           onPageFinished: (_) => setState(() => _isLoading = false),
           onWebResourceError: (error) => setState(() {
             _isLoading = false;
-            _error = 'Failed to load: ${error.description}\n\n'
-                'Make sure `ng serve` is running and your device is on the same Wi-Fi as this Mac.';
+            _error = 'Failed to load: ${error.description}\n\nCheck your internet connection.';
           }),
         ),
       )
-      ..loadRequest(Uri.parse(kDevServerUrl));
+      ..loadRequest(Uri.parse(kSiteUrl));
+
+    // iOS's edge-swipe back gesture recognizer sometimes fails to reset,
+    // which blocks subsequent taps inside the WebView. It's unused here
+    // (single-page app), so disable it.
+    final platform = _controller.platform;
+    if (platform is WebKitWebViewController) {
+      platform.setAllowsBackForwardNavigationGestures(false);
+      // WKWebView's long-press link-preview gesture recognizer competes with
+      // the page's own touch handlers on real devices, blocking taps on
+      // links and drag gestures on the editor's sliders.
+      platform.setAllowsLinkPreview(false);
+    }
   }
 
   Future<void> _reload() async {

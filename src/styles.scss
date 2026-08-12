@@ -12,6 +12,16 @@ body fpd-element-toolbar .fpd-panel-font-family input {
   @apply border border-[#35475a33] border-solid rounded-[8px]
 }
 
+// Every FPD slider (.fpd-slider-range) sits inside a .fpd-scroll-area panel
+// (overflow:auto + -webkit-overflow-scrolling:touch). With no touch-action
+// set on the input, WebKit can't disambiguate "drag the thumb" from "scroll
+// the panel" on a real device and resolves it toward scrolling the panel,
+// so slider drags get eaten. Reserve touch gestures on the input for the
+// slider itself.
+.fpd-slider-range {
+  touch-action: none;
+}
+
 @font-face {
   font-family: 'Nunito Sans';
   font-style: normal;
