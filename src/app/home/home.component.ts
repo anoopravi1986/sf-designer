@@ -63,6 +63,10 @@ export class HomeComponent implements AfterViewInit {
   private savedContent: string = '';
   fontArrayStr: any;
   private searchTimeout: any;
+  // Whether the real product fetch (cache or fresh) has finished - gates
+  // #fpd-loader-step-2 so it can't be tapped before there's actually
+  // something to show. See updateProductsLoaderStep2State().
+  private productsDataReady = false;
   showFacebookOptions = false;
   private lastFacebookType: 'post' | 'message' = 'post';
   private currentDesignId: string | null = null;
@@ -325,6 +329,63 @@ export class HomeComponent implements AfterViewInit {
       }
     });
 
+    // Mobile bottom nav (.fpd-nav-item, one per mainBarModules entry -
+    // Products/Designs/Elements/Add Text/Image) is rebuilt by the vendor
+    // library itself, so this is delegated on document rather than bound
+    // once. Tapping Products shows the 3-step tap loader; tapping any other
+    // tab (or Products again, restarting the window) always clears it first
+    // so it can never outlive the tab it was shown for.
+    //
+    // Capture phase is required here: the vendor's own nav-item handler
+    // (wr() in FancyProductDesigner.js) calls event.stopPropagation() as
+    // its very first line, so a normal bubble-phase document listener
+    // never sees this click at all - capture runs top-down before that
+    // handler gets a chance to stop it.
+    document.addEventListener('click', (e: any) => {
+      const navItem = e.target?.closest?.('.fpd-nav-item[data-module]');
+      if (!navItem) return;
+      // wr() (same vendor file) treats a tap on an already-active nav item
+      // as "close this panel", not "reopen it" - only an inactive ->
+      // active transition is a genuine tab switch worth loading for.
+      const isAlreadyActive = navItem.classList.contains('fpd-active');
+      if (navItem.dataset.module === 'products' && !isAlreadyActive) {
+        this.startProductsTabLoader();
+      } else {
+        this.stopProductsTabLoader();
+      }
+    }, true);
+
+    // The loader's 3-step tap sequence (see startProductsTabLoader) - each
+    // button needs exactly one real physical tap, since that's the only
+    // thing confirmed to fix [[ios_early_interaction_hang]]. No timers
+    // involved, so there's nothing for these taps to fall out of sync with.
+    // Each tap also applies a real category filter (selectProductsCategory)
+    // so the tap isn't just a blank "continue" - the user sees the grid
+    // actually filter/update as visible feedback for each of the 3 taps.
+    // The category selection itself is still done via the same synthetic
+    // dispatchEvent() technique as before (confirmed NOT to fix the hang on
+    // its own) - what makes these taps count is that they're riding on a
+    // genuine touch/click on our own button, not a synthetic click with no
+    // real tap behind it at all.
+    document.addEventListener('click', (e: any) => {
+      // Index 0 is whatever category the dropdown already defaults to, so
+      // selecting it produces no visible change - start from index 1 so
+      // every one of these taps actually filters to something different.
+      if (e.target?.closest?.('#fpd-loader-step-1')) {
+        this.selectProductsCategory(1);
+        this.setProductsLoaderStep(2);
+      } else if (e.target?.closest?.('#fpd-loader-step-2')) {
+        // Native <button disabled> already refuses to dispatch click at
+        // all, but guard here too in case that ever changes.
+        if (!this.productsDataReady) return;
+        this.selectProductsCategory(2);
+        this.setProductsLoaderStep(3);
+      } else if (e.target?.closest?.('#fpd-loader-step-3')) {
+        this.selectProductsCategory(3);
+        this.finishProductsTabLoader();
+      }
+    });
+
     if (isPlatformBrowser(this.platformId)) {
       const waitForElements = () => {
         const hideIcon = this.document.querySelector(
@@ -336,6 +397,48 @@ export class HomeComponent implements AfterViewInit {
 
         if (hideIcon && mainBar) {
           ;
+
+          // The mobile bottom-sheet nav bar (fpd-main-bar) renders at
+          // z-index:999999999999 in the vendor CSS - our own loader
+          // overlay can never out-z-index that from outside it (a past
+          // attempt to raise the loader's z-index above the vendor's
+          // draggable-dialog caused the editor to freeze/stop responding
+          // to touch on real iPhones, see the revert note in styles.scss).
+          // Moving the loader to live *inside* .fpd-module-content instead
+          // sidesteps the whole z-index race: it just paints on top of
+          // whichever module panel (Products/Designs/etc.) is currently
+          // shown, and disappears with it the moment the panel itself is
+          // hidden or closed, so it can never get stranded over the editor.
+          const moduleContent = mainBar.querySelector(
+            '.fpd-module-content'
+          ) as HTMLElement;
+          const loader = document.getElementById('fpd-loader');
+          if (moduleContent && loader && loader.parentElement !== moduleContent) {
+            moduleContent.style.position = 'relative';
+            moduleContent.appendChild(loader);
+          }
+
+          // The category dropdown (.fpd-product-categories, "searchable")
+          // is a real <input>, so tapping it to open the list also focuses
+          // a text field and pops the on-screen keyboard on mobile - not
+          // wanted here, the dropdown is only ever used to pick an item,
+          // never to type. readonly stops the keyboard without blocking
+          // focus/click, so the dropdown itself still opens normally.
+          // Applied on mobile only, and re-applied via observer since
+          // Products/Designs each have their own dropdown instance and not
+          // all of them necessarily exist yet at this point.
+          const applyCategoryInputReadonly = () => {
+            if (window.innerWidth > 768) return;
+            mainBar
+              .querySelectorAll('.fpd-product-categories .fpd-dropdown-current')
+              .forEach((el) => {
+                const input = el as HTMLInputElement;
+                if (!input.readOnly) input.readOnly = true;
+              });
+          };
+          applyCategoryInputReadonly();
+          const categoryInputObserver = new MutationObserver(applyCategoryInputReadonly);
+          categoryInputObserver.observe(mainBar, { childList: true, subtree: true });
 
           hideIcon.addEventListener('click', (event) => {
             event.stopPropagation();
@@ -2442,6 +2545,8 @@ export class HomeComponent implements AfterViewInit {
       ;
       this.designer.product = cachedProducts;
       this.showFPDLoading(false);
+      this.productsDataReady = true;
+      this.updateProductsLoaderStep2State();
     } else {
       ;
       this.showFPDLoading(true);
@@ -2462,6 +2567,8 @@ export class HomeComponent implements AfterViewInit {
         ;
 
         this.showFPDLoading(false);
+        this.productsDataReady = true;
+        this.updateProductsLoaderStep2State();
 
         // Optional: Show toast notification (uncomment if you have this method)
         // this.showToast("Products updated!");
@@ -2469,6 +2576,11 @@ export class HomeComponent implements AfterViewInit {
       .catch((err) => {
         console.error("❌ API fetch failed:", err);
         this.showFPDLoading(false);
+        // Don't leave the Products-tab loader's step-2 button permanently
+        // disabled if the fetch genuinely fails - the cached copy (if any)
+        // is already applied above, so there's still something to show.
+        this.productsDataReady = true;
+        this.updateProductsLoaderStep2State();
       });
 
     // Elements tab (fpd-module-designs): same cache-first-then-refresh
@@ -3558,9 +3670,102 @@ export class HomeComponent implements AfterViewInit {
 
   showFPDLoading(show: boolean) {
     const loader = document.getElementById('fpd-loader');
-    if (loader) {
-      loader.style.display = show ? 'flex' : 'none';
+    if (!loader) return;
+    if (show) {
+      // #fpd-loader lives inside .fpd-module-content (see waitForElements),
+      // which sizes itself via the vendor's own
+      // `height: calc(100% - var(--fpd-sidebar-nav-width))` rule - that
+      // chain silently collapses to a much shorter box than the visible
+      // panel in the mobile layout, which is why the spinner/countdown
+      // rendered pinned near the top instead of centered. Measuring the
+      // real rendered height of fpd-main-bar (the whole bottom-sheet) minus
+      // its own nav row and setting it explicitly sidesteps that calc()
+      // chain entirely, so centering is always correct regardless of it.
+      const mainBar = loader.closest('fpd-main-bar') as HTMLElement | null;
+      const navRow = mainBar?.querySelector('.fpd-navigation') as HTMLElement | null;
+      if (mainBar) {
+        const contentHeight = mainBar.getBoundingClientRect().height - (navRow?.getBoundingClientRect().height || 0);
+        if (contentHeight > 0) {
+          loader.style.height = contentHeight + 'px';
+        }
+      }
     }
+    loader.style.display = show ? 'flex' : 'none';
+  }
+
+  // Drives the Products-tab loader (mobile shows a 3-step tap sequence
+  // instead of the shimmer-text design - see .fpd-loader-step-btn in
+  // home.component.scss). No timers/countdowns here on purpose: both a
+  // passive countdown and synthetic dispatchEvent() clicks (tried and
+  // confirmed by the user NOT to fix [[ios_early_interaction_hang]]) were
+  // dead ends. The editor kept hanging right after either one, but a REAL
+  // manual tap fixed it instantly every time - meaning this is a native
+  // WebKit touch/gesture-recognizer settling issue that only an actual
+  // touch going through UIKit's gesture pipeline can resolve. So this asks
+  // for exactly that: 3 sequential buttons, one real tap each.
+  private startProductsTabLoader() {
+    this.showFPDLoading(true);
+    this.setProductsLoaderStep(1);
+  }
+
+  private setProductsLoaderStep(step: 0 | 1 | 2 | 3) {
+    const finalWait = document.getElementById('fpd-loader-final-wait');
+    if (finalWait) finalWait.style.display = 'none';
+    for (let i = 1; i <= 3; i++) {
+      const btn = document.getElementById(`fpd-loader-step-${i}`) as HTMLButtonElement | null;
+      if (!btn) continue;
+      btn.style.display = i === step ? 'block' : 'none';
+    }
+    this.updateProductsLoaderStep2State();
+  }
+
+  // Step 2 ("Load Products") stays disabled until the real product fetch
+  // (see the getProducts()/fetch() flow earlier in this file) has actually
+  // finished - tapping it before there's real data to show would just be
+  // another blank tap. Native <button disabled> both blocks clicks and
+  // renders visibly grayed out (see .fpd-loader-step-btn:disabled).
+  private updateProductsLoaderStep2State() {
+    const step2 = document.getElementById('fpd-loader-step-2') as HTMLButtonElement | null;
+    if (step2) step2.disabled = !this.productsDataReady;
+  }
+
+  // Step 3 doesn't hand off to the editor immediately - it shows a plain
+  // 5s loading indicator first (no buttons, nothing to tap: by this point
+  // all 3 required real taps have already happened, so there's no hang-fix
+  // reason left to gate this behind another tap; it's purely cosmetic).
+  private finishProductsTabLoader() {
+    this.setProductsLoaderStep(0);
+    const finalWait = document.getElementById('fpd-loader-final-wait');
+    if (finalWait) finalWait.style.display = 'flex';
+    setTimeout(() => {
+      this.stopProductsTabLoader();
+    }, 5000);
+  }
+
+  private stopProductsTabLoader() {
+    this.showFPDLoading(false);
+  }
+
+  // Applies a real category filter as visible feedback for a loader-step
+  // tap (see the document click listener above). Same synthetic-selection
+  // technique as the saved-design restore flow elsewhere in this file
+  // (search "Simulate actual category selection logic") - set the visible
+  // dropdown value, fire input/change, then dispatch a click on the actual
+  // category item so the vendor's own selection handler runs and the grid
+  // re-renders for that category.
+  private selectProductsCategory(index: number) {
+    const categoryItems = Array.from(
+      document.querySelectorAll('.fpd-product-categories .fpd-item')
+    ) as HTMLElement[];
+    const dropdownInput = document.querySelector(
+      '.fpd-product-categories .fpd-dropdown-current'
+    ) as HTMLInputElement | null;
+    const item = categoryItems[index];
+    if (!item || !dropdownInput) return;
+    dropdownInput.value = item.textContent || '';
+    dropdownInput.dispatchEvent(new Event('input', { bubbles: true }));
+    dropdownInput.dispatchEvent(new Event('change', { bubbles: true }));
+    item.dispatchEvent(new MouseEvent('click', { bubbles: true }));
   }
 }
 
