@@ -64,10 +64,16 @@ export class HomeComponent implements AfterViewInit {
   fontArrayStr: any;
   private searchTimeout: any;
   // Whether the real product fetch (cache or fresh) has finished - gates
-  // #fpd-loader-step-2 so it can't be tapped before there's actually
-  // something to show. See updateProductsLoaderStep2State().
+  // #fpd-loader-active-btn while step 2 is live so it can't be tapped
+  // before there's actually something to show. See
+  // updateProductsLoaderStep2State().
   private productsDataReady = false;
   private productsFinalWaitInterval: any;
+  // Tracks which step's Continue button is currently live, since all 3
+  // steps (and the final wait) now share one physical button element
+  // (#fpd-loader-active-btn) instead of 3 separate buttons - see
+  // setProductsLoaderStep().
+  private currentProductsLoaderStep: 0 | 1 | 2 | 3 = 0;
   // Set true after the first Products-tab loader run completes in this app
   // session (in-memory only - resets on a real app relaunch, which is
   // exactly when the hang can recur). Gates the cosmetic 5s final wait in
@@ -374,19 +380,20 @@ export class HomeComponent implements AfterViewInit {
     // genuine touch/click on our own button, not a synthetic click with no
     // real tap behind it at all.
     document.addEventListener('click', (e: any) => {
+      if (!e.target?.closest?.('#fpd-loader-active-btn')) return;
       // Index 0 is whatever category the dropdown already defaults to, so
       // selecting it produces no visible change - start from index 1 so
       // every one of these taps actually filters to something different.
-      if (e.target?.closest?.('#fpd-loader-step-1')) {
+      if (this.currentProductsLoaderStep === 1) {
         this.selectProductsCategory(1);
         this.setProductsLoaderStep(2);
-      } else if (e.target?.closest?.('#fpd-loader-step-2')) {
+      } else if (this.currentProductsLoaderStep === 2) {
         // Native <button disabled> already refuses to dispatch click at
         // all, but guard here too in case that ever changes.
         if (!this.productsDataReady) return;
         this.selectProductsCategory(2);
         this.setProductsLoaderStep(3);
-      } else if (e.target?.closest?.('#fpd-loader-step-3')) {
+      } else if (this.currentProductsLoaderStep === 3) {
         this.selectProductsCategory(3);
         this.finishProductsTabLoader();
       }
@@ -3694,8 +3701,9 @@ export class HomeComponent implements AfterViewInit {
   // silently collapses to a much shorter box than the visible panel in the
   // mobile layout, which is why content inside it rendered pinned near the
   // top instead of centered. Measuring the real rendered height of
-  // fpd-main-bar (the whole bottom-sheet) minus its own nav row and setting
-  // it explicitly sidesteps that calc() chain entirely.
+  // fpd-main-bar (the whole bottom-sheet, tab row included so the dimmed
+  // backdrop covers that too) and setting it explicitly sidesteps that
+  // calc() chain entirely.
   //
   // This isn't a one-time calculation: selectProductsCategory() changes the
   // visible category mid-flow, which changes how many product rows render
@@ -3707,9 +3715,11 @@ export class HomeComponent implements AfterViewInit {
     const loader = document.getElementById('fpd-loader');
     if (!loader) return;
     const mainBar = loader.closest('fpd-main-bar') as HTMLElement | null;
-    const navRow = mainBar?.querySelector('.fpd-navigation') as HTMLElement | null;
     if (mainBar) {
-      const contentHeight = mainBar.getBoundingClientRect().height - (navRow?.getBoundingClientRect().height || 0);
+      // Full mainBar height, not minus the bottom .fpd-navigation tab row -
+      // the dimmed backdrop is meant to cover that row too now, not stop
+      // just above it.
+      const contentHeight = mainBar.getBoundingClientRect().height;
       if (contentHeight > 0) {
         loader.style.height = contentHeight + 'px';
       }
@@ -3731,13 +3741,48 @@ export class HomeComponent implements AfterViewInit {
     this.setProductsLoaderStep(1);
   }
 
+  // Step 1/2/3 copy shown in #fpd-loader-active-text - see setProductsLoaderStep().
+  private readonly productsLoaderStepCopy: Record<1 | 2 | 3, string> = {
+    1: 'This tool is used to create your own self-design right on your device.',
+    2: 'This device shows multiple categories - filter and browse through all of them.',
+    3: "Now let's load the overlay images so you can preview them on your product.",
+  };
+
+  // Steps 1/2/3 and the final wait all live inside ONE card
+  // (#fpd-loader-active-card) and share ONE button (#fpd-loader-active-btn)
+  // - only the text and the button-vs-spinner visibility change between
+  // them. This replaced 4 separately-positioned elements specifically so
+  // the popup and the final spinner can never end up in different spots on
+  // screen: there's only one box to position, reused for every step.
   private setProductsLoaderStep(step: 0 | 1 | 2 | 3) {
+    this.currentProductsLoaderStep = step;
+    const cardEl = document.getElementById('fpd-loader-active-card') as HTMLElement | null;
+    const textEl = document.getElementById('fpd-loader-active-text') as HTMLElement | null;
+    const btnEl = document.getElementById('fpd-loader-active-btn') as HTMLElement | null;
     const finalWait = document.getElementById('fpd-loader-final-wait');
-    if (finalWait) finalWait.style.display = 'none';
-    for (let i = 1; i <= 3; i++) {
-      const btn = document.getElementById(`fpd-loader-step-${i}`) as HTMLButtonElement | null;
-      if (!btn) continue;
-      btn.style.display = i === step ? 'block' : 'none';
+    // The card itself defaults to display:none (see .fpd-loader-step-card
+    // in home.component.scss) - it needs to be shown here since nothing
+    // else does it now that there's only one shared card instead of one
+    // per step. The white card panel/shadow only makes sense behind actual
+    // text + a button (steps 1-3) - for the plain spinner "Loading..."
+    // wait (step 0) it's cleared back to transparent so just the spinner
+    // and text float over the dimmed backdrop, no white box.
+    if (cardEl) {
+      cardEl.style.display = 'flex';
+      cardEl.style.background = step === 0 ? 'transparent' : '';
+      cardEl.style.boxShadow = step === 0 ? 'none' : '';
+    }
+    if (step === 0) {
+      if (textEl) textEl.style.display = 'none';
+      if (btnEl) btnEl.style.display = 'none';
+      if (finalWait) finalWait.style.display = 'flex';
+    } else {
+      if (textEl) {
+        textEl.style.display = 'block';
+        textEl.textContent = this.productsLoaderStepCopy[step];
+      }
+      if (btnEl) btnEl.style.display = 'block';
+      if (finalWait) finalWait.style.display = 'none';
     }
     this.updateProductsLoaderStep2State();
     this.recalculateLoaderHeight();
@@ -3749,8 +3794,8 @@ export class HomeComponent implements AfterViewInit {
   // another blank tap. Native <button disabled> both blocks clicks and
   // renders visibly grayed out (see .fpd-loader-step-btn:disabled).
   private updateProductsLoaderStep2State() {
-    const step2 = document.getElementById('fpd-loader-step-2') as HTMLButtonElement | null;
-    if (step2) step2.disabled = !this.productsDataReady;
+    const btn = document.getElementById('fpd-loader-active-btn') as HTMLButtonElement | null;
+    if (btn) btn.disabled = this.currentProductsLoaderStep === 2 && !this.productsDataReady;
   }
 
   // Step 3 doesn't hand off to the editor immediately - it shows a plain

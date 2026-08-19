@@ -69,8 +69,14 @@
 
   .fpd-loader-overlay {
   position: absolute;
-  top: 0; left: 0;
+  top: 0; left: 0; bottom: 0;
   width: 100%; height: 100%;
+  // Floor so the dimmed backdrop can never render shorter than its
+  // container even if the JS-measured px height (recalculateLoaderHeight()
+  // in home.component.ts, needed because the vendor's own height calc()
+  // for this container collapses) comes up short - height can still grow
+  // past 100% if JS sets something taller, this only guards the low end.
+  min-height: 100%;
   background: linear-gradient(
       to right,
       #3a0b0f,
@@ -82,7 +88,7 @@
   align-items: center;
   z-index: 9999;
 
-  .fpd-loader-step-btn,
+  .fpd-loader-step-card,
   .fpd-loader-final-wait {
     display: none;
   }
@@ -167,6 +173,46 @@
       display: none;
     }
 
+    // The single popup card, reused for all 3 steps and the final wait
+    // (see setProductsLoaderStep() in home.component.ts - it's one shared
+    // element whose text/button/spinner content gets swapped, specifically
+    // so nothing can ever end up positioned differently from anything
+    // else). flex/height are pinned to content size and !important -
+    // swapping the step element from <button> to <div> made it start
+    // matching a vendor/global rule that stretches generic divs to fill
+    // their flex parent's full height, which a <button> was never affected
+    // by. Positioned dead-center of #fpd-loader itself (top/left 50% +
+    // negative transform) rather than relying on the overlay's flex
+    // justify-content - that centered fine visually back when this element
+    // was a near-full-height block, but once it shrank to content size it
+    // stayed pinned near the top instead of moving to the true middle, so
+    // it's centered directly against the loader box's own geometry instead.
+    .fpd-loader-step-card {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 14px;
+      width: auto;
+      height: auto !important;
+      background: rgba(255, 255, 255, 0.96);
+      border-radius: 16px;
+      padding: 24px 22px;
+      max-width: 280px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    }
+
+    .fpd-loader-step-text {
+      margin: 0;
+      font-size: 14px;
+      line-height: 1.5;
+      color: #1a1a1a;
+      text-align: center;
+    }
+
     .fpd-loader-step-btn {
       border: none;
       border-radius: 24px;
@@ -177,6 +223,7 @@
       background: var(--theme-color, #d02e3a);
       box-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
       cursor: pointer;
+      width: 100%;
 
       // Step 2 before the real product fetch has finished - see
       // updateProductsLoaderStep2State() in home.component.ts.
@@ -188,14 +235,17 @@
       }
     }
 
-    // Shown for a fixed 5s after step-3 is tapped, in place of all 3
-    // buttons - purely cosmetic by that point (all 3 required real taps
-    // already happened), see finishProductsTabLoader().
+    // Shown for a fixed 5s after step-3 is tapped, in place of the text +
+    // Continue button - purely cosmetic by that point (all 3 required real
+    // taps already happened), see finishProductsTabLoader(). Lives inside
+    // .fpd-loader-step-card (see the HTML) so it inherits that card's
+    // centering for free instead of needing its own.
     .fpd-loader-final-wait {
       display: none;
       flex-direction: column;
       align-items: center;
       gap: 16px;
+      width: 100%;
     }
 
     .fpd-loader-final-spinner {

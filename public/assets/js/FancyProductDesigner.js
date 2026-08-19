@@ -28629,16 +28629,20 @@
           localStorage.setItem('clickedTitleProdcutInside', '');
           ;
           ;
-          // This handler only ever fires for tiles inside the Products-tab
-          // grid (#ProductModule), so this must always resolve to
-          // 'ProductModule'. It used to be derived from
-          // e.target.closest('div').parentElement.id, but most of a tile's
-          // visible area (thumbnail/title/manufacturer) are child <div>s with
-          // no id, so a tap there resolved to '' while a tap on the tile's
-          // own padding resolved to 'ProductModule' - depending on exactly
-          // where the user tapped, selectProduct() would either show the
-          // face-selection grid or skip straight to loading the product.
-          const parentDivId = 'ProductModule'
+          // This handler is shared by both the Products tab (We, container
+          // <fpd-module-products>) and the Design tab (Wes, container
+          // <fpd-module-productsnew>) - selectProduct() below picks between
+          // this.products and this.productsnew based on this value, so it
+          // must reflect whichever grid was actually tapped. It used to be
+          // derived from e.target.closest('div').parentElement.id, but most
+          // of a tile's visible area (thumbnail/title/manufacturer) are
+          // child <div>s with no id, so a tap there resolved to '' - hence
+          // deriving it from this.container's tag name instead, which is
+          // stable regardless of where inside the tile the user tapped.
+          const parentDivId =
+            this.container.tagName.toLowerCase() === 'fpd-module-productsnew'
+              ? 'DesignModule'
+              : 'ProductModule'
           const clickedTitle = e.currentTarget.dataset.title;
           localStorage.setItem('clickedTitleProdcutInside', clickedTitle);
           localStorage.setItem('parentDivId', parentDivId)
@@ -38350,6 +38354,10 @@ function updateFPDLayersToSingleGroup(group) {
               this.loadProduct(p, this.mainOptions.replaceInitialElements)
             }
           } else if (savedId === 'DesignModule') {
+            // Design-tab products (this.productsnew) aren't grouped into
+            // face/variant lists the way this.products is - they load
+            // directly onto the canvas, same as the products tab's
+            // catch-all fallback below (which this branch mirrors).
             ;
             To(this, Io, To(this, Oo, 0)),
               (this.currentCategoryIndex =
@@ -38358,178 +38366,16 @@ function updateFPDLayersToSingleGroup(group) {
                 this.productsnew &&
                 this.productsnew.length &&
                 this.productsnew[0].category
-                  ? this.productsnew[this.currentCategoryIndex].products
-                  : this.products),
+                  ? this.productsnew[this.currentCategoryIndex]?.products
+                  : this.productsnew),
               (this.currentProductIndex = t),
               t < 0
                 ? (this.currentProductIndex = 0)
                 : t > i.length - 1 && (this.currentProductIndex = i.length - 1)
             ;
             const n = i[this.currentProductIndex]
-            // const n = i[0];
-            let valueofTitle = localStorage.getItem('valueofTitle')
             ;
-            if (
-              valueofTitle === null ||
-              valueofTitle === 'undefined' ||
-              valueofTitle === ''
-            ) {
-              ;
-              const n = i[this.currentProductIndex]
-              ;
-
-              ;
-
-              ;
-              if (n.length > 1) {
-                if (valueofTitle === null || valueofTitle === 'undefined') {
-                  ;
-                } else {
-                  ;
-                }
-              }
-              let valueofUE = localStorage.getItem('UE')
-              let facesListed = false
-              if (valueofUE === 'true') {
-                const container = document.querySelector('.ProductModuleMy')
-                ;
-                if (container && Array.isArray(n) && n.length >= 1) {
-                  facesListed = true
-                  const productModuleEl = document.querySelector('.ProductModule')
-                  const backbuttonStoP = document.getElementById('backbuttonStoP')
-                  const productsModuleEl = document.querySelector('fpd-module-products')
-                  if (productModuleEl) productModuleEl.style.display = 'none'
-                  container.style.display = 'grid'
-                  if (backbuttonStoP) backbuttonStoP.style.display = 'block'
-                  if (productsModuleEl) productsModuleEl.classList.add('valueoffpdmoduleproducts-active')
-                }
-                n.forEach((e, i) => {
-                  ;
-                  if (container) {
-                    let n = e.thumbnail,
-                      s = e.title ? e.title : e.productTitle,
-                      pr = e.price ? e.price : 0,
-                      th = e.manufacturer ? e.manufacturer : 'Styleflip',
-                      sct = e.subcategorytype ? e.subcategorytype : 'General'
-                    const r = document.createElement('div')
-                    r.className =
-                      'mt-1 fpd-item fpd-hover-thumbnail text skins-det'
-                    r.dataset.title = s
-                    r.dataset.index = i
-                    r.dataset.source = n
-                    r.dataset.index = i
-                    r.dataset.manufacturer = th
-
-                    const a = document.createElement('picture')
-                    a.className = 'flex'
-                    a.dataset.img = n
-                    a.style.backgroundImage = `url("${n}")`
-                    r.append(a)
-
-                    // ========== Append Product Name Label ==========
-                    const label = document.createElement('div')
-                    label.className =
-                      'fpd-label text-center mt-0 text-xs text-gray-700 truncate max-w-[130px] overflow-hidden whitespace-nowrap mb-1 h-[30px]'
-                    label.title = s
-                    label.textContent = s
-                    r.append(label)
-
-                    const manufacturer = document.createElement('div')
-                    manufacturer.className =
-                      'fpd-label text-center mt-0 text-xs font-bold text-gray-900 truncate max-w-[130px] overflow-hidden whitespace-nowrap h-[30px] mb-2'
-                    manufacturer.productTitle = pr
-                    manufacturer.textContent = '$' + pr
-                    r.append(manufacturer)
-
-                    container.appendChild(r)
-
-                    r.addEventListener('click', e => {
-                      if (e.isTrusted) window.__fpdUserInteracted = true
-                      ;
-                      ;
-                      ;
-                      let valueofTitle = e?.srcElement.dataset.title
-                      ;
-                      localStorage.setItem('valueofTitle', valueofTitle)
-                      if (
-                        (e.preventDefault(),
-                        fpdInstance.mainOptions.swapProductConfirmation)
-                      ) {
-                        var n = t(
-                          fpdInstance.translator.getTranslation(
-                            'modules',
-                            'products_confirm_replacement'
-                          ),
-                          !1,
-                          'confirm',
-                          this.fpdInstance.container
-                        )
-                        const eBtn = n.querySelector('.fpd-confirm')
-                        eBtn.innerText = fpdInstance.translator.getTranslation(
-                          'modules',
-                          'products_confirm_button'
-                        )
-
-                        G(eBtn, ['click'], () => {
-                          ;
-                          fpdInstance.selectProduct(
-                            i,
-                            this.currentCategoryIndex
-                          )
-                          n.remove()
-                        })
-                      } else {
-                        ;
-                        localStorage.setItem('rdatasetindex', r.dataset.index)
-                        fpdInstance.selectProduct(
-                          Number(r.dataset.index),
-                          this.currentCategoryIndex
-                        )
-                        // const modal = t(
-                        //     fpdInstance.translator.getTranslation("modules", "products_confirm_replacement"),
-                        //     false,
-                        //     "confirm",
-                        //     fpdInstance.container
-                        // );
-                        // const confirmBtn = modal.querySelector(".fpd-confirm");
-                        // confirmBtn.innerText = fpdInstance.translator.getTranslation("modules", "products_confirm_button");
-
-                        // const target = e.currentTarget;
-                        // G(confirmBtn, ["click"], () => {
-                        //     modal.remove();
-                        //     console.log("Anoop Data 5-1");
-                        //     localStorage.setItem('UE', true);
-                        //     fpdInstance.selectProduct(Number(target.dataset.index), this.currentCategoryIndex);
-                        // });
-                      }
-
-                      //  const i = Array.from(r.querySelectorAll(".fpd-item")).indexOf(s);
-                      // fpdInstance.selectView(i), this.reset();
-                    })
-
-                    // ========== Append to Grid ==========
-                    // this.container.querySelector(".fpd-grid").append(r);
-                  }
-                })
-              }
-              localStorage.setItem('dataskins', JSON.stringify(n))
-              ;
-              if (!facesListed) {
-                this.loadProduct(n, this.mainOptions.replaceInitialElements)
-              }
-            } else {
-              // n = i[this.currentProductIndex]
-              ;
-              const flatArray = i.flat() // Flatten the nested structure
-              ;
-              p = [flatArray.find(item => item.title === valueofTitle)]
-              ;
-              if (p[0] === undefined || p[0] === null) {
-                p = [flatArray.find(item => item.productTitle === valueofTitle)]
-                ;
-              }
-              this.loadProduct(p, this.mainOptions.replaceInitialElements)
-            }
+            this.loadProduct(n, this.mainOptions.replaceInitialElements)
           } else {
             ;
             To(this, Io, To(this, Oo, 0)),
