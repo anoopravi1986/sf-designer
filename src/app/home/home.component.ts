@@ -68,6 +68,11 @@ export class HomeComponent implements AfterViewInit {
   // something to show. See updateProductsLoaderStep2State().
   private productsDataReady = false;
   private productsFinalWaitInterval: any;
+  // Set true after the first Products-tab loader run completes in this app
+  // session (in-memory only - resets on a real app relaunch, which is
+  // exactly when the hang can recur). Gates the cosmetic 5s final wait in
+  // finishProductsTabLoader() - see that method.
+  private hasShownProductsLoaderFinalWait = false;
   showFacebookOptions = false;
   private lastFacebookType: 'post' | 'message' = 'post';
   private currentDesignId: string | null = null;
@@ -3751,8 +3756,20 @@ export class HomeComponent implements AfterViewInit {
   // both the countdown text and the dismissal in the same tick, same
   // "one timer, not two" fix as the Products-tab loader itself learned
   // the hard way (see [[styleflip_products_tab_loader]] history).
+  //
+  // Only runs on the FIRST Products-tab loader completion per app session -
+  // repeat tab switches (hasShownProductsLoaderFinalWait already true) skip
+  // straight to stopProductsTabLoader() instead, since the 5s wait is pure
+  // polish and doesn't need repeating every time.
   private finishProductsTabLoader() {
     this.setProductsLoaderStep(0);
+
+    if (this.hasShownProductsLoaderFinalWait) {
+      this.stopProductsTabLoader();
+      return;
+    }
+    this.hasShownProductsLoaderFinalWait = true;
+
     const finalWait = document.getElementById('fpd-loader-final-wait');
     if (finalWait) finalWait.style.display = 'flex';
 

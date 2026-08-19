@@ -2172,7 +2172,7 @@ fpd-element-toolbar[data-fabric-type=image] {
 @media (max-width: 768px) {
   .fpd-container.fpd-sidebar.fpd-layout-small.fpd-module-visible .fpd-module-content {
     display: block !important;
-    height: 947px !important;
+    height: 101vh !important;
   }
 
   /* The 947px above is a hardcoded height tuned for one specific device. On
@@ -2188,10 +2188,10 @@ fpd-element-toolbar[data-fabric-type=image] {
      108px is this panel's fixed top offset (constant across viewport
      heights), 90px matches the bottom clearance reserved for the nav bar
      elsewhere in this file. */
-  .fpd-container.fpd-sidebar.fpd-layout-small.fpd-module-visible .fpd-module-content:has(> fpd-module-designs.fpd-active),
-  .fpd-container.fpd-sidebar.fpd-layout-small.fpd-module-visible .fpd-module-content:has(> fpd-module-images.fpd-active) {
-    height: calc(100dvh - 108px - 90px) !important;
-  }
+  // .fpd-container.fpd-sidebar.fpd-layout-small.fpd-module-visible .fpd-module-content:has(> fpd-module-designs.fpd-active),
+  // .fpd-container.fpd-sidebar.fpd-layout-small.fpd-module-visible .fpd-module-content:has(> fpd-module-images.fpd-active) {
+  //   height: calc(100dvh - 108px - 90px) !important;
+  // }
 }
 
 @media (max-width: 768px) {
@@ -2235,7 +2235,14 @@ fpd-element-toolbar[data-fabric-type=image] {
     transform-origin: top center !important;
     margin-top: 0 !important;
   }
-
+.fpd-view-staage-mains.fpd-view-stage {
+    width: 100% !important;
+    height: 100% !important;
+    min-width: unset !important;
+    transform: scale(1.15) !important;
+    transform-origin: top center !important;
+    margin-top: 70px !important;
+}
   /* Zoom Center - pinned to the viewport (not the scaled canvas) so it
      always stays visible just above the bottom nav bar. Sits above the
      Reset/Preview row and the view-arrows row (see below) so none of the
@@ -2379,14 +2386,14 @@ fpd-element-toolbar[data-fabric-type=image] {
   .fpd-btn.fpd-tooltip[aria-label="Redo"] {
     position: fixed;
     right: 6.9rem;
-    top: 40px;
+    top: 0px;
     z-index: 99;
   }
 
   .fpd-btn.fpd-tooltip[aria-label="Undo"] {
     position: fixed;
     right: 9.9rem;
-    top: 40px;
+    top: 0px;
     z-index:99;
   }
   
@@ -2437,10 +2444,24 @@ fpd-element-toolbar[data-fabric-type=image] {
 }
 
 @media (max-width: 768px) {
-    .py-2 {
-        padding-top: 4.5rem;
-        padding-bottom: 0.9rem;
-    }
+  /* Was `.py-2 { padding-top: 4.5rem; ... }` - a blanket override of
+     Tailwind's shared `py-2` utility class, meant only for the fixed mobile
+     topbar (back/title/save/share/cart row) to clear the iPhone
+     notch/Dynamic Island, but it silently applied 72px of top padding to
+     EVERY `py-2`-classed element on mobile (buttons, dropdown menus, etc.
+     across this file), and even for the topbar itself 72px was far more
+     than the notch needs - the excess padding pushed the topbar's content
+     down inside its fixed height:85px box and past its own bottom edge
+     (box-sizing: border-box via Tailwind preflight), which is what showed
+     up as the huge blank gap above the popup panel / canvas on real
+     iPhones. Scoped to .fpd-mobile-topbar (see home.component.html) and
+     switched to env(safe-area-inset-top) so it adapts to the actual notch
+     height per-device instead of a guessed flat value, with 0 on devices/
+     browsers that don't report a safe area. */
+  .fpd-mobile-topbar {
+    padding-top: calc(env(safe-area-inset-top, 0px) + 8px) !important;
+    padding-bottom: 8px !important;
+  }
 }
 @media (max-width: 768px) {
   .fpd-head.flex.items-center {
@@ -3511,6 +3532,10 @@ fpd-element-toolbar.fpd-smart.fpd-layout-small {
      — same !text-sm (14px) trap, just missed the first pass. */
   .fpd-panel-font-family input {
     font-size: 16px !important;
+  }
+  .fpd-container.fpd-sidebar.fpd-layout-small.fpd-module-visible fpd-main-bar, .fpd-container.fpd-sidebar.fpd-layout-small.fpd-secondary-visible fpd-main-bar{
+
+        height: calc( 100vh - 40px ) !important;
   }
 }
 
