@@ -67,6 +67,7 @@ export class HomeComponent implements AfterViewInit {
   // #fpd-loader-step-2 so it can't be tapped before there's actually
   // something to show. See updateProductsLoaderStep2State().
   private productsDataReady = false;
+  private productsFinalWaitInterval: any;
   showFacebookOptions = false;
   private lastFacebookType: 'post' | 'message' = 'post';
   private currentDesignId: string | null = null;
@@ -3672,25 +3673,37 @@ export class HomeComponent implements AfterViewInit {
     const loader = document.getElementById('fpd-loader');
     if (!loader) return;
     if (show) {
-      // #fpd-loader lives inside .fpd-module-content (see waitForElements),
-      // which sizes itself via the vendor's own
-      // `height: calc(100% - var(--fpd-sidebar-nav-width))` rule - that
-      // chain silently collapses to a much shorter box than the visible
-      // panel in the mobile layout, which is why the spinner/countdown
-      // rendered pinned near the top instead of centered. Measuring the
-      // real rendered height of fpd-main-bar (the whole bottom-sheet) minus
-      // its own nav row and setting it explicitly sidesteps that calc()
-      // chain entirely, so centering is always correct regardless of it.
-      const mainBar = loader.closest('fpd-main-bar') as HTMLElement | null;
-      const navRow = mainBar?.querySelector('.fpd-navigation') as HTMLElement | null;
-      if (mainBar) {
-        const contentHeight = mainBar.getBoundingClientRect().height - (navRow?.getBoundingClientRect().height || 0);
-        if (contentHeight > 0) {
-          loader.style.height = contentHeight + 'px';
-        }
-      }
+      this.recalculateLoaderHeight();
     }
     loader.style.display = show ? 'flex' : 'none';
+  }
+
+  // #fpd-loader lives inside .fpd-module-content (see waitForElements),
+  // which sizes itself via the vendor's own
+  // `height: calc(100% - var(--fpd-sidebar-nav-width))` rule - that chain
+  // silently collapses to a much shorter box than the visible panel in the
+  // mobile layout, which is why content inside it rendered pinned near the
+  // top instead of centered. Measuring the real rendered height of
+  // fpd-main-bar (the whole bottom-sheet) minus its own nav row and setting
+  // it explicitly sidesteps that calc() chain entirely.
+  //
+  // This isn't a one-time calculation: selectProductsCategory() changes the
+  // visible category mid-flow, which changes how many product rows render
+  // and therefore the panel's actual height. A value measured once at the
+  // very first tap goes stale by the time later steps show new content, so
+  // this gets re-measured before every step transition, not just on the
+  // initial show.
+  private recalculateLoaderHeight() {
+    const loader = document.getElementById('fpd-loader');
+    if (!loader) return;
+    const mainBar = loader.closest('fpd-main-bar') as HTMLElement | null;
+    const navRow = mainBar?.querySelector('.fpd-navigation') as HTMLElement | null;
+    if (mainBar) {
+      const contentHeight = mainBar.getBoundingClientRect().height - (navRow?.getBoundingClientRect().height || 0);
+      if (contentHeight > 0) {
+        loader.style.height = contentHeight + 'px';
+      }
+    }
   }
 
   // Drives the Products-tab loader (mobile shows a 3-step tap sequence
@@ -3717,6 +3730,7 @@ export class HomeComponent implements AfterViewInit {
       btn.style.display = i === step ? 'block' : 'none';
     }
     this.updateProductsLoaderStep2State();
+    this.recalculateLoaderHeight();
   }
 
   // Step 2 ("Load Products") stays disabled until the real product fetch
@@ -3730,19 +3744,36 @@ export class HomeComponent implements AfterViewInit {
   }
 
   // Step 3 doesn't hand off to the editor immediately - it shows a plain
-  // 5s loading indicator first (no buttons, nothing to tap: by this point
-  // all 3 required real taps have already happened, so there's no hang-fix
-  // reason left to gate this behind another tap; it's purely cosmetic).
+  // 5s loading indicator (with a visible 5-4-3-2-1 countdown) first, no
+  // buttons, nothing to tap: by this point all 3 required real taps have
+  // already happened, so there's no hang-fix reason left to gate this
+  // behind another tap; it's purely cosmetic. Single setInterval drives
+  // both the countdown text and the dismissal in the same tick, same
+  // "one timer, not two" fix as the Products-tab loader itself learned
+  // the hard way (see [[styleflip_products_tab_loader]] history).
   private finishProductsTabLoader() {
     this.setProductsLoaderStep(0);
     const finalWait = document.getElementById('fpd-loader-final-wait');
     if (finalWait) finalWait.style.display = 'flex';
-    setTimeout(() => {
+
+    clearInterval(this.productsFinalWaitInterval);
+    let remaining = 5;
+    const countdownEl = document.getElementById('fpd-loader-final-countdown');
+    if (countdownEl) countdownEl.textContent = String(remaining);
+    this.productsFinalWaitInterval = setInterval(() => {
+      remaining -= 1;
+      if (remaining > 0) {
+        const el = document.getElementById('fpd-loader-final-countdown');
+        if (el) el.textContent = String(remaining);
+        return;
+      }
+      clearInterval(this.productsFinalWaitInterval);
       this.stopProductsTabLoader();
-    }, 5000);
+    }, 1000);
   }
 
   private stopProductsTabLoader() {
+    clearInterval(this.productsFinalWaitInterval);
     this.showFPDLoading(false);
   }
 
