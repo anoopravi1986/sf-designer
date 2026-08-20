@@ -28909,15 +28909,14 @@
 
                       if (element) {
                         // Place the new text horizontally centered near the
-                        // bottom of the stage instead of the canvas center.
+                        // top of the stage instead of the canvas center.
                         const stageWidth = canvas.viewOptions.stageWidth
-                        const stageHeight = canvas.viewOptions.stageHeight
-                        const bottomMargin = 100
+                        const topMargin = 100
 
                         element.setPositionByOrigin(
-                          new St.fabric.Point(stageWidth / 2, stageHeight - bottomMargin),
+                          new St.fabric.Point(stageWidth / 2, topMargin),
                           'center',
-                          'bottom'
+                          'top'
                         )
                         element.setCoords()
 
