@@ -79,13 +79,19 @@ export class HomeComponent implements AfterViewInit {
   // exactly when the hang can recur). Gates the cosmetic 5s final wait in
   // finishProductsTabLoader() - see that method.
   private hasShownProductsLoaderFinalWait = false;
-  // Set true after the first Products-tab loader run FINISHES (not just
-  // starts) in this app session - see finishProductsTabLoader(). Real taps
-  // already happened once this session by that point, so the hang risk
-  // that requires 3 separate taps is already past; later opens only need
-  // one lighter tap to keep the same "real touch" property. In-memory only
-  // - resets on a real app relaunch, same as hasShownProductsLoaderFinalWait.
-  private hasCompletedProductsTabLoaderOnce = false;
+  // Set true after the first tap-loader run FINISHES (not just starts) in
+  // this app session, on WHICHEVER bottom-nav tab (Products/Designs/
+  // Elements/Add Text) the user happens to open first - see
+  // finishProductsTabLoader() and the nav-item click listener in ngOnInit.
+  // The iOS hang this works around isn't Products-specific, so the
+  // mandatory 3-tap sequence is tied to "first tab opened this session",
+  // not "first Products-tab open" specifically. Once true: Products always
+  // falls back to the abbreviated single-tap version (even on its own
+  // first visit, if some other tab already consumed the full sequence),
+  // and Elements/Designs/Add Text show nothing more at all - only Products
+  // keeps a lightweight repeat-visit touch. In-memory only - resets on a
+  // real app relaunch, same as hasShownProductsLoaderFinalWait.
+  private hasShownFirstEditorTabLoader = false;
   // Whether the loader run currently in progress is the abbreviated
   // single-tap version (2nd+ Products-tab open this session) or the full
   // first-time 3-step version. Set in startProductsTabLoader(), read by the
@@ -366,6 +372,12 @@ export class HomeComponent implements AfterViewInit {
     // its very first line, so a normal bubble-phase document listener
     // never sees this click at all - capture runs top-down before that
     // handler gets a chance to stop it.
+    // Which bottom-nav tabs count as "an editor tab was opened" for the
+    // mandatory first-session tap loader - every tab except Products,
+    // which is handled separately below since it always runs the loader
+    // (full or abbreviated), never skipped outright.
+    const firstLoaderModules = ['productsnew', 'designs', 'text', 'images'];
+
     document.addEventListener('click', (e: any) => {
       const navItem = e.target?.closest?.('.fpd-nav-item[data-module]');
       if (!navItem) return;
@@ -373,7 +385,39 @@ export class HomeComponent implements AfterViewInit {
       // as "close this panel", not "reopen it" - only an inactive ->
       // active transition is a genuine tab switch worth loading for.
       const isAlreadyActive = navItem.classList.contains('fpd-active');
-      if (navItem.dataset.module === 'products' && !isAlreadyActive) {
+      const module = navItem.dataset.module;
+
+      // Reload the Images tab's Uploads grid from the backend every single
+      // time it's opened (not just once per session like the tap-loader
+      // above) - independent of the loader branching below, since this
+      // should fire on every inactive -> active transition to Images
+      // regardless of which loader branch (if any) also runs.
+      // fpdReloadUploadedImages is the vendor's loadItems() exposed onto
+      // window (see FancyProductDesigner.js ~line 21453) specifically so
+      // it's callable from here; `true` bypasses its normal
+      // once-per-session gate.
+      if (!isAlreadyActive && module === 'images') {
+        (window as any).fpdReloadUploadedImages?.(true);
+      }
+
+      if (isAlreadyActive) {
+        this.stopProductsTabLoader();
+      } else if (module === 'products') {
+        // Always runs - full sequence the very first time this session
+        // (on any tab), abbreviated single-tap every time after - see
+        // startProductsTabLoader().
+        this.startProductsTabLoader();
+      } else if (!this.hasShownFirstEditorTabLoader && firstLoaderModules.includes(module)) {
+        // Some other tab (Designs/Elements/Add Text/Image) is the very
+        // first tab opened this session - run the same mandatory first-time loader
+        // here instead, since the hang this works around isn't specific
+        // to Products. Reuses startProductsTabLoader() as-is: the DOM
+        // relocation/sizing is module-agnostic (see showFPDLoading /
+        // recalculateLoaderHeight), and selectProductsCategory() calls
+        // inside the tap handler just no-op harmlessly here since this
+        // tab has no .fpd-product-categories dropdown - only the "real
+        // tap" itself, not the category filter, was ever confirmed to
+        // matter for the hang.
         this.startProductsTabLoader();
       } else {
         this.stopProductsTabLoader();
@@ -3778,9 +3822,11 @@ export class HomeComponent implements AfterViewInit {
     // via the inline style.display below, just unstyled, on desktop.
     if (window.innerWidth > 768) return;
     this.showFPDLoading(true);
-    // From the 2nd Products-tab open onward this session, skip straight to
-    // the abbreviated single-tap flow - see isAbbreviatedProductsLoader.
-    this.isAbbreviatedProductsLoader = this.hasCompletedProductsTabLoaderOnce;
+    // Once the mandatory first-session loader has completed on ANY tab
+    // (see hasShownFirstEditorTabLoader), skip straight to the abbreviated
+    // single-tap flow whenever this runs again - see
+    // isAbbreviatedProductsLoader.
+    this.isAbbreviatedProductsLoader = this.hasShownFirstEditorTabLoader;
     this.setProductsLoaderStep(1);
   }
 
@@ -3850,12 +3896,12 @@ export class HomeComponent implements AfterViewInit {
   // "one timer, not two" fix as the Products-tab loader itself learned
   // the hard way (see [[styleflip_products_tab_loader]] history).
   //
-  // Only runs on the FIRST Products-tab loader completion per app session -
-  // repeat tab switches (hasShownProductsLoaderFinalWait already true) skip
-  // straight to stopProductsTabLoader() instead, since the 5s wait is pure
-  // polish and doesn't need repeating every time.
+  // Only runs on the FIRST tap-loader completion per app session, on
+  // whichever tab that happens to be - repeat runs (hasShownProductsLoaderFinalWait
+  // already true) skip straight to stopProductsTabLoader() instead, since
+  // the 5s wait is pure polish and doesn't need repeating every time.
   private finishProductsTabLoader() {
-    this.hasCompletedProductsTabLoaderOnce = true;
+    this.hasShownFirstEditorTabLoader = true;
     this.setProductsLoaderStep(0);
 
     if (this.hasShownProductsLoaderFinalWait) {

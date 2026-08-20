@@ -20946,8 +20946,15 @@
             trash.className = 'fa-solid fa-trash';
             e.append(trash);
           }
-          async function loadItems() {
-            if (itemsLoaded) return; // prevent double calls
+          async function loadItems(force) {
+            // force=true bypasses the one-time-per-session gate below and
+            // re-fetches/re-renders even if this already ran once - used
+            // for an explicit reload (after an upload finishes, or every
+            // time the Images tab is opened) rather than the normal
+            // once-per-page-load call this function otherwise gets from
+            // every single $(t) invocation across every module (see
+            // itemsLoaded's declaration comment).
+            if (itemsLoaded && !force) return; // prevent double calls
             itemsLoaded = true;
             try {
               // 👇 Call your API (replace with your real endpoint)
@@ -20978,11 +20985,19 @@
                 console.error('❌ Failed to reconcile fpd_uploaded_images cache:', e);
               }
 
-              if(data.length > 0){
+              // assuming API response looks like: [{ url, title, thumbnailUrl, disableDraggable, disablePrice, price, removable }, ...]
+              // const container = document.querySelector("#items-container"); // 👈 parent element where items go
+              let container = document.querySelector(".fpd-module-content #extracontainer-data");
+              // This function only ever appended items, never removed any -
+              // harmless for the original once-per-session call (container
+              // starts empty), but a `force` reload needs the grid wiped
+              // first or every existing item gets duplicated alongside the
+              // fresh set. Clearing unconditionally (not just when
+              // data.length is 0) also drops stale items if the reload
+              // genuinely returns fewer/no images now.
+              if (container) container.innerHTML = '';
 
-                // assuming API response looks like: [{ url, title, thumbnailUrl, disableDraggable, disablePrice, price, removable }, ...]
-                // const container = document.querySelector("#items-container"); // 👈 parent element where items go
-                let container = document.querySelector(".fpd-module-content #extracontainer-data");
+              if(data.length > 0){
                 data.forEach(t => {
                   ;
                   const e = document.createElement("div");
@@ -21432,7 +21447,19 @@
             }
           }
 
-          
+          // loadItems is redefined and immediately invoked (see the "Call
+          // it on page load" call below) every single time this outer $(t)
+          // factory runs, for every module's every grid item - itemsLoaded
+          // is what keeps that from re-fetching every time. There's no
+          // other way to reach this function from outside this closure
+          // (it's not on any module class, not a designer method), so it's
+          // exposed here for the upload-success handler and the Angular
+          // Images-tab click listener to force a reload via
+          // `window.fpdReloadUploadedImages(true)` - reassigned on every
+          // call, harmless since each instance behaves identically when
+          // invoked (no meaningful state carried between instances beyond
+          // the shared, outer-scoped itemsLoaded flag).
+          window.fpdReloadUploadedImages = loadItems;
 
           // Call it on page load
           loadItems();
@@ -31045,6 +31072,14 @@
                           Ci(this, Ei, ((i = wi(this, Ei)), ++i)),
                           (a.xhr = null)),
                           (this.fpdInstance.loadingCustomImage = !1)
+                        // Force a full reload of the uploads grid from
+                        // /api/image/getByUserId right after a successful
+                        // upload, instead of only updating this one
+                        // placeholder item in place - see
+                        // window.fpdReloadUploadedImages's definition
+                        // (loadItems, ~line 20949) for why a global
+                        // exposure was needed to reach it from here.
+                        ;t.image_src && window.fpdReloadUploadedImages && window.fpdReloadUploadedImages(true);
                       }
                     }
                   }),
