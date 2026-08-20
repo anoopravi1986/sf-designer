@@ -712,6 +712,29 @@ export class HomeComponent implements AfterViewInit {
         opacityToolbarEl?.classList.remove('fpd-opacity-open');
       };
 
+      // The chevron/down-arrow above the toolbar (vendor's `.fpd-close`)
+      // normally collapses the whole element toolbar and deselects the
+      // element (see the `G(... '.fpd-close' ...)` handler in
+      // FancyProductDesigner.js) - every other tool panel avoids this by
+      // swapping in `.fpd-close-sub-panel` while open, but the Opacity
+      // flyout uses its own `fpd-opacity-open` class instead and never
+      // makes that swap, so the chevron stayed wired to the whole-toolbar
+      // close. Capture phase intercepts the click before the vendor's own
+      // listener runs, same technique as the Products-tab loader's
+      // capture-phase delegation (needed there because a vendor handler
+      // calls stopPropagation() first - same precaution here).
+      document.addEventListener(
+        'click',
+        (e: any) => {
+          if (!opacityToolbarEl?.classList.contains('fpd-opacity-open')) return;
+          if (!e.target?.closest?.('.fpd-close')) return;
+          e.stopPropagation();
+          e.preventDefault();
+          closeOpacityPanel();
+        },
+        true
+      );
+
       function updateSliderProgress() {
         const percent = (parseFloat(sliderOpacity.value) / parseFloat(sliderOpacity.max)) * 100;
         sliderOpacity.style.setProperty('--progress', percent + '%');
@@ -752,17 +775,6 @@ export class HomeComponent implements AfterViewInit {
           titleRow.className = 'fpd-opacity-title-row';
           panel.insertBefore(titleRow, existingLabel);
           titleRow.appendChild(existingLabel);
-
-          const closeBtn = document.createElement('button');
-          closeBtn.type = 'button';
-          closeBtn.className = 'fpd-opacity-close';
-          closeBtn.setAttribute('aria-label', 'Close');
-          closeBtn.innerHTML = '&times;';
-          closeBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            closeOpacityPanel();
-          });
-          titleRow.appendChild(closeBtn);
         }
 
         const stepperRow = document.createElement('div');
