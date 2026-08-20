@@ -92,6 +92,16 @@ export class HomeComponent implements AfterViewInit {
   // keeps a lightweight repeat-visit touch. In-memory only - resets on a
   // real app relaunch, same as hasShownProductsLoaderFinalWait.
   private hasShownFirstEditorTabLoader = false;
+  // Set by openTitlePopup() when it defers itself behind the first-session
+  // loader (Save Design isn't a .fpd-nav-item, so it can't go through the
+  // nav-click listener like the other 6 tabs - see openTitlePopup()).
+  // Invoked - and always cleared - in stopProductsTabLoader(); only
+  // actually invoked if hasShownFirstEditorTabLoader is true by then
+  // (i.e. the loader that's stopping is a genuine completion via
+  // finishProductsTabLoader, not the user abandoning it by switching
+  // tabs mid-sequence - in that case this still gets cleared so a LATER,
+  // unrelated tab's loader completion can't wrongly reopen the popup).
+  private pendingLoaderCompletionCallback: (() => void) | null = null;
   // Whether the loader run currently in progress is the abbreviated
   // single-tap version (2nd+ Products-tab open this session) or the full
   // first-time 3-step version. Set in startProductsTabLoader(), read by the
@@ -376,7 +386,7 @@ export class HomeComponent implements AfterViewInit {
     // mandatory first-session tap loader - every tab except Products,
     // which is handled separately below since it always runs the loader
     // (full or abbreviated), never skipped outright.
-    const firstLoaderModules = ['productsnew', 'designs', 'text', 'images'];
+    const firstLoaderModules = ['productsnew', 'designs', 'text', 'images', 'manage-layers', 'save-load'];
 
     document.addEventListener('click', (e: any) => {
       const navItem = e.target?.closest?.('.fpd-nav-item[data-module]');
@@ -3528,6 +3538,18 @@ export class HomeComponent implements AfterViewInit {
   }
 
   openTitlePopup() {
+    // Save Design isn't wired through the .fpd-nav-item click listener
+    // (it's a plain button/custom popup, not one of the 7 mainBarModules
+    // tabs), so it needs its own check for "is this the very first thing
+    // opened this session" - defer to the same first-session tap loader
+    // used by the other tabs, then re-enter this same function once it
+    // completes (by which point hasShownFirstEditorTabLoader is true, so
+    // this guard is skipped and the popup opens normally).
+    if (window.innerWidth <= 768 && !this.hasShownFirstEditorTabLoader) {
+      this.pendingLoaderCompletionCallback = () => this.openTitlePopup();
+      this.startProductsTabLoader();
+      return;
+    }
     const popup = document.getElementById('title-popup');
     const input = document.getElementById('design-title-input') as HTMLInputElement;
     const btn = document.getElementById('save-title-btn');
@@ -3932,6 +3954,17 @@ export class HomeComponent implements AfterViewInit {
   private stopProductsTabLoader() {
     clearInterval(this.productsFinalWaitInterval);
     this.showFPDLoading(false);
+    // See pendingLoaderCompletionCallback's declaration comment: only
+    // actually run it on a genuine completion (hasShownFirstEditorTabLoader
+    // was just set true by finishProductsTabLoader right before this
+    // ran), not on abandonment (switching tabs mid-sequence also reaches
+    // this function, but hasShownFirstEditorTabLoader is still false in
+    // that case) - always clear it either way.
+    if (this.pendingLoaderCompletionCallback) {
+      const callback = this.pendingLoaderCompletionCallback;
+      this.pendingLoaderCompletionCallback = null;
+      if (this.hasShownFirstEditorTabLoader) callback();
+    }
   }
 
   // Applies a real category filter as visible feedback for a loader-step
