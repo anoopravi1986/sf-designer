@@ -2236,7 +2236,7 @@ fpd-element-toolbar[data-fabric-type=image] {
     margin-top: 0 !important;
   }
 .fpd-view-staage-mains.fpd-view-stage {
-    width: 100% !important;
+    width: 85% !important;
     height: 100% !important;
     min-width: unset !important;
     transform: scale(1.15) !important;
@@ -3397,6 +3397,35 @@ fpd-element-toolbar.fpd-smart.fpd-layout-small {
 
     &::-webkit-scrollbar {
       display: none;
+    }
+  }
+}
+
+// Products tab (fpd-module-products, e.g. "MIDI Controller Skins",
+// "Sequencers & Samplers & Synths"): drop the prev/next arrow buttons on
+// mobile and let the category row scroll as a swipeable slider instead.
+// Structurally NOT identical to the Elements tab below despite sharing the
+// .our-elements class name: there, the arrow <button>s are direct children
+// of .our-elements, but here the vendor JS appends both arrow <button>s as
+// siblings of .our-elements, both inside the outer .fpd-designs-tags
+// wrapper (see FancyProductDesigner.js ~28447-28502) - so the arrows must
+// be targeted via the wrapper, not via .our-elements > button.
+@media (max-width: 768px) {
+  fpd-module-products .fpd-designs-tags {
+    > button {
+      display: none !important;
+    }
+
+    .our-elements {
+      overflow-x: auto !important;
+      overflow-y: hidden !important;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+
+      &::-webkit-scrollbar {
+        display: none;
+      }
     }
   }
 }

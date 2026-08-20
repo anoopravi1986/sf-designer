@@ -195,13 +195,17 @@
       flex-direction: column;
       align-items: center;
       justify-content: flex-start;
-      gap: 14px;
-      width: auto;
+      gap: 30px;
+      // auto sizes to content only, ignoring max-width if the content is
+      // narrower than it - use a percentage so the card actually fills
+      // more of the screen, with max-width still capping it on wider
+      // phones/tablets.
+      width: 85%;
       height: auto !important;
       background: rgba(255, 255, 255, 0.96);
-      border-radius: 16px;
-      padding: 24px 22px;
-      max-width: 280px;
+      border-radius: 5px;
+      padding: 30px 26px;
+      max-width: 419px;
       box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
     }
 

@@ -79,6 +79,19 @@ export class HomeComponent implements AfterViewInit {
   // exactly when the hang can recur). Gates the cosmetic 5s final wait in
   // finishProductsTabLoader() - see that method.
   private hasShownProductsLoaderFinalWait = false;
+  // Set true after the first Products-tab loader run FINISHES (not just
+  // starts) in this app session - see finishProductsTabLoader(). Real taps
+  // already happened once this session by that point, so the hang risk
+  // that requires 3 separate taps is already past; later opens only need
+  // one lighter tap to keep the same "real touch" property. In-memory only
+  // - resets on a real app relaunch, same as hasShownProductsLoaderFinalWait.
+  private hasCompletedProductsTabLoaderOnce = false;
+  // Whether the loader run currently in progress is the abbreviated
+  // single-tap version (2nd+ Products-tab open this session) or the full
+  // first-time 3-step version. Set in startProductsTabLoader(), read by the
+  // #fpd-loader-active-btn click handler to decide whether a tap should
+  // advance to step 2/3 or finish immediately.
+  private isAbbreviatedProductsLoader = false;
   showFacebookOptions = false;
   private lastFacebookType: 'post' | 'message' = 'post';
   private currentDesignId: string | null = null;
@@ -381,6 +394,14 @@ export class HomeComponent implements AfterViewInit {
     // real tap behind it at all.
     document.addEventListener('click', (e: any) => {
       if (!e.target?.closest?.('#fpd-loader-active-btn')) return;
+      // 2nd+ open this session: one real tap + one category filter is
+      // enough (see isAbbreviatedProductsLoader) - finish immediately
+      // instead of advancing through step 2/3.
+      if (this.isAbbreviatedProductsLoader) {
+        this.selectProductsCategory(1);
+        this.finishProductsTabLoader();
+        return;
+      }
       // Index 0 is whatever category the dropdown already defaults to, so
       // selecting it produces no visible change - start from index 1 so
       // every one of these taps actually filters to something different.
@@ -3737,7 +3758,17 @@ export class HomeComponent implements AfterViewInit {
   // touch going through UIKit's gesture pipeline can resolve. So this asks
   // for exactly that: 3 sequential buttons, one real tap each.
   private startProductsTabLoader() {
+    // This whole tap-popup exists only to work around the iOS
+    // WKWebView-only hang - desktop was never affected, so skip it there
+    // entirely rather than relying on CSS alone to hide it. The card's
+    // positioning/background/etc. only exist inside the mobile media
+    // query, so without this check the popup would still get force-shown
+    // via the inline style.display below, just unstyled, on desktop.
+    if (window.innerWidth > 768) return;
     this.showFPDLoading(true);
+    // From the 2nd Products-tab open onward this session, skip straight to
+    // the abbreviated single-tap flow - see isAbbreviatedProductsLoader.
+    this.isAbbreviatedProductsLoader = this.hasCompletedProductsTabLoaderOnce;
     this.setProductsLoaderStep(1);
   }
 
@@ -3812,6 +3843,7 @@ export class HomeComponent implements AfterViewInit {
   // straight to stopProductsTabLoader() instead, since the 5s wait is pure
   // polish and doesn't need repeating every time.
   private finishProductsTabLoader() {
+    this.hasCompletedProductsTabLoaderOnce = true;
     this.setProductsLoaderStep(0);
 
     if (this.hasShownProductsLoaderFinalWait) {

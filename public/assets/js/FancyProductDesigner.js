@@ -28400,6 +28400,7 @@
               flexWrapper.className =
                 'flex gap-2 ml-[5px] transition-transform duration-300 ease-in-out'
               flexWrapper.style.transform = `translateX(${currentOffset}px)`
+              const realPillEls = []
 
               subcategories.forEach(sub => {
                 const div = document.createElement('div')
@@ -28407,6 +28408,7 @@
                   'capitalize border border-[#35475a33] border-solid pt-2 pb-2 pr-3 pl-3 text-sm text-[#0d1216] rounded-[6px] cursor-pointer hover:bg-[#40576d12] flex-none whitespace-nowrap my-class-buttons-sub'
                 div.textContent = sub
                 flexWrapper.appendChild(div)
+                realPillEls.push(div)
                 div.addEventListener('click', event => {
                   const allSubcategoryButtons = document.querySelectorAll('.my-class-buttons-sub'); // change this to the correct class for all buttons
                   allSubcategoryButtons.forEach(btn => btn.classList.remove('active'));
@@ -28441,6 +28443,54 @@
                   }
                 })
               })
+
+              // Infinite swipe loop (mobile only - matches the
+              // overflow-x:auto/arrow-hiding CSS on
+              // fpd-module-products .fpd-designs-tags .our-elements in
+              // styles.scss). Clone the pill set once before and once
+              // after the real one so swiping past either end lands in a
+              // matching clone, then silently snap scrollLeft back into
+              // the real (middle) set once the user scrolls into a clone
+              // zone. cloneNode(true) doesn't carry over the click
+              // listener above, so each clone re-dispatches a real click
+              // on its corresponding original pill instead of
+              // re-implementing the filter logic a second time.
+              if (window.innerWidth <= 768 && realPillEls.length > 1) {
+                const makeClones = () =>
+                  realPillEls.map(el => {
+                    const clone = el.cloneNode(true)
+                    clone.addEventListener('click', () => {
+                      el.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+                    })
+                    return clone
+                  })
+
+                makeClones()
+                  .reverse()
+                  .forEach(clone =>
+                    flexWrapper.insertBefore(clone, flexWrapper.firstChild)
+                  )
+                makeClones().forEach(clone => flexWrapper.appendChild(clone))
+
+                setTimeout(() => {
+                  const realSetWidth = realPillEls.reduce(
+                    (sum, el) => sum + el.offsetWidth + 8,
+                    0
+                  )
+                  container.scrollLeft = realSetWidth
+
+                  container.addEventListener('scroll', () => {
+                    if (container.scrollLeft <= 4) {
+                      container.scrollLeft += realSetWidth
+                    } else if (
+                      container.scrollLeft >=
+                      realSetWidth * 2 - container.offsetWidth - 4
+                    ) {
+                      container.scrollLeft -= realSetWidth
+                    }
+                  })
+                }, 100)
+              }
 
               container.appendChild(flexWrapper)
 
