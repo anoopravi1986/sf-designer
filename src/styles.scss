@@ -1890,7 +1890,57 @@ fpd-element-toolbar[data-element-type="image"] .fpd-tool-advanced-editing {
   width: 150px;
 }
 
+/* Bumps the thumb on every fpd-range-slider (stroke width, rotate, font
 
+   size, letter-spacing, line-height, curve radius, shadow, scale — the
+
+   Add Text panel's sliders included, they're the same component) from the
+
+   vendor's default 20px to 32px, matching #fpd-opacity-range above. Only
+
+   width/height/margin-top are overridden (same selector as the vendor
+
+   rule in FancyProductDesigner.min.css, so this wins on source order
+
+   without needing !important); everything else (background, border,
+
+   hover scale) falls through to the vendor rule unchanged. margin-top and
+
+   the .fpd-progress fill's --sx both hardcode the thumb's half-width in
+
+   their centering math, so they need the new 32px swapped in too or the
+
+   thumb sits off-center / the filled track segment stops short of it. */
+
+.fpd-container fpd-range-slider input[type="range"]::-webkit-slider-thumb {
+
+  width: 32px;
+
+  height: 32px;
+
+  margin-top: calc((var(--fpd-track-height) * .5 - 1px) - (32px * .5));
+
+}
+
+
+
+.fpd-container fpd-range-slider input[type="range"]::-moz-range-thumb {
+
+  width: 32px;
+
+  height: 32px;
+
+  margin-top: calc((var(--fpd-track-height) * .5 - 1px) - (32px * .5));
+
+}
+
+
+
+.fpd-container fpd-range-slider.fpd-progress input[type="range"] {
+
+  --sx: calc(0.5 * 32px + var(--ratio) * (100% - 32px));
+
+}
 /* fpd-range-slider is the vendor's generic slider component — used for
    stroke width, letter-spacing, line-height and other tool sliders, same
    underlying <input type="range"> as #fpd-opacity-range below. Without
