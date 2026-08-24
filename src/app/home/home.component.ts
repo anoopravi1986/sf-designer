@@ -460,7 +460,12 @@ export class HomeComponent implements AfterViewInit {
     // genuine touch/click on our own button, not a synthetic click with no
     // real tap behind it at all.
     document.addEventListener('click', (e: any) => {
-      if (!e.target?.closest?.('#fpd-loader-active-btn')) return;
+      // Continue and Skip (#fpd-loader-skip-btn, added 2026-08-24 per
+      // client request - "dono button pe same kaam hona chahiye category
+      // filter wala") both advance the loader identically - the real-tap
+      // hang mitigation this loader exists for only cares that SOME real
+      // button got tapped, not which one.
+      if (!e.target?.closest?.('#fpd-loader-active-btn, #fpd-loader-skip-btn')) return;
       // 2nd+ open this session: one real tap + one category filter is
       // enough (see isAbbreviatedProductsLoader) - finish immediately
       // instead of advancing through step 2/3.
@@ -2595,6 +2600,39 @@ export class HomeComponent implements AfterViewInit {
     );
     ;
 
+    // The zoom slider (.fpd-zoom-wrapper) is only ever built by the vendor
+    // lazily, the first time someone taps the "zoom" action icon
+    // (FancyProductDesigner.js's doAction('zoom') branch, ~line 27718) - the
+    // mobile zoom action icon itself is hidden separately
+    // (div[data-pos="left"] .fpd-btn[aria-label="Zoom"] in src/styles.scss,
+    // pre-existing), so mobile can otherwise never reach it manually.
+    // Calling the exact same doAction('zoom') the icon's own click handler
+    // calls makes it appear immediately on both desktop and mobile instead
+    // of waiting for that first tap.
+    //
+    // Self-heals by polling forever (not just until the first success) for
+    // ".fpd-zoom-wrapper missing + a real view exists" and recreating it,
+    // rather than a one-shot poll-then-call - the vendor's own actions-bar
+    // class has a `reset()` that `.remove()`s any existing
+    // `.fpd-zoom-wrapper` on certain internal events (its constructor wires
+    // `G(t, ['viewSelect'], t => this.reset())`, ~line 27556) and a one-shot
+    // version loses that race on desktop (confirmed via a real
+    // headless-browser repro - see [[styleflip_zoom_slider_auto_show]]).
+    // Polling forever self-heals regardless of what removes it or why, and
+    // correctly keeps the slider's displayed value in sync with whichever
+    // view is current (doAction('zoom') reads the CURRENT view's zoom when
+    // it rebuilds) - it's a no-op most ticks once the slider's already
+    // there (`if (zoomWrapper) return` in the vendor code itself).
+    setInterval(() => {
+      if (
+        this.designer?.actionsBar &&
+        this.designer?.currentViewInstance &&
+        !this.designer.mainWrapper?.container?.querySelector('.fpd-zoom-wrapper')
+      ) {
+        this.designer.actionsBar.doAction('zoom');
+      }
+    }, 800);
+
     // Some product entries ship a locked background ("Base"/"Overlay") image
     // whose scaleX/scaleY was authored against a different reference size than
     // the stageWidth/stageHeight actually declared for that view (e.g. Toshiba's
@@ -4010,8 +4048,9 @@ export class HomeComponent implements AfterViewInit {
   };
 
   // Steps 1/2/3 and the final wait all live inside ONE card
-  // (#fpd-loader-active-card) and share ONE button (#fpd-loader-active-btn)
-  // - only the text and the button-vs-spinner visibility change between
+  // (#fpd-loader-active-card) and share the same button pair
+  // (#fpd-loader-active-btn/#fpd-loader-skip-btn, in #fpd-loader-step-btn-row)
+  // - only the text and the button-row-vs-spinner visibility change between
   // them. This replaced 4 separately-positioned elements specifically so
   // the popup and the final spinner can never end up in different spots on
   // screen: there's only one box to position, reused for every step.
@@ -4019,7 +4058,7 @@ export class HomeComponent implements AfterViewInit {
     this.currentProductsLoaderStep = step;
     const cardEl = document.getElementById('fpd-loader-active-card') as HTMLElement | null;
     const textEl = document.getElementById('fpd-loader-active-text') as HTMLElement | null;
-    const btnEl = document.getElementById('fpd-loader-active-btn') as HTMLElement | null;
+    const btnRowEl = document.getElementById('fpd-loader-step-btn-row') as HTMLElement | null;
     const finalWait = document.getElementById('fpd-loader-final-wait');
     // The card itself defaults to display:none (see .fpd-loader-step-card
     // in home.component.scss) - it needs to be shown here since nothing
@@ -4035,14 +4074,14 @@ export class HomeComponent implements AfterViewInit {
     }
     if (step === 0) {
       if (textEl) textEl.style.display = 'none';
-      if (btnEl) btnEl.style.display = 'none';
+      if (btnRowEl) btnRowEl.style.display = 'none';
       if (finalWait) finalWait.style.display = 'flex';
     } else {
       if (textEl) {
         textEl.style.display = 'block';
         textEl.textContent = this.productsLoaderStepCopy[step];
       }
-      if (btnEl) btnEl.style.display = 'block';
+      if (btnRowEl) btnRowEl.style.display = 'flex';
       if (finalWait) finalWait.style.display = 'none';
     }
     this.updateProductsLoaderStep2State();
@@ -4055,8 +4094,11 @@ export class HomeComponent implements AfterViewInit {
   // another blank tap. Native <button disabled> both blocks clicks and
   // renders visibly grayed out (see .fpd-loader-step-btn:disabled).
   private updateProductsLoaderStep2State() {
+    const disabled = this.currentProductsLoaderStep === 2 && !this.productsDataReady;
     const btn = document.getElementById('fpd-loader-active-btn') as HTMLButtonElement | null;
-    if (btn) btn.disabled = this.currentProductsLoaderStep === 2 && !this.productsDataReady;
+    const skipBtn = document.getElementById('fpd-loader-skip-btn') as HTMLButtonElement | null;
+    if (btn) btn.disabled = disabled;
+    if (skipBtn) skipBtn.disabled = disabled;
   }
 
   // Step 3 doesn't hand off to the editor immediately - it shows a plain

@@ -2293,20 +2293,24 @@ fpd-element-toolbar[data-fabric-type=image] {
     transform-origin: top center !important;
     margin-top: 70px !important;
 }
-  /* Zoom Center - pinned to the viewport (not the scaled canvas) so it
-     always stays visible just above the bottom nav bar. Sits above the
-     Reset/Preview row and the view-arrows row (see below) so none of the
-     three fixed floating controls overlap each other. */
+  /* Zoom row - pinned to the viewport (not the scaled canvas), same
+     bottom:80px level as the Reset/Preview icons (aria-label="Reset"/
+     "Preview" rules below) so all three read as one shared row: slider on
+     the left, Reset+Preview grouped on the right. Width capped so it can't
+     grow wide enough to reach the Reset/Preview pair. Horizontal
+     (flex-direction:row) so the slider and its pan/drag toggle sit
+     side-by-side instead of stacked. */
   div.fpd-container .fpd-zoom-wrapper {
     position: fixed !important;
-    bottom: 190px !important;
-    left: 50% !important;
+    bottom: 80px !important;
+    left: 16px !important;
     right: auto !important;
-    transform: translateX(-50%) !important;
+    transform: none !important;
     z-index: 9999 !important;
+    width: 140px !important;
 
     display: flex !important;
-    flex-direction: column !important;
+    flex-direction: row !important;
     align-items: center !important;
   }
 
@@ -2315,21 +2319,14 @@ fpd-element-toolbar[data-fabric-type=image] {
 
 @media (max-width: 768px) {
 
-  /* Sits directly above the Reset/Preview row (bottom: 80px, ~54px tall,
-     see the aria-label="Reset"/"Preview" rules below) so the two fixed
-     floating rows stack instead of overlapping now that this nav is
-     truly viewport-fixed instead of absolute. */
+  /* View-switcher prev/next arrows ("< 1/3 >") - client asked for these
+     hidden on mobile, 2026-08-24 ("uske upar jo left right arrow the
+     unko hatana tha" - sitting right above the zoom/Reset/Preview row
+     below, see .fpd-zoom-wrapper/aria-label="Reset"/"Preview"). Was
+     previously repositioned to fixed/bottom:142px (stacked above that
+     row) - hidden outright now instead. */
   .fpd-views-inside-left fpd-views-nav {
-    position: fixed !important;
-    bottom: 142px !important;
-    left: 50% !important;
-    right: auto !important;
-    transform: translateX(-50%) !important;
-    z-index: 9999 !important;
-
-    display: flex !important;
-    justify-content: center !important;
-    align-items: center !important;
+    display: none !important;
   }
 
 }
@@ -2448,20 +2445,27 @@ fpd-element-toolbar[data-fabric-type=image] {
   }
   
 
+  /* Same bottom:80px row as the zoom slider (.fpd-zoom-wrapper, left:16px -
+     see above). Reset grouped right next to Preview rather than the old
+     left+right+margin:auto trick, which centered against the button's own
+     shrink-to-fit width and left it overlapping the zoom slider's box once
+     that moved into this same row. */
  .fpd-container fpd-actions-bar .fpd-dropdown-menu>.fpd-btn[aria-label="Reset"]{
     position: fixed;
     bottom: 80px;
-    left: -57px;
-    right: 0;
-    margin: auto;
+    left: auto;
+    right: 60px;
+    transform: none;
+    margin: 0;
     z-index: 99;
   }
   .fpd-container fpd-actions-bar .fpd-dropdown-menu>.fpd-btn[aria-label="Preview"]{
-        position: fixed;
+    position: fixed;
     bottom: 80px;
-    left: 26px;
-    right: 0;
-    margin: auto;
+    left: auto;
+    right: 16px;
+    transform: none;
+    margin: 0;
     z-index: 99;
   }
   div[data-pos="left"] .fpd-dropdown-menu .fpd-btn[aria-label="Zoom"]{

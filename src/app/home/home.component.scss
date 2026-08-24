@@ -217,6 +217,19 @@
       text-align: center;
     }
 
+    // Continue + Skip sit side by side (client request, 2026-08-24) - both
+    // wired to the exact same tap-advance handler in home.component.ts
+    // (#fpd-loader-active-btn, #fpd-loader-skip-btn share one click
+    // listener), so which one gets tapped doesn't matter for the real-tap
+    // hang mitigation this loader exists for; Skip is just a visually
+    // lighter/secondary option for someone who doesn't want to read the
+    // step text.
+    .fpd-loader-step-btn-row {
+      display: flex;
+      gap: 12px;
+      width: 100%;
+    }
+
     .fpd-loader-step-btn {
       border: none;
       border-radius: 24px;
@@ -227,7 +240,7 @@
       background: var(--theme-color, #d02e3a);
       box-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
       cursor: pointer;
-      width: 100%;
+      flex: 1;
 
       // Step 2 before the real product fetch has finished - see
       // updateProductsLoaderStep2State() in home.component.ts.
@@ -236,6 +249,16 @@
         box-shadow: none;
         cursor: not-allowed;
         opacity: 0.6;
+      }
+    }
+
+    .fpd-loader-step-btn-skip {
+      color: #1a1a1a;
+      background: #eee;
+      box-shadow: none;
+
+      &:disabled {
+        color: #fff;
       }
     }
 
