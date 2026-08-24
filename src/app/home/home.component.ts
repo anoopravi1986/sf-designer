@@ -108,6 +108,19 @@ export class HomeComponent implements AfterViewInit {
   // #fpd-loader-active-btn click handler to decide whether a tap should
   // advance to step 2/3 or finish immediately.
   private isAbbreviatedProductsLoader = false;
+  // Set by openSaveConfirmPopup()'s guard right before it triggers this
+  // loader as the very first session action (Save tapped before any real
+  // .fpd-nav-item tab was ever opened). The #fpd-loader-active-btn handler
+  // below normally calls selectProductsCategory() on each tap so every tap
+  // visibly does something for a genuine Products-tab open - but that has a
+  // real side effect (opens the vendor's Products panel, at its
+  // z-index:2147483647), which would then bury #save-confirm-popup/
+  // #title-popup (z-index:99999) once the loader finishes, since no
+  // .fpd-nav-item tab is actually meant to be open in this flow. Checked at
+  // each tap to skip just that side effect while everything else about the
+  // loader (three genuine physical taps, same UI) stays identical - cleared
+  // in finishProductsTabLoader() once this loader run is done.
+  private suppressLoaderCategorySelect = false;
   showFacebookOptions = false;
   private lastFacebookType: 'post' | 'message' = 'post';
   private currentDesignId: string | null = null;
@@ -452,7 +465,7 @@ export class HomeComponent implements AfterViewInit {
       // enough (see isAbbreviatedProductsLoader) - finish immediately
       // instead of advancing through step 2/3.
       if (this.isAbbreviatedProductsLoader) {
-        this.selectProductsCategory(1);
+        if (!this.suppressLoaderCategorySelect) this.selectProductsCategory(1);
         this.finishProductsTabLoader();
         return;
       }
@@ -460,16 +473,16 @@ export class HomeComponent implements AfterViewInit {
       // selecting it produces no visible change - start from index 1 so
       // every one of these taps actually filters to something different.
       if (this.currentProductsLoaderStep === 1) {
-        this.selectProductsCategory(1);
+        if (!this.suppressLoaderCategorySelect) this.selectProductsCategory(1);
         this.setProductsLoaderStep(2);
       } else if (this.currentProductsLoaderStep === 2) {
         // Native <button disabled> already refuses to dispatch click at
         // all, but guard here too in case that ever changes.
         if (!this.productsDataReady) return;
-        this.selectProductsCategory(2);
+        if (!this.suppressLoaderCategorySelect) this.selectProductsCategory(2);
         this.setProductsLoaderStep(3);
       } else if (this.currentProductsLoaderStep === 3) {
-        this.selectProductsCategory(3);
+        if (!this.suppressLoaderCategorySelect) this.selectProductsCategory(3);
         this.finishProductsTabLoader();
       }
     });
@@ -3537,6 +3550,135 @@ export class HomeComponent implements AfterViewInit {
     }
   }
 
+  // #save-confirm-popup and #title-popup both live at the top level of
+  // home.component.html (siblings of #fpd-loader's ORIGINAL spot, outside
+  // #clothing-designer entirely) with z-index:99999 - fine normally, but
+  // fpd-main-bar (the mobile bottom-sheet nav bar) renders at
+  // z-index:2147483647 (max 32-bit value, already the ceiling - nothing can
+  // be raised above it, see the loader relocation comments elsewhere in
+  // this file for the same constraint). Whenever a real tab panel happens
+  // to be open underneath - including right after the mandatory tap-loader,
+  // which is why this is called from both popup functions below, mobile
+  // only (same reasoning as startProductsTabLoader's own desktop bail-out;
+  // fpd-main-bar isn't the active layout there) - these popups would render
+  // with display:flex but be completely invisible behind it. Appending as
+  // fpd-main-bar's own last child (a sibling of .fpd-module-content, not
+  // nested inside it) makes them paint on top by DOM order within that same
+  // maxed-out stacking context instead of trying to out-z-index it - the
+  // same trick the loader uses. position:fixed still measures against the
+  // true viewport here since fpd-main-bar has no transform/filter of its
+  // own (confirmed - a transformed ancestor would otherwise break that).
+  private ensurePopupAboveMainBar(popup: HTMLElement) {
+    if (window.innerWidth > 768) return;
+    const mainBar = document.querySelector('fpd-main-bar');
+    if (mainBar && popup.parentElement !== mainBar) {
+      mainBar.appendChild(popup);
+    }
+  }
+
+  // Shown when the header Save icon (mobile topbar + desktop button) is
+  // tapped, before the real save popup opens. Yes hands off to the real
+  // save flow (openTitlePopup), Cancel just dismisses.
+  openSaveConfirmPopup() {
+    // If a PRIOR call into this function had to move #fpd-loader out to
+    // document.body (see the guard below - only happens when Save is the
+    // very first tap this session, before any real tab has ever opened
+    // .fpd-module-content), put it back home now that this function is
+    // running again (either the deferred loader just finished, or Save was
+    // tapped a 2nd time). waitForElements() (ngOnInit) only ever relocates
+    // it into module-content ONCE, early in the page lifecycle - without
+    // this, every LATER genuine .fpd-nav-item tap's loader (still the same
+    // shared #fpd-loader element, abbreviated 1-tap version after the
+    // first) would keep rendering from body instead of its z-index-safe
+    // home for the rest of the session.
+    const strandedLoader = document.getElementById('fpd-loader');
+    if (strandedLoader && strandedLoader.parentElement === document.body) {
+      const mainBarEl = document.querySelector('fpd-main-bar') as HTMLElement | null;
+      const moduleContentEl = mainBarEl?.querySelector('.fpd-module-content') as HTMLElement | null;
+      if (moduleContentEl) {
+        moduleContentEl.style.position = 'relative';
+        moduleContentEl.appendChild(strandedLoader);
+
+        // Defensive cleanup, not the primary fix (see
+        // suppressLoaderCategorySelect below for that) - if Products ended
+        // up open here anyway, close it back to the same collapsed state it
+        // was in before Save was tapped. fpd-main-bar renders at
+        // z-index:2147483647 (the max possible 32-bit value - already the
+        // ceiling, which is exactly why the loader has to live inside it
+        // rather than try to out-z-index it), so a left-open tab panel
+        // would completely bury #save-confirm-popup/#title-popup
+        // (z-index:99999, home.component.scss) - display:flex set, but
+        // invisible underneath it.
+        moduleContentEl.style.display = 'none';
+        mainBarEl?.querySelectorAll('.fpd-nav-item.fpd-active').forEach((el) => {
+          el.classList.remove('fpd-active');
+        });
+      }
+    }
+
+    // Same mandatory first-session tap-loader guard openTitlePopup() used to
+    // apply itself back when Save called it directly - moved one level
+    // earlier so it now runs BEFORE this confirm popup instead of between
+    // it and the real save popup. Without this, tapping Save as the very
+    // first thing this mobile session would show this confirm popup, then
+    // tapping Yes would silently swap it for the full-screen tap loader
+    // instead of the actual save popup - confusing/looks broken since the
+    // loader looks nothing like "the save popup" the user just confirmed.
+    // Deferring to openSaveConfirmPopup() itself (not openTitlePopup()
+    // directly) means once the loader completes, the user sees the confirm
+    // popup as normal, and by the time Yes is tapped hasShownFirstEditorTabLoader
+    // is already true so openTitlePopup()'s own matching guard no-ops.
+    if (window.innerWidth <= 768 && !this.hasShownFirstEditorTabLoader) {
+      this.pendingLoaderCompletionCallback = () => this.openSaveConfirmPopup();
+      // waitForElements() (ngOnInit) relocates #fpd-loader inside
+      // .fpd-module-content specifically so it inherits fpd-main-bar's
+      // z-index instead of trying to out-z-index the vendor's own dialog
+      // from outside it (see that comment - a past attempt at the latter
+      // froze real iPhones). That relocation assumes SOME tab's panel is
+      // genuinely open/rendered, which is true for every other caller of
+      // startProductsTabLoader() (all reached via an actual .fpd-nav-item
+      // tap). Save is a plain header button, not a tab - if it's the very
+      // first thing tapped this session, no module-content is open yet, so
+      // it's sitting at display:none and everything relocated inside it
+      // (including our loader, regardless of its own inline styles)
+      // collapses to an invisible 0x0 box. Since no tab is open, there's
+      // also no vendor dialog actually on screen to compete z-index with -
+      // safe to fall back to the loader's ORIGINAL plain top-level spot
+      // (modest z-index:9999 from home.component.scss, not trying to beat
+      // the vendor's extreme value) for just this one case.
+      const loaderEl = document.getElementById('fpd-loader');
+      if (loaderEl && loaderEl.parentElement !== document.body) {
+        document.body.appendChild(loaderEl);
+      }
+      // No real tab is meant to open here - see suppressLoaderCategorySelect's
+      // own declaration comment for why this matters (the tap handler would
+      // otherwise open the Products panel as a side effect of each tap).
+      this.suppressLoaderCategorySelect = true;
+      this.startProductsTabLoader();
+      return;
+    }
+    const popup = document.getElementById('save-confirm-popup');
+    const yesBtn = document.getElementById('save-confirm-yes-btn');
+    const cancelBtn = document.getElementById('save-confirm-cancel-btn');
+    if (!popup || !yesBtn || !cancelBtn) return;
+
+    this.ensurePopupAboveMainBar(popup);
+    popup.style.display = 'flex';
+
+    yesBtn.onclick = () => {
+      popup.style.display = 'none';
+      this.openTitlePopup();
+    };
+    cancelBtn.onclick = () => {
+      popup.style.display = 'none';
+    };
+    popup.onclick = (e) => {
+      if (e.target === popup) {
+        popup.style.display = 'none';
+      }
+    };
+  }
+
   openTitlePopup() {
     // Save Design isn't wired through the .fpd-nav-item click listener
     // (it's a plain button/custom popup, not one of the 7 mainBarModules
@@ -3556,6 +3698,7 @@ export class HomeComponent implements AfterViewInit {
     const closeBtn = document.getElementById('close-title-popup-btn');
     if (!popup || !input || !btn) return;
 
+    this.ensurePopupAboveMainBar(popup);
     popup.style.display = 'flex';
 
     btn.onclick = () => {
@@ -3814,15 +3957,22 @@ export class HomeComponent implements AfterViewInit {
     const loader = document.getElementById('fpd-loader');
     if (!loader) return;
     const mainBar = loader.closest('fpd-main-bar') as HTMLElement | null;
-    if (mainBar) {
-      // Full mainBar height, not minus the bottom .fpd-navigation tab row -
-      // the dimmed backdrop is meant to cover that row too now, not stop
-      // just above it.
-      const contentHeight = mainBar.getBoundingClientRect().height;
-      if (contentHeight > 0) {
-        loader.style.height = contentHeight + 'px';
-      }
-    }
+    // Full mainBar height, not minus the bottom .fpd-navigation tab row -
+    // the dimmed backdrop is meant to cover that row too now, not stop
+    // just above it.
+    const contentHeight = mainBar ? mainBar.getBoundingClientRect().height : 0;
+    // mainBar can still measure 0 here if the vendor widget hasn't finished
+    // its own initial layout yet (a real race, not tab-dependent - seen even
+    // several seconds after page load in testing) - most likely to be hit
+    // when the Save button (openSaveConfirmPopup's guard) fires this as the
+    // very first session action, since unlike a .fpd-nav-item tap it isn't
+    // preceded by the vendor's own tab-switch work settling mainBar's
+    // layout first. Previously this silently left loader.style.height
+    // unset in that case, collapsing the whole overlay (and its Continue
+    // button) to an invisible 0x0 box - falling back to the viewport height
+    // guarantees a real, visible size either way; the real mainBar height
+    // is still used whenever it's actually available, unchanged from before.
+    loader.style.height = (contentHeight > 0 ? contentHeight : window.innerHeight) + 'px';
   }
 
   // Drives the Products-tab loader (mobile shows a 3-step tap sequence
@@ -3954,6 +4104,11 @@ export class HomeComponent implements AfterViewInit {
   private stopProductsTabLoader() {
     clearInterval(this.productsFinalWaitInterval);
     this.showFPDLoading(false);
+    // Always clear, same reasoning as pendingLoaderCompletionCallback below -
+    // whether this loader run just genuinely finished or was abandoned
+    // mid-sequence, it shouldn't affect any LATER, real .fpd-nav-item tab's
+    // loader run.
+    this.suppressLoaderCategorySelect = false;
     // See pendingLoaderCompletionCallback's declaration comment: only
     // actually run it on a genuine completion (hasShownFirstEditorTabLoader
     // was just set true by finishProductsTabLoader right before this

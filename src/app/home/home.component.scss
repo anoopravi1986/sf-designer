@@ -278,6 +278,61 @@
   }
 }
 
+// Same card/button look as the mobile 3-step tap loader
+// (.fpd-loader-step-card/.fpd-loader-step-text/.fpd-loader-step-btn above),
+// reused here for the Save confirm popup so both feel like the same design
+// system. Kept as standalone top-level classes (not nested under
+// .fpd-loader-overlay) since this popup isn't part of that loader element.
+.fpd-confirm-popup-box {
+  background: rgba(255, 255, 255, 0.96);
+  border-radius: 5px;
+  padding: 30px 26px;
+  width: 85%;
+  max-width: 419px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+}
+
+.fpd-confirm-popup-text {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #1a1a1a;
+  text-align: center;
+  font-weight: 500;
+}
+
+.fpd-confirm-popup-actions {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+}
+
+.fpd-confirm-popup-btn {
+  flex: 1;
+  border: none;
+  border-radius: 24px;
+  padding: 10px 20px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
+}
+
+.fpd-confirm-popup-btn.fpd-confirm-yes {
+  color: #fff;
+  background: var(--theme-color, #d02e3a);
+}
+
+.fpd-confirm-popup-btn.fpd-confirm-cancel {
+  color: #1a1a1a;
+  background: #eee;
+  box-shadow: none;
+}
+
 @-webkit-keyframes fpd-simple-spin {
   to { -webkit-transform: rotate(360deg); transform: rotate(360deg); }
 }

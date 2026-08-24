@@ -43,7 +43,7 @@
   <div class="flex items-center gap-0.5">
     
     <!-- Save -->
-    <button (click)="openTitlePopup()" class="w-9 h-9 rounded-full flex items-center justify-center hover:bg-black/5 transition">
+    <button (click)="openSaveConfirmPopup()" class="w-9 h-9 rounded-full flex items-center justify-center hover:bg-black/5 transition">
       <i data-lucide="save" class="w-5 h-5" style="color: black;"></i>
     </button>
 
@@ -291,9 +291,9 @@
         Preview
       </button> -->
       <button
-        (click)="openTitlePopup()"
+        (click)="openSaveConfirmPopup()"
         class="border border-[#ffffff59] mr-[7px] rounded-[8px] font-semibold flex items-center gap-2 bg-transparent text-white pl-[0.565rem] pr-[1rem] py-2 text-sm rounded-[8px] min-w-[80px] justify-center">
-        
+
         Save
       </button>
      
@@ -525,6 +525,16 @@
 <div id="copyData" class="hidden fixed top-[40px] left-[70%] -translate-x-1/2 bg-[#333] text-white px-4 py-2 rounded-md text-sm z-[9999] transition-opacity transition-[bottom] duration-400 ease-in-out">Copied Success</div>
 
 
+
+<div id="save-confirm-popup" class="fpd-popup-overlay">
+  <div class="fpd-confirm-popup-box">
+    <p class="fpd-confirm-popup-text">Save this design?</p>
+    <div class="fpd-confirm-popup-actions">
+      <button id="save-confirm-cancel-btn" class="fpd-confirm-popup-btn fpd-confirm-cancel">Cancel</button>
+      <button id="save-confirm-yes-btn" class="fpd-confirm-popup-btn fpd-confirm-yes">Yes</button>
+    </div>
+  </div>
+</div>
 
 <div id="title-popup" class="fpd-popup-overlay">
   <div class="fpd-popup-box">
