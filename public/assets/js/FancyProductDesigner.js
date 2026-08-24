@@ -38116,6 +38116,7 @@ function updateFPDLayersToSingleGroup(group) {
           let t =
             arguments.length > 0 && void 0 !== arguments[0] ? arguments[0] : []
           ;
+          t = t.filter(item => !(item.category && /laptop/i.test(item.category)));
           const groupedCategories = t.map(item => ({
             category: item.category,
             subcategory: item.subcategory
@@ -38144,6 +38145,7 @@ function updateFPDLayersToSingleGroup(group) {
         setupProductsNew () {
           let t =
             arguments.length > 0 && void 0 !== arguments[0] ? arguments[0] : []
+          t = t.filter(tItem => !(tItem.category && /laptop/i.test(tItem.category)));
           (this.productsnew = [])
 
           t.forEach(tItem => {
