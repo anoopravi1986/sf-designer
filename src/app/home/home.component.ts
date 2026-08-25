@@ -121,6 +121,12 @@ export class HomeComponent implements AfterViewInit {
   // loader (three genuine physical taps, same UI) stays identical - cleared
   // in finishProductsTabLoader() once this loader run is done.
   private suppressLoaderCategorySelect = false;
+  // Reset to false each time openTitlePopup() opens #title-popup, flipped to
+  // true the first time #design-title-input gains focus - gates the 5s
+  // "preparing your design" loader (#title-popup-loader) shown over the
+  // whole popup box to a single trigger per popup-open, not once per click
+  // while the user is already typing.
+  private titlePopupLoaderShown = false;
   showFacebookOptions = false;
   private lastFacebookType: 'post' | 'message' = 'post';
   private currentDesignId: string | null = null;
@@ -2594,6 +2600,18 @@ export class HomeComponent implements AfterViewInit {
       toolbarPlacement: 'smart',
     };
 
+    // Laptop category is now hidden (see FancyProductDesigner.js
+    // setupProducts/setupProductsNew), so it can no longer be the product
+    // that auto-loads on a fresh editor open. selectProduct()'s initial
+    // call (triggered by mainOptions.loadFirstProductInStage) picks
+    // this.products (Products tab) vs this.productsnew (Designs tab)
+    // based on localStorage 'parentDivId', which otherwise still holds
+    // whatever tab was last clicked in a previous session. Forcing it to
+    // 'DesignModule' here, before the designer is constructed, makes every
+    // fresh page load land on a Designs-tab product by default; a real tab
+    // click later in the session still overwrites it as before.
+    localStorage.setItem('parentDivId', 'DesignModule');
+
     this.designer = new FancyProductDesigner(
       this.document.querySelector('#clothing-designer'),
       this.appOptions
@@ -3734,10 +3752,26 @@ export class HomeComponent implements AfterViewInit {
     const input = document.getElementById('design-title-input') as HTMLInputElement;
     const btn = document.getElementById('save-title-btn');
     const closeBtn = document.getElementById('close-title-popup-btn');
+    const preparingLoader = document.getElementById('title-popup-loader');
     if (!popup || !input || !btn) return;
 
     this.ensurePopupAboveMainBar(popup);
     popup.style.display = 'flex';
+
+    // Fresh popup-open - re-arm the one-time "preparing your design" loader
+    // (see titlePopupLoaderShown's declaration comment).
+    this.titlePopupLoaderShown = false;
+    if (preparingLoader) {
+      preparingLoader.style.display = 'none';
+    }
+    input.onfocus = () => {
+      if (this.titlePopupLoaderShown || !preparingLoader) return;
+      this.titlePopupLoaderShown = true;
+      preparingLoader.style.display = 'flex';
+      setTimeout(() => {
+        preparingLoader.style.display = 'none';
+      }, 5000);
+    };
 
     btn.onclick = () => {
       const value = input.value.trim();

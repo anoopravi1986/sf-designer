@@ -555,16 +555,21 @@
     </div>
 
     <div class="fpd-popup-body" style="padding: 16px;">
-      <input 
-        type="text" 
-        id="design-title-input" 
-        placeholder="Enter design title..." 
+      <input
+        type="text"
+        id="design-title-input"
+        placeholder="Enter design title..."
         style="width: 100%; padding: 10px 12px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 14px; box-sizing: border-box;"
       />
     </div>
 
     <div class="fpd-popup-footer" style="padding: 12px 16px; border-top: 1px solid #e5e7eb; display: flex; justify-content: flex-end;">
       <button id="save-title-btn" class="fpd-btn-save" style="background: var(--theme-color); color: white; border: none; padding: 8px 20px; border-radius: 8px; font-weight: 600; cursor: pointer;">Save</button>
+    </div>
+
+    <div id="title-popup-loader" class="fpd-title-popup-loader">
+      <div class="fpd-title-popup-spinner"></div>
+      <div class="fpd-title-popup-loader-text">Please wait, we are preparing your design...</div>
     </div>
 
   </div>

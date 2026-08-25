@@ -2108,7 +2108,12 @@
               //       ((s.onload = null), E.util.loadImageInDom(s, r)),
               //     (s.src = t)
               // }
-              if (t) {
+              if (t && 'string' != typeof t) {
+                console.error('loadImage called with a non-string source:', t);
+                e && e.call(i, null, !0);
+              }
+
+              else if (t) {
                 var s = E.util.createImage();
                 ;
 
@@ -2138,7 +2143,7 @@
 
                 s.src = t;
               }
- 
+
               else e && e.call(i, t)
             },
             loadImageInDom: function (t, e) {
@@ -24574,7 +24579,11 @@
                 n.fire('elementAdd', { element: t })
             }
             if (void 0 === e || 0 === e.length)
-              return void console.log('No image source set for: ' + i)
+              return (
+                console.log('No image source set for: ' + i),
+                n.fire('imageFail', { url: e }),
+                void n.fire('elementAdd', { element: void 0 })
+              )
             if (-1 !== e.search('<svg'))
               St.fabric.loadSVGFromString(e, (e, i) => {
                 var n = St.fabric.util.groupSVGElements(e, i)
