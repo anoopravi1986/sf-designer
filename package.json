@@ -3,10 +3,14 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
+    "prestart": "npm run build:fpd",
     "start": "ng serve",
+    "prebuild": "npm run build:fpd",
     "build": "ng build",
+    "prewatch": "npm run build:fpd",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
+    "build:fpd": "node scripts/build-fpd.js",
     "serve:ssr:designer-angular": "node dist/designer-angular/server/server.mjs"
   },
   "private": true,

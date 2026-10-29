@@ -1,3 +1,18 @@
+/*
+ * FancyProductDesigner - part 1/6: vendor libraries & bundler runtime
+ * ---------------------------------------------------------------------
+ * Bundled third-party code: fabric.js, the fabric-history plugin, and the
+ * webpack module-loader runtime this build was produced with.
+ *
+ * Not modified by StyleFlip - if this ever needs a vendor upgrade, this
+ * is the file that gets replaced wholesale. No StyleFlip customizations
+ * live in this file.
+ *
+ * GENERATED FILE NOTICE: public/assets/js/FancyProductDesigner.js is
+ * assembled from the 6 files in this folder by scripts/build-fpd.js
+ * (run automatically via "npm run build"/"npm start", or manually via
+ * "npm run build:fpd"). Edit the files here, not the generated output.
+ */
 /*! For license information please see main.js.LICENSE.txt */
 ;(() => {
   var t = {
@@ -15203,7 +15218,10 @@
                     : (this._renderTextFill(t), this._renderTextStroke(t))
                 },
                 _setTextStyles: function (t, e, i) {
-                  if (((t.textBaseline = 'alphabetical'), this.path))
+                  // Must be the CanvasTextBaseline enum value "alphabetic"
+                  // (not "alphabetical"). The typo floods the console on every
+                  // text paint and freezes canvas select/drag.
+                  if (((t.textBaseline = 'alphabetic'), this.path))
                     switch (this.pathAlign) {
                       case 'center':
                         t.textBaseline = 'middle'
@@ -19756,6 +19774,16 @@
     var r = (e[n] = { exports: {} })
     return t[n].call(r.exports, r, r.exports, i), r.exports
   }
+/*
+ * FancyProductDesigner - part 2/6: engine core & shared utilities
+ * ---------------------------------------------------------------------
+ * Product-designer engine internals: shared helper functions, the base
+ * product/view classes, and the core FancyProductDesigner engine class
+ * used during initialization. Mostly vendor code; contains one StyleFlip
+ * customization (the backend-driven image gallery loader) marked with
+ * "===== CUSTOM (StyleFlip)" banner comments below.
+ */
+
   ;(i.n = t => {
     var e = t && t.__esModule ? () => t.default : () => t
     return i.d(e, { a: e }), e
@@ -20751,6 +20779,574 @@
         return !!j.CSS_UNIT.exec(t)
       }
       let itemsLoaded = false;
+      let itemsLoadInFlight = false;
+      let uploadedImagesMenuListener = null;
+
+// ===================================================================
+      // ===== CUSTOM (StyleFlip): backend-driven image gallery ==========
+      // Loads uploaded images from the StyleFlip backend (instead of/in
+      // addition to the vendor's local-only gallery), reconciles them
+      // against the fpd_uploaded_images localStorage cache, and renders
+      // each item with a custom three-dot menu (share / delete / download
+      // / "Uploaded by ..." label).
+      // ===================================================================
+      async function loadItems(force) {
+        // force=true bypasses the one-time-per-session gate below and
+        // re-fetches/re-renders even if this already ran once - used
+        // for an explicit reload (after an upload finishes, or every
+        // time the Images tab is opened) rather than the normal
+        // once-per-page-load call this function otherwise gets from
+        // every single $(t) invocation across every module (see
+        // itemsLoaded's declaration comment).
+        // One in-flight request is enough (Images tab + Angular may both
+        // ask at once). force=true only bypasses the completed-load gate.
+        if (itemsLoadInFlight) return;
+        if (itemsLoaded && !force) return;
+        itemsLoadInFlight = true;
+        try {
+          // 👇 Call your API (replace with your real endpoint)
+          const response = await fetch("https://styleflip-backend-jdm5.ithemes.xyz/api/image/getByUserId/70011");
+          const data = await response.json();
+          ;
+
+          // The uploads grid also restores a separate cache from
+          // localStorage['fpd_uploaded_images'] on init (see the Ri class
+          // constructor further down), independent of the backend. That
+          // meant images deleted from the database kept reappearing,
+          // since nothing ever pruned the local cache. Now that the DB is
+          // the source of truth (this fetch), reconcile the cache against
+          // it: drop any cached entry whose URL the API no longer
+          // returns. If the API returns no images, this empties the
+          // cache entirely.
+          try {
+            const validUrls = new Set(
+              Array.isArray(data) ? data.map(item => item.image) : []
+            );
+            const cachedRaw = window.localStorage.getItem('fpd_uploaded_images');
+            if (cachedRaw) {
+              const cached = JSON.parse(cachedRaw);
+              const stillValid = cached.filter(item => validUrls.has(item.url));
+              window.localStorage.setItem('fpd_uploaded_images', JSON.stringify(stillValid));
+            }
+          } catch (e) {
+            console.error('❌ Failed to reconcile fpd_uploaded_images cache:', e);
+          }
+
+          // Prefer the Images module that is actually open in the main
+          // sidebar. A second fpd-module-uploads (with its own
+          // #extracontainer-data) lives in the upload-zone secondary panel;
+          // document.querySelector('#extracontainer-data') hits that hidden
+          // copy first, so thumbnails rendered there never appear in the UI.
+          let container =
+            document.querySelector(
+              '.fpd-module-content fpd-module-images.fpd-active #extracontainer-data'
+            ) ||
+            document.querySelector(
+              '.fpd-module-content #extracontainer-data'
+            )
+          // This function only ever appended items, never removed any -
+          // harmless for the original once-per-session call (container
+          // starts empty), but a `force` reload needs the grid wiped
+          // first or every existing item gets duplicated alongside the
+          // fresh set. Clearing unconditionally (not just when
+          // data.length is 0) also drops stale items if the reload
+          // genuinely returns fewer/no images now.
+          if (!container) {
+            return;
+          }
+          container.innerHTML = '';
+
+          function formatTimeAgo(uploadedAt) {
+            if (!uploadedAt) return;
+            const now = new Date();
+            const past = new Date(uploadedAt);
+            const diffMs = now - past;
+            const seconds = Math.floor(diffMs / 1000);
+            const minutes = Math.floor(diffMs / (1000 * 60));
+            const hours   = Math.floor(diffMs / (1000 * 60 * 60));
+            const days    = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+            if (seconds < 60) {
+              return `${seconds} sec${seconds !== 1 ? "s" : ""} ago`;
+            }
+            if (minutes < 60) {
+              return `${minutes} min${minutes !== 1 ? "s" : ""} ago`;
+            }
+            if (hours < 24) {
+              return `${hours} hour${hours !== 1 ? "s" : ""} ago`;
+            }
+            if (days < 30) {
+              return `${days} day${days !== 1 ? "s" : ""} ago`;
+            }
+            const options = { day: "numeric", month: "short", year: "numeric" };
+            return `on ${past.toLocaleDateString("en-GB", options)}`;
+          }
+
+          if (uploadedImagesMenuListener && uploadedImagesMenuListener.length) {
+            uploadedImagesMenuListener.forEach(fn => document.removeEventListener('click', fn));
+          }
+          uploadedImagesMenuListener = [];
+
+          if(Array.isArray(data) && data.length > 0){
+            data.forEach(t => {
+              ;
+              const e = document.createElement("div");
+              e.className = "fpd-item fpd-hover-thumbnail ts mt-1 bg-[#f6f6f6] item-data-click";
+              e.dataset.source = t.image;
+              e.dataset.time = t.createdAt;
+              e.dataset.imageId = t._id;
+  
+              if (!t.disableDraggable) e.classList.add("fpd-draggable");
+  
+              if (t.title) {
+                e.dataset.title = t.title;
+                e.setAttribute("aria-label", t.title);
+              }
+  
+              const imageUrl = t.image || t.url || t.thumbnailUrl;
+              if (!imageUrl) return;
+              const i = document.createElement("picture");
+              i.dataset.img = t.thumbnailUrl ? t.thumbnailUrl : imageUrl;
+              i.style.backgroundImage = `url("${imageUrl}")`;
+              e.append(i);
+              e.dataset.source = imageUrl;
+  
+              if (!t.disablePrice) {
+                const priceSpan = document.createElement("span");
+                priceSpan.className = "fpd-price";
+                priceSpan.innerHTML = t.price || 0;
+                e.append(priceSpan);
+  
+                // Assuming J is your utility function for toggling classes
+                J(priceSpan, ["fpd-hidden"], !Boolean(t.price));
+              }
+  
+              if (t.removable) {
+                const trash = document.createElement("span");
+                trash.className = "fa-solid fa-trash";
+                e.append(trash);
+              }
+              // --- Add three dots (ellipsis) menu for share link ---
+            let threeDot = document.createElement('span');
+            threeDot.className = 'fpd-three-dot-menu';
+            threeDot.innerHTML = `
+              <svg width="18" height="18" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="4" cy="10" r="2" fill="#888"/>
+                <circle cx="10" cy="10" r="2" fill="#888"/>
+                <circle cx="16" cy="10" r="2" fill="#888"/>
+              </svg>
+            `;
+            threeDot.style.cursor = 'pointer';
+            threeDot.style.marginLeft = '8px';
+            threeDot.style.verticalAlign = 'middle';
+            // Share menu popup
+          
+            let shareMenu = document.createElement('div')
+            shareMenu.className = 'fpd-share-menu';
+            shareMenu.style.display = 'none';
+            shareMenu.style.position = 'fixed';
+            shareMenu.style.background = '#fff';
+            shareMenu.style.border = '1px solid #eee';
+            shareMenu.style.boxShadow = '0 2px 8px rgba(0,0,0,0.08)';
+            shareMenu.style.padding = '10px 16px';
+            shareMenu.style.borderRadius = '8px';
+            shareMenu.style.zIndex = '9999';
+            shareMenu.style.marginTop = '-80px';
+            ;
+            let title = document.createElement('h4');
+                  title.textContent = t.title;
+                  title.className = 'font-bold mb-1 text-capitalize text-[1rem]';
+                  function formatTimeAgo(uploadedAt) {
+                    if(t.createdAt){
+                      const now = new Date();
+                      const past = new Date(uploadedAt);
+                      
+                      const diffMs = now - past;
+                      const seconds = Math.floor(diffMs / 1000);
+                      const minutes = Math.floor(diffMs / (1000 * 60));
+                      const hours   = Math.floor(diffMs / (1000 * 60 * 60));
+                      const days    = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+                      ;
+                      if (seconds < 60) {
+                        return `${seconds} sec${seconds !== 1 ? "s" : ""} ago`;
+                      }
+                      if (minutes < 60) {
+                        return `${minutes} min${minutes !== 1 ? "s" : ""} ago`;
+                      }
+                      if (hours < 24) {
+                        ;
+                        return `${hours} hour${hours !== 1 ? "s" : ""} ago`;
+                      }
+                      if (days < 30) {
+                        return `${days} day${days !== 1 ? "s" : ""} ago`;
+                      }
+
+                      // older than a month → show full date
+                      const options = { day: "numeric", month: "short", year: "numeric" };
+                      ;
+                      return `on ${past.toLocaleDateString("en-GB", options)}`;
+                    }
+                  }
+                  const para = document.createElement('p');
+                  para.className = 'mt-2';
+                  let uploadedAt = t?.createdAt;
+                  const timeupload = formatTimeAgo(uploadedAt);
+                  ;
+                  para.textContent = `Uploaded by Anoop ${timeupload}`;
+
+            let buttonDonw = document.createElement('button');
+                  buttonDonw.className = 'download-button flex items-center gap-2 w-full p-2 text-left hover:bg-gray-100 text-black text-[0.9rem]';
+                  buttonDonw.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" style="width:20px;height:20px;" class="w-4 h-4 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 4v12" />
+                    </svg>
+                    Download Image
+                  `;
+
+                  const buttonDel = document.createElement('button');
+                  buttonDel.className = 'delete-button flex items-center gap-2 w-full p-2 text-left hover:bg-gray-100 text-black text-[0.9rem]';
+                  buttonDel.innerHTML = `
+                    <span class="fpd-icon-bin"></span>
+                    Delete
+                  `;
+
+                  let buttonShare = document.createElement('button');
+                  buttonShare.className = 'fpd-share-link-btn flex items-center gap-2 w-full p-2 text-left hover:bg-gray-100 text-black text-[0.9rem]';
+                  buttonShare.innerHTML = `
+                    <span class="fpd-icon-share"></span>
+                    Share
+                  `;
+                    ;
+                    // 👇 finally append item into container
+                    e.append(threeDot);
+                    e.append(shareMenu);
+                    if (container) container.append(e);
+
+                  // Delete the .fpd-item element
+            buttonDel.addEventListener('click', function (e) {
+              e.stopPropagation(); // Prevent triggering the outside click close
+               const itemEl = e.target.closest('.ts'); // Adjust selector if needed
+              const title = itemEl?.getAttribute('data-title');
+              ;
+              if (!title) {
+                ;
+                return;
+              }
+
+              // 2. Remove the element from the DOM
+              itemEl.remove();
+
+              // 3. Get data from localStorage
+              const saved = localStorage.getItem('clothing-designer'); // Replace with your actual key
+              let dataArray = saved ? JSON.parse(saved) : [];
+
+              // 4. Filter out the item with the matching title
+              const updatedArray = dataArray.filter(item => item.title !== title);
+
+              // 5. Save updated data back to localStorage
+              localStorage.setItem('clothing-designer', JSON.stringify(updatedArray));
+
+              alert(`Removed design titled "${title}"`);
+            });
+
+            buttonShare.addEventListener('click', function (e) {
+              e.stopPropagation();
+
+              fetch(`https://styleflip-backend-jdm5.ithemes.xyz/api/sharedproduct/search?title=${encodeURIComponent(t.title)}&design_id=${t?.design_id}`, {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' }
+              })
+                .then(response => response.json())
+                .then(data => {
+                  ;
+
+                  // Ensure valid product data
+                  if (data && Array.isArray(data.product) && data.product.length > 0) {
+                    const firstProduct = data.product[0];
+                    const urlBase = window.location.origin;
+                    const shareUrl = `${urlBase}/savedesign?design_id=${encodeURIComponent(data.design_id)}&title=${encodeURIComponent(data.title)}`;
+
+                    // Update share link field
+                    const urlField = document.querySelector('.fpd-share-link-url');
+                    const copyBtn = document.querySelector('.fpd-share-link-btn');
+
+                    if (urlField) {
+                      urlField.textContent = shareUrl;
+                    }
+
+                    // Clipboard copy logic
+                    if (navigator.clipboard && copyBtn) {
+                      navigator.clipboard.writeText(shareUrl).then(() => {
+                        // copyBtn.textContent = 'Copied!';
+                        const copyEl = document.querySelector('#copyData');
+                        if (copyEl) {
+                          copyEl.style.display = 'block';
+
+                          setTimeout(() => {
+                            copyEl.style.display = 'none';
+                          }, 1000); // 10 seconds
+                        }
+                        // setTimeout(() => {
+                        //   copyBtn.textContent = 'Copy Link';
+                        // }, 1200);
+                      }).catch(err => {
+                        console.error('Clipboard copy failed:', err);
+                        window.prompt('Copy this link:', shareUrl);
+                      });
+                    } else {
+                      window.prompt('Copy this link:', shareUrl);
+                    }
+                  } else {
+                    alert('No product found with this title.');
+                  }
+                })
+                .catch(err => {
+                  console.error('Error searching product:', err);
+                  alert('Error searching product.');
+                });
+
+            });
+
+            const actionContainer = document.createElement('div');
+            actionContainer.className = 'flex flex-col items-start gap-1 action-container-box'; // tailwind for vertical stack with gap
+            actionContainer.appendChild(title);
+            actionContainer.appendChild(para);
+            actionContainer.appendChild(buttonDonw);
+            actionContainer.appendChild(buttonShare);
+            actionContainer.appendChild(buttonDel);
+            shareMenu.appendChild(actionContainer);
+
+            const titleInfomation = document.createElement('div');
+            titleInfomation.className = 'fixed bg-white text-black text-sm ml-[0px] p-2 rounded shadow-md z-[999] border border-[#ccc] border-solid rounded-[6px] shadow-custom-light sharebox hidden'
+
+            
+            
+            // Hide menu on click outside
+            const hideShareMenu = function (ev) {
+              if (!shareMenu.contains(ev.target) && ev.target !== threeDot && !threeDot.contains(ev.target)) {
+                shareMenu.style.display = 'none';
+              }
+            };
+            document.addEventListener('click', hideShareMenu);
+            uploadedImagesMenuListener.push(hideShareMenu);
+
+            const onUploadItemClick = function (ev) {
+              if (ev.target.closest(".fpd-three-dot-menu")) {
+                if (ev.target.closest(".fpd-three-dot-menu") !== threeDot) return;
+
+                const activeElementData = ev.target.closest('.fpd-active');
+                ;
+                ev.stopPropagation();
+                if(activeElementData && activeElementData.tagName === 'FPD-MODULE-SAVE-LOAD'){
+                  
+                  // Toggle menu
+                  const isOpen = shareMenu.style.display === 'block';
+                  // Close all other open share menus (optional, for multiple items)
+                  document.querySelectorAll('.fpd-share-menu').forEach(menu => menu.style.display = 'none');
+                  shareMenu.style.display = isOpen ? 'none' : 'block';
+      
+                  if (!isOpen) {
+                    // Add a one-time event listener to close the menu when clicking outside
+                    const closeMenu = function(event) {
+                      if (!shareMenu.contains(event.target) && event.target !== threeDot) {
+                        shareMenu.style.display = 'none';
+                        document.removeEventListener('click', closeMenu);
+                      }
+                    };
+                    setTimeout(() => { // Timeout to allow this click to finish
+                      document.addEventListener('click', closeMenu);
+                    }, 0);
+                  }
+                }
+                else {
+                  const parentItem = ev.target.closest('.fpd-item');
+                  ;
+                  if (!parentItem) return;
+
+                  const dataSource = parentItem.getAttribute('data-source');
+                  const dataTitle = parentItem.getAttribute('data-title');
+                  const uploadedAt = parentItem.getAttribute('data-time');
+                  if (dataSource && dataTitle) {
+                    // Remove any existing info box
+                    const existingBox = document.querySelector('.titleInformation');
+                    existingBox?.remove();
+
+                    // Create info box
+                    const titleInformation = document.createElement('div');
+                    titleInformation.className = 'titleInformation fixed bg-white text-black text-sm ml-[0px] p-2 rounded shadow-md z-[999] border border-[#ccc] border-solid rounded-[6px] shadow-custom-light sharebox';
+                    titleInformation.style.display = 'block';
+
+                    const title = document.createElement('h4');
+                    title.textContent = dataTitle;
+                    title.className = 'mb-1 font-bold text-capitalize';
+
+                    const para = document.createElement('p');
+                    para.className = 'mt-2';
+                    const timeupload = formatTimeAgo(uploadedAt);
+                    ;
+                    para.textContent = `Uploaded by Anoop ${timeupload}`; // replace with real content if needed
+
+                    let buttonDonw = document.createElement('button');
+                    buttonDonw.className = 'flex items-center w-full gap-2 p-2 text-left download-button hover:bg-gray-100';
+                    buttonDonw.innerHTML = `
+                      <svg xmlns="http://www.w3.org/2000/svg" style="width:20px;height:20px;" class="w-4 h-4 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 4v12" />
+                      </svg>
+                      Download Image
+                    `;
+
+                    let buttonDel = document.createElement('button');
+                    buttonDel.className = 'flex items-center w-full gap-2 p-2 text-left delete-button hover:bg-gray-100';
+                    buttonDel.innerHTML = `
+                      <span class="fpd-icon-bin"></span>
+                      Delete
+                    `;
+
+
+                    // Delete the .fpd-item element
+                    buttonDel.addEventListener('click', function (e) {
+                      e.stopPropagation(); // Prevent triggering the outside click close
+                      if (parentItem) {
+                        ;
+                        ;
+                        parentItem.remove();
+                        titleInformation.remove();
+                        document.body.classList.remove('photo-box-open');
+                        let imageId = parentItem?.getAttribute('data-image-id');
+
+                         fetch(`https://styleflip-backend-jdm5.ithemes.xyz/api/image/deleteByUserId/${imageId}`, {
+                            method: "DELETE", // or DELETE if backend expects delete
+                            headers: {
+                              "Content-Type": "application/json",
+                            },
+                          })
+                            .then((response) => {
+                              if (!response.ok) throw new Error("Failed to delete");
+                              return response.json();
+                            })
+                            .then((data) => {
+                              ;
+                            })
+                            .catch((error) => {
+                              console.error("❌ API Error:", error);
+                            });
+                      }
+                    });
+
+                    // Download the image from data-source
+                    buttonDonw.addEventListener('click', function (e) {
+                      e.stopPropagation(); // Prevent triggering the outside click close
+
+                      if (dataSource) {
+                        ;
+
+                        fetch(dataSource, { mode: 'cors' }) // Add CORS handling if needed
+                          .then(response => {
+                            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+                            return response.blob();
+                          })
+                          .then(blob => {
+                            const blobUrl = URL.createObjectURL(blob);
+
+                            const link = document.createElement('a');
+                            link.href = blobUrl;
+                            link.download = (dataTitle || 'downloaded-image') + '.jpg'; // you can use .png if needed
+                            document.body.appendChild(link);
+                            link.click();
+                            document.body.removeChild(link);
+
+                            URL.revokeObjectURL(blobUrl); // Clean up
+                          })
+                          .catch(error => {
+                            console.error("Download failed:", error);
+                            alert("Image could not be downloaded.");
+                          });
+                      }
+                    });
+
+
+
+                    const actionContainer = document.createElement('div');
+                    actionContainer.className = 'flex flex-col items-start gap-1 action-container-box'; // tailwind for vertical stack with gap
+                    actionContainer.appendChild(buttonDonw);
+                    actionContainer.appendChild(buttonDel);
+
+
+
+                    titleInformation.appendChild(title);
+                    titleInformation.appendChild(para);
+                    titleInformation.appendChild(actionContainer);
+
+                    document.body.appendChild(titleInformation);
+                    document.body.classList.add('photo-box-open');
+
+                    // Position next to the clicked element
+                    const rect = ev.target.getBoundingClientRect();
+                    titleInformation.style.position = 'absolute';
+                    titleInformation.style.top = `${rect.bottom + window.scrollY + 5}px`;
+                    titleInformation.style.left = `${rect.left + window.scrollX}px`;
+
+                    // Close on outside click
+                    const closeBox = (e) => {
+                      const target = e.target;
+                      if (!titleInformation.contains(target) && !threeDot.contains(target)) {
+                        titleInformation.remove();
+                        document.body.classList.remove('photo-box-open');
+                        document.removeEventListener('click', closeBox);
+                      }
+                    };
+
+                    setTimeout(() => {
+                      document.addEventListener('click', closeBox);
+                    }, 10); // ensure it doesn’t trigger immediately
+                  }
+                }
+                ;
+              }
+              else if(ev.target.closest(".download-button")) {
+                const downloadUrl = e.dataset.source;
+                if (downloadUrl && ev.target.closest('.fpd-item') === e) {
+                  ;
+
+                  fetch(downloadUrl, { mode: 'cors' }) // Add CORS handling if needed
+                    .then(response => {
+                      if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+                      return response.blob();
+                    })
+                    .then(blob => {
+                      const blobUrl = URL.createObjectURL(blob);
+
+                      const link = document.createElement('a');
+                      link.href = blobUrl;
+                      link.download = (e.dataset.title || t.title || 'downloaded-image') + '.jpg'; // you can use .png if needed
+                      document.body.appendChild(link);
+                      link.click();
+                      document.body.removeChild(link);
+
+                      URL.revokeObjectURL(blobUrl); // Clean up
+                    })
+                    .catch(error => {
+                      console.error("Download failed:", error);
+                      alert("Image could not be downloaded.");
+                    });
+                }
+              }
+            };
+            document.addEventListener('click', onUploadItemClick);
+            uploadedImagesMenuListener.push(onUploadItemClick);
+            });
+          }
+          itemsLoaded = true;
+        } catch (error) {
+          itemsLoaded = false;
+          console.error("Error loading items:", error);
+        } finally {
+          itemsLoadInFlight = false;
+        }
+      }
+
+      // Always available for Images-tab opens and upload-success reloads.
+      window.fpdReloadUploadedImages = loadItems;
+
       const N = t => '[object Object]' === Object.prototype.toString.call(t),
         H = (t, e) => {
           if (t && 'object' == typeof t) {
@@ -20951,525 +21547,7 @@
             trash.className = 'fa-solid fa-trash';
             e.append(trash);
           }
-          async function loadItems(force) {
-            // force=true bypasses the one-time-per-session gate below and
-            // re-fetches/re-renders even if this already ran once - used
-            // for an explicit reload (after an upload finishes, or every
-            // time the Images tab is opened) rather than the normal
-            // once-per-page-load call this function otherwise gets from
-            // every single $(t) invocation across every module (see
-            // itemsLoaded's declaration comment).
-            if (itemsLoaded && !force) return; // prevent double calls
-            itemsLoaded = true;
-            try {
-              // 👇 Call your API (replace with your real endpoint)
-              const response = await fetch("https://styleflip-backend-jdm5.ithemes.xyz/api/image/getByUserId/70011");
-              const data = await response.json();
-              ;
-
-              // The uploads grid also restores a separate cache from
-              // localStorage['fpd_uploaded_images'] on init (see the Ri class
-              // constructor further down), independent of the backend. That
-              // meant images deleted from the database kept reappearing,
-              // since nothing ever pruned the local cache. Now that the DB is
-              // the source of truth (this fetch), reconcile the cache against
-              // it: drop any cached entry whose URL the API no longer
-              // returns. If the API returns no images, this empties the
-              // cache entirely.
-              try {
-                const validUrls = new Set(
-                  Array.isArray(data) ? data.map(item => item.image) : []
-                );
-                const cachedRaw = window.localStorage.getItem('fpd_uploaded_images');
-                if (cachedRaw) {
-                  const cached = JSON.parse(cachedRaw);
-                  const stillValid = cached.filter(item => validUrls.has(item.url));
-                  window.localStorage.setItem('fpd_uploaded_images', JSON.stringify(stillValid));
-                }
-              } catch (e) {
-                console.error('❌ Failed to reconcile fpd_uploaded_images cache:', e);
-              }
-
-              // assuming API response looks like: [{ url, title, thumbnailUrl, disableDraggable, disablePrice, price, removable }, ...]
-              // const container = document.querySelector("#items-container"); // 👈 parent element where items go
-              let container = document.querySelector(".fpd-module-content #extracontainer-data");
-              // This function only ever appended items, never removed any -
-              // harmless for the original once-per-session call (container
-              // starts empty), but a `force` reload needs the grid wiped
-              // first or every existing item gets duplicated alongside the
-              // fresh set. Clearing unconditionally (not just when
-              // data.length is 0) also drops stale items if the reload
-              // genuinely returns fewer/no images now.
-              if (container) container.innerHTML = '';
-
-              if(data.length > 0){
-                data.forEach(t => {
-                  ;
-                  const e = document.createElement("div");
-                  e.className = "fpd-item fpd-hover-thumbnail ts mt-1 bg-[#f6f6f6] item-data-click";
-                  e.dataset.source = t.image;
-                  e.dataset.time = t.createdAt;
-                  e.dataset.imageId = t._id;
-  
-                  if (!t.disableDraggable) e.classList.add("fpd-draggable");
-  
-                  if (t.title) {
-                    e.dataset.title = t.title;
-                    e.setAttribute("aria-label", t.title);
-                  }
-  
-                  const i = document.createElement("picture");
-                  i.dataset.img = t.thumbnailUrl ? t.thumbnailUrl : t.image;
-                  i.style.backgroundImage = `url("${t.image}")`;
-                  e.append(i);
-  
-                  const n = new Image();
-                  n.onerror = () => e.remove();
-                  n.src = i.dataset.img;
-  
-                  if (!t.disablePrice) {
-                    const priceSpan = document.createElement("span");
-                    priceSpan.className = "fpd-price";
-                    priceSpan.innerHTML = t.price || 0;
-                    e.append(priceSpan);
-  
-                    // Assuming J is your utility function for toggling classes
-                    J(priceSpan, ["fpd-hidden"], !Boolean(t.price));
-                  }
-  
-                  if (t.removable) {
-                    const trash = document.createElement("span");
-                    trash.className = "fa-solid fa-trash";
-                    e.append(trash);
-                  }
-                  // --- Add three dots (ellipsis) menu for share link ---
-                let threeDot = document.createElement('span');
-                threeDot.className = 'fpd-three-dot-menu';
-                threeDot.innerHTML = `
-                  <svg width="18" height="18" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="4" cy="10" r="2" fill="#888"/>
-                    <circle cx="10" cy="10" r="2" fill="#888"/>
-                    <circle cx="16" cy="10" r="2" fill="#888"/>
-                  </svg>
-                `;
-                threeDot.style.cursor = 'pointer';
-                threeDot.style.marginLeft = '8px';
-                threeDot.style.verticalAlign = 'middle';
-                // Share menu popup
-              
-                let shareMenu = document.createElement('div')
-                shareMenu.className = 'fpd-share-menu';
-                shareMenu.style.display = 'none';
-                shareMenu.style.position = 'fixed';
-                shareMenu.style.background = '#fff';
-                shareMenu.style.border = '1px solid #eee';
-                shareMenu.style.boxShadow = '0 2px 8px rgba(0,0,0,0.08)';
-                shareMenu.style.padding = '10px 16px';
-                shareMenu.style.borderRadius = '8px';
-                shareMenu.style.zIndex = '9999';
-                shareMenu.style.marginTop = '-80px';
-                ;
-                let title = document.createElement('h4');
-                      title.textContent = t.title;
-                      title.className = 'font-bold mb-1 text-capitalize text-[1rem]';
-                      function formatTimeAgo(uploadedAt) {
-                        if(t.createdAt){
-                          const now = new Date();
-                          const past = new Date(uploadedAt);
-                          
-                          const diffMs = now - past;
-                          const seconds = Math.floor(diffMs / 1000);
-                          const minutes = Math.floor(diffMs / (1000 * 60));
-                          const hours   = Math.floor(diffMs / (1000 * 60 * 60));
-                          const days    = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-                          ;
-                          if (seconds < 60) {
-                            return `${seconds} sec${seconds !== 1 ? "s" : ""} ago`;
-                          }
-                          if (minutes < 60) {
-                            return `${minutes} min${minutes !== 1 ? "s" : ""} ago`;
-                          }
-                          if (hours < 24) {
-                            ;
-                            return `${hours} hour${hours !== 1 ? "s" : ""} ago`;
-                          }
-                          if (days < 30) {
-                            return `${days} day${days !== 1 ? "s" : ""} ago`;
-                          }
-
-                          // older than a month → show full date
-                          const options = { day: "numeric", month: "short", year: "numeric" };
-                          ;
-                          return `on ${past.toLocaleDateString("en-GB", options)}`;
-                        }
-                      }
-                      const para = document.createElement('p');
-                      para.className = 'mt-2';
-                      let uploadedAt = t?.createdAt;
-                      const timeupload = formatTimeAgo(uploadedAt);
-                      ;
-                      para.textContent = `Uploaded by Anoop ${timeupload}`;
-
-                let buttonDonw = document.createElement('button');
-                      buttonDonw.className = 'download-button flex items-center gap-2 w-full p-2 text-left hover:bg-gray-100 text-black text-[0.9rem]';
-                      buttonDonw.innerHTML = `
-                        <svg xmlns="http://www.w3.org/2000/svg" style="width:20px;height:20px;" class="w-4 h-4 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 4v12" />
-                        </svg>
-                        Download Image
-                      `;
-
-                      const buttonDel = document.createElement('button');
-                      buttonDel.className = 'delete-button flex items-center gap-2 w-full p-2 text-left hover:bg-gray-100 text-black text-[0.9rem]';
-                      buttonDel.innerHTML = `
-                        <span class="fpd-icon-bin"></span>
-                        Delete
-                      `;
-
-                      let buttonShare = document.createElement('button');
-                      buttonShare.className = 'fpd-share-link-btn flex items-center gap-2 w-full p-2 text-left hover:bg-gray-100 text-black text-[0.9rem]';
-                      buttonShare.innerHTML = `
-                        <span class="fpd-icon-share"></span>
-                        Share
-                      `;
-                        ;
-                        // 👇 finally append item into container
-                        e.append(threeDot);
-                        e.append(shareMenu);
-                        container.append(e);
-                        ;
-                      });
-
-                      // Delete the .fpd-item element
-                buttonDel.addEventListener('click', function (e) {
-                  e.stopPropagation(); // Prevent triggering the outside click close
-                   const itemEl = e.target.closest('.ts'); // Adjust selector if needed
-                  const title = itemEl?.getAttribute('data-title');
-                  ;
-                  if (!title) {
-                    ;
-                    return;
-                  }
-
-                  // 2. Remove the element from the DOM
-                  itemEl.remove();
-
-                  // 3. Get data from localStorage
-                  const saved = localStorage.getItem('clothing-designer'); // Replace with your actual key
-                  let dataArray = saved ? JSON.parse(saved) : [];
-
-                  // 4. Filter out the item with the matching title
-                  const updatedArray = dataArray.filter(item => item.title !== title);
-
-                  // 5. Save updated data back to localStorage
-                  localStorage.setItem('clothing-designer', JSON.stringify(updatedArray));
-
-                  alert(`Removed design titled "${title}"`);
-                });
-
-                buttonShare.addEventListener('click', function (e) {
-                  e.stopPropagation();
-
-                  fetch(`https://styleflip-backend-jdm5.ithemes.xyz/api/sharedproduct/search?title=${encodeURIComponent(t.title)}&design_id=${t?.design_id}`, {
-                    method: 'GET',
-                    headers: { 'Content-Type': 'application/json' }
-                  })
-                    .then(response => response.json())
-                    .then(data => {
-                      ;
-
-                      // Ensure valid product data
-                      if (data && Array.isArray(data.product) && data.product.length > 0) {
-                        const firstProduct = data.product[0];
-                        const urlBase = window.location.origin;
-                        const shareUrl = `${urlBase}/savedesign?design_id=${encodeURIComponent(data.design_id)}&title=${encodeURIComponent(data.title)}`;
-
-                        // Update share link field
-                        const urlField = document.querySelector('.fpd-share-link-url');
-                        const copyBtn = document.querySelector('.fpd-share-link-btn');
-
-                        if (urlField) {
-                          urlField.textContent = shareUrl;
-                        }
-
-                        // Clipboard copy logic
-                        if (navigator.clipboard && copyBtn) {
-                          navigator.clipboard.writeText(shareUrl).then(() => {
-                            // copyBtn.textContent = 'Copied!';
-                            const copyEl = document.querySelector('#copyData');
-                            if (copyEl) {
-                              copyEl.style.display = 'block';
-
-                              setTimeout(() => {
-                                copyEl.style.display = 'none';
-                              }, 1000); // 10 seconds
-                            }
-                            // setTimeout(() => {
-                            //   copyBtn.textContent = 'Copy Link';
-                            // }, 1200);
-                          }).catch(err => {
-                            console.error('Clipboard copy failed:', err);
-                            window.prompt('Copy this link:', shareUrl);
-                          });
-                        } else {
-                          window.prompt('Copy this link:', shareUrl);
-                        }
-                      } else {
-                        alert('No product found with this title.');
-                      }
-                    })
-                    .catch(err => {
-                      console.error('Error searching product:', err);
-                      alert('Error searching product.');
-                    });
-
-                });
-
-                const actionContainer = document.createElement('div');
-                actionContainer.className = 'flex flex-col items-start gap-1 action-container-box'; // tailwind for vertical stack with gap
-                actionContainer.appendChild(title);
-                actionContainer.appendChild(para);
-                actionContainer.appendChild(buttonDonw);
-                actionContainer.appendChild(buttonShare);
-                actionContainer.appendChild(buttonDel);
-                shareMenu.appendChild(actionContainer);
-
-                const titleInfomation = document.createElement('div');
-                titleInfomation.className = 'fixed bg-white text-black text-sm ml-[0px] p-2 rounded shadow-md z-[999] border border-[#ccc] border-solid rounded-[6px] shadow-custom-light sharebox hidden'
-
-                
-                
-                // Hide menu on click outside
-                document.addEventListener('click', function hideShareMenu(ev) {
-                  if (!shareMenu.contains(ev.target) && ev.target !== threeDot) {
-                    shareMenu.style.display = 'none';
-                  }
-                });
-                
-                document.addEventListener("click", function(ev) {
-                  if (ev.target.closest(".fpd-three-dot-menu")) {
-                    
-                    const activeElementData = ev.target.closest('.fpd-active');
-                    ;
-                    ev.stopPropagation();
-                    if(activeElementData.tagName === 'FPD-MODULE-SAVE-LOAD'){
-                      
-                      // Toggle menu
-                      const isOpen = shareMenu.style.display === 'block';
-                      // Close all other open share menus (optional, for multiple items)
-                      document.querySelectorAll('.fpd-share-menu').forEach(menu => menu.style.display = 'none');
-                      shareMenu.style.display = isOpen ? 'none' : 'block';
-          
-                      if (!isOpen) {
-                        // Add a one-time event listener to close the menu when clicking outside
-                        const closeMenu = function(event) {
-                          if (!shareMenu.contains(event.target) && event.target !== threeDot) {
-                            shareMenu.style.display = 'none';
-                            document.removeEventListener('click', closeMenu);
-                          }
-                        };
-                        setTimeout(() => { // Timeout to allow this click to finish
-                          document.addEventListener('click', closeMenu);
-                        }, 0);
-                      }
-                    }
-                    else if(activeElementData.tagName === 'DIV'){
-                      const parentItem = ev.target.closest('.fpd-item');
-                      ;
-                      if (!parentItem) return;
-
-                      const dataSource = parentItem.getAttribute('data-source');
-                      const dataTitle = parentItem.getAttribute('data-title');
-                      const uploadedAt = parentItem.getAttribute('data-time');
-                      if (dataSource && dataTitle) {
-                        // Remove any existing info box
-                        const existingBox = document.querySelector('.titleInformation');
-                        existingBox?.remove();
-
-                        // Create info box
-                        const titleInformation = document.createElement('div');
-                        titleInformation.className = 'titleInformation fixed bg-white text-black text-sm ml-[0px] p-2 rounded shadow-md z-[999] border border-[#ccc] border-solid rounded-[6px] shadow-custom-light sharebox';
-                        titleInformation.style.display = 'block';
-
-                        const title = document.createElement('h4');
-                        title.textContent = dataTitle;
-                        title.className = 'mb-1 font-bold text-capitalize';
-
-                        const para = document.createElement('p');
-                        para.className = 'mt-2';
-                        const timeupload = formatTimeAgo(uploadedAt);
-                        ;
-                        para.textContent = `Uploaded by Anoop ${timeupload}`; // replace with real content if needed
-
-                        let buttonDonw = document.createElement('button');
-                        buttonDonw.className = 'flex items-center w-full gap-2 p-2 text-left download-button hover:bg-gray-100';
-                        buttonDonw.innerHTML = `
-                          <svg xmlns="http://www.w3.org/2000/svg" style="width:20px;height:20px;" class="w-4 h-4 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 4v12" />
-                          </svg>
-                          Download Image
-                        `;
-
-                        let buttonDel = document.createElement('button');
-                        buttonDel.className = 'flex items-center w-full gap-2 p-2 text-left delete-button hover:bg-gray-100';
-                        buttonDel.innerHTML = `
-                          <span class="fpd-icon-bin"></span>
-                          Delete
-                        `;
-
-
-                        // Delete the .fpd-item element
-                        buttonDel.addEventListener('click', function (e) {
-                          e.stopPropagation(); // Prevent triggering the outside click close
-                          if (parentItem) {
-                            ;
-                            ;
-                            parentItem.remove();
-                            titleInformation.remove();
-                            document.body.classList.remove('photo-box-open');
-                            let imageId = parentItem?.getAttribute('data-image-id');
-
-                             fetch(`https://styleflip-backend-jdm5.ithemes.xyz/api/image/deleteByUserId/${imageId}`, {
-                                method: "DELETE", // or DELETE if backend expects delete
-                                headers: {
-                                  "Content-Type": "application/json",
-                                },
-                              })
-                                .then((response) => {
-                                  if (!response.ok) throw new Error("Failed to delete");
-                                  return response.json();
-                                })
-                                .then((data) => {
-                                  ;
-                                })
-                                .catch((error) => {
-                                  console.error("❌ API Error:", error);
-                                });
-                          }
-                        });
-
-                        // Download the image from data-source
-                        buttonDonw.addEventListener('click', function (e) {
-                          e.stopPropagation(); // Prevent triggering the outside click close
-
-                          if (dataSource) {
-                            ;
-
-                            fetch(dataSource, { mode: 'cors' }) // Add CORS handling if needed
-                              .then(response => {
-                                if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-                                return response.blob();
-                              })
-                              .then(blob => {
-                                const blobUrl = URL.createObjectURL(blob);
-
-                                const link = document.createElement('a');
-                                link.href = blobUrl;
-                                link.download = (dataTitle || 'downloaded-image') + '.jpg'; // you can use .png if needed
-                                document.body.appendChild(link);
-                                link.click();
-                                document.body.removeChild(link);
-
-                                URL.revokeObjectURL(blobUrl); // Clean up
-                              })
-                              .catch(error => {
-                                console.error("Download failed:", error);
-                                alert("Image could not be downloaded.");
-                              });
-                          }
-                        });
-
-
-
-                        const actionContainer = document.createElement('div');
-                        actionContainer.className = 'flex flex-col items-start gap-1 action-container-box'; // tailwind for vertical stack with gap
-                        actionContainer.appendChild(buttonDonw);
-                        actionContainer.appendChild(buttonDel);
-
-
-
-                        titleInformation.appendChild(title);
-                        titleInformation.appendChild(para);
-                        titleInformation.appendChild(actionContainer);
-
-                        document.body.appendChild(titleInformation);
-                        document.body.classList.add('photo-box-open');
-
-                        // Position next to the clicked element
-                        const rect = ev.target.getBoundingClientRect();
-                        titleInformation.style.position = 'absolute';
-                        titleInformation.style.top = `${rect.bottom + window.scrollY + 5}px`;
-                        titleInformation.style.left = `${rect.left + window.scrollX}px`;
-
-                        // Close on outside click
-                        const closeBox = (e) => {
-                          const target = e.target;
-                          if (!titleInformation.contains(target) && !threeDot.contains(target)) {
-                            titleInformation.remove();
-                            document.body.classList.remove('photo-box-open');
-                            document.removeEventListener('click', closeBox);
-                          }
-                        };
-
-                        setTimeout(() => {
-                          document.addEventListener('click', closeBox);
-                        }, 10); // ensure it doesn’t trigger immediately
-                      }
-                    }
-                    ;
-                  }
-                  else if(ev.target.closest(".download-button")) {
-                    if (t.url) {
-                      ;
-
-                      fetch(t.url, { mode: 'cors' }) // Add CORS handling if needed
-                        .then(response => {
-                          if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-                          return response.blob();
-                        })
-                        .then(blob => {
-                          const blobUrl = URL.createObjectURL(blob);
-
-                          const link = document.createElement('a');
-                          link.href = blobUrl;
-                          link.download = (t.title || 'downloaded-image') + '.jpg'; // you can use .png if needed
-                          document.body.appendChild(link);
-                          link.click();
-                          document.body.removeChild(link);
-
-                          URL.revokeObjectURL(blobUrl); // Clean up
-                        })
-                        .catch(error => {
-                          console.error("Download failed:", error);
-                          alert("Image could not be downloaded.");
-                        });
-                    }
-                  }
-                });
-              }
-            } catch (error) {
-              console.error("Error loading items:", error);
-            }
-          }
-
-          // loadItems is redefined and immediately invoked (see the "Call
-          // it on page load" call below) every single time this outer $(t)
-          // factory runs, for every module's every grid item - itemsLoaded
-          // is what keeps that from re-fetching every time. There's no
-          // other way to reach this function from outside this closure
-          // (it's not on any module class, not a designer method), so it's
-          // exposed here for the upload-success handler and the Angular
-          // Images-tab click listener to force a reload via
-          // `window.fpdReloadUploadedImages(true)` - reassigned on every
-          // call, harmless since each instance behaves identically when
-          // invoked (no meaningful state carried between instances beyond
-          // the shared, outer-scoped itemsLoaded flag).
-          window.fpdReloadUploadedImages = loadItems;
-
-          // Call it on page load
-          loadItems();
-
-          // --- Add three dots (ellipsis) menu for share link ---
+                    // --- Add three dots (ellipsis) menu for share link ---
           const threeDot = document.createElement('span');
           threeDot.className = 'fpd-three-dot-menu';
           threeDot.innerHTML = `
@@ -21897,6 +21975,7 @@
         //       alert('Failed to save product.');
         //     });
         //   };
+          // ===== END CUSTOM (StyleFlip: image gallery) =====================
 
           return e
         },
@@ -25842,6 +25921,18 @@
         'innerBleed'
       ]),
         (window.FancyProductDesigner = Ht)
+/*
+ * FancyProductDesigner - part 3/6: content UI modules
+ * ---------------------------------------------------------------------
+ * The sidebar module panels for content editing: save/load design,
+ * products, product text, saved designs, image gallery, uploads, and the
+ * social-image (Facebook/Instagram/Pixabay) and text-to-image panels.
+ * Several StyleFlip customizations live here (save/load backend
+ * integration, productsnew/designsnew module variants, uploads
+ * share/delete/download UI) - marked with "===== CUSTOM (StyleFlip)"
+ * banner comments below.
+ */
+
       const Vt = t => {
           let e = t.url
           t.params && (e += '?' + new URLSearchParams(t.params).toString())
@@ -27169,6 +27260,12 @@
               }
             }
           }, 100);
+          // ===================================================================
+          // ===== CUSTOM (StyleFlip): restore a shared/saved design from URL ==
+          // When the page is opened at .../savedesign?title=...&design_id=...,
+          // fetches the saved design from the StyleFlip backend and loads its
+          // fabric.js JSON onto the current canvas.
+          // ===================================================================
           if (window.location.href.includes("savedesign")) {
 
                 setTimeout(async () => {
@@ -27190,30 +27287,26 @@
               return;
             }
 
-            const response = await fetch(`https://styleflip-backend-jdm5.ithemes.xyz/api/sharedproduct/search?title=${encodeURIComponent(titleParam)}&design_id=${encodeURIComponent(idParam)}`, );
-            const data = await response.json();
-            const encodedTitle = 'DataSave11';
-            const designTitleData = localStorage.getItem('clothing-designer');
-            let matchedDesign = null;
-            if (designTitleData) {
-              const parsedDesigns = JSON.parse(designTitleData);
-              matchedDesign = parsedDesigns.find(i => i.title === encodedTitle);
+            const response = await fetch(`https://styleflip-backend-jdm5.ithemes.xyz/api/sharedproduct/search?title=${encodeURIComponent(titleParam)}&design_id=${encodeURIComponent(idParam)}`);
+            if (!response.ok) {
+              throw new Error('Saved design request failed: ' + response.status);
             }
-            ;
-            const elementsJSON = matchedDesign?.product[0];
+            const data = await response.json();
+            const productViews = Array.isArray(data && data.product)
+              ? data.product
+              : data && data.product
+              ? [data.product]
+              : null;
             const canvas = t.currentViewInstance && t.currentViewInstance.fabricCanvas;
-            ;  
             if (!canvas) {
               console.error("Canvas not available", t);
               return;
             }
-            ;
-            // Clear previous elements
-            canvas.clear();
-            canvas.loadFromJSON(elementsJSON, () => {
-              canvas.renderAll();
-              ;
-            });
+            if (!productViews || !productViews.length) {
+              console.error('Saved design response did not include product views', data);
+              return;
+            }
+            t.loadProduct(productViews);
             // const base64Image = data?.base64save;
             // if (!base64Image || typeof base64Image !== 'string' || !base64Image.startsWith('data:image')) {
             //   console.log("No valid base64 image found");
@@ -27268,12 +27361,12 @@
             console.error("Error fetching or rendering image:", error);
           }
         }, 2000);
+          // ===== END CUSTOM (StyleFlip: restore design from URL) ============
+
+          }
 
 
-          } 
 
-
-     
 
           (i.style.backgroundColor = '#000'),
             new fe({
@@ -27322,6 +27415,13 @@
       }
       var ve = i(729),
         be = i.n(ve)
+      // ===================================================================
+      // ===== CUSTOM (StyleFlip): save/load design module =================
+      // The vendor's stock "Saved Designs" module (fpd-module-save-load),
+      // customized to save designs (as a thumbnail + fabric.js JSON) to the
+      // StyleFlip backend and generate shareable /savedesign?... links, in
+      // addition to the vendor's original browser-localStorage save.
+      // ===================================================================
       class ye extends HTMLElement {
         constructor () {
           super()
@@ -27555,6 +27655,7 @@
         return i
       }
       window.FPDSaveLoadModule = Ce
+      // ===== END CUSTOM (StyleFlip: save/load design module) =============
       var Ae = new WeakSet()
       class Ie extends EventTarget {
         constructor (t) {
@@ -28111,6 +28212,13 @@
             '<div data-moduleicon="book-copy" data-defaulttext="Products" data-title="Design"><div class="fpd-head"> <div class="fpd-input-back-search input-search-box !shadow-none border border-[#35475a33] border-solid !rounded-[8px] ml-[5px] w-[calc(100% - 22px)]"> <div class="fpd-back fpd-btn !bg-white"> <svg xmlns="http://www.w3.org/2000/svg" class="min-w-[24px] text-black relative top-[-2px]" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M15.2 16.34a7.5 7.5 0 1 1 1.38-1.45l4.2 4.2a1 1 0 1 1-1.42 1.41l-4.16-4.16zm-4.7.16a6 6 0 1 0 0-12 6 6 0 0 0 0 12z"></path></svg> </div> <div class="fpd-input-search"> <input type="text" class="!text-sm placeholder-gray-500 !pl-2" placeholder="Search" id="searchInput" /> <span class="fpd-icon-magnify"></span> </div> </div> </div><div class="icon-box"><i data-lucide="house"></i></div> <fpd-dropdown class="fpd-product-categories rounded-[8px] border border-[#35475a33] border-solid mt-[8px] bg-white p-2 dark:border-gray-800 dark:bg-white/[0.03] md:p-2 mr-[14px] pl-[6px] ml-[5px] w-[calc(100% - 22px)] mb-[5px]" searchable></fpd-dropdown> <div class="fpd-scroll-area"><div class="flex gap-2 ml-[5px] transition-transform duration-300 ease-in-out mb-2" id="data-info"></div> <div class="fpd-grid fpd-grid-contain fpd-padding one-tt ProductModule" id="ProductModule"><div class="searchox bg-white rounded-lg relative flex"><div id="search-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M15.2 16.34a7.5 7.5 0 1 1 1.38-1.45l4.2 4.2a1 1 0 1 1-1.42 1.41l-4.16-4.16zm-4.7.16a6 6 0 1 0 0-12 6 6 0 0 0 0 12z"></path></svg></div><div><input type="text" class="appearance-none bg-inherit border-0 box-border text-inherit font-normal min-w-[8px] outline-none w-full" /></div></div> </div> <div id="ProductModule" class="grid grid-cols-1 md:grid-cols-3 gap-4"></div><button id="backbuttonStoP" class="w-[30px] h-[30px] rounded-full p-[2px]"  style="display:none"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="text-[#0d1216] hover:text-blue-600 transition duration-200 cursor-pointer"><path d="M6.9 10.996h11.596a.75.75 0 0 1 0 1.5H6.9l4.377 4.377a.75.75 0 0 1-1.061 1.06l-4.95-4.95a1.75 1.75 0 0 1 0-2.474l4.95-4.95a.75.75 0 1 1 1.06 1.06L6.9 10.996z" fill="currentColor"></path></svg></button><div id="ProductModule" class="fpd-grid fpd-grid-contain fpd-padding one-tt skins-data ProductModuleMy"></div></div> </div>'
         }
       }
+      // ===================================================================
+      // ===== CUSTOM (StyleFlip): "Design" tab products module ============
+      // A parallel copy of the vendor's products module (fpd-module-products
+      // / je above), registered as fpd-module-productsnew and driving the
+      // "Design" sidebar tab separately from the main Products tab. See
+      // Wes below for the panel logic (this.fpdInstance.productsnew).
+      // ===================================================================
       class jaikant extends HTMLElement {
         constructor () {
           super()
@@ -28836,6 +28944,7 @@
       }
       window.FPDProductsModule = We
       window.FPDProductsModuleNew = Wes
+      // ===== END CUSTOM (StyleFlip: "Design" tab products module) ========
       class Ye extends HTMLElement {
         constructor () {
           super()
@@ -29690,6 +29799,7 @@
             '<div data-moduleicon="component" data-defaulttext="Elements" data-title="Elements"> <div class="fpd-head relative"><div id="icon-search-back-data" class="icon-search-back-data fpd-hidden absolute top-[8px] left-0"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="text-[#0d1216] hover:text-blue-600 transition duration-200 cursor-pointer"><path d="M6.9 10.996h11.596a.75.75 0 0 1 0 1.5H6.9l4.377 4.377a.75.75 0 0 1-1.061 1.06l-4.95-4.95a1.75 1.75 0 0 1 0-2.474l4.95-4.95a.75.75 0 1 1 1.06 1.06L6.9 10.996z" fill="currentColor"></path></svg></div> <div class="fpd-input-back-search input-search-box !shadow-none border border-[#35475a33] border-solid !rounded-[8px] ml-[5px] w-[calc(100% - 22px)]"> <div class="fpd-back fpd-btn !bg-white"> <svg xmlns="http://www.w3.org/2000/svg" class="min-w-[24px] text-black relative top-[-2px]" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M15.2 16.34a7.5 7.5 0 1 1 1.38-1.45l4.2 4.2a1 1 0 1 1-1.42 1.41l-4.16-4.16zm-4.7.16a6 6 0 1 0 0-12 6 6 0 0 0 0 12z"></path></svg> </div> <div class="fpd-input-search"> <input type="text" class="!text-sm placeholder-gray-500 !pl-2" placeholder="Search" /> <span class="fpd-icon-magnify"></span> </div> </div> </div> <div class="fpd-scroll-area"> <div class="relative fpd-grid fpd-grid-contain fpd-padding one !flex !flex-col"> </div> </div>'
         }
       }
+      // ===== CUSTOM (StyleFlip): parallel "Elements" module (fpd-module-designsnew), registered alongside the vendor's qe below ==
       class qet extends HTMLElement {
         constructor () {
           super()
@@ -30807,6 +30917,10 @@
             (this.container = document.createElement('fpd-module-uploads')),
             e.append(this.container),
             (this.gridElem = this.container.querySelector('.fpd-grid'))
+          // #extracontainer-data now exists - load previously uploaded images
+          // immediately so the grid is ready when the Images tab is first shown.
+          window.fpdReloadUploadedImages &&
+            window.fpdReloadUploadedImages(!0)
           const i = this.container.querySelector('.fpd-upload-image')
           Ci(this, Ti, t.mainOptions.allowedImageTypes),
             wi(this, Ti).includes('jpeg') &&
@@ -31705,13 +31819,12 @@
 
                       ;
                       G(e, ['click'], t => {
-                        ;
+                        const item = t.currentTarget
+                        if (!item) return
                         this.fpdInstance.addCanvasDesign(
-                          t.srcElement.dataset.source,
-                          t.srcElement.dataset.title
+                          item.dataset.source,
+                          item.dataset.title
                         )
-                        this.fpdInstance.loadingCustomImage ||
-                          this.fpdInstance._addGridItemToCanvas(t.currentTarget)
                       })
                       this.gridElem.append(e),
                         this.fpdInstance.lazyBackgroundObserver.observe(
@@ -31960,6 +32073,14 @@
         }
       }
       window.FPDImagesModule = Mn
+/*
+ * FancyProductDesigner - part 4/6: layer modules & app shell
+ * ---------------------------------------------------------------------
+ * The manage-layers, text-layers, layouts and names/numbers module
+ * panels, plus the app shell components: main wrapper, views nav, views
+ * grid, and the element toolbar registration.
+ */
+
       class Pn extends HTMLElement {
         constructor () {
           super()
@@ -33529,6 +33650,13 @@
           }
           this.toggleContentDisplay(),
             (this.currentModuleKey = t),
+            // Images uploads grid is filled by StyleFlip's loadItems()
+            // (window.fpdReloadUploadedImages). Reload every time this tab
+            // opens so previously uploaded images appear without requiring
+            // a new upload first.
+            'images' === t &&
+              window.fpdReloadUploadedImages &&
+              window.fpdReloadUploadedImages(!0),
             this.fpdInstance.dispatchEvent(
               new CustomEvent('moduleCalled', { detail: { moduleName: t } })
             )
@@ -34802,6 +34930,16 @@
         fa = new WeakSet(),
         pa = new WeakSet(),
         ga = new WeakSet()
+/*
+ * FancyProductDesigner - part 5/6: element-toolbar interactions
+ * ---------------------------------------------------------------------
+ * The element toolbar's behavior class (multi-select, alignment,
+ * z-ordering) plus supporting view-option helper classes. Contains
+ * significant StyleFlip customizations (toast notifications, layer
+ * grouping/merging, copy/paste for grouped elements and images) - marked
+ * with "===== CUSTOM (StyleFlip)" banner comments below.
+ */
+
       class ma extends EventTarget {
         constructor (t) {
           var e, i
@@ -34990,6 +35128,48 @@
               })
           }
           let copiedGroup = null;
+          if (!ma._groupClipboardBound) {
+            ma._groupClipboardBound = true;
+            document.addEventListener('keydown', ev => {
+              if (!ev.ctrlKey) return;
+              const key = ev.key ? ev.key.toLowerCase() : '';
+              if (key !== 'c' && key !== 'v') return;
+              const target = ev.target;
+              const tag = target && target.nodeName;
+              if (
+                tag === 'INPUT' ||
+                tag === 'TEXTAREA' ||
+                (target && target.isContentEditable)
+              )
+                return;
+              const fabricCanvas = this.fpdInstance.currentViewInstance?.fabricCanvas;
+              if (!fabricCanvas) return;
+              if (key === 'c') {
+                const obj = fabricCanvas.getActiveObject();
+                if (obj && obj.type === 'group') {
+                  obj.clone(clone => {
+                    copiedGroup = clone;
+                  });
+                }
+              } else if (copiedGroup) {
+                copiedGroup.clone(cloned => {
+                  cloned.set({
+                    left: copiedGroup.left + 20,
+                    top: copiedGroup.top + 20,
+                    originX: 'center',
+                    originY: 'center',
+                    autoCenter: false,
+                    clipPath: null,
+                    boundingBox: null,
+                    boundingBoxMode: 'none'
+                  });
+                  fabricCanvas.add(cloned);
+                  fabricCanvas.setActiveObject(cloned);
+                  fabricCanvas.requestRenderAll();
+                });
+              }
+            });
+          }
           const r = this.subPanel.querySelector('.fpd-tool-crop-masks')
           Array.isArray(t.mainOptions.cropMasks) &&
             t.mainOptions.cropMasks.forEach(e => {
@@ -35562,9 +35742,19 @@
               this.fpdInstance.actionsBar.doAction('reset-product')
               
             }),
-            
-            
-              
+
+
+              // ===================================================================
+              // ===== CUSTOM (StyleFlip): group/ungroup, copy/paste, toast ======
+              // Repurposes the toolbar's group/ungroup buttons to merge selected
+              // text elements into a fabric.js group (and back), adds copy/paste
+              // for grouped elements and images (Ctrl+C/V and toolbar buttons),
+              // z-ordering helpers to keep pasted elements above the base/below
+              // any overlay, a lightweight toast notification (showToast, defined
+              // below), and syncing the layers panel to show merged groups as a
+              // single row (updateFPDLayersToSingleGroup, defined below).
+              // Runs through the .fpd-ungroup1 handler further down.
+              // ===================================================================
               G(this.navElem.querySelector('.fpd-ungroup'), 'click', e => {
                 let groupCounter = 1;
   ;
@@ -35661,50 +35851,13 @@
   updateFPDLayersToSingleGroup(group);
   fabricCanvas.requestRenderAll();
 
-  // --- COPY SUPPORT ---
-  let copiedGroup = null;
-
-  document.addEventListener('keydown', ev => {
-    if (ev.ctrlKey && ev.key.toLowerCase() === 'c') {
-      const obj = fabricCanvas.getActiveObject();
-      if (obj && obj.type === 'group') {
-        obj.clone(clone => copiedGroup = clone);
-      }
-    }
-  });
-
-  document.addEventListener('keydown', ev => {
-    if (ev.ctrlKey && ev.key.toLowerCase() === 'v') {
-      if (copiedGroup) {
-        copiedGroup.clone(cloned => {
-          cloned.set({
-            left: copiedGroup.left + 20,
-            top: copiedGroup.top + 20,
-            originX: 'center',
-            originY: 'center',
-            autoCenter: false,
-            clipPath: null,
-            boundingBox: null,
-            boundingBoxMode: 'none'
-          });
-
-          fabricCanvas.add(cloned);
-          fabricCanvas.setActiveObject(cloned);
-          fabricCanvas.requestRenderAll();
-          
-
-        });
-      }
-    }
-  });
-
   // --- UI TOGGLE ---
   document.querySelector('.fpd-ungroup1')?.classList.remove('fpd-hidden');
   document.querySelector('.fpd-ungroup')?.classList.add('fpd-hidden');
   document.querySelector('.fpd-group-copy-by')?.classList.remove('fpd-hidden');
   document.querySelector('.fpd-group-paste-by')?.classList.remove('fpd-hidden');
-  document.querySelector('.fpd-tool-text-format').classList.add('fpd-hidden');
-  document.querySelector('.fpd-tool-curved-text').classList.add('fpd-hidden');
+  document.querySelector('.fpd-tool-text-format')?.classList.add('fpd-hidden');
+  document.querySelector('.fpd-tool-curved-text')?.classList.add('fpd-hidden');
   const toolbarEl = document.querySelector('fpd-element-toolbar');
     if (toolbarEl) {
       toolbarEl.setAttribute('data-fabric-type', 'group');
@@ -36305,6 +36458,7 @@ function updateFPDLayersToSingleGroup(group) {
             document.querySelector('.fpd-group-copy-by')?.classList.add('fpd-hidden');
             document.querySelector('.fpd-group-paste-by')?.classList.add('fpd-hidden');
           });
+          // ===== END CUSTOM (StyleFlip: group/ungroup, copy/paste, toast) ===
 
 
           G(this.navElem.querySelector('.fpd-tool-duplicate'), 'click', e => {
@@ -37995,6 +38149,14 @@ function updateFPDLayersToSingleGroup(group) {
         jo = new WeakSet(),
         Ro = new WeakSet(),
         No = new WeakSet()
+/*
+ * FancyProductDesigner - part 6/6: main engine class & boot
+ * ---------------------------------------------------------------------
+ * The main FancyProductDesigner orchestrator class (product/view
+ * loading, options, event wiring) and the final boot sequence that
+ * assigns window.FancyProductDesigner.
+ */
+
       class Ho extends EventTarget {
         constructor (t) {
           let e =
@@ -38125,7 +38287,6 @@ function updateFPDLayersToSingleGroup(group) {
           let t =
             arguments.length > 0 && void 0 !== arguments[0] ? arguments[0] : []
           ;
-          t = t.filter(item => !(item.category && /laptop/i.test(item.category)));
           const groupedCategories = t.map(item => ({
             category: item.category,
             subcategory: item.subcategory
@@ -38154,8 +38315,7 @@ function updateFPDLayersToSingleGroup(group) {
         setupProductsNew () {
           let t =
             arguments.length > 0 && void 0 !== arguments[0] ? arguments[0] : []
-          t = t.filter(tItem => !(tItem.category && /laptop/i.test(tItem.category)));
-          (this.productsnew = [])
+          ;(this.productsnew = [])
 
           t.forEach(tItem => {
             const category = tItem.category
@@ -38169,9 +38329,16 @@ function updateFPDLayersToSingleGroup(group) {
 
                 if (existingCategory) {
                   existingCategory.products.push(product)
+                  if (
+                    !existingCategory.subcategory &&
+                    tItem.subcategory
+                  ) {
+                    existingCategory.subcategory = tItem.subcategory
+                  }
                 } else {
                   this.productsnew.push({
                     category: category,
+                    subcategory: tItem.subcategory,
                     products: [product]
                   })
                 }
@@ -38187,9 +38354,14 @@ function updateFPDLayersToSingleGroup(group) {
               ? this.selectProduct(0)
               : this.toggleSpinner(!1),
             q(this, 'productsSet', {})
-
-          this.productsnew = t
-          ;
+        }
+        get product () {
+          return this._productSource
+        }
+        set product (t) {
+          this._productsLoadToken = (this._productsLoadToken || 0) + 1
+          this._productSource = t
+          this.setupProducts(Array.isArray(t) ? t : [])
         }
 
         setupDesigns (t) {
@@ -38553,10 +38725,10 @@ function updateFPDLayersToSingleGroup(group) {
 
             const targetTitleOfUrl = localStorage.getItem('selectedSlug')
             let matchedIndex = 0;
-            if (t && Array.isArray(t)) {
+            if (t && Array.isArray(t) && typeof targetTitleOfUrl === 'string' && targetTitleOfUrl) {
+              const compareTitle = targetTitleOfUrl.replace(/-/g, ' ').toLowerCase().trim();
               for (let i = 0; i < t.length; i++) {
                 const productTitle = t[i].title?.toLowerCase().trim();
-                const compareTitle = targetTitleOfUrl.replace(/-/g, ' ').toLowerCase().trim();;
                 ;
                 if (productTitle === compareTitle) {
                   ;
@@ -39251,12 +39423,16 @@ function updateFPDLayersToSingleGroup(group) {
                 copyable: true,
                 lockUniScaling: true,
                 autoSelect: true,
-                minDPI: 300,
-                title: e.title ? e.title : 'Custom Element'
+                title:
+                  e && typeof e === 'object' && e.title
+                    ? e.title
+                    : typeof e === 'string' && e
+                    ? e
+                    : 'Custom Element'
               },
               i
             )),
-            document.querySelector('.fpd-ungroup1').classList.add('fpd-hidden'),
+            document.querySelector('.fpd-ungroup1')?.classList.add('fpd-hidden'),
             (i.isCustom = !0),
             this.currentViewInstance.currentUploadZone &&
               (i._addToUZ = this.currentViewInstance.currentUploadZone),
@@ -39645,22 +39821,38 @@ function updateFPDLayersToSingleGroup(group) {
       async function Wo () {
         // const savedJson = localStorage.getItem('fpdProductsJSON');
         ;
-        const savedJson = await getProducts("Products");
-        ;
-        // this.mainOptions.productsJSON = JSON.parse(savedJson);
-        this.mainOptions.productsJSON = Array.isArray(savedJson) || typeof savedJson === "object"
-        ? savedJson
-        : JSON.parse(savedJson);
+        const bundledProductsUrl = this.mainOptions.productsJSON
+        let savedJson = null
+        try {
+          savedJson = await getProducts("Products");
+        } catch (err) {
+          console.error('Failed to read cached products:', err)
+        }
+        const productsAlreadyLoaded =
+          Array.isArray(this.products) && this.products.length > 0
+        if (!productsAlreadyLoaded) {
+          const hasCachedProducts =
+            Array.isArray(savedJson) && savedJson.length > 0
+          this.mainOptions.productsJSON = hasCachedProducts
+            ? savedJson
+            : bundledProductsUrl
+        }
         ;
         q(this, 'ready', {}),
           (this.warningsWrapper =
             this.container.querySelector('.fpd-warnings')),
+          !productsAlreadyLoaded &&
           this.mainOptions.productsJSON &&
             ('object' == typeof this.mainOptions.productsJSON
               ? this.setupProducts(this.mainOptions.productsJSON)
-              : Vt({
+              : ((this._productsRequestToken =
+                  this._productsLoadToken =
+                    (this._productsLoadToken || 0) + 1),
+                Vt({
                   url: this.mainOptions.productsJSON,
                   onSuccess: t => {
+                    if (this._productsRequestToken !== this._productsLoadToken)
+                      return
                     ;
                     const processed = []
 
@@ -39721,7 +39913,7 @@ function updateFPDLayersToSingleGroup(group) {
                         this.mainOptions.productsJSON
                     )
                   }
-                }))
+                })))
         this.mainOptions.productsJSON1 &&
           ('object' == typeof this.mainOptions.productsJSON1
             ? this.setupProductsNew(this.mainOptions.productsJSON1)
@@ -40116,89 +40308,15 @@ function updateFPDLayersToSingleGroup(group) {
         } else this.mainTooltip.classList.remove('fpd-show')
       }
       function Jo () {
+        // StyleFlip: do not show the low-resolution / DPI warning when
+        // uploading or selecting custom images.
         if (!this.warningsWrapper || this.mainOptions.editorMode) return
         this.warningsWrapper.innerHTML = ''
-        const t = this.currentElement
-        if (this.productCreated && t) {
-          const e = this.calcElementDPI(t)
-          if (
-            t.isCustomImage &&
-            null !== e &&
-            e < this.mainOptions.customImageParameters.minDPI
-          ) {
-            const i = document.createElement('div')
-            if (
-              ((i.className = 'fpd-size-warning'),
-              (i.innerHTML =
-                '<span>' +
-                this.translator.getTranslation(
-                  'misc',
-                  'dpi_warning',
-                  'Low resolution!'
-                ) +
-                '</span>'),
-              this.warningsWrapper.append(i),
-              this.mainOptions.aiService.serverURL &&
-                this.mainOptions.aiService.superRes)
-            ) {
-              const e = document.createElement('span')
-              ;(e.className = 'fpd-btn'),
-                (e.innerText = this.translator.getTranslation(
-                  'misc',
-                  'ai_upscale_btn'
-                )),
-                i.append(e),
-                G(e, 'click', e => {
-                  const i = this.calcDisplaySize(t),
-                    s = 'mm' == i.unit ? 25.4 : 2.54
-                  let r =
-                    parseInt(
-                      (this.mainOptions.customImageParameters.minDPI *
-                        i.width) /
-                        s
-                    ) / t.width
-                  ;(r = Math.ceil(r)),
-                    (r = r > 4 ? 4 : r),
-                    this.deselectElement(),
-                    this.toggleSpinner(
-                      !0,
-                      this.translator.getTranslation('misc', 'loading_image')
-                    ),
-                    Ut({
-                      url: this.mainOptions.aiService.serverURL,
-                      body: { service: 'superRes', image: t.source, scale: r },
-                      onSuccess: e => {
-                        if (e && e.new_image) {
-                          let i = t.getScaledWidth()
-                          t.setSrc(
-                            e.new_image,
-                            () => {
-                              ;(t.source = e.new_image),
-                                t.scaleToWidth(i),
-                                t.scaleToWidth(i),
-                                t.canvas.renderAll(),
-                                n(
-                                  this.translator.getTranslation(
-                                    'misc',
-                                    'ai_upscale_success'
-                                  )
-                                ),
-                                q(this, 'elementModify', {
-                                  options: { scaleX: t.scaleX },
-                                  element: t
-                                })
-                            },
-                            { crossOrigin: 'anonymous' }
-                          )
-                        } else this.aiRequestError(e.error)
-                        this.toggleSpinner(!1)
-                      },
-                      onError: this.aiRequestError.bind(this)
-                    })
-                })
-            }
-            q(this, 'imageDPIWarningOn', { element: t, dpi: e })
-          } else q(this, 'imageDPIWarningOff', { element: t, dpi: e })
+        if (this.productCreated && this.currentElement) {
+          q(this, 'imageDPIWarningOff', {
+            element: this.currentElement,
+            dpi: this.calcElementDPI(this.currentElement)
+          })
         }
       }
       function Qo () {

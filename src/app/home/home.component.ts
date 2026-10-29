@@ -2600,16 +2600,14 @@ export class HomeComponent implements AfterViewInit {
       toolbarPlacement: 'smart',
     };
 
-    // Laptop category is now hidden (see FancyProductDesigner.js
-    // setupProducts/setupProductsNew), so it can no longer be the product
-    // that auto-loads on a fresh editor open. selectProduct()'s initial
-    // call (triggered by mainOptions.loadFirstProductInStage) picks
-    // this.products (Products tab) vs this.productsnew (Designs tab)
-    // based on localStorage 'parentDivId', which otherwise still holds
-    // whatever tab was last clicked in a previous session. Forcing it to
-    // 'DesignModule' here, before the designer is constructed, makes every
-    // fresh page load land on a Designs-tab product by default; a real tab
-    // click later in the session still overwrites it as before.
+    // selectProduct()'s initial call (triggered by
+    // mainOptions.loadFirstProductInStage) picks this.products (Products
+    // tab) vs this.productsnew (Designs tab) based on localStorage
+    // 'parentDivId', which otherwise still holds whatever tab was last
+    // clicked in a previous session. Forcing it to 'DesignModule' here,
+    // before the designer is constructed, makes every fresh page load land
+    // on a Designs-tab product by default; a real tab click later in the
+    // session still overwrites it as before.
     localStorage.setItem('parentDivId', 'DesignModule');
 
     this.designer = new FancyProductDesigner(
