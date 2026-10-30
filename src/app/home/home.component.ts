@@ -727,11 +727,16 @@ export class HomeComponent implements AfterViewInit {
       this.moveBoldToPrimaryTools()
       this.mergeTextFormatIntoSecondaryTools()
       this.bindAddTextEditorActions()
+      // Desktop Add Text only — separate file/classes; does not alter mobile ate
+      this.bindDesktopAddTextEditorActions()
+      this.applyDesktopAddTextEditorClasses()
       this.fixRotateAroundCenter()
       this.applyDocOptInToolbarClasses()
       // Re-stamp after FPD finishes layout-small / toolbar rebuilds
       setTimeout(() => this.applyDocOptInToolbarClasses(), 1000)
       setTimeout(() => this.applyDocOptInToolbarClasses(), 2500)
+      setTimeout(() => this.applyDesktopAddTextEditorClasses(), 1000)
+      setTimeout(() => this.applyDesktopAddTextEditorClasses(), 2500)
     }, 3000);
     createIcons({ icons });
 
@@ -2737,6 +2742,277 @@ export class HomeComponent implements AfterViewInit {
         stampUniform(paste, 'Paste');
       }
     });
+  }
+
+  /**
+   * Desktop Add Text only — stamp fpd-dte-editor when layout-large text.
+   * No DOM reparenting. No MutationObserver. Clears itself on mobile.
+   */
+  applyDesktopAddTextEditorClasses(): void {
+    const tb = document.querySelector(
+      'fpd-element-toolbar'
+    ) as HTMLElement | null;
+    if (!tb) return;
+
+    const isDesktopText =
+      tb.classList.contains('fpd-layout-large') &&
+      !tb.classList.contains('fpd-layout-small') &&
+      !tb.classList.contains('fpd-ate-editor') &&
+      tb.getAttribute('data-element-type') === 'text' &&
+      !window.matchMedia('(max-width: 768px)').matches &&
+      !document
+        .querySelector('.fpd-container')
+        ?.classList.contains('fpd-layout-small');
+
+    if (!isDesktopText) {
+      tb.classList.remove('fpd-dte-editor');
+      tb.querySelector('#fpd-opacity-btn')?.classList.remove(
+        'fpd-dte-opacity-btn'
+      );
+      return;
+    }
+
+    tb.classList.add('fpd-dte-editor');
+    tb.querySelector('#fpd-opacity-btn')?.classList.add('fpd-dte-opacity-btn');
+  }
+
+  /**
+   * Desktop Add Text click binder — completely separate from mobile ate.
+   * Document capture; gated to layout-large + fpd-dte-editor.
+   * No MutationObserver (that froze the app previously).
+   */
+  bindDesktopAddTextEditorActions(): void {
+    if ((document as any)._fpdDteActionsBound) return;
+    (document as any)._fpdDteActionsBound = true;
+
+    const getCanvas = () =>
+      this.designer?.currentViewInstance?.fabricCanvas ?? null;
+    const getObj = () => getCanvas()?.getActiveObject?.() ?? null;
+
+    const isDteDesktop = (toolbar: HTMLElement | null) =>
+      !!toolbar &&
+      toolbar.classList.contains('fpd-dte-editor') &&
+      toolbar.classList.contains('fpd-layout-large') &&
+      !toolbar.classList.contains('fpd-layout-small') &&
+      !toolbar.classList.contains('fpd-ate-editor') &&
+      toolbar.getAttribute('data-element-type') === 'text' &&
+      !window.matchMedia('(max-width: 768px)').matches;
+
+    window.addEventListener('resize', () =>
+      this.applyDesktopAddTextEditorClasses()
+    );
+    document.addEventListener('uiLayoutChange', () =>
+      this.applyDesktopAddTextEditorClasses()
+    );
+
+    document.addEventListener(
+      'click',
+      (e: Event) => {
+        const raw = e.target as HTMLElement | null;
+        if (!raw) return;
+
+        // Lazy stamp so desktop tools work even before delayed timeouts.
+        const maybeTb = raw.closest(
+          'fpd-element-toolbar'
+        ) as HTMLElement | null;
+        if (maybeTb?.classList.contains('fpd-layout-large')) {
+          this.applyDesktopAddTextEditorClasses();
+        }
+
+        const toolbar = maybeTb;
+        if (!isDteDesktop(toolbar) || !toolbar) return;
+
+        const opacityBtn = raw.closest(
+          '#fpd-opacity-btn'
+        ) as HTMLElement | null;
+        if (
+          opacityBtn &&
+          opacityBtn.closest('.fpd-tools-nav') &&
+          !opacityBtn.closest('.fpd-sub-panel')
+        ) {
+          e.preventDefault();
+          e.stopPropagation();
+          const panel = toolbar.querySelector(
+            '#fpd-opacity-panel'
+          ) as HTMLElement | null;
+          if (!panel) return;
+          const isOpen =
+            toolbar.classList.contains('fpd-opacity-open') ||
+            panel.style.display === 'block';
+          if (isOpen) {
+            panel.style.display = 'none';
+            opacityBtn.classList.remove('fpd-active');
+            toolbar.classList.remove(
+              'fpd-opacity-open',
+              'fpd-doc-opacity-dock'
+            );
+          } else {
+            toolbar
+              .querySelector('.fpd-sub-panel')
+              ?.querySelectorAll(':scope > .fpd-active')
+              .forEach((el) => el.classList.remove('fpd-active'));
+            toolbar.classList.remove('fpd-panel-visible');
+            panel.style.display = 'block';
+            opacityBtn.classList.add('fpd-active');
+            toolbar.classList.add(
+              'fpd-opacity-open',
+              'fpd-doc-opacity-dock',
+              'fpd-show'
+            );
+            const obj = getObj();
+            const slider = panel.querySelector(
+              '#fpd-opacity-range'
+            ) as HTMLInputElement | null;
+            if (obj && slider) {
+              const value = Math.min(1, Math.max(0, obj.opacity ?? 1));
+              slider.value = value.toFixed(2);
+              if (!(slider as any)._fpdDteBound) {
+                (slider as any)._fpdDteBound = true;
+                slider.addEventListener('input', () => {
+                  const o = getObj();
+                  const c = getCanvas();
+                  if (!o || !c) return;
+                  const v = Math.min(
+                    1,
+                    Math.max(0, parseFloat(slider.value) || 0)
+                  );
+                  o.set('opacity', v);
+                  c.requestRenderAll();
+                  c.fire('object:modified', { target: o });
+                });
+              }
+              slider.dispatchEvent(new Event('input', { bubbles: true }));
+            }
+          }
+          return;
+        }
+
+        const sizeBtn = raw.closest(
+          '#minusElement, #plusElement, .fpd-tool-text-size-customize-icon'
+        ) as HTMLElement | null;
+        if (sizeBtn) {
+          e.preventDefault();
+          e.stopPropagation();
+          const canvas = getCanvas();
+          const inputEl = toolbar.querySelector(
+            'input[data-control="fontSize"]'
+          ) as HTMLInputElement | null;
+          if (!canvas || !inputEl) return;
+          let current = parseInt(inputEl.value, 10) || 1;
+          const isMinus =
+            sizeBtn.id === 'minusElement' ||
+            sizeBtn.classList.contains('minus');
+          current = isMinus
+            ? Math.max(1, current - 1)
+            : Math.min(200, current + 1);
+          inputEl.value = String(current);
+          inputEl.dispatchEvent(new Event('input', { bubbles: true }));
+          inputEl.dispatchEvent(new Event('change', { bubbles: true }));
+          const obj = getObj();
+          canvas.setElementOptions({ fontSize: current }, obj);
+          return;
+        }
+
+        const bold = raw.closest(
+          '#boldOutside, .fpd-tool-text-bold'
+        ) as HTMLElement | null;
+        if (
+          bold &&
+          bold.closest('.fpd-tools-nav') &&
+          !bold.closest('.fpd-sub-panel')
+        ) {
+          e.preventDefault();
+          e.stopPropagation();
+          const canvas = getCanvas();
+          const obj = getObj();
+          if (!canvas || !obj) return;
+          const weight = String(obj.fontWeight || 'normal').toLowerCase();
+          const next =
+            weight === 'bold' || weight === '700' ? 'normal' : 'bold';
+          canvas.setElementOptions({ fontWeight: next }, obj);
+          bold.classList.toggle('active', next === 'bold');
+          bold.classList.toggle('fpd-enabled', next === 'bold');
+          return;
+        }
+
+        const italic = raw.closest(
+          '#fontItalic, .fpd-tool-text-italic'
+        ) as HTMLElement | null;
+        if (
+          italic &&
+          italic.closest('.fpd-tools-nav') &&
+          !italic.closest('.fpd-sub-panel')
+        ) {
+          e.preventDefault();
+          e.stopPropagation();
+          const canvas = getCanvas();
+          const obj = getObj();
+          if (!canvas || !obj) return;
+          const next = obj.fontStyle === 'italic' ? 'normal' : 'italic';
+          canvas.setElementOptions({ fontStyle: next }, obj);
+          italic.classList.toggle('active', next === 'italic');
+          italic.classList.toggle('fpd-enabled', next === 'italic');
+          return;
+        }
+
+        const underline = raw.closest(
+          '#UnderlineText, .fpd-tool-text-underline'
+        ) as HTMLElement | null;
+        if (
+          underline &&
+          underline.closest('.fpd-tools-nav') &&
+          !underline.closest('.fpd-sub-panel')
+        ) {
+          e.preventDefault();
+          e.stopPropagation();
+          const canvas = getCanvas();
+          const obj = getObj();
+          if (!canvas || !obj) return;
+          const next = !obj.underline;
+          canvas.setElementOptions({ underline: next }, obj);
+          underline.classList.toggle('active', next);
+          underline.classList.toggle('fpd-enabled', next);
+          return;
+        }
+
+        const textTransform = raw.closest(
+          '#TextTransform, .fpd-tool-text-transform'
+        ) as HTMLElement | null;
+        if (
+          textTransform &&
+          textTransform.closest('.fpd-tools-nav') &&
+          !textTransform.closest('.fpd-sub-panel')
+        ) {
+          e.preventDefault();
+          e.stopPropagation();
+          const canvas = getCanvas();
+          const obj = getObj();
+          if (!canvas || !obj || obj.text == null) return;
+          const spanIcon = textTransform.querySelector(
+            'span:not(.fpd-label):not(.fpd-ate-tool-caption)'
+          );
+          const current = obj.textTransform || 'none';
+          const next =
+            current === 'none'
+              ? 'uppercase'
+              : current === 'uppercase'
+                ? 'lowercase'
+                : 'none';
+          canvas.setElementOptions({ textTransform: next }, obj);
+          if (spanIcon) {
+            spanIcon.className =
+              next === 'uppercase'
+                ? 'fpd-icon-uppercase'
+                : next === 'lowercase'
+                  ? 'fpd-icon-lowercase'
+                  : 'dd fpd-icon-text-transform tts';
+          }
+          textTransform.classList.toggle('active', next !== 'none');
+          return;
+        }
+      },
+      true
+    );
   }
 
   /**

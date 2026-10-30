@@ -1,0 +1,108 @@
+/*
+  Desktop Add Text Editor — isolated fpd-dte-* only.
+  Hard scope (ALL required):
+    fpd-element-toolbar.fpd-dte-editor.fpd-layout-large
+    :not(.fpd-layout-small):not(.fpd-ate-editor)
+  Never matches mobile Add Text (fpd-ate-* / fpd-layout-small).
+  Does not modify styles.scss, fpd-doc-fixes.css, or fpd-add-text-editor.css.
+*/
+
+fpd-element-toolbar.fpd-dte-editor.fpd-layout-large:not(.fpd-layout-small):not(
+    .fpd-ate-editor
+  )[data-element-type='text']
+  #fpd-opacity-btn,
+fpd-element-toolbar.fpd-dte-editor.fpd-layout-large:not(.fpd-layout-small):not(
+    .fpd-ate-editor
+  )[data-element-type='text']
+  #fpd-opacity-btn.fpd-dte-opacity-btn {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  pointer-events: auto !important;
+  visibility: visible !important;
+}
+
+/* Beat body .fpd-hidden { pointer-events: none } for desktop text tools */
+fpd-element-toolbar.fpd-dte-editor.fpd-layout-large:not(.fpd-layout-small):not(
+    .fpd-ate-editor
+  )
+  #boldOutside,
+fpd-element-toolbar.fpd-dte-editor.fpd-layout-large:not(.fpd-layout-small):not(
+    .fpd-ate-editor
+  )
+  #boldOutside.fpd-hidden,
+fpd-element-toolbar.fpd-dte-editor.fpd-layout-large:not(.fpd-layout-small):not(
+    .fpd-ate-editor
+  )
+  .fpd-tool-text-bold,
+fpd-element-toolbar.fpd-dte-editor.fpd-layout-large:not(.fpd-layout-small):not(
+    .fpd-ate-editor
+  )
+  #fontItalic,
+fpd-element-toolbar.fpd-dte-editor.fpd-layout-large:not(.fpd-layout-small):not(
+    .fpd-ate-editor
+  )
+  #fontItalic.fpd-hidden,
+fpd-element-toolbar.fpd-dte-editor.fpd-layout-large:not(.fpd-layout-small):not(
+    .fpd-ate-editor
+  )
+  .fpd-tool-text-italic,
+fpd-element-toolbar.fpd-dte-editor.fpd-layout-large:not(.fpd-layout-small):not(
+    .fpd-ate-editor
+  )
+  #UnderlineText,
+fpd-element-toolbar.fpd-dte-editor.fpd-layout-large:not(.fpd-layout-small):not(
+    .fpd-ate-editor
+  )
+  #UnderlineText.fpd-hidden,
+fpd-element-toolbar.fpd-dte-editor.fpd-layout-large:not(.fpd-layout-small):not(
+    .fpd-ate-editor
+  )
+  .fpd-tool-text-underline,
+fpd-element-toolbar.fpd-dte-editor.fpd-layout-large:not(.fpd-layout-small):not(
+    .fpd-ate-editor
+  )
+  #TextTransform,
+fpd-element-toolbar.fpd-dte-editor.fpd-layout-large:not(.fpd-layout-small):not(
+    .fpd-ate-editor
+  )
+  #TextTransform.fpd-hidden,
+fpd-element-toolbar.fpd-dte-editor.fpd-layout-large:not(.fpd-layout-small):not(
+    .fpd-ate-editor
+  )
+  #letter-spacing,
+fpd-element-toolbar.fpd-dte-editor.fpd-layout-large:not(.fpd-layout-small):not(
+    .fpd-ate-editor
+  )
+  #textAlignCust,
+fpd-element-toolbar.fpd-dte-editor.fpd-layout-large:not(.fpd-layout-small):not(
+    .fpd-ate-editor
+  )
+  #CenterTools,
+fpd-element-toolbar.fpd-dte-editor.fpd-layout-large:not(.fpd-layout-small):not(
+    .fpd-ate-editor
+  )
+  #minusElement,
+fpd-element-toolbar.fpd-dte-editor.fpd-layout-large:not(.fpd-layout-small):not(
+    .fpd-ate-editor
+  )
+  #plusElement,
+fpd-element-toolbar.fpd-dte-editor.fpd-layout-large:not(.fpd-layout-small):not(
+    .fpd-ate-editor
+  )
+  #fpd-opacity-btn {
+  pointer-events: auto !important;
+  cursor: pointer;
+}
+
+fpd-element-toolbar.fpd-dte-editor.fpd-layout-large:not(.fpd-layout-small):not(
+    .fpd-ate-editor
+  )
+  #fpd-opacity-panel,
+fpd-element-toolbar.fpd-dte-editor.fpd-layout-large:not(.fpd-layout-small):not(
+    .fpd-ate-editor
+  )
+  #fpd-opacity-range {
+  pointer-events: auto !important;
+}
