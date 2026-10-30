@@ -1365,7 +1365,7 @@
               return;
             }
 
-            const response = await fetch(`https://styleflip-backend-jdm5.ithemes.xyz/api/sharedproduct/search?title=${encodeURIComponent(titleParam)}&design_id=${encodeURIComponent(idParam)}`);
+            const response = await fetch(`/api/sharedproduct/search?title=${encodeURIComponent(titleParam)}&design_id=${encodeURIComponent(idParam)}`);
             if (!response.ok) {
               throw new Error('Saved design request failed: ' + response.status);
             }
@@ -4507,10 +4507,11 @@
           dots.className =
             'fpd-elements-dot-menu absolute top-0 right-0 z-10 px-2 text-lg font-bold text-black rounded-full cursor-pointer top-1 right-1 bg-opacity-40'
 
-          // Tooltip container
+          // Tooltip on body (not inside the grid cell) so overflow/clipping
+          // after copy/paste doesn't make ⋯ clicks look dead.
           const tooltip = document.createElement('div')
           tooltip.className =
-            'fixed bg-white text-black text-sm ml-[80px] p-2 rounded shadow-md hidden z-[999] border border-[#ccc] border-solid rounded-[6px] shadow-custom-light '
+            'fpd-doc-elements-tooltip fixed bg-white text-black text-sm p-2 rounded shadow-md hidden z-[9999] border border-[#ccc] border-solid rounded-[6px] shadow-custom-light'
 
           // Sample fallback tags if img.tags doesn't exist
           const tagsArray = imgSrc.tags || [
@@ -4546,11 +4547,12 @@
 
           // Add tooltip to the global list
           allTooltips.push(tooltip)
+          document.body.appendChild(tooltip)
 
           // Toggle visibility and close others
           dots.addEventListener('click', e => {
             e.stopPropagation()
-            ;
+            e.preventDefault()
             // Close all other tooltips
             allTooltips.forEach(tip => {
               if (tip !== tooltip) {
@@ -4558,15 +4560,20 @@
               }
             })
             const parent = e.currentTarget.closest('.fpd-active')
-            ;
             if (parent) {
               parent.classList.toggle('backdrop-test')
-              ;
               localStorage.setItem('fpdMenuClicked', 'true')
             }
 
-            // Toggle this one
-            tooltip.classList.toggle('hidden')
+            const willShow = tooltip.classList.contains('hidden')
+            if (willShow) {
+              const rect = dots.getBoundingClientRect()
+              tooltip.style.left = `${Math.round(rect.right + 8)}px`
+              tooltip.style.top = `${Math.round(rect.top)}px`
+              tooltip.classList.remove('hidden')
+            } else {
+              tooltip.classList.add('hidden')
+            }
           })
 
           // Optional: Hide tooltip if user clicks outside
@@ -4576,7 +4583,6 @@
 
           div.appendChild(picture)
           div.appendChild(dots)
-          div.appendChild(tooltip)
 
           if (index < 3) {
             visibleImagesContainer.appendChild(div)

@@ -1276,9 +1276,10 @@
             buttonShare.addEventListener('click', function (e) {
               e.stopPropagation();
 
-              fetch(`https://styleflip-backend-jdm5.ithemes.xyz/api/sharedproduct/search?title=${encodeURIComponent(t.title)}&design_id=${t?.design_id}`, {
-                method: 'GET',
-                headers: { 'Content-Type': 'application/json' }
+              // Same-origin /api avoids CORS; never send Content-Type on GET
+              // (that forces a preflight many customer networks block).
+              fetch(`/api/sharedproduct/search?title=${encodeURIComponent(t.title)}&design_id=${encodeURIComponent(t?.design_id ?? '')}`, {
+                method: 'GET'
               })
                 .then(response => response.json())
                 .then(data => {
@@ -1882,9 +1883,8 @@
                 buttonShare.addEventListener('click', function (e) {
                   e.stopPropagation();
 
-                  fetch(`https://styleflip-backend-jdm5.ithemes.xyz/api/sharedproduct/search?title=${encodeURIComponent(t.title)}&design_id=${t?.design_id}`, {
-                    method: 'GET',
-                    headers: { 'Content-Type': 'application/json' }
+                  fetch(`/api/sharedproduct/search?title=${encodeURIComponent(t.title)}&design_id=${encodeURIComponent(t?.design_id ?? '')}`, {
+                    method: 'GET'
                   })
                     .then(response => response.json())
                     .then(data => {
@@ -5254,6 +5254,19 @@
                   (t.hasControls = !0))),
               (t.borderColor = 'transparent'),
               (t.excludeFromExport = !0)),
+            // Info / Base / Overlay are product chrome — never move or stretch
+            // in customer mode (Google Doc desktop item 2). Applied after the
+            // unlock block so those flags cannot reopen the locks.
+            !this.viewOptions.editorMode &&
+              e.title &&
+              ['Info', 'Base', 'Overlay'].includes(e.title) &&
+              ((t.draggable = t.resizable = t.rotatable = !1),
+              (t.lockMovementX = t.lockMovementY = !0),
+              (t.lockScalingX = t.lockScalingY = !0),
+              (t.lockRotation = !0),
+              (t.hasControls = !1),
+              'Info' === e.title &&
+                ((t.evented = !1), (t.selectable = !1), (t.isEditable = !1))),
             t.fixed && Q(t.replace) && (t.replace = e.title),
             !this.viewOptions.editorMode && t.replace && '' != t.replace)
           ) {
@@ -5407,7 +5420,22 @@
             (void 0 !== t.pattern && e.setPattern(t.pattern),
             e.canvas &&
               t.z >= 0 &&
-              (e.moveTo(t.z), this._bringToppedElementsToFront()),
+              (() => {
+                let z = t.z
+                const objects = e.canvas.getObjects()
+                const baseObj = objects.find(o => o.title === 'Base')
+                const overlayObj = objects.find(o => o.title === 'Overlay')
+                if (baseObj && e !== baseObj) {
+                  const baseZ = baseObj.getZIndex()
+                  if (z <= baseZ) z = baseZ + 1
+                }
+                if (overlayObj && e !== overlayObj) {
+                  const overlayZ = overlayObj.getZIndex()
+                  if (z >= overlayZ) z = overlayZ - 1
+                }
+                e.moveTo(z)
+                this._bringToppedElementsToFront()
+              })(),
             t.hasOwnProperty('curved'))
           )
             if (t.curved) {

@@ -364,6 +364,7 @@
                 i = e.getElementByID(t.id)
               let n = this.listElem.querySelector('.fpd-sortable-closest'),
                 s = e.getElementByID(n ? n.id : t.id).getZIndex()
+              // setElementOptions clamps z against Base/Overlay
               n || s++, e.setElementOptions({ z: s }, i)
             },
             onEnd: t => {

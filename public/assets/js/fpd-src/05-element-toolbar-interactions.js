@@ -510,12 +510,12 @@
                 else if ('align-center' == i)
                   t.currentElement.centerElement(!0, !1)
                 else if ('layer-up' == i || 'layer-down' == i) {
+                  // z clamp vs Base/Overlay lives only in setElementOptions
+                  // (shared with Layers drag + TextMoveUp/Down).
                   let e = t.currentElement.getZIndex()
-                  ;(e = 'layer-up' == i ? e + 1 : e - 1),
-                    (e = e < 0 ? 0 : e),
-                    t.currentViewInstance.fabricCanvas.setElementOptions({
-                      z: e
-                    })
+                  e = 'layer-up' == i ? e + 1 : e - 1
+                  e = e < 0 ? 0 : e
+                  t.currentViewInstance.fabricCanvas.setElementOptions({ z: e })
                 } else if ('flip-x' == i || 'flip-y' == i) {
                   const e = {}
                   ;
@@ -2038,10 +2038,11 @@ function updateFPDLayersToSingleGroup(group) {
                 !t.textPlaceholder && !t.numberPlaceholder
               ))
             : 'text' !== t.getType() && X(this.container, ['fpd-type-image']),
+          // Comma after console.log previously discarded the condition and
+          // always enabled advanced-editing (filters/crop) for every type.
           t.advancedEditing &&
             t.source &&
             st(t.source) &&
-            console.log("eeee1",t), 
             (Kr(this, ia, ya).call(this, 'advanced-editing'),
             Kr(this, sa, wa).call(this, 'advanced-editing', 'filters', !0),
             Kr(this, sa, wa).call(
@@ -2967,9 +2968,18 @@ function updateFPDLayersToSingleGroup(group) {
         const t = this.fpdInstance.mainOptions.responsiveBreakpoints
         let e
         var i, n, s
+        // Phone landscape: width often exceeds the small breakpoint (768)
+        // and flipped the UI to desktop. Use the short side only for short
+        // landscape viewports so portrait phones and real desktops are unchanged.
+        const isShortLandscape =
+          window.matchMedia('(orientation: landscape) and (max-height: 560px)')
+            .matches
+        const layoutWidth = isShortLandscape
+          ? Math.min(window.innerWidth, window.innerHeight)
+          : window.innerWidth
         ;(i = this),
           (n = co),
-          (s = window.innerWidth),
+          (s = layoutWidth),
           (function (t, e, i) {
             if (e.set) e.set.call(t, i)
             else {
@@ -2992,6 +3002,10 @@ function updateFPDLayersToSingleGroup(group) {
               this.fpdInstance.container.classList.remove('fpd-layout-small'),
               this.fpdInstance.container.classList.add('fpd-layout-large'),
               (e = 'large')),
+          document.documentElement.classList.toggle(
+            'fpd-doc-landscape-sheet',
+            isShortLandscape && e === 'small'
+          ),
           (this.fpdInstance.container.dataset.layout = e),
           e != this.currentLayout &&
             ((this.currentLayout = e),

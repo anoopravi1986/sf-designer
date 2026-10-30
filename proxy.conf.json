@@ -4,5 +4,11 @@
     "secure": true,
     "changeOrigin": true,
     "logLevel": "debug"
+  },
+  "/api": {
+    "target": "https://styleflip-backend-jdm5.ithemes.xyz",
+    "secure": true,
+    "changeOrigin": true,
+    "logLevel": "debug"
   }
 }

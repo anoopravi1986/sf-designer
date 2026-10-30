@@ -384,6 +384,10 @@ export class HomeComponent implements AfterViewInit {
     // reintroducing that hover dependency.
     document.addEventListener('click', (e: any) => {
       const item = e.target?.closest?.('.fpd-item');
+      // Clear sticky taps on siblings so only the current item shows ⋯
+      document.querySelectorAll('.fpd-item.fpd-dot-menu-tapped').forEach((el) => {
+        if (el !== item) el.classList.remove('fpd-dot-menu-tapped');
+      });
       if (item?.querySelector(':scope > .fpd-dot-menu, :scope > .fpd-three-dot-menu, :scope > .fpd-elements-dot-menu')) {
         item.classList.add('fpd-dot-menu-tapped');
       }
@@ -722,7 +726,12 @@ export class HomeComponent implements AfterViewInit {
 
       this.moveBoldToPrimaryTools()
       this.mergeTextFormatIntoSecondaryTools()
+      this.bindAddTextEditorActions()
       this.fixRotateAroundCenter()
+      this.applyDocOptInToolbarClasses()
+      // Re-stamp after FPD finishes layout-small / toolbar rebuilds
+      setTimeout(() => this.applyDocOptInToolbarClasses(), 1000)
+      setTimeout(() => this.applyDocOptInToolbarClasses(), 2500)
     }, 3000);
     createIcons({ icons });
 
@@ -787,7 +796,7 @@ export class HomeComponent implements AfterViewInit {
       const closeOpacityPanel = () => {
         panel.style.display = 'none';
         btnOpacity.classList.remove('fpd-active');
-        opacityToolbarEl?.classList.remove('fpd-opacity-open');
+        opacityToolbarEl?.classList.remove('fpd-opacity-open', 'fpd-doc-opacity-dock');
       };
 
       // The chevron/down-arrow above the toolbar (vendor's `.fpd-close`)
@@ -813,19 +822,45 @@ export class HomeComponent implements AfterViewInit {
         true
       );
 
-      function updateSliderProgress() {
-        const percent = (parseFloat(sliderOpacity.value) / parseFloat(sliderOpacity.max)) * 100;
+      // Same control stack as Color > Fill opacity:
+      //   .fpd-input > fpd-range-slider.fpd-progress + .fpd-slider-number
+      let docRangeSlider: HTMLElement | null = null;
+      let docRangeInput: HTMLInputElement | null = null;
+      let docNumberInput: HTMLInputElement | null = null;
+
+      const syncLegacyRange = (value: number) => {
+        sliderOpacity.value = value.toFixed(2);
+        const percent = (value / parseFloat(sliderOpacity.max || '1')) * 100;
         sliderOpacity.style.setProperty('--progress', percent + '%');
-        const valueLabel = document.getElementById('fpd-opacity-value');
-        if (valueLabel) {
-          valueLabel.textContent = String(Math.round(percent));
+      };
+
+      const syncDocSliderUi = (value: number) => {
+        const v = value.toFixed(2);
+        if (docRangeSlider) {
+          docRangeSlider.setAttribute('value', v);
         }
+        if (docRangeInput) {
+          docRangeInput.value = v;
+          docRangeInput.style.setProperty('--value', v);
+          docRangeInput.style.setProperty('--min', '0');
+          docRangeInput.style.setProperty('--max', '1');
+        }
+        if (docNumberInput) {
+          docNumberInput.value = v;
+        }
+      };
+
+      function updateSliderProgress() {
+        const value = parseFloat(sliderOpacity.value);
+        syncLegacyRange(value);
+        syncDocSliderUi(value);
       }
 
-      const setOpacityValue = (value: number) => {
+      const setOpacityValue = (value: number, applyToObject = true) => {
         value = Math.min(1, Math.max(0, value));
-        sliderOpacity.value = value.toFixed(2);
-        updateSliderProgress();
+        syncLegacyRange(value);
+        syncDocSliderUi(value);
+        if (!applyToObject) return;
         const canvas = this.designer.currentViewInstance.fabricCanvas;
         const obj = canvas.getActiveObject();
         if (!obj) return;
@@ -834,51 +869,130 @@ export class HomeComponent implements AfterViewInit {
         canvas.fire('object:modified', { target: obj });
       };
 
-      // Mobile-only: centered bold "Opacity" title with a close (X) button,
-      // a second row with the "Opacity" label on the left and the +/-
-      // stepper on the right, and a slider that spans the full sheet width
-      // (see styles.scss for the matching layout), and let text elements
-      // use this flyout instead of the vendor's inline Transparency slider
-      // in the Fill tab (see the [data-element-type="text"] override
-      // there). Desktop markup/behaviour is untouched.
-      if (
-        window.matchMedia('(max-width: 768px)').matches &&
-        !panel.querySelector('.fpd-opacity-stepper-row')
-      ) {
-        const existingLabel = panel.querySelector('span.fpd-label');
-        existingLabel?.classList.add('fpd-opacity-panel-title');
-
-        if (existingLabel && existingLabel.parentElement === panel) {
-          const titleRow = document.createElement('div');
-          titleRow.className = 'fpd-opacity-title-row';
-          panel.insertBefore(titleRow, existingLabel);
-          titleRow.appendChild(existingLabel);
+      // Mobile-only: bottom sheet title + Color-identical slider/number row.
+      // Reuses fpd-range-slider / fpd-slider-number so the thumb/track match
+      // Color (and Transform) instead of the custom padded #fpd-opacity-range.
+      if (window.matchMedia('(max-width: 768px)').matches) {
+        panel.classList.add('fpd-doc-opacity-sheet');
+        btnOpacity.classList.add('fpd-doc-labeled-opacity', 'fpd-doc-uniform-tool');
+        if (!btnOpacity.querySelector('.fpd-doc-opacity-label')) {
+          const lab = document.createElement('span');
+          lab.className = 'fpd-doc-opacity-label';
+          lab.textContent = 'Opacity';
+          btnOpacity.appendChild(lab);
+        } else {
+          const lab = btnOpacity.querySelector(
+            '.fpd-doc-opacity-label'
+          ) as HTMLElement;
+          lab.textContent = 'Opacity';
+          btnOpacity.appendChild(lab);
         }
 
-        const stepperRow = document.createElement('div');
-        stepperRow.className = 'fpd-opacity-stepper-row';
-        stepperRow.innerHTML = `<span class="fpd-opacity-row-label">Opacity</span>`;
-        const stepper = document.createElement('div');
-        stepper.className = 'fpd-opacity-stepper';
-        stepper.innerHTML = `
-          <button type="button" class="fpd-opacity-minus" aria-label="Decrease opacity">&minus;</button>
-          <span id="fpd-opacity-value" class="fpd-opacity-value">100</span>
-          <button type="button" class="fpd-opacity-plus" aria-label="Increase opacity">+</button>
-        `;
-        stepperRow.appendChild(stepper);
-        panel.insertBefore(stepperRow, sliderOpacity);
+        // Drop the old custom +/- stepper if a prior session injected it
+        panel.querySelector('.fpd-opacity-stepper-row')?.remove();
 
-        stepperRow.querySelector('.fpd-opacity-minus')?.addEventListener('click', (e) => {
-          e.stopPropagation();
-          setOpacityValue(parseFloat(sliderOpacity.value) - 0.01);
+        let existingLabel = panel.querySelector(
+          ':scope > span.fpd-label, .fpd-opacity-title-row > span.fpd-label'
+        ) as HTMLElement | null;
+        if (existingLabel) {
+          existingLabel.classList.add('fpd-opacity-panel-title');
+          existingLabel.textContent = 'Opacity';
+          existingLabel.setAttribute('data-defaulttext', 'Opacity');
+          if (!existingLabel.closest('.fpd-opacity-title-row')) {
+            const titleRow = document.createElement('div');
+            titleRow.className = 'fpd-opacity-title-row';
+            panel.insertBefore(titleRow, existingLabel);
+            titleRow.appendChild(existingLabel);
+          }
+        }
+
+        let control = panel.querySelector(
+          '.fpd-doc-opacity-control'
+        ) as HTMLElement | null;
+        if (!control) {
+          control = document.createElement('div');
+          // Same layout primitives as Color > Fill opacity (.fpd-input +
+          // fpd-range-slider + .fpd-slider-number). Do NOT add
+          // .fpd-tool-fill-opacity — mobile text rules hide that class
+          // when it is not #fpd-opacity-panel itself.
+          control.className = 'fpd-doc-opacity-control fpd-input';
+
+          const fieldLabel = document.createElement('span');
+          fieldLabel.className = 'fpd-label';
+          fieldLabel.textContent = 'Opacity';
+          fieldLabel.setAttribute('data-defaulttext', 'Opacity');
+
+          const rangeSlider = document.createElement('fpd-range-slider');
+          rangeSlider.className = 'fpd-progress';
+          rangeSlider.id = 'fpd-doc-opacity-slider';
+          rangeSlider.setAttribute('value', sliderOpacity.value || '1');
+          rangeSlider.setAttribute('min', '0');
+          rangeSlider.setAttribute('max', '1');
+          rangeSlider.setAttribute('step', '0.01');
+
+          const numberInput = document.createElement('input');
+          numberInput.className = 'fpd-slider-number fpd-number';
+          numberInput.type = 'number';
+          numberInput.id = 'fpd-opacity-value';
+          numberInput.min = '0';
+          numberInput.max = '1';
+          numberInput.step = '0.01';
+          numberInput.value = sliderOpacity.value || '1';
+
+          control.append(fieldLabel, rangeSlider, numberInput);
+          panel.appendChild(control);
+        }
+
+        docRangeSlider = panel.querySelector(
+          '#fpd-doc-opacity-slider'
+        ) as HTMLElement | null;
+        docNumberInput = panel.querySelector(
+          '#fpd-opacity-value'
+        ) as HTMLInputElement | null;
+
+        // Hide the legacy raw range — Color uses fpd-range-slider instead
+        sliderOpacity.classList.add('fpd-doc-opacity-range-legacy');
+        sliderOpacity.setAttribute('aria-hidden', 'true');
+
+        const bindDocSlider = () => {
+          docRangeInput =
+            (docRangeSlider?.querySelector(
+              'input[type="range"]'
+            ) as HTMLInputElement | null) || null;
+          if (!docRangeInput || (docRangeInput as any)._fpdDocBound) return;
+          (docRangeInput as any)._fpdDocBound = true;
+          docRangeInput.addEventListener('input', () => {
+            setOpacityValue(parseFloat(docRangeInput!.value));
+          });
+        };
+        bindDocSlider();
+        // Custom element may append its <input> after connectedCallback
+        setTimeout(bindDocSlider, 0);
+        setTimeout(bindDocSlider, 100);
+
+        docNumberInput?.addEventListener('change', () => {
+          setOpacityValue(parseFloat(docNumberInput!.value || '0'));
         });
-        stepperRow.querySelector('.fpd-opacity-plus')?.addEventListener('click', (e) => {
-          e.stopPropagation();
-          setOpacityValue(parseFloat(sliderOpacity.value) + 0.01);
+        docNumberInput?.addEventListener('input', () => {
+          const n = parseFloat(docNumberInput!.value);
+          if (Number.isFinite(n)) {
+            setOpacityValue(n);
+          }
         });
       }
 
-      btnOpacity.addEventListener('click', () => {
+      btnOpacity.addEventListener('click', (e) => {
+        // Stop the document-level outside-click closer from treating this
+        // same tap as an outside click (can close the sheet immediately).
+        e.stopPropagation();
+        // Add Text mobile: capture handler in bindAddTextEditorActions owns
+        // the toggle — skip here so we don't open-then-immediately-close.
+        if (
+          opacityToolbarEl?.classList.contains('fpd-ate-editor') &&
+          opacityToolbarEl?.classList.contains('fpd-layout-small')
+        ) {
+          return;
+        }
         if (targetSection) {
           const activeElem = targetSection.querySelector('.fpd-active');
 
@@ -886,45 +1000,35 @@ export class HomeComponent implements AfterViewInit {
             activeElem.classList.remove('fpd-active');
           }
         }
-        ;
-        panel.style.display =
-          panel.style.display === 'block' ? 'none' : 'block';
-        if (panel.style.display === 'block') {
+        const willOpen =
+          !opacityToolbarEl?.classList.contains('fpd-opacity-open') &&
+          panel.style.display !== 'block';
+        if (willOpen) {
+          panel.style.display = 'block';
           btnOpacity.classList.add('fpd-active');
-          opacityToolbarEl?.classList.add('fpd-opacity-open');
+          opacityToolbarEl?.classList.add(
+            'fpd-opacity-open',
+            'fpd-doc-opacity-dock',
+            'fpd-show'
+          );
         } else {
-          btnOpacity.classList.remove('fpd-active');
-          opacityToolbarEl?.classList.remove('fpd-opacity-open');
+          closeOpacityPanel();
         }
         const canvas = this.designer.currentViewInstance.fabricCanvas;
         const obj = canvas.getActiveObject();
 
         if (obj) {
-          sliderOpacity.value = obj.opacity ?? 1;
-          updateSliderProgress();
+          setOpacityValue(obj.opacity ?? 1, false);
         }
       });
       sliderOpacity.addEventListener('input', () => {
-        updateSliderProgress();
-        const canvas = this.designer.currentViewInstance.fabricCanvas;
-        const obj = canvas.getActiveObject();
-        if (!obj) return;
-
-        obj.set('opacity', parseFloat(sliderOpacity.value));
-
-        canvas.requestRenderAll();
-
-        canvas.fire('object:modified', { target: obj });
-
+        setOpacityValue(parseFloat(sliderOpacity.value));
       });
 
       document.addEventListener('click', (e: any) => {
-        if (
-          !panel.contains(e.target) &&
-          !btnOpacity.contains(e.target)
-        ) {
-          closeOpacityPanel();
-        }
+        if (!opacityToolbarEl?.classList.contains('fpd-opacity-open')) return;
+        if (panel.contains(e.target) || btnOpacity.contains(e.target)) return;
+        closeOpacityPanel();
       });
     }, 5000);
     setTimeout(() => {
@@ -1470,51 +1574,48 @@ export class HomeComponent implements AfterViewInit {
 
     if (targetElement) {
       targetElement.addEventListener('click', (event) => {
+        event.stopPropagation();
+        const obj =
+          this.designer.currentViewInstance.fabricCanvas.getActiveObject();
+        if (!obj) return;
+        const weight = String(obj.fontWeight || 'normal').toLowerCase();
+        const next =
+          weight === 'bold' || weight === '700' ? 'normal' : 'bold';
         this.designer.currentViewInstance.fabricCanvas.setElementOptions({
-          fontWeight:
-            this.designer.currentViewInstance.fabricCanvas.getActiveObject().fontWeight === 'bold'
-              ? 'normal'
-              : 'bold',
+          fontWeight: next,
         });
-
-        targetElement.classList.toggle(
-          'active',
-          this.designer.currentViewInstance.fabricCanvas.getActiveObject().fontWeight === 'bold'
-        );
+        targetElement.classList.toggle('active', next === 'bold');
       });
     }
 
     const targetElement2 = document.getElementById('fontItalic');
     if (targetElement2) {
-      targetElement2.addEventListener('click', () => {
+      targetElement2.addEventListener('click', (event) => {
+        event.stopPropagation();
+        const obj =
+          this.designer.currentViewInstance.fabricCanvas.getActiveObject();
+        if (!obj) return;
+        const next = obj.fontStyle === 'italic' ? 'normal' : 'italic';
         this.designer.currentViewInstance.fabricCanvas.setElementOptions({
-          fontStyle:
-            this.designer.currentViewInstance.fabricCanvas.getActiveObject().fontStyle === 'italic'
-              ? 'normal'
-              : 'italic',
+          fontStyle: next,
         });
-
-        targetElement2.classList.toggle(
-          'active',
-          this.designer.currentViewInstance.fabricCanvas.getActiveObject().fontStyle === 'italic'
-        );
+        targetElement2.classList.toggle('active', next === 'italic');
       });
     }
 
     const targetElement3 = document.getElementById('UnderlineText');
     if (targetElement3) {
-      targetElement3.addEventListener('click', () => {
+      targetElement3.addEventListener('click', (event) => {
+        event.stopPropagation();
+        // Fabric text uses boolean `underline`, not CSS `textDecoration`.
+        const obj =
+          this.designer.currentViewInstance.fabricCanvas.getActiveObject();
+        if (!obj) return;
+        const next = !obj.underline;
         this.designer.currentViewInstance.fabricCanvas.setElementOptions({
-          textDecoration:
-            this.designer.currentViewInstance.fabricCanvas.getActiveObject().textDecoration === 'underline'
-              ? 'normal'
-              : 'underline',
+          underline: next,
         });
-
-        targetElement3.classList.toggle(
-          'active',
-          this.designer.currentViewInstance.fabricCanvas.getActiveObject().textDecoration === 'underline'
-        );
+        targetElement3.classList.toggle('active', next);
       });
     }
 
@@ -1557,6 +1658,16 @@ export class HomeComponent implements AfterViewInit {
 
     if (alignButton) {
       alignButton.addEventListener('click', () => {
+        // Add Text mobile: capture handler opens the align sheet instead
+        // of cycling left→center→right on each tap.
+        const tb = alignButton.closest('fpd-element-toolbar');
+        if (
+          tb?.classList.contains('fpd-ate-editor') &&
+          tb?.classList.contains('fpd-layout-small')
+        ) {
+          return;
+        }
+
         const span = alignButton.querySelector('span');
         const obj = this.designer.currentViewInstance.fabricCanvas.getActiveObject();
         if (!obj || !obj.text) return;
@@ -1669,43 +1780,24 @@ export class HomeComponent implements AfterViewInit {
     document.getElementById('TextMoveUp')?.addEventListener('click', () => {
       const canvas = this.designer.currentViewInstance.fabricCanvas;
       const obj = canvas.getActiveObject();
-      ;
       if (!obj) return;
 
-      const objects = canvas.getObjects();
-      const overlayObj = objects.find((o: any) => o.title === 'Overlay');
-
-      ;
-
+      // Same path as Arrange layer-up — setElementOptions clamps vs Overlay.
+      const nextZ = (obj.getZIndex?.() ?? canvas.getObjects().indexOf(obj)) + 1;
+      const overlayObj = canvas.getObjects().find((o: any) => o.title === 'Overlay');
       if (overlayObj) {
-        const overlayIndex = objects.indexOf(overlayObj);
-        const objIndex = objects.indexOf(obj);
-
-        ;
-
-        if (objIndex < overlayIndex - 1) {
-          canvas.bringForward(obj);
-          moveLayerRowUp(obj.id);
-        } else {
+        const overlayZ = overlayObj.getZIndex?.() ?? canvas.getObjects().indexOf(overlayObj);
+        if (nextZ >= overlayZ) {
           this.showToast('Not possible to move above Overlay layer!');
           return;
         }
-      } else {
-        canvas.bringForward(obj);
-        moveLayerRowUp(obj.id);
       }
-
+      canvas.setElementOptions({ z: nextZ }, obj);
+      moveLayerRowUp(obj.id);
       obj.setCoords();
-      ;
       canvas.fire('object:modified', { target: obj });
-      canvas.fire('elementModify', {
-        element: obj,
-        options: {}
-      })
-
+      canvas.fire('elementModify', { element: obj, options: {} });
       canvas.requestRenderAll();
-
-      ;
     });
 
     function moveLayerRowUp(elementId: string) {
@@ -1747,39 +1839,34 @@ export class HomeComponent implements AfterViewInit {
       const obj = canvas.getActiveObject();
       if (!obj) return;
 
-      ;
-
-      const baseObj = canvas.getObjects().find((o: any) => o.title === "Base");
-
+      // Same path as Arrange layer-down — setElementOptions clamps vs Base.
+      const nextZ = (obj.getZIndex?.() ?? canvas.getObjects().indexOf(obj)) - 1;
+      const baseObj = canvas.getObjects().find((o: any) => o.title === 'Base');
       if (baseObj) {
-        const baseIndex = canvas.getObjects().indexOf(baseObj);
-        const objIndex = canvas.getObjects().indexOf(obj);
-
-        if (objIndex > baseIndex + 1) {
-          canvas.sendBackwards(obj);
-          moveLayerRowDown(obj.id);
-        } else {
-          this.showToast("Reached just above base, not moving further down.");
+        const baseZ = baseObj.getZIndex?.() ?? canvas.getObjects().indexOf(baseObj);
+        if (nextZ <= baseZ) {
+          this.showToast('Reached just above base, not moving further down.');
+          return;
         }
-      } else {
-        canvas.sendBackwards(obj);
-        moveLayerRowDown(obj.id);
       }
-
+      canvas.setElementOptions({ z: Math.max(0, nextZ) }, obj);
+      moveLayerRowDown(obj.id);
       canvas.requestRenderAll();
-
     });
 
     const minusEl = document.getElementById('minusElement');
     const plusEl = document.getElementById('plusElement');
 
     if (minusEl) {
-      minusEl.addEventListener('click', () => {
+      minusEl.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
         const inputEl = document.querySelector('input[data-control="fontSize"]') as HTMLInputElement;
         if (inputEl) {
           let current = parseInt(inputEl.value) || 1;
           current = Math.max(1, current - 1);
           inputEl.value = String(current);
+          inputEl.dispatchEvent(new Event('change', { bubbles: true }));
 
           this.designer.currentViewInstance.fabricCanvas.setElementOptions({
             fontSize: current,
@@ -1789,12 +1876,15 @@ export class HomeComponent implements AfterViewInit {
     }
 
     if (plusEl) {
-      plusEl.addEventListener('click', () => {
+      plusEl.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
         const inputEl = document.querySelector('input[data-control="fontSize"]') as HTMLInputElement;
         if (inputEl) {
           let current = parseInt(inputEl.value) || 1;
           current = Math.min(200, current + 1);
           inputEl.value = String(current);
+          inputEl.dispatchEvent(new Event('change', { bubbles: true }));
 
           this.designer.currentViewInstance.fabricCanvas.setElementOptions({
             fontSize: current,
@@ -2122,11 +2212,8 @@ export class HomeComponent implements AfterViewInit {
         return;
       }
 
-      fetch(`https://styleflip-backend-jdm5.ithemes.xyz/api/sharedproduct/search?title=${encodeURIComponent(dataTitle)}&design_id=${matchedData[0]?.design_id}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json'
-        }
+      fetch(`/api/sharedproduct/search?title=${encodeURIComponent(dataTitle)}&design_id=${encodeURIComponent(matchedData[0]?.design_id ?? '')}`, {
+        method: 'GET'
       })
         .then(response => response.json())
         .then(data => {
@@ -2301,22 +2388,1088 @@ export class HomeComponent implements AfterViewInit {
     if (!icons.length) return;
 
     const isMobileLayout = () => window.matchMedia('(max-width: 768px)').matches;
+    const isTextElementSelected = () => {
+      const toolbar = document.querySelector('fpd-element-toolbar') as HTMLElement | null;
+      return toolbar?.getAttribute('data-element-type') === 'text';
+    };
 
     const placeTextFormatIcons = () => {
-      if (isMobileLayout()) {
+      // Text-only controls must not appear for image/group on mobile.
+      if (isMobileLayout() && isTextElementSelected()) {
         if (icons[0].parentElement !== secondaryTools) {
           const insertionPoint = secondaryTools.firstElementChild;
           icons.forEach((icon) => secondaryTools.insertBefore(icon, insertionPoint));
           originalPanel.style.display = 'none';
         }
-      } else if (icons[0].parentElement !== textFormatGroup) {
-        icons.forEach((icon) => textFormatGroup.appendChild(icon));
-        originalPanel.style.display = '';
+        icons.forEach((icon) => { icon.style.display = ''; });
+      } else {
+        if (icons[0].parentElement !== textFormatGroup) {
+          icons.forEach((icon) => textFormatGroup.appendChild(icon));
+        }
+        originalPanel.style.display = isMobileLayout() ? 'none' : '';
+        if (isMobileLayout() && !isTextElementSelected()) {
+          icons.forEach((icon) => { icon.style.display = 'none'; });
+        } else {
+          icons.forEach((icon) => { icon.style.display = ''; });
+        }
       }
     };
 
     placeTextFormatIcons();
-    window.addEventListener('resize', placeTextFormatIcons);
+    window.addEventListener('resize', () => {
+      placeTextFormatIcons();
+      this.applyDocOptInToolbarClasses();
+    });
+    const toolbar = document.querySelector('fpd-element-toolbar');
+    if (toolbar) {
+      // Ignore opacity sheet chrome class toggles — re-stamping mid-open
+      // was collapsing the Opacity panel right after it opened.
+      const opacityChrome = new Set([
+        'fpd-opacity-open',
+        'fpd-doc-opacity-dock',
+      ]);
+      new MutationObserver((mutations) => {
+        const meaningful = mutations.some((m) => {
+          if (m.type !== 'attributes') return true;
+          if (m.attributeName !== 'class') return true;
+          const el = m.target as HTMLElement;
+          const prev = (m.oldValue || '').split(/\s+/).filter(Boolean);
+          const next = Array.from(el.classList);
+          const added = next.filter((c) => !prev.includes(c));
+          const removed = prev.filter((c) => !next.includes(c));
+          const delta = [...added, ...removed];
+          return delta.some((c) => !opacityChrome.has(c));
+        });
+        if (!meaningful) return;
+        placeTextFormatIcons();
+        this.applyDocOptInToolbarClasses();
+      }).observe(toolbar, {
+        attributes: true,
+        attributeFilter: ['data-element-type', 'class', 'data-fabric-type'],
+        attributeOldValue: true,
+      });
+    }
+    document.addEventListener('uiLayoutChange', () => {
+      this.applyDocOptInToolbarClasses();
+    });
+  }
+
+  /**
+   * Stamp NEW opt-in classes only (fpd-doc-* for Element Editor,
+   * fpd-ate-* for Add Text Editor). Uniform size + label under every
+   * visible mobile tool icon. Desktop is cleared and left untouched.
+   */
+  applyDocOptInToolbarClasses(): void {
+    const toolbar = document.querySelector(
+      'fpd-element-toolbar'
+    ) as HTMLElement | null;
+    // Don't rebuild tool stamps while Opacity sheet is open — the class
+    // mutation from opening used to re-enter here and kill the panel.
+    if (toolbar?.classList.contains('fpd-opacity-open')) return;
+
+    const container = document.querySelector('.fpd-container');
+    // Follow FPD's layout-small (incl. phone landscape), not only CSS width —
+    // otherwise labels are cleared when width > 768 even though the mobile
+    // toolbar is still showing (Transform/Color appear unlabeled).
+    const isMobileUi =
+      !!toolbar?.classList.contains('fpd-layout-small') ||
+      !!container?.classList.contains('fpd-layout-small') ||
+      window.matchMedia('(max-width: 768px)').matches;
+
+    const clearDocToolClasses = () => {
+      document
+        .querySelectorAll(
+          '.fpd-doc-uniform-tool, .fpd-doc-tool-label, .fpd-doc-layer-group, .fpd-doc-btn-group, .fpd-doc-show-duplicate, .fpd-doc-size-tool, .fpd-doc-copy-paste-row'
+        )
+        .forEach((el) => {
+          el.classList.remove(
+            'fpd-doc-uniform-tool',
+            'fpd-doc-tool-label',
+            'fpd-doc-layer-group',
+            'fpd-doc-btn-group',
+            'fpd-doc-show-duplicate',
+            'fpd-doc-size-tool',
+            'fpd-doc-copy-paste-row'
+          );
+        });
+    };
+
+    const clearAteToolClasses = () => {
+      document
+        .querySelectorAll(
+          '.fpd-ate-editor, .fpd-ate-uniform-tool, .fpd-ate-tool-label, .fpd-ate-layer-group, .fpd-ate-btn-group, .fpd-ate-show-duplicate, .fpd-ate-size-tool, .fpd-ate-size-wrap, .fpd-ate-copy-paste-row, .fpd-ate-tool-shell, .fpd-ate-labeled-opacity, .fpd-ate-fonts-scroll, .fpd-ate-font-panel, .fpd-ate-font-cell, .fpd-ate-font-preview, .fpd-ate-position-panel, .fpd-ate-position-align-grid, .fpd-ate-position-arrange-grid, .fpd-ate-position-tabs, .fpd-ate-position-tabs-content'
+        )
+        .forEach((el) => {
+          el.classList.remove(
+            'fpd-ate-editor',
+            'fpd-ate-uniform-tool',
+            'fpd-ate-tool-label',
+            'fpd-ate-layer-group',
+            'fpd-ate-btn-group',
+            'fpd-ate-show-duplicate',
+            'fpd-ate-size-tool',
+            'fpd-ate-size-wrap',
+            'fpd-ate-copy-paste-row',
+            'fpd-ate-tool-shell',
+            'fpd-ate-labeled-opacity',
+            'fpd-ate-fonts-scroll',
+            'fpd-ate-font-panel',
+            'fpd-ate-font-cell',
+            'fpd-ate-font-preview',
+            'fpd-ate-position-panel',
+            'fpd-ate-position-align-grid',
+            'fpd-ate-position-arrange-grid',
+            'fpd-ate-position-tabs',
+            'fpd-ate-position-tabs-content'
+          );
+        });
+      document
+        .querySelectorAll('.fpd-ate-tool-caption, .fpd-ate-opacity-label')
+        .forEach((el) => el.remove());
+    };
+
+    if (!isMobileUi) {
+      clearDocToolClasses();
+      clearAteToolClasses();
+      return;
+    }
+
+    if (!toolbar) return;
+
+    // Add Text Editor uses its own fpd-ate-* classes (mobile only).
+    // Element Editor keeps fpd-doc-* — paths stay isolated.
+    if (toolbar.getAttribute('data-element-type') === 'text') {
+      clearDocToolClasses();
+      // Also drop leftover Element-Editor caption nodes so they can't
+      // stack under Add Text labels (Bold/Bold, Opacity/Opacity).
+      toolbar
+        .querySelectorAll(
+          '.fpd-doc-tool-caption, .fpd-doc-opacity-label'
+        )
+        .forEach((el) => el.remove());
+      this.applyAddTextEditorClasses(toolbar);
+      return;
+    }
+
+    clearAteToolClasses();
+
+    const ensureCaption = (el: Element, text: string) => {
+      const existingLabel = el.querySelector(
+        ':scope > .fpd-label'
+      ) as HTMLElement | null;
+      if (existingLabel) {
+        if (text) {
+          existingLabel.textContent = text;
+          return;
+        }
+        const def = existingLabel.getAttribute('data-defaulttext');
+        if (
+          def &&
+          (!existingLabel.textContent ||
+            existingLabel.textContent.trim().startsWith('toolbar.'))
+        ) {
+          existingLabel.textContent = def;
+        }
+        return;
+      }
+
+      let cap = el.querySelector(
+        ':scope > .fpd-doc-tool-caption'
+      ) as HTMLElement | null;
+      const dataSpan = el.querySelector(
+        ':scope > span[data-defaulttext]'
+      ) as HTMLElement | null;
+
+      if (!cap && dataSpan) {
+        dataSpan.classList.add('fpd-doc-tool-caption');
+        const def = dataSpan.getAttribute('data-defaulttext') || text;
+        dataSpan.textContent = text || def;
+        return;
+      }
+
+      if (!cap) {
+        cap = document.createElement('span');
+        cap.className = 'fpd-doc-tool-caption';
+        cap.textContent = text;
+        el.appendChild(cap);
+        return;
+      }
+
+      if (text) {
+        cap.textContent = text;
+      } else if (
+        !cap.textContent ||
+        cap.textContent.trim().startsWith('toolbar.')
+      ) {
+        /* keep existing */
+      }
+    };
+
+    const stampUniform = (el: Element, caption?: string) => {
+      el.classList.add('fpd-doc-uniform-tool', 'fpd-doc-tool-label');
+      if (caption) {
+        ensureCaption(el, caption);
+        return;
+      }
+      if (el.querySelector(':scope > .fpd-label')) {
+        ensureCaption(el, '');
+        return;
+      }
+      const title =
+        (el as HTMLElement).getAttribute('title') ||
+        (el as HTMLElement).getAttribute('data-defaulttext') ||
+        '';
+      if (title) ensureCaption(el, title);
+    };
+
+    toolbar.querySelectorAll('.fpd-tool-duplicate').forEach((el) => {
+      el.classList.add('fpd-doc-show-duplicate');
+      stampUniform(el, 'Duplicate');
+    });
+
+    // Opacity — same icon-above / label-below layout as every other tool
+    const opacityBtn = toolbar.querySelector(
+      '#fpd-opacity-btn'
+    ) as HTMLElement | null;
+    if (opacityBtn) {
+      opacityBtn.classList.add('fpd-doc-labeled-opacity', 'fpd-doc-uniform-tool');
+      let opLab = opacityBtn.querySelector(
+        '.fpd-doc-opacity-label'
+      ) as HTMLElement | null;
+      if (!opLab) {
+        opLab = document.createElement('span');
+        opLab.className = 'fpd-doc-opacity-label';
+        opLab.textContent = 'Opacity';
+        opacityBtn.appendChild(opLab);
+      } else {
+        opLab.textContent = 'Opacity';
+        opacityBtn.appendChild(opLab);
+      }
+    }
+
+    [
+      // Element editor requested labels (1, 2, 4)
+      ['.fpd-tool-color', 'Color'],
+      ['.fpd-tool-transform', 'Transform'],
+      ['.fpd-tool-position', 'Align'], // Align icon (opens Align/Arrange panel)
+      ['.fpd-tool-reset', 'Reset'],
+      ['.fpd-tool-remove', 'Remove'],
+      ['.fpd-tool-duplicate', 'Duplicate'],
+      // Other tools that already use the same stamp path
+      ['.fpd-tool-font-family', 'Font'],
+      ['.fpd-tool-edit-text', 'Edit Text'],
+      ['.fpd-tool-text-format', 'Format'],
+      ['.fpd-tool-curved-text', 'Curved Text'],
+      ['.fpd-tool-advanced-editing', 'Edit Image'],
+      ['.fpd-tool-remove-bg', 'Remove BG'],
+      ['.fpd-tool-text-bold', 'Bold'],
+      ['.fpd-tool-text-italic', 'Italic'],
+      ['.fpd-tool-text-underline', 'Underline'],
+      ['.fpd-tool-text-transform', 'Text'],
+      ['#TextTransform', 'Text'],
+      ['#letter-spacing', 'Spacing'],
+      // Group Text (⌘ four-square icon): group multiple text elements
+      ['.fpd-ungroup', 'Group'],
+      // Ungroup Text: split a grouped text set back apart
+      ['.fpd-ungroup1', 'Ungroup'],
+    ].forEach(([sel, caption]) => {
+      toolbar.querySelectorAll(sel).forEach((el) => {
+        // Skip if vendor currently hides this state of the toggle
+        if (getComputedStyle(el).display === 'none') return;
+        stampUniform(el, caption as string);
+      });
+    });
+
+    // Size stepper — wider cell + Size label
+    toolbar
+      .querySelectorAll(
+        '.fpd-tool-text-size.fpd-tool-text-size-customize, .fpd-primary-tools .fpd-tool-text-size'
+      )
+      .forEach((el) => {
+        el.classList.add('fpd-doc-size-tool');
+        ensureCaption(el, 'Size');
+      });
+
+    // Arrange icons (layer up / down)
+    toolbar.querySelectorAll('.fpd-tool-layer-depth').forEach((group) => {
+      group.classList.add('fpd-doc-layer-group');
+      group
+        .querySelectorAll(
+          ':scope > [data-do], :scope > #TextMoveUp, :scope > #TextMoveDown'
+        )
+        .forEach((btn) => {
+          const isUp =
+            btn.id === 'TextMoveUp' ||
+            btn.getAttribute('data-do') === 'layer-up';
+          // Arrange controls in the Element editor toolbar
+          stampUniform(btn, isUp ? 'Up' : 'Down');
+        });
+    });
+
+    toolbar
+      .querySelectorAll('.fpd-tool-text-align, .fpd-tool-position-align')
+      .forEach((group) => {
+        group.classList.add('fpd-doc-btn-group');
+        group
+          .querySelectorAll(':scope > [data-do], :scope > div')
+          .forEach((btn) => {
+            const doAttr = (btn as HTMLElement).getAttribute('data-do') || '';
+            const title =
+              (btn as HTMLElement).getAttribute('title') ||
+              doAttr.replace(/^align-/, '') ||
+              'Align';
+            stampUniform(
+              btn,
+              title.charAt(0).toUpperCase() + title.slice(1)
+            );
+          });
+      });
+
+    // Copy / Paste — remove shared outer box; each is a separate tool cell
+    toolbar.querySelectorAll('.groupby-text').forEach((group) => {
+      group.classList.add('fpd-doc-copy-paste-row');
+      const copy = group.querySelector('.fpd-group-copy-by');
+      const paste = group.querySelector('.fpd-group-paste-by');
+      if (copy && getComputedStyle(copy).display !== 'none') {
+        stampUniform(copy, 'Copy');
+      }
+      if (paste && getComputedStyle(paste).display !== 'none') {
+        stampUniform(paste, 'Paste');
+      }
+    });
+  }
+
+  /**
+   * Capture-phase delegation for Add Text mobile tools.
+   * Direct listeners on nodes can miss taps after merge/stamp, and
+   * body .fpd-hidden { pointer-events:none } was swallowing Size/Bold
+   * hits. One toolbar-level handler keeps every icon working.
+   */
+  bindAddTextEditorActions(): void {
+    const toolbar = document.querySelector(
+      'fpd-element-toolbar'
+    ) as HTMLElement | null;
+    if (!toolbar || (toolbar as any)._fpdAteActionsBound) return;
+    (toolbar as any)._fpdAteActionsBound = true;
+
+    const getCanvas = () =>
+      this.designer?.currentViewInstance?.fabricCanvas ?? null;
+    const getObj = () => getCanvas()?.getActiveObject?.() ?? null;
+
+    const isAteMobile = () =>
+      toolbar.classList.contains('fpd-ate-editor') &&
+      toolbar.classList.contains('fpd-layout-small');
+
+    toolbar.addEventListener(
+      'click',
+      (e: Event) => {
+        if (!isAteMobile()) return;
+        const raw = e.target as HTMLElement | null;
+        if (!raw) return;
+
+        // Opacity — handle in capture so the document outside-click closer
+        // and mid-open class re-stamps cannot immediately collapse it.
+        const opacityBtn = raw.closest('#fpd-opacity-btn') as HTMLElement | null;
+        if (
+          opacityBtn &&
+          opacityBtn.closest('.fpd-tools-nav') &&
+          !opacityBtn.closest('.fpd-sub-panel')
+        ) {
+          e.preventDefault();
+          e.stopPropagation();
+          const panel = toolbar.querySelector(
+            '#fpd-opacity-panel'
+          ) as HTMLElement | null;
+          if (!panel) return;
+
+          const isOpen =
+            toolbar.classList.contains('fpd-opacity-open') ||
+            panel.style.display === 'block';
+
+          if (isOpen) {
+            panel.style.display = 'none';
+            opacityBtn.classList.remove('fpd-active');
+            toolbar.classList.remove(
+              'fpd-opacity-open',
+              'fpd-doc-opacity-dock'
+            );
+          } else {
+            const subPanel = toolbar.querySelector('.fpd-sub-panel');
+            subPanel
+              ?.querySelectorAll(':scope > .fpd-active')
+              .forEach((el) => el.classList.remove('fpd-active'));
+            toolbar.classList.remove('fpd-panel-visible');
+            panel.style.display = 'block';
+            opacityBtn.classList.add('fpd-active');
+            toolbar.classList.add(
+              'fpd-opacity-open',
+              'fpd-doc-opacity-dock',
+              'fpd-show'
+            );
+            const canvas = getCanvas();
+            const obj = getObj();
+            const slider = panel.querySelector(
+              '#fpd-opacity-range'
+            ) as HTMLInputElement | null;
+            if (obj && slider) {
+              const value = Math.min(1, Math.max(0, obj.opacity ?? 1));
+              slider.value = value.toFixed(2);
+              slider.dispatchEvent(new Event('input', { bubbles: true }));
+            }
+          }
+          return;
+        }
+
+        // Size +/- (must run even when wrapped in .fpd-hidden)
+        const sizeBtn = raw.closest(
+          '#minusElement, #plusElement, .fpd-tool-text-size-customize-icon'
+        ) as HTMLElement | null;
+        if (sizeBtn) {
+          e.preventDefault();
+          e.stopPropagation();
+          const canvas = getCanvas();
+          const inputEl = toolbar.querySelector(
+            'input[data-control="fontSize"]'
+          ) as HTMLInputElement | null;
+          if (!canvas || !inputEl) return;
+          let current = parseInt(inputEl.value, 10) || 1;
+          const isMinus =
+            sizeBtn.id === 'minusElement' ||
+            sizeBtn.classList.contains('minus');
+          current = isMinus
+            ? Math.max(1, current - 1)
+            : Math.min(200, current + 1);
+          inputEl.value = String(current);
+          inputEl.dispatchEvent(new Event('input', { bubbles: true }));
+          inputEl.dispatchEvent(new Event('change', { bubbles: true }));
+          canvas.setElementOptions({ fontSize: current });
+          return;
+        }
+
+        const bold = raw.closest(
+          '#boldOutside, .fpd-tool-text-bold'
+        ) as HTMLElement | null;
+        if (
+          bold &&
+          bold.closest('.fpd-tools-nav') &&
+          !bold.closest('.fpd-sub-panel')
+        ) {
+          e.preventDefault();
+          e.stopPropagation();
+          const canvas = getCanvas();
+          const obj = getObj();
+          if (!canvas || !obj) return;
+          const weight = String(obj.fontWeight || 'normal').toLowerCase();
+          const next =
+            weight === 'bold' || weight === '700' ? 'normal' : 'bold';
+          canvas.setElementOptions({ fontWeight: next }, obj);
+          bold.classList.toggle('active', next === 'bold');
+          bold.classList.toggle('fpd-enabled', next === 'bold');
+          return;
+        }
+
+        const italic = raw.closest(
+          '#fontItalic, .fpd-tool-text-italic'
+        ) as HTMLElement | null;
+        if (
+          italic &&
+          italic.closest('.fpd-tools-nav') &&
+          !italic.closest('.fpd-sub-panel')
+        ) {
+          e.preventDefault();
+          e.stopPropagation();
+          const canvas = getCanvas();
+          const obj = getObj();
+          if (!canvas || !obj) return;
+          const next = obj.fontStyle === 'italic' ? 'normal' : 'italic';
+          canvas.setElementOptions({ fontStyle: next }, obj);
+          italic.classList.toggle('active', next === 'italic');
+          italic.classList.toggle('fpd-enabled', next === 'italic');
+          return;
+        }
+
+        const underline = raw.closest(
+          '#UnderlineText, .fpd-tool-text-underline'
+        ) as HTMLElement | null;
+        if (
+          underline &&
+          underline.closest('.fpd-tools-nav') &&
+          !underline.closest('.fpd-sub-panel')
+        ) {
+          e.preventDefault();
+          e.stopPropagation();
+          const canvas = getCanvas();
+          const obj = getObj();
+          if (!canvas || !obj) return;
+          const next = !obj.underline;
+          canvas.setElementOptions({ underline: next }, obj);
+          underline.classList.toggle('active', next);
+          underline.classList.toggle('fpd-enabled', next);
+          return;
+        }
+
+        const textTransform = raw.closest(
+          '#TextTransform, .fpd-tool-text-transform'
+        ) as HTMLElement | null;
+        if (
+          textTransform &&
+          textTransform.closest('.fpd-tools-nav') &&
+          !textTransform.closest('.fpd-sub-panel')
+        ) {
+          e.preventDefault();
+          e.stopPropagation();
+          const canvas = getCanvas();
+          const obj = getObj();
+          if (!canvas || !obj || obj.text == null) return;
+          const spanIcon = textTransform.querySelector(
+            'span:not(.fpd-ate-tool-caption):not(.fpd-label)'
+          );
+          const current = obj.textTransform || 'none';
+          const next =
+            current === 'none'
+              ? 'uppercase'
+              : current === 'uppercase'
+                ? 'lowercase'
+                : 'none';
+          canvas.setElementOptions({ textTransform: next }, obj);
+          if (spanIcon) {
+            spanIcon.className =
+              next === 'uppercase'
+                ? 'fpd-icon-uppercase'
+                : next === 'lowercase'
+                  ? 'fpd-icon-lowercase'
+                  : 'dd fpd-icon-text-transform tts';
+          }
+          textTransform.classList.toggle('active', next !== 'none');
+          return;
+        }
+
+        const spacing = raw.closest('#letter-spacing') as HTMLElement | null;
+        if (
+          spacing &&
+          spacing.closest('.fpd-tools-nav') &&
+          !spacing.closest('.fpd-sub-panel')
+        ) {
+          e.preventDefault();
+          e.stopPropagation();
+          document.body.classList.remove('fpd-toolbar-transform-our');
+          if (spacing.classList.contains('letter-spac-active')) {
+            toolbar.classList.remove('fpd-panel-visible');
+            spacing.classList.remove('letter-spac-active');
+            return;
+          }
+          spacing.classList.add('letter-spac-active');
+          const subPanel = toolbar.querySelector('.fpd-sub-panel');
+          if (!subPanel) return;
+          subPanel.querySelectorAll(':scope > .fpd-active').forEach((el) => {
+            el.classList.remove('fpd-active');
+          });
+          const sizePanel = subPanel.querySelector('.fpd-panel-text-size');
+          if (sizePanel) {
+            sizePanel.classList.add(
+              'fpd-active',
+              'fpd-letter-spacing-lineheight'
+            );
+            document.body.classList.remove('fpd-tools-custom-data');
+          }
+          toolbar.classList.add('fpd-panel-visible');
+          return;
+        }
+
+        // Text Align (Left) — open sheet with Left/Center/Right/Justify
+        const textAlignBtn = raw.closest(
+          '#textAlignCust, .fpd-tool-text-align'
+        ) as HTMLElement | null;
+        if (
+          textAlignBtn &&
+          textAlignBtn.closest('.fpd-tools-nav') &&
+          !textAlignBtn.closest('.fpd-sub-panel') &&
+          !raw.closest('.fpd-ate-text-align-sheet')
+        ) {
+          e.preventDefault();
+          e.stopPropagation();
+          this.toggleAteTextAlignSheet(toolbar, textAlignBtn);
+          return;
+        }
+
+        // Option inside the ate text-align sheet
+        const alignOpt = raw.closest(
+          '.fpd-ate-text-align-option'
+        ) as HTMLElement | null;
+        if (alignOpt && alignOpt.closest('.fpd-ate-text-align-sheet')) {
+          e.preventDefault();
+          e.stopPropagation();
+          const option = alignOpt.getAttribute('data-option') || 'left';
+          this.applyAteTextAlign(toolbar, option);
+          return;
+        }
+      },
+      true
+    );
+  }
+
+  /** Build / return the Add Text mobile text-align bottom sheet. */
+  ensureAteTextAlignSheet(toolbar: HTMLElement): HTMLElement | null {
+    const subPanel = toolbar.querySelector(
+      ':scope > .fpd-sub-panel'
+    ) as HTMLElement | null;
+    if (!subPanel) return null;
+
+    let sheet = subPanel.querySelector(
+      ':scope > .fpd-ate-text-align-sheet'
+    ) as HTMLElement | null;
+    if (sheet) return sheet;
+
+    sheet = document.createElement('div');
+    sheet.className = 'fpd-ate-text-align-sheet';
+    sheet.innerHTML = `
+      <div class="fpd-ate-text-align-title">Align</div>
+      <div class="fpd-ate-text-align-options" data-control="textAlign">
+        <div class="fpd-ate-text-align-option" data-option="left" role="button" tabindex="0">
+          <span class="fpd-icon-format-align-left"></span>
+          <span class="fpd-ate-text-align-option-label">Left</span>
+        </div>
+        <div class="fpd-ate-text-align-option" data-option="center" role="button" tabindex="0">
+          <span class="fpd-icon-format-align-center"></span>
+          <span class="fpd-ate-text-align-option-label">Center</span>
+        </div>
+        <div class="fpd-ate-text-align-option" data-option="right" role="button" tabindex="0">
+          <span class="fpd-icon-format-align-right"></span>
+          <span class="fpd-ate-text-align-option-label">Right</span>
+        </div>
+        <div class="fpd-ate-text-align-option" data-option="justify" role="button" tabindex="0">
+          <span class="fpd-icon-format-align-justify"></span>
+          <span class="fpd-ate-text-align-option-label">Justify</span>
+        </div>
+      </div>
+    `;
+    subPanel.appendChild(sheet);
+    return sheet;
+  }
+
+  syncAteTextAlignSheet(toolbar: HTMLElement, current?: string): void {
+    const sheet = toolbar.querySelector(
+      '.fpd-ate-text-align-sheet'
+    ) as HTMLElement | null;
+    if (!sheet) return;
+    const align =
+      current ||
+      String(
+        this.designer?.currentViewInstance?.fabricCanvas?.getActiveObject?.()
+          ?.textAlign || 'left'
+      );
+    sheet.querySelectorAll('.fpd-ate-text-align-option').forEach((el) => {
+      el.classList.toggle(
+        'fpd-ate-text-align-option-active',
+        el.getAttribute('data-option') === align
+      );
+    });
+  }
+
+  applyAteTextAlign(toolbar: HTMLElement, option: string): void {
+    const canvas = this.designer?.currentViewInstance?.fabricCanvas;
+    const obj = canvas?.getActiveObject?.();
+    if (!canvas || !obj) return;
+
+    canvas.setElementOptions({ textAlign: option }, obj);
+    this.syncAteTextAlignSheet(toolbar, option);
+
+    const trigger = toolbar.querySelector(
+      '#textAlignCust'
+    ) as HTMLElement | null;
+    const span = trigger?.querySelector(
+      'span:not(.fpd-ate-tool-caption):not(.fpd-label)'
+    ) as HTMLElement | null;
+    if (span) {
+      span.className =
+        option === 'center'
+          ? 'fpd-icon-format-align-center'
+          : option === 'right'
+            ? 'fpd-icon-format-align-right'
+            : option === 'justify'
+              ? 'fpd-icon-format-align-justify'
+              : 'fpd-icon-format-align-left';
+      span.setAttribute('data-option', option);
+      span.classList.add('active-icon');
+    }
+  }
+
+  toggleAteTextAlignSheet(
+    toolbar: HTMLElement,
+    trigger: HTMLElement
+  ): void {
+    const sheet = this.ensureAteTextAlignSheet(toolbar);
+    if (!sheet) return;
+
+    const subPanel = toolbar.querySelector('.fpd-sub-panel');
+    const isOpen = sheet.classList.contains('fpd-active');
+
+    // Close opacity if it was open
+    const opacityPanel = toolbar.querySelector(
+      '#fpd-opacity-panel'
+    ) as HTMLElement | null;
+    if (opacityPanel) opacityPanel.style.display = 'none';
+    toolbar.classList.remove('fpd-opacity-open', 'fpd-doc-opacity-dock');
+    toolbar
+      .querySelector('#fpd-opacity-btn')
+      ?.classList.remove('fpd-active');
+
+    document.body.classList.remove('fpd-toolbar-transform-our');
+    toolbar
+      .querySelector('#letter-spacing')
+      ?.classList.remove('letter-spac-active');
+    toolbar
+      .querySelector('#CenterTools')
+      ?.classList.remove('letter-spac-active');
+
+    subPanel?.querySelectorAll(':scope > .fpd-active').forEach((el) => {
+      el.classList.remove('fpd-active');
+    });
+
+    if (isOpen) {
+      toolbar.classList.remove('fpd-panel-visible', 'my-position');
+      trigger.classList.remove('fpd-active', 'fpd-ate-text-align-open');
+      return;
+    }
+
+    sheet.classList.add('fpd-active');
+    trigger.classList.add('fpd-active', 'fpd-ate-text-align-open');
+    toolbar.classList.add('fpd-panel-visible', 'fpd-show');
+    this.syncAteTextAlignSheet(toolbar);
+  }
+
+  /**
+   * Add Text Editor (mobile) — stamp isolated fpd-ate-* classes so the
+   * text toolbar matches Element Editor layout without touching fpd-doc-*
+   * or styles.scss. Only runs when data-element-type="text" + layout-small.
+   */
+  applyAddTextEditorClasses(toolbar: HTMLElement): void {
+    toolbar.classList.add('fpd-ate-editor');
+
+    // Only stamp the outer tool strip — never sub-panel contents
+    // (Align grid, font list, etc. break when given 68×76 cells).
+    const toolsNav = toolbar.querySelector(
+      ':scope > .fpd-tools-nav'
+    ) as HTMLElement | null;
+    const stampRoot = toolsNav || toolbar;
+
+    // Undo any prior mistaken stamps inside sub-panels.
+    toolbar.querySelectorAll('.fpd-sub-panel [class*="fpd-ate-"]').forEach((el) => {
+      el.classList.remove(
+        'fpd-ate-uniform-tool',
+        'fpd-ate-tool-label',
+        'fpd-ate-layer-group',
+        'fpd-ate-btn-group',
+        'fpd-ate-show-duplicate',
+        'fpd-ate-size-tool',
+        'fpd-ate-size-wrap',
+        'fpd-ate-copy-paste-row',
+        'fpd-ate-tool-shell',
+        'fpd-ate-labeled-opacity',
+        'fpd-ate-font-cell'
+      );
+      el.querySelectorAll(':scope > .fpd-ate-tool-caption, :scope > .fpd-ate-opacity-label')
+        .forEach((n) => n.remove());
+    });
+
+    // Font list must scroll when a family (e.g. Lobster) expands variants.
+    toolbar
+      .querySelectorAll('.fpd-panel-font-family .fpd-fonts-list')
+      .forEach((el) => el.classList.add('fpd-ate-fonts-scroll'));
+    toolbar
+      .querySelectorAll('.fpd-panel-font-family.fpd-active, .fpd-panel-font-family')
+      .forEach((el) => el.classList.add('fpd-ate-font-panel'));
+
+    // Center tool → Align/Arrange position sheet (layout via ate CSS only).
+    toolbar.querySelectorAll('.fpd-panel-position').forEach((panel) => {
+      panel.classList.add('fpd-ate-position-panel');
+      panel
+        .querySelectorAll('.fpd-tool-position-align')
+        .forEach((grid) => grid.classList.add('fpd-ate-position-align-grid'));
+      panel
+        .querySelectorAll('.fpd-tool-layer-depth')
+        .forEach((grid) => grid.classList.add('fpd-ate-position-arrange-grid'));
+      panel
+        .querySelectorAll('.fpd-panel-tabs')
+        .forEach((tabs) => tabs.classList.add('fpd-ate-position-tabs'));
+      panel
+        .querySelectorAll('.fpd-panel-tabs-content')
+        .forEach((content) =>
+          content.classList.add('fpd-ate-position-tabs-content')
+        );
+    });
+
+    // Preview the selected face in the Font dropdown (vendor only sets .value).
+    const syncFontPreview = () => {
+      const fontInput = stampRoot.querySelector(
+        '.fpd-tool-font-family fpd-dropdown > input.fpd-dropdown-current'
+      ) as HTMLInputElement | null;
+      if (!fontInput) return;
+      fontInput.classList.add('fpd-ate-font-preview');
+      const face = (fontInput.value || '').trim();
+      if (face) {
+        fontInput.style.fontFamily = `"${face.replace(/"/g, '')}", sans-serif`;
+      }
+      fontInput
+        .closest('.fpd-tool-font-family')
+        ?.classList.add('fpd-ate-font-cell');
+    };
+    syncFontPreview();
+    if (!(toolbar as any)._fpdAteFontPreviewBound) {
+      (toolbar as any)._fpdAteFontPreviewBound = true;
+      // FPD assigns input.value in JS (no input event) — re-sync after taps.
+      toolbar.addEventListener(
+        'click',
+        () => setTimeout(syncFontPreview, 0),
+        true
+      );
+      stampRoot
+        .querySelector('.fpd-tool-font-family fpd-dropdown')
+        ?.addEventListener('input', syncFontPreview, true);
+    }
+
+    // Strip every prior caption so we never stack Bold/Bold or Opacity/Opacity.
+    stampRoot
+      .querySelectorAll(
+        '.fpd-ate-tool-caption, .fpd-ate-opacity-label, .fpd-doc-tool-caption, .fpd-doc-opacity-label'
+      )
+      .forEach((el) => el.remove());
+    stampRoot
+      .querySelectorAll('.fpd-label.fpd-ate-caption-active')
+      .forEach((el) => el.classList.remove('fpd-ate-caption-active'));
+
+    const ensureAteCaption = (el: Element, text: string) => {
+      // Prefer a single vendor .fpd-label when present.
+      const existingLabel = el.querySelector(
+        ':scope > .fpd-label'
+      ) as HTMLElement | null;
+      if (existingLabel) {
+        if (text) existingLabel.textContent = text;
+        existingLabel.classList.add('fpd-ate-caption-active');
+        // Remove any extra sibling labels/captions that may have accumulated.
+        el.querySelectorAll(
+          ':scope > .fpd-ate-tool-caption, :scope > .fpd-ate-opacity-label, :scope > .fpd-doc-tool-caption, :scope > .fpd-doc-opacity-label'
+        ).forEach((n) => n.remove());
+        el.querySelectorAll(':scope > .fpd-label').forEach((lab, i) => {
+          if (i === 0) return;
+          (lab as HTMLElement).classList.remove('fpd-ate-caption-active');
+        });
+        return;
+      }
+
+      let cap = el.querySelector(
+        ':scope > .fpd-ate-tool-caption'
+      ) as HTMLElement | null;
+
+      if (!cap) {
+        cap = document.createElement('span');
+        cap.className = 'fpd-ate-tool-caption';
+        el.appendChild(cap);
+      }
+      cap.textContent = text;
+
+      // Keep exactly one caption child.
+      el.querySelectorAll(':scope > .fpd-ate-tool-caption').forEach((n, i) => {
+        if (i > 0) n.remove();
+      });
+    };
+
+    const stampAte = (el: Element, caption?: string) => {
+      el.classList.add('fpd-ate-uniform-tool', 'fpd-ate-tool-label');
+      if (caption) {
+        ensureAteCaption(el, caption);
+        return;
+      }
+      if (el.querySelector(':scope > .fpd-label')) {
+        ensureAteCaption(el, '');
+        return;
+      }
+      const title =
+        (el as HTMLElement).getAttribute('title') ||
+        (el as HTMLElement).getAttribute('data-defaulttext') ||
+        '';
+      if (title && !title.startsWith('toolbar.')) ensureAteCaption(el, title);
+      else if (title.startsWith('toolbar.')) {
+        const def = (el as HTMLElement).getAttribute('data-defaulttext');
+        if (def) ensureAteCaption(el, def);
+      }
+    };
+
+    const stamped = new Set<Element>();
+    const stampOnce = (el: Element, caption?: string) => {
+      if (stamped.has(el)) return;
+      if (getComputedStyle(el).display === 'none') return;
+      stamped.add(el);
+      stampAte(el, caption);
+    };
+
+    stampRoot.querySelectorAll('.fpd-tool-duplicate').forEach((el) => {
+      el.classList.add('fpd-ate-show-duplicate');
+      stampOnce(el, 'Duplicate');
+    });
+
+    const opacityBtn = stampRoot.querySelector(
+      '#fpd-opacity-btn'
+    ) as HTMLElement | null;
+    if (opacityBtn) {
+      opacityBtn.classList.add(
+        'fpd-ate-labeled-opacity',
+        'fpd-ate-uniform-tool',
+        'fpd-ate-tool-label'
+      );
+      opacityBtn
+        .querySelectorAll(
+          ':scope > .fpd-doc-opacity-label, :scope > .fpd-ate-opacity-label, :scope > .fpd-doc-tool-caption, :scope > .fpd-ate-tool-caption'
+        )
+        .forEach((n) => n.remove());
+      const opLab = document.createElement('span');
+      opLab.className = 'fpd-ate-opacity-label';
+      opLab.textContent = 'Opacity';
+      opacityBtn.appendChild(opLab);
+      stamped.add(opacityBtn);
+    }
+
+    (
+      [
+        ['.fpd-tool-color', 'Color'],
+        ['.fpd-tool-transform', 'Transform'],
+        ['.fpd-tool-position', 'Align'],
+        ['.fpd-tool-reset', 'Reset'],
+        ['.fpd-tool-remove', 'Remove'],
+        ['.fpd-tool-duplicate', 'Duplicate'],
+        ['.fpd-tool-font-family', 'Font'],
+        ['.fpd-tool-edit-text', 'Edit Text'],
+        ['.fpd-tool-curved-text', 'Curved Text'],
+        ['.fpd-tool-text-bold', 'Bold'],
+        ['.fpd-tool-text-italic', 'Italic'],
+        ['.fpd-tool-text-underline', 'Underline'],
+        ['#TextTransform', 'Text'],
+        ['.fpd-tool-text-transform', 'Text'],
+        ['#letter-spacing', 'Spacing'],
+        ['.fpd-ungroup', 'Group'],
+        ['.fpd-ungroup1', 'Ungroup'],
+      ] as [string, string][]
+    ).forEach(([sel, caption]) => {
+      stampRoot.querySelectorAll(sel).forEach((el) => stampOnce(el, caption));
+    });
+
+    // Size +/- outer wrap + Size label
+    stampRoot
+      .querySelectorAll(
+        '#minusCust.flex-plus-minus-icon, .fpd-primary-tools .flex-plus-minus-icon'
+      )
+      .forEach((wrap) => {
+        if (getComputedStyle(wrap).display === 'none') return;
+        wrap.classList.add('fpd-ate-size-wrap');
+      });
+    stampRoot
+      .querySelectorAll(
+        '.fpd-tool-text-size.fpd-tool-text-size-customize, .fpd-primary-tools .fpd-tool-text-size, .fpd-ate-size-wrap .fpd-tool-text-size'
+      )
+      .forEach((el) => {
+        el.classList.add('fpd-ate-size-tool');
+        ensureAteCaption(el, 'Size');
+      });
+
+    // Layer Up / Down
+    stampRoot.querySelectorAll('.fpd-tool-layer-depth').forEach((group) => {
+      group.classList.add('fpd-ate-layer-group');
+      group
+        .querySelectorAll(
+          ':scope > [data-do], :scope > #TextMoveUp, :scope > #TextMoveDown'
+        )
+        .forEach((btn) => {
+          const isUp =
+            btn.id === 'TextMoveUp' ||
+            btn.getAttribute('data-do') === 'layer-up';
+          stampOnce(btn, isUp ? 'Up' : 'Down');
+        });
+    });
+
+    // Align / Center — outer toolbar cells only (never .fpd-tool-position-align
+    // inside the Align panel — that grid needs all Left/Center/Right options).
+    stampRoot
+      .querySelectorAll('#textAlignCust, #CenterTools')
+      .forEach((group) => {
+        group.classList.add('fpd-ate-btn-group');
+        const label =
+          group.id === 'CenterTools'
+            ? 'Center'
+            : group.id === 'textAlignCust'
+              ? 'Align'
+              : 'Align';
+        stampOnce(group, label);
+      });
+
+    // Prefetch the text-align bottom sheet so the first tap opens instantly.
+    this.ensureAteTextAlignSheet(toolbar);
+
+    // Spacing — stamp the .extra-icon shell as the 68×76 cell (same as siblings)
+    stampRoot.querySelectorAll('.extra-icon').forEach((shell) => {
+      const spacing = shell.querySelector('#letter-spacing');
+      if (!spacing) return;
+      if (shell.querySelector('#copytext, #pastetext')) return;
+      shell.classList.add('fpd-ate-tool-shell');
+      stampOnce(shell, 'Spacing');
+    });
+
+    // Copy / Paste — open row; each icon is its own labeled cell
+    stampRoot
+      .querySelectorAll('.groupby-text, .extra-icon-main-div-box')
+      .forEach((group) => {
+        group.classList.add('fpd-ate-copy-paste-row');
+        const copy =
+          group.querySelector('.fpd-group-copy-by') ||
+          group.querySelector('#copytext')?.closest('.extra-icon') ||
+          group.querySelector('#copytext');
+        const paste =
+          group.querySelector('.fpd-group-paste-by') ||
+          group.querySelector('#pastetext')?.closest('.extra-icon') ||
+          group.querySelector('#pastetext');
+        if (copy) stampOnce(copy, 'Copy');
+        if (paste) stampOnce(paste, 'Paste');
+      });
+
+    // Final pass: each stamped cell keeps ONE caption; drop text-only
+    // duplicate spans (the Bold/Bold + Opacity/Opacity bug).
+    stampRoot.querySelectorAll('.fpd-ate-uniform-tool').forEach((cell) => {
+      const captions = Array.from(
+        cell.querySelectorAll(
+          ':scope > .fpd-ate-tool-caption, :scope > .fpd-ate-opacity-label, :scope > .fpd-label.fpd-ate-caption-active'
+        )
+      ) as HTMLElement[];
+      captions.slice(1).forEach((n) => n.remove());
+
+      Array.from(cell.childNodes).forEach((node) => {
+        if (node.nodeType === Node.TEXT_NODE && node.textContent?.trim()) {
+          node.textContent = '';
+        }
+      });
+
+      // Text-only leftover spans that aren't the icon and aren't the caption
+      cell.querySelectorAll(':scope > span').forEach((span) => {
+        const s = span as HTMLElement;
+        if (
+          s.classList.contains('fpd-ate-tool-caption') ||
+          s.classList.contains('fpd-ate-opacity-label') ||
+          s.classList.contains('fpd-ate-caption-active') ||
+          s.classList.contains('fpd-current-fill') ||
+          s.classList.contains('fpd-current-color') ||
+          s.className.includes('fpd-icon') ||
+          s.classList.contains('dd') ||
+          s.querySelector('svg') ||
+          s.id === 'copytext' ||
+          s.id === 'pastetext' ||
+          s.id === 'letter-spacing'
+        ) {
+          return;
+        }
+        // Bare text span competing with our caption → remove
+        if ((s.textContent || '').trim() && !s.querySelector('*')) {
+          s.remove();
+        }
+      });
+    });
   }
 
   // The Transform panel's Rotate control sets fabric's `angle` directly
@@ -2786,11 +3939,8 @@ export class HomeComponent implements AfterViewInit {
         ;
         ;
         ;
-        fetch(`https://styleflip-backend-jdm5.ithemes.xyz/api/sharedproduct/search?title=${encodeURIComponent(title)}&design_id=${id}`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json'
-          }
+        fetch(`/api/sharedproduct/search?title=${encodeURIComponent(title)}&design_id=${encodeURIComponent(id ?? '')}`, {
+          method: 'GET'
         })
           .then(response => response.json())
           .then(data => {

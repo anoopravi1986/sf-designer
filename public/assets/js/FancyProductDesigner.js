@@ -21051,9 +21051,10 @@
             buttonShare.addEventListener('click', function (e) {
               e.stopPropagation();
 
-              fetch(`https://styleflip-backend-jdm5.ithemes.xyz/api/sharedproduct/search?title=${encodeURIComponent(t.title)}&design_id=${t?.design_id}`, {
-                method: 'GET',
-                headers: { 'Content-Type': 'application/json' }
+              // Same-origin /api avoids CORS; never send Content-Type on GET
+              // (that forces a preflight many customer networks block).
+              fetch(`/api/sharedproduct/search?title=${encodeURIComponent(t.title)}&design_id=${encodeURIComponent(t?.design_id ?? '')}`, {
+                method: 'GET'
               })
                 .then(response => response.json())
                 .then(data => {
@@ -21657,9 +21658,8 @@
                 buttonShare.addEventListener('click', function (e) {
                   e.stopPropagation();
 
-                  fetch(`https://styleflip-backend-jdm5.ithemes.xyz/api/sharedproduct/search?title=${encodeURIComponent(t.title)}&design_id=${t?.design_id}`, {
-                    method: 'GET',
-                    headers: { 'Content-Type': 'application/json' }
+                  fetch(`/api/sharedproduct/search?title=${encodeURIComponent(t.title)}&design_id=${encodeURIComponent(t?.design_id ?? '')}`, {
+                    method: 'GET'
                   })
                     .then(response => response.json())
                     .then(data => {
@@ -25029,6 +25029,19 @@
                   (t.hasControls = !0))),
               (t.borderColor = 'transparent'),
               (t.excludeFromExport = !0)),
+            // Info / Base / Overlay are product chrome — never move or stretch
+            // in customer mode (Google Doc desktop item 2). Applied after the
+            // unlock block so those flags cannot reopen the locks.
+            !this.viewOptions.editorMode &&
+              e.title &&
+              ['Info', 'Base', 'Overlay'].includes(e.title) &&
+              ((t.draggable = t.resizable = t.rotatable = !1),
+              (t.lockMovementX = t.lockMovementY = !0),
+              (t.lockScalingX = t.lockScalingY = !0),
+              (t.lockRotation = !0),
+              (t.hasControls = !1),
+              'Info' === e.title &&
+                ((t.evented = !1), (t.selectable = !1), (t.isEditable = !1))),
             t.fixed && Q(t.replace) && (t.replace = e.title),
             !this.viewOptions.editorMode && t.replace && '' != t.replace)
           ) {
@@ -25182,7 +25195,22 @@
             (void 0 !== t.pattern && e.setPattern(t.pattern),
             e.canvas &&
               t.z >= 0 &&
-              (e.moveTo(t.z), this._bringToppedElementsToFront()),
+              (() => {
+                let z = t.z
+                const objects = e.canvas.getObjects()
+                const baseObj = objects.find(o => o.title === 'Base')
+                const overlayObj = objects.find(o => o.title === 'Overlay')
+                if (baseObj && e !== baseObj) {
+                  const baseZ = baseObj.getZIndex()
+                  if (z <= baseZ) z = baseZ + 1
+                }
+                if (overlayObj && e !== overlayObj) {
+                  const overlayZ = overlayObj.getZIndex()
+                  if (z >= overlayZ) z = overlayZ - 1
+                }
+                e.moveTo(z)
+                this._bringToppedElementsToFront()
+              })(),
             t.hasOwnProperty('curved'))
           )
             if (t.curved) {
@@ -27287,7 +27315,7 @@
               return;
             }
 
-            const response = await fetch(`https://styleflip-backend-jdm5.ithemes.xyz/api/sharedproduct/search?title=${encodeURIComponent(titleParam)}&design_id=${encodeURIComponent(idParam)}`);
+            const response = await fetch(`/api/sharedproduct/search?title=${encodeURIComponent(titleParam)}&design_id=${encodeURIComponent(idParam)}`);
             if (!response.ok) {
               throw new Error('Saved design request failed: ' + response.status);
             }
@@ -30429,10 +30457,11 @@
           dots.className =
             'fpd-elements-dot-menu absolute top-0 right-0 z-10 px-2 text-lg font-bold text-black rounded-full cursor-pointer top-1 right-1 bg-opacity-40'
 
-          // Tooltip container
+          // Tooltip on body (not inside the grid cell) so overflow/clipping
+          // after copy/paste doesn't make ⋯ clicks look dead.
           const tooltip = document.createElement('div')
           tooltip.className =
-            'fixed bg-white text-black text-sm ml-[80px] p-2 rounded shadow-md hidden z-[999] border border-[#ccc] border-solid rounded-[6px] shadow-custom-light '
+            'fpd-doc-elements-tooltip fixed bg-white text-black text-sm p-2 rounded shadow-md hidden z-[9999] border border-[#ccc] border-solid rounded-[6px] shadow-custom-light'
 
           // Sample fallback tags if img.tags doesn't exist
           const tagsArray = imgSrc.tags || [
@@ -30468,11 +30497,12 @@
 
           // Add tooltip to the global list
           allTooltips.push(tooltip)
+          document.body.appendChild(tooltip)
 
           // Toggle visibility and close others
           dots.addEventListener('click', e => {
             e.stopPropagation()
-            ;
+            e.preventDefault()
             // Close all other tooltips
             allTooltips.forEach(tip => {
               if (tip !== tooltip) {
@@ -30480,15 +30510,20 @@
               }
             })
             const parent = e.currentTarget.closest('.fpd-active')
-            ;
             if (parent) {
               parent.classList.toggle('backdrop-test')
-              ;
               localStorage.setItem('fpdMenuClicked', 'true')
             }
 
-            // Toggle this one
-            tooltip.classList.toggle('hidden')
+            const willShow = tooltip.classList.contains('hidden')
+            if (willShow) {
+              const rect = dots.getBoundingClientRect()
+              tooltip.style.left = `${Math.round(rect.right + 8)}px`
+              tooltip.style.top = `${Math.round(rect.top)}px`
+              tooltip.classList.remove('hidden')
+            } else {
+              tooltip.classList.add('hidden')
+            }
           })
 
           // Optional: Hide tooltip if user clicks outside
@@ -30498,7 +30533,6 @@
 
           div.appendChild(picture)
           div.appendChild(dots)
-          div.appendChild(tooltip)
 
           if (index < 3) {
             visibleImagesContainer.appendChild(div)
@@ -32438,6 +32472,7 @@
                 i = e.getElementByID(t.id)
               let n = this.listElem.querySelector('.fpd-sortable-closest'),
                 s = e.getElementByID(n ? n.id : t.id).getZIndex()
+              // setElementOptions clamps z against Base/Overlay
               n || s++, e.setElementOptions({ z: s }, i)
             },
             onEnd: t => {
@@ -35441,12 +35476,12 @@
                 else if ('align-center' == i)
                   t.currentElement.centerElement(!0, !1)
                 else if ('layer-up' == i || 'layer-down' == i) {
+                  // z clamp vs Base/Overlay lives only in setElementOptions
+                  // (shared with Layers drag + TextMoveUp/Down).
                   let e = t.currentElement.getZIndex()
-                  ;(e = 'layer-up' == i ? e + 1 : e - 1),
-                    (e = e < 0 ? 0 : e),
-                    t.currentViewInstance.fabricCanvas.setElementOptions({
-                      z: e
-                    })
+                  e = 'layer-up' == i ? e + 1 : e - 1
+                  e = e < 0 ? 0 : e
+                  t.currentViewInstance.fabricCanvas.setElementOptions({ z: e })
                 } else if ('flip-x' == i || 'flip-y' == i) {
                   const e = {}
                   ;
@@ -36969,10 +37004,11 @@ function updateFPDLayersToSingleGroup(group) {
                 !t.textPlaceholder && !t.numberPlaceholder
               ))
             : 'text' !== t.getType() && X(this.container, ['fpd-type-image']),
+          // Comma after console.log previously discarded the condition and
+          // always enabled advanced-editing (filters/crop) for every type.
           t.advancedEditing &&
             t.source &&
             st(t.source) &&
-            console.log("eeee1",t), 
             (Kr(this, ia, ya).call(this, 'advanced-editing'),
             Kr(this, sa, wa).call(this, 'advanced-editing', 'filters', !0),
             Kr(this, sa, wa).call(
@@ -37898,9 +37934,18 @@ function updateFPDLayersToSingleGroup(group) {
         const t = this.fpdInstance.mainOptions.responsiveBreakpoints
         let e
         var i, n, s
+        // Phone landscape: width often exceeds the small breakpoint (768)
+        // and flipped the UI to desktop. Use the short side only for short
+        // landscape viewports so portrait phones and real desktops are unchanged.
+        const isShortLandscape =
+          window.matchMedia('(orientation: landscape) and (max-height: 560px)')
+            .matches
+        const layoutWidth = isShortLandscape
+          ? Math.min(window.innerWidth, window.innerHeight)
+          : window.innerWidth
         ;(i = this),
           (n = co),
-          (s = window.innerWidth),
+          (s = layoutWidth),
           (function (t, e, i) {
             if (e.set) e.set.call(t, i)
             else {
@@ -37923,6 +37968,10 @@ function updateFPDLayersToSingleGroup(group) {
               this.fpdInstance.container.classList.remove('fpd-layout-small'),
               this.fpdInstance.container.classList.add('fpd-layout-large'),
               (e = 'large')),
+          document.documentElement.classList.toggle(
+            'fpd-doc-landscape-sheet',
+            isShortLandscape && e === 'small'
+          ),
           (this.fpdInstance.container.dataset.layout = e),
           e != this.currentLayout &&
             ((this.currentLayout = e),

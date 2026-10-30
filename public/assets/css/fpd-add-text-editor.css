@@ -1,0 +1,1386 @@
+/*
+  Add Text Editor (mobile only) — NEW opt-in classes (fpd-ate-*).
+  Compact bottom sheet + one horizontal swipe strip (like Element Editor).
+  Does not modify styles.scss or fpd-doc-fixes.css.
+*/
+
+/* ---- Compact sheet: only as tall as the tool row (no empty white void) ---- */
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small {
+  height: auto !important;
+  max-height: none !important;
+  min-height: 0 !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  justify-content: flex-start !important;
+  padding: 14px 0 10px !important;
+  overflow: visible !important;
+}
+
+/* Hide inactive sub-panel so it can't inflate the sheet */
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small:not(.fpd-panel-visible)
+  > .fpd-sub-panel {
+  display: none !important;
+  height: 0 !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+  pointer-events: none !important;
+}
+
+/* ---- One horizontal swipe strip ----
+   Do NOT set touch-action: pan-x on this scroller — it cancels taps on
+   Opacity / Size / Bold / Italic / Underline on iOS & Android. */
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small > .fpd-tools-nav {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  align-items: center !important;
+  gap: 10px !important;
+  flex: 0 0 auto !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  height: 84px !important;
+  min-height: 84px !important;
+  max-height: 84px !important;
+  margin: 0 !important;
+  padding: 4px 14px 8px !important;
+  box-sizing: border-box !important;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  overscroll-behavior-x: contain;
+  pointer-events: auto !important;
+}
+
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  > .fpd-tools-nav::-webkit-scrollbar {
+  display: none;
+}
+
+/*
+  Keep wrapper groups as inline rows inside the strip.
+  Scoped to > .fpd-tools-nav so Align/Arrange sub-panel grids are untouched.
+  (Avoid display:contents — it left a tall empty region in WebKit.)
+*/
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  > .fpd-tools-nav
+  .fpd-primary-tools,
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  > .fpd-tools-nav
+  .fpd-secondary-tools,
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  > .fpd-tools-nav
+  .fpd-secondary-tools.fpd-scroll-area,
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  > .fpd-tools-nav
+  #SecondaryIconBoxHeader,
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  > .fpd-tools-nav
+  .fpd-panel-text-format,
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  > .fpd-tools-nav
+  .fpd-tools-group.flex,
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  > .fpd-tools-nav
+  .fpd-tools-group {
+  display: inline-flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  align-items: center !important;
+  flex: 0 0 auto !important;
+  gap: 10px !important;
+  width: max-content !important;
+  max-width: none !important;
+  height: 76px !important;
+  min-height: 76px !important;
+  max-height: 76px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  overflow: visible !important;
+}
+
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .fpd-panel-text-format::before,
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .fpd-panel-text-format::after {
+  display: none !important;
+  content: none !important;
+}
+
+/* Opacity panel must NOT sit in the icon strip or inflate height when closed */
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .fpd-tools-nav
+  > #fpd-opacity-panel,
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  #fpd-opacity-panel.fpd-opacity-panel {
+  display: none !important;
+}
+
+/* When open: match Element Editor bottom-sheet behavior (styles.scss) */
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small.fpd-opacity-open {
+  overflow: visible !important;
+  max-height: 80vh !important;
+}
+
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small.fpd-opacity-open
+  > .fpd-tools-nav {
+  display: block !important;
+  width: 100% !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: 70vh !important;
+  flex-wrap: nowrap !important;
+  overflow-x: visible !important;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: auto !important;
+  pointer-events: auto !important;
+}
+
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small.fpd-opacity-open
+  .fpd-tools-nav
+  > *:not(#fpd-opacity-panel) {
+  display: none !important;
+}
+
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small.fpd-opacity-open
+  .fpd-tools-nav
+  > #fpd-opacity-panel,
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small.fpd-opacity-open
+  #fpd-opacity-panel.fpd-opacity-panel,
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small.fpd-opacity-open
+  #fpd-opacity-panel.fpd-doc-opacity-sheet {
+  display: block !important;
+  position: static !important;
+  flex: none !important;
+  width: 100% !important;
+  min-width: 100% !important;
+  max-width: 100% !important;
+  height: auto !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 0 12px !important;
+  overflow: visible !important;
+  pointer-events: auto !important;
+  order: 99 !important;
+  left: auto !important;
+  right: auto !important;
+  top: auto !important;
+  bottom: auto !important;
+  box-shadow: none !important;
+}
+
+/*
+  body .fpd-hidden { pointer-events: none !important } was killing taps on
+  Size / Italic / Underline / TextTransform. Beat it for outer toolbar tools.
+*/
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small .fpd-ate-uniform-tool,
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .fpd-ate-uniform-tool.fpd-hidden,
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small .fpd-ate-size-wrap,
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .fpd-ate-size-wrap.fpd-hidden,
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  #minusCust.fpd-hidden,
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  #minusCust.fpd-ate-size-wrap,
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  #fpd-opacity-btn.fpd-ate-labeled-opacity,
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small #minusElement,
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small #plusElement,
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .fpd-tool-text-size-customize-icon,
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .fpd-tool-text-bold,
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .fpd-tool-text-italic,
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .fpd-tool-text-italic.fpd-hidden,
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .fpd-tool-text-underline,
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .fpd-tool-text-underline.fpd-hidden,
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small #boldOutside,
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small #fontItalic,
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  #fontItalic.fpd-hidden,
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small #UnderlineText,
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  #UnderlineText.fpd-hidden,
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small #TextTransform,
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  #TextTransform.fpd-hidden,
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .fpd-tool-text-transform,
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small #letter-spacing,
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  input[data-control='fontSize'],
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .fpd-ate-size-wrap
+  * {
+  pointer-events: auto !important;
+  touch-action: manipulation;
+  cursor: pointer;
+}
+
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .fpd-ate-uniform-tool
+  > svg,
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .fpd-ate-uniform-tool
+  > span.fpd-ate-tool-caption,
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .fpd-ate-uniform-tool
+  > span.fpd-ate-opacity-label,
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .fpd-ate-uniform-tool
+  > span.fpd-label.fpd-ate-caption-active {
+  pointer-events: none !important;
+}
+
+/* Sub-panel visible: stay in flow and receive taps (layout unchanged) */
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small.fpd-panel-visible
+  > .fpd-sub-panel {
+  display: flex !important;
+  flex-direction: column !important;
+  position: static !important;
+  top: auto !important;
+  left: auto !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  pointer-events: auto !important;
+  /* auto (not hidden) so Align/Arrange option grids aren't clipped */
+  overflow: auto !important;
+  max-height: min(62vh, calc(100vh - 160px)) !important;
+}
+
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small.fpd-panel-visible
+  > .fpd-sub-panel:has(> .fpd-panel-position.fpd-active) {
+  overflow: visible !important;
+  max-height: none !important;
+}
+
+/*
+  Font panel: keep the mobile 283px height from styles.scss; make the
+  inner list the scroll container so Lobster variants (Bold/Italic/…)
+  remain reachable via scrollbar.
+*/
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small.fpd-panel-visible
+  .fpd-panel-font-family.fpd-ate-font-panel.fpd-active {
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+  min-height: 0 !important;
+}
+
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small.fpd-panel-visible
+  .fpd-fonts-list.fpd-ate-fonts-scroll {
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  height: 100% !important;
+  max-height: 100% !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+  overscroll-behavior: contain;
+}
+
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .fpd-ate-uniform-tool::after,
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .fpd-ate-uniform-tool::before {
+  content: none !important;
+  display: none !important;
+}
+
+/* ---- Uniform labeled cell (68×76) — match Element Editor ---- */
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .fpd-ate-uniform-tool,
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .fpd-tools-group.flex
+  > .fpd-ate-uniform-tool,
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .fpd-tools-group.flex
+  > div.fpd-ate-uniform-tool,
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .fpd-secondary-tools.fpd-scroll-area
+  > .fpd-ate-uniform-tool,
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .fpd-secondary-tools.fpd-scroll-area
+  > div.fpd-ate-uniform-tool,
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .fpd-primary-tools
+  > .fpd-ate-uniform-tool,
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  #fpd-opacity-btn.fpd-ate-uniform-tool,
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .fpd-tool-color.fpd-ate-uniform-tool,
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .fpd-tool-transform.fpd-ate-uniform-tool,
+fpd-element-toolbar.fpd-ate-editor.fpd-layout-small .fpd-ate-uniform-tool {
+  display: flex !important;
+  flex-direction: column !important;
+  flex-wrap: nowrap !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex: 0 0 68px !important;
+  width: 68px !important;
+  min-width: 68px !important;
+  max-width: 68px !important;
+  height: 76px !important;
+  min-height: 76px !important;
+  max-height: 76px !important;
+  box-sizing: border-box !important;
+  padding: 8px 2px 6px !important;
+  margin: 0 !important;
+  gap: 4px !important;
+  overflow: hidden !important;
+  border: 1px solid #e3e5e9 !important;
+  border-radius: 12px !important;
+  background: #fff !important;
+  position: relative !important;
+}
+
+/* Icon row */
+fpd-element-toolbar.fpd-ate-editor.fpd-layout-small .fpd-ate-uniform-tool > svg,
+fpd-element-toolbar.fpd-ate-editor.fpd-layout-small
+  .fpd-ate-uniform-tool
+  > span[class^='fpd-icon-'],
+fpd-element-toolbar.fpd-ate-editor.fpd-layout-small
+  .fpd-ate-uniform-tool
+  > span[class*=' fpd-icon-'],
+fpd-element-toolbar.fpd-ate-editor.fpd-layout-small
+  .fpd-ate-uniform-tool
+  > span.fpd-icon-transform,
+fpd-element-toolbar.fpd-ate-editor.fpd-layout-small
+  .fpd-ate-uniform-tool
+  > span.fpd-current-fill,
+fpd-element-toolbar.fpd-ate-editor.fpd-layout-small
+  .fpd-ate-uniform-tool
+  > span.fpd-current-color,
+fpd-element-toolbar.fpd-ate-editor.fpd-layout-small
+  .fpd-ate-uniform-tool
+  > span.dd,
+fpd-element-toolbar.fpd-ate-editor.fpd-layout-small
+  .fpd-ate-uniform-tool
+  > span:not(.fpd-label):not(.fpd-ate-tool-caption):not(.fpd-ate-opacity-label):not(.fpd-doc-tool-caption):not(.fpd-doc-opacity-label) {
+  flex: 0 0 auto !important;
+  order: 0 !important;
+  position: static !important;
+  top: auto !important;
+  margin: 0 !important;
+  max-width: 32px !important;
+  max-height: 32px !important;
+  line-height: 1 !important;
+}
+
+fpd-element-toolbar.fpd-ate-editor.fpd-layout-small .fpd-ate-uniform-tool > svg,
+fpd-element-toolbar.fpd-ate-editor.fpd-layout-small
+  .fpd-ate-uniform-tool
+  > span
+  > svg {
+  width: 28px !important;
+  height: 28px !important;
+  min-width: 28px !important;
+  min-height: 28px !important;
+  max-width: 28px !important;
+  max-height: 28px !important;
+}
+
+fpd-element-toolbar.fpd-ate-editor.fpd-layout-small
+  .fpd-ate-uniform-tool
+  > span[class^='fpd-icon-'],
+fpd-element-toolbar.fpd-ate-editor.fpd-layout-small
+  .fpd-ate-uniform-tool
+  > span[class*=' fpd-icon-'],
+fpd-element-toolbar.fpd-ate-editor.fpd-layout-small
+  .fpd-ate-uniform-tool
+  > span.dd {
+  font-size: 26px !important;
+  line-height: 1 !important;
+  width: auto !important;
+  height: auto !important;
+}
+
+/* ONE caption under icon */
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .fpd-ate-uniform-tool
+  > span.fpd-ate-tool-caption,
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .fpd-ate-uniform-tool
+  > span.fpd-ate-opacity-label,
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .fpd-ate-uniform-tool
+  > span.fpd-label.fpd-ate-caption-active,
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small[data-element-type='text']
+  .fpd-tools-nav
+  .fpd-ate-uniform-tool
+  > span.fpd-label.fpd-ate-caption-active,
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  #fpd-opacity-btn.fpd-ate-labeled-opacity
+  > span.fpd-ate-opacity-label {
+  flex: 0 0 auto !important;
+  order: 1 !important;
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  position: static !important;
+  font-size: 9px !important;
+  font-weight: 500 !important;
+  line-height: 1.15 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  white-space: nowrap !important;
+  text-align: center !important;
+  max-width: 64px !important;
+  width: 100% !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  color: #6b6e73 !important;
+}
+
+/* Hide leftover duplicate captions */
+fpd-element-toolbar.fpd-ate-editor.fpd-layout-small
+  .fpd-ate-uniform-tool
+  > span.fpd-doc-tool-caption,
+fpd-element-toolbar.fpd-ate-editor.fpd-layout-small
+  .fpd-ate-uniform-tool
+  > span.fpd-doc-opacity-label,
+fpd-element-toolbar.fpd-ate-editor.fpd-layout-small
+  .fpd-ate-uniform-tool
+  > span.fpd-label:not(.fpd-ate-caption-active),
+fpd-element-toolbar.fpd-ate-editor.fpd-layout-small
+  #fpd-opacity-btn
+  > span.fpd-doc-opacity-label,
+fpd-element-toolbar.fpd-ate-editor.fpd-layout-small
+  .fpd-ate-uniform-tool
+  > .fpd-ate-tool-caption
+  ~ .fpd-ate-tool-caption,
+fpd-element-toolbar.fpd-ate-editor.fpd-layout-small
+  .fpd-ate-uniform-tool
+  > .fpd-ate-opacity-label
+  ~ .fpd-ate-opacity-label {
+  display: none !important;
+  visibility: hidden !important;
+  height: 0 !important;
+  width: 0 !important;
+  overflow: hidden !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  font-size: 0 !important;
+}
+
+fpd-element-toolbar.fpd-ate-editor.fpd-layout-small
+  .fpd-ate-uniform-tool
+  > .fpd-label::before,
+fpd-element-toolbar.fpd-ate-editor.fpd-layout-small
+  .fpd-ate-uniform-tool
+  > .fpd-ate-tool-caption::before,
+fpd-element-toolbar.fpd-ate-editor.fpd-layout-small
+  .fpd-ate-uniform-tool.fpd-tool-transform
+  > span::before {
+  content: none !important;
+  display: none !important;
+  background: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+/* Opacity cell */
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  #fpd-opacity-btn.fpd-ate-labeled-opacity {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin: 0 !important;
+  padding: 8px 2px 6px !important;
+  border: 1px solid #e3e5e9 !important;
+  border-radius: 12px !important;
+  background: #fff !important;
+}
+
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  #fpd-opacity-btn.fpd-ate-labeled-opacity
+  > svg {
+  width: 28px !important;
+  height: 28px !important;
+  min-width: 28px !important;
+  max-width: 28px !important;
+  margin: 0 !important;
+}
+
+/* Color swatch */
+fpd-element-toolbar.fpd-ate-editor.fpd-layout-small
+  .fpd-tool-color.fpd-ate-uniform-tool
+  > .fpd-current-fill {
+  width: 28px !important;
+  height: 28px !important;
+  min-width: 28px !important;
+  border-radius: 50% !important;
+  border: 2px solid rgba(0, 0, 0, 0.1) !important;
+  margin: 0 !important;
+}
+
+/* Font — preview face + arrow snug to the name (not stretched far right) */
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .fpd-tool-font-family.fpd-ate-uniform-tool.fpd-ate-font-cell,
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .fpd-tool-font-family.fpd-ate-uniform-tool {
+  flex: 0 0 auto !important;
+  width: auto !important;
+  min-width: 96px !important;
+  max-width: 120px !important;
+  overflow: hidden !important;
+  padding: 0px 25px 0px !important;
+}
+
+fpd-element-toolbar.fpd-ate-editor.fpd-layout-small
+  .fpd-tool-font-family.fpd-ate-font-cell
+  > fpd-dropdown,
+fpd-element-toolbar.fpd-ate-editor.fpd-layout-small
+  .fpd-tool-font-family.fpd-ate-uniform-tool
+  > fpd-dropdown {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  position: relative !important;
+  width: auto !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  order: 0 !important;
+  gap: 2px !important;
+}
+
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .fpd-tool-font-family.fpd-ate-font-cell
+  input.fpd-dropdown-current.fpd-ate-font-preview,
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .fpd-tool-font-family.fpd-ate-uniform-tool
+  input.fpd-dropdown-current {
+  flex: 0 1 auto !important;
+  width: auto !important;
+  max-width: 100px !important;
+  min-width: 0 !important;
+  height: auto !important;
+  padding: 2px 2px 2px 4px !important;
+  margin: 0 !important;
+  border: none !important;
+  background: transparent !important;
+  font-size: 16px !important;
+  font-weight: 500 !important;
+  letter-spacing: 0 !important;
+  color: #485563 !important;
+  text-overflow: ellipsis !important;
+  overflow: hidden !important;
+  white-space: nowrap !important;
+}
+
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .fpd-tool-font-family.fpd-ate-font-cell
+  > fpd-dropdown
+  > .fpd-dropdown-arrow,
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .fpd-tool-font-family.fpd-ate-uniform-tool
+  > fpd-dropdown
+  > .fpd-dropdown-arrow {
+  position: static !important;
+  right: auto !important;
+  top: auto !important;
+  flex: 0 0 16px !important;
+  width: 16px !important;
+  height: 16px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  font-size: 14px !important;
+  line-height: 16px !important;
+  opacity: 0.7 !important;
+  transform: none !important;
+}
+
+/* Size +/- wrap — equal columns so the value sits dead-center */
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small .fpd-ate-size-wrap,
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  #minusCust.fpd-ate-size-wrap {
+  display: inline-grid !important;
+  grid-template-columns: 24px minmax(40px, 1fr) 24px !important;
+  grid-template-rows: auto !important;
+  align-items: center !important;
+  justify-items: center !important;
+  column-gap: 6px !important;
+  row-gap: 0 !important;
+  flex: 0 0 auto !important;
+  width: auto !important;
+  min-width: 112px !important;
+  height: 76px !important;
+  min-height: 76px !important;
+  max-height: 76px !important;
+  box-sizing: border-box !important;
+  padding: 4px 8px !important;
+  margin: 0 !important;
+  gap: 6px !important;
+  border: 1px solid #e3e5e9 !important;
+  border-radius: 12px !important;
+  background: #fff !important;
+  overflow: visible !important;
+  pointer-events: auto !important;
+}
+
+fpd-element-toolbar.fpd-ate-editor.fpd-layout-small
+  .fpd-ate-size-wrap
+  > .fpd-ate-size-tool {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  grid-column: 2 !important;
+  border: none !important;
+  background: transparent !important;
+  height: auto !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+  min-width: 0 !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  gap: 2px !important;
+}
+
+fpd-element-toolbar.fpd-ate-editor.fpd-layout-small
+  .fpd-ate-size-wrap
+  > .fpd-ate-size-tool
+  > input[data-control='fontSize'],
+fpd-element-toolbar.fpd-ate-editor.fpd-layout-small
+  .fpd-ate-size-wrap
+  > .fpd-ate-size-tool
+  > input {
+  display: block !important;
+  width: 100% !important;
+  max-width: 48px !important;
+  margin: 0 auto !important;
+  padding: 0 !important;
+  border: none !important;
+  background: transparent !important;
+  text-align: center !important;
+  font-size: 15px !important;
+  font-weight: 600 !important;
+  color: #485563 !important;
+  line-height: 1.2 !important;
+}
+
+fpd-element-toolbar.fpd-ate-editor.fpd-layout-small
+  .fpd-ate-size-wrap
+  > .fpd-ate-size-tool
+  > .fpd-ate-tool-caption,
+fpd-element-toolbar.fpd-ate-editor.fpd-layout-small
+  .fpd-ate-size-wrap
+  > .fpd-ate-size-tool
+  > .fpd-label.fpd-ate-caption-active {
+  display: block !important;
+  font-size: 9px !important;
+  color: #6b6e73 !important;
+  margin: 0 !important;
+  line-height: 1.15 !important;
+  text-align: center !important;
+  width: 100% !important;
+}
+
+fpd-element-toolbar.fpd-ate-editor.fpd-layout-small
+  .fpd-ate-size-wrap
+  > button.fpd-tool-text-size-customize-icon,
+fpd-element-toolbar.fpd-ate-editor.fpd-layout-small
+  .fpd-ate-size-wrap
+  > .fpd-tool-text-size-customize-icon,
+fpd-element-toolbar.fpd-ate-editor.fpd-layout-small
+  .fpd-ate-size-wrap
+  > #minusElement,
+fpd-element-toolbar.fpd-ate-editor.fpd-layout-small
+  .fpd-ate-size-wrap
+  > #plusElement {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex: none !important;
+  width: 24px !important;
+  height: 24px !important;
+  min-width: 24px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 1px solid #e3e5e9 !important;
+  border-radius: 50% !important;
+  background: #fff !important;
+  color: #485563 !important;
+  font-size: 16px !important;
+  line-height: 1 !important;
+  cursor: pointer !important;
+}
+
+fpd-element-toolbar.fpd-ate-editor.fpd-layout-small
+  .fpd-ate-size-wrap
+  > #minusElement,
+fpd-element-toolbar.fpd-ate-editor.fpd-layout-small
+  .fpd-ate-size-wrap
+  > .fpd-tool-text-size-customize-icon.minus,
+fpd-element-toolbar.fpd-ate-editor.fpd-layout-small
+  .fpd-ate-size-wrap
+  > button.minus {
+  grid-column: 1 !important;
+}
+
+fpd-element-toolbar.fpd-ate-editor.fpd-layout-small
+  .fpd-ate-size-wrap
+  > #plusElement,
+fpd-element-toolbar.fpd-ate-editor.fpd-layout-small
+  .fpd-ate-size-wrap
+  > .fpd-tool-text-size-customize-icon.plus,
+fpd-element-toolbar.fpd-ate-editor.fpd-layout-small
+  .fpd-ate-size-wrap
+  > button.plus {
+  grid-column: 3 !important;
+}
+
+/* Layer up/down — open row of cells */
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small .fpd-ate-layer-group {
+  display: inline-flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 10px !important;
+  flex: 0 0 auto !important;
+  height: 76px !important;
+  width: auto !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+fpd-element-toolbar.fpd-ate-editor.fpd-layout-small .fpd-ate-layer-group::before,
+fpd-element-toolbar.fpd-ate-editor.fpd-layout-small .fpd-ate-layer-group::after {
+  display: none !important;
+  content: none !important;
+}
+
+fpd-element-toolbar.fpd-ate-editor.fpd-layout-small
+  .fpd-ate-layer-group
+  > .fpd-ate-uniform-tool
+  > svg {
+  position: static !important;
+  top: auto !important;
+  margin: 0 !important;
+}
+
+/* Align group wrappers — open row when they contain child cells */
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .fpd-ate-btn-group:not(.fpd-ate-uniform-tool) {
+  display: inline-flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 10px !important;
+  flex: 0 0 auto !important;
+  height: 76px !important;
+  width: auto !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: none !important;
+  background: transparent !important;
+}
+
+/*
+  Spacing / Left / Center were stuck at 48px from styles.scss:
+    .fpd-tools-group.flex > div { height: 48px !important }
+  Beat that with ID + ate classes so they match Text/Transform (68×76).
+*/
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .fpd-tools-group.flex
+  > #textAlignCust.fpd-ate-uniform-tool,
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .fpd-tools-group.flex
+  > #CenterTools.fpd-ate-uniform-tool,
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .fpd-tools-group.flex
+  > .extra-icon.fpd-ate-uniform-tool,
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .fpd-secondary-tools
+  > #textAlignCust.fpd-ate-uniform-tool,
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .fpd-secondary-tools
+  > #CenterTools.fpd-ate-uniform-tool,
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .fpd-secondary-tools
+  > .extra-icon.fpd-ate-uniform-tool,
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  #textAlignCust.fpd-ate-btn-group.fpd-ate-uniform-tool,
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  #CenterTools.fpd-ate-btn-group.fpd-ate-uniform-tool,
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  #letter-spacing.fpd-ate-uniform-tool,
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .fpd-ate-btn-group.fpd-ate-uniform-tool,
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .extra-icon.fpd-ate-uniform-tool {
+  display: flex !important;
+  flex-direction: column !important;
+  flex-wrap: nowrap !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex: 0 0 68px !important;
+  width: 68px !important;
+  min-width: 68px !important;
+  max-width: 68px !important;
+  height: 76px !important;
+  min-height: 76px !important;
+  max-height: 76px !important;
+  box-sizing: border-box !important;
+  padding: 8px 2px 6px !important;
+  margin: 0 !important;
+  gap: 4px !important;
+  overflow: hidden !important;
+  border: 1px solid #e3e5e9 !important;
+  border-radius: 12px !important;
+  background: #fff !important;
+}
+
+/* Spacing lives in .extra-icon — size the shell as the cell, not contents */
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .extra-icon.fpd-ate-tool-shell.fpd-ate-uniform-tool {
+  display: flex !important;
+}
+
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .extra-icon.fpd-ate-uniform-tool
+  > #letter-spacing {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 28px !important;
+  height: 28px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  background: transparent !important;
+}
+
+/* Copy / Paste shared box → open row */
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .fpd-ate-copy-paste-row,
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .extra-icon-main-div-box.fpd-ate-copy-paste-row,
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .groupby-text.fpd-ate-copy-paste-row {
+  display: inline-flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 10px !important;
+  flex: 0 0 auto !important;
+  height: 76px !important;
+  width: auto !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+}
+
+fpd-element-toolbar.fpd-ate-editor.fpd-layout-small .fpd-ate-show-duplicate {
+  display: flex !important;
+}
+
+/*
+  Text (case) caption — beat styles.scss
+  `#TextTransform span { font-size: 28px !important }` which was enlarging
+  the "Text" label under aA to match the icon glyph size.
+*/
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  #TextTransform.fpd-ate-uniform-tool
+  > span.fpd-ate-tool-caption,
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  #TextTransform.fpd-ate-uniform-tool
+  > span.fpd-label.fpd-ate-caption-active,
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .fpd-tool-text-transform.fpd-ate-uniform-tool
+  > span.fpd-ate-tool-caption,
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .fpd-tool-text-transform.fpd-ate-uniform-tool
+  > span.fpd-label.fpd-ate-caption-active {
+  font-size: 9px !important;
+  font-weight: 500 !important;
+  line-height: 1.15 !important;
+  color: #6b6e73 !important;
+  max-width: 64px !important;
+}
+
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  #TextTransform.fpd-ate-uniform-tool
+  > span.dd,
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  #TextTransform.fpd-ate-uniform-tool
+  > span.fpd-icon-text-transform,
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  #TextTransform.fpd-ate-uniform-tool
+  > span.fpd-icon-uppercase,
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  #TextTransform.fpd-ate-uniform-tool
+  > span.fpd-icon-lowercase,
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  #TextTransform.fpd-ate-uniform-tool
+  > span.tts {
+  font-size: 22px !important;
+  line-height: 1 !important;
+  max-width: none !important;
+  max-height: none !important;
+}
+
+/*
+  Center tool → Align / Arrange position sheet.
+  Fixes left-skew from mobile styles.scss `.fpd-tools-group { margin-left: 35px }`
+  and lays out a proper 3×2 Align grid + Arrange row to match other ate popups.
+*/
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .fpd-sub-panel
+  > .fpd-panel-position.fpd-ate-position-panel,
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .fpd-sub-panel
+  > .fpd-panel-position.fpd-ate-position-panel.fpd-active {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  height: auto !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 12px 16px 20px !important;
+  box-sizing: border-box !important;
+  overflow: visible !important;
+  border: none !important;
+  box-shadow: none !important;
+  background: #fff !important;
+  gap: 0 !important;
+}
+
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .fpd-ate-position-panel
+  > .fpd-ate-position-tabs.fpd-panel-tabs {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 36px !important;
+  width: 100% !important;
+  margin: 0 0 16px !important;
+  padding: 0 !important;
+  box-sizing: border-box !important;
+}
+
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .fpd-ate-position-panel
+  > .fpd-ate-position-tabs
+  > span[data-tab] {
+  flex: 0 0 auto !important;
+  margin: 0 !important;
+  padding: 8px 4px 10px !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  line-height: 1.2 !important;
+}
+
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .fpd-ate-position-panel
+  > .fpd-ate-position-tabs-content {
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: visible !important;
+}
+
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .fpd-ate-position-panel
+  > .fpd-ate-position-tabs-content
+  > [data-id] {
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Align: 3 columns × 2 rows, full width (Top/Middle/Bottom + Left/Center/Right) */
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .fpd-ate-position-panel
+  .fpd-ate-position-align-grid.fpd-tool-position-align,
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .fpd-ate-position-panel
+  .fpd-ate-position-align-grid {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  grid-auto-rows: 68px !important;
+  align-items: stretch !important;
+  justify-items: stretch !important;
+  gap: 10px !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  margin: 0 !important;
+  margin-left: 0 !important;
+  padding: 0 !important;
+  overflow: visible !important;
+  box-sizing: border-box !important;
+}
+
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .fpd-ate-position-panel
+  .fpd-ate-position-align-grid
+  > [data-do] {
+  display: flex !important;
+  flex-direction: column !important;
+  flex-wrap: nowrap !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex: none !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  height: 68px !important;
+  min-height: 68px !important;
+  max-height: 68px !important;
+  margin: 0 !important;
+  padding: 8px 4px !important;
+  gap: 2px !important;
+  box-sizing: border-box !important;
+  border: 1px solid #e3e5e9 !important;
+  border-radius: 12px !important;
+  background: #fff !important;
+  overflow: hidden !important;
+  cursor: pointer !important;
+}
+
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .fpd-ate-position-panel
+  .fpd-ate-position-align-grid
+  > [data-do]
+  > span[class*='fpd-icon'] {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin: 0 !important;
+  font-size: 20px !important;
+  line-height: 1 !important;
+  pointer-events: none !important;
+}
+
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .fpd-ate-position-panel
+  .fpd-ate-position-align-grid
+  > [data-do]
+  > span:not([class*='fpd-icon']) {
+  display: none !important;
+}
+
+/* Arrange: Move Up / Move Down — equal tiles, not stuck left */
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .fpd-ate-position-panel
+  .fpd-ate-position-arrange-grid.fpd-tool-layer-depth,
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .fpd-ate-position-panel
+  .fpd-ate-position-arrange-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  grid-auto-rows: 68px !important;
+  gap: 10px !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  margin: 0 !important;
+  margin-left: 0 !important;
+  padding: 0 !important;
+  overflow: visible !important;
+  box-sizing: border-box !important;
+}
+
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .fpd-ate-position-panel
+  .fpd-ate-position-arrange-grid
+  > [data-do] {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  height: 68px !important;
+  min-height: 68px !important;
+  max-height: 68px !important;
+  margin: 0 !important;
+  padding: 8px 4px !important;
+  box-sizing: border-box !important;
+  border: 1px solid #e3e5e9 !important;
+  border-radius: 12px !important;
+  background: #fff !important;
+  overflow: hidden !important;
+  cursor: pointer !important;
+}
+
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .fpd-ate-position-panel
+  .fpd-ate-position-arrange-grid
+  > [data-do]
+  > span[class*='fpd-icon'] {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin: 0 !important;
+  font-size: 20px !important;
+  line-height: 1 !important;
+  pointer-events: none !important;
+}
+
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .fpd-ate-position-panel
+  .fpd-ate-position-arrange-grid
+  > [data-do]
+  > span:not([class*='fpd-icon']) {
+  display: none !important;
+}
+
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small.fpd-panel-visible
+  > .fpd-sub-panel:has(> .fpd-ate-position-panel.fpd-active) {
+  overflow: visible !important;
+  max-height: none !important;
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+/*
+  Text-align bottom sheet (opened from #textAlignCust / Align tool).
+  Shows Left / Center / Right / Justify like other Add Text panels.
+*/
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .fpd-sub-panel
+  > .fpd-ate-text-align-sheet {
+  display: none !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+  padding: 16px 16px 20px !important;
+  margin: 0 !important;
+  background: #fff !important;
+  overflow: visible !important;
+  height: auto !important;
+  min-height: 0 !important;
+}
+
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .fpd-sub-panel
+  > .fpd-ate-text-align-sheet.fpd-active {
+  display: flex !important;
+}
+
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .fpd-ate-text-align-title {
+  display: block !important;
+  font-size: 15px !important;
+  font-weight: 600 !important;
+  color: #485563 !important;
+  margin: 0 0 14px !important;
+  padding: 0 !important;
+  line-height: 1.2 !important;
+  text-align: left !important;
+}
+
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .fpd-ate-text-align-options {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: wrap !important;
+  align-items: stretch !important;
+  justify-content: flex-start !important;
+  gap: 10px !important;
+  width: 100% !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  overflow: visible !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .fpd-ate-text-align-option {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex: 0 0 calc(25% - 8px) !important;
+  width: calc(25% - 8px) !important;
+  min-width: 64px !important;
+  max-width: 88px !important;
+  height: 76px !important;
+  min-height: 76px !important;
+  max-height: 76px !important;
+  box-sizing: border-box !important;
+  margin: 0 !important;
+  padding: 8px 4px 6px !important;
+  gap: 4px !important;
+  border: 1px solid #e3e5e9 !important;
+  border-radius: 12px !important;
+  background: #fff !important;
+  color: #485563 !important;
+  cursor: pointer !important;
+  overflow: visible !important;
+  pointer-events: auto !important;
+  -webkit-tap-highlight-color: transparent;
+}
+
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .fpd-ate-text-align-option.fpd-ate-text-align-option-active,
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .fpd-ate-text-align-option.fpd-active {
+  border-color: var(--theme-color, #e8576d) !important;
+  background: color-mix(in srgb, var(--theme-color, #e8576d) 10%, #fff) !important;
+}
+
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .fpd-ate-text-align-option
+  > span[class^='fpd-icon-'],
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .fpd-ate-text-align-option
+  > span[class*=' fpd-icon-'] {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 22px !important;
+  line-height: 1 !important;
+  width: 28px !important;
+  height: 28px !important;
+  margin: 0 !important;
+  color: #485563 !important;
+  pointer-events: none !important;
+}
+
+/* Distinct icons per option (styles.scss reuses one SVG for all three) */
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .fpd-ate-text-align-option
+  > .fpd-icon-format-align-left:before,
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .fpd-ate-text-align-option
+  > .fpd-icon-format-align-center:before,
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .fpd-ate-text-align-option
+  > .fpd-icon-format-align-right:before,
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .fpd-ate-text-align-option
+  > .fpd-icon-format-align-justify:before {
+  content: '' !important;
+  display: inline-block !important;
+  width: 22px !important;
+  height: 22px !important;
+  background-repeat: no-repeat !important;
+  background-position: center !important;
+  background-size: contain !important;
+  position: static !important;
+  top: auto !important;
+}
+
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .fpd-ate-text-align-option
+  > .fpd-icon-format-align-left:before {
+  background-image: url('/assets/icon/left-align-01.svg') !important;
+}
+
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .fpd-ate-text-align-option
+  > .fpd-icon-format-align-center:before {
+  background-image: url('/assets/icon/center-align-01.svg') !important;
+}
+
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .fpd-ate-text-align-option
+  > .fpd-icon-format-align-right:before {
+  background-image: url('/assets/icon/right-align-01.svg') !important;
+}
+
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .fpd-ate-text-align-option
+  > .fpd-icon-format-align-justify:before {
+  background-image: url('/assets/icon/Text-Alignment-Icon.svg') !important;
+}
+
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .fpd-ate-text-align-option.fpd-ate-text-align-option-active
+  > .fpd-icon-format-align-left:before {
+  background-image: url('/assets/icon/left-align-01-active.svg') !important;
+}
+
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .fpd-ate-text-align-option.fpd-ate-text-align-option-active
+  > .fpd-icon-format-align-center:before {
+  background-image: url('/assets/icon/center-align-01-active.svg') !important;
+}
+
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .fpd-ate-text-align-option.fpd-ate-text-align-option-active
+  > .fpd-icon-format-align-right:before {
+  background-image: url('/assets/icon/right-align-01-active.svg') !important;
+}
+
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .fpd-ate-text-align-option.fpd-ate-text-align-option-active
+  > .fpd-icon-format-align-justify:before {
+  background-image: url('/assets/icon/Text-Alignment-Icon-Active.svg') !important;
+}
+
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .fpd-ate-text-align-option
+  > .fpd-ate-text-align-option-label {
+  display: block !important;
+  font-size: 9px !important;
+  font-weight: 500 !important;
+  line-height: 1.15 !important;
+  color: #6b6e73 !important;
+  text-align: center !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  pointer-events: none !important;
+  white-space: nowrap !important;
+}
+
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .fpd-ate-text-align-option.fpd-ate-text-align-option-active
+  > .fpd-ate-text-align-option-label,
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .fpd-ate-text-align-option.fpd-ate-text-align-option-active
+  > span[class^='fpd-icon-'],
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .fpd-ate-text-align-option.fpd-ate-text-align-option-active
+  > span[class*=' fpd-icon-'] {
+  color: var(--theme-color, #e8576d) !important;
+}
+
+/* When align sheet is open, keep sub-panel tall enough for the 4 cells */
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small.fpd-panel-visible
+  > .fpd-sub-panel:has(> .fpd-ate-text-align-sheet.fpd-active) {
+  overflow: visible !important;
+  max-height: none !important;
+  width: 100% !important;
+  max-width: 100% !important;
+}
