@@ -1,0 +1,78 @@
+/*
+  Add Text Editor (mobile) — Color panel fixes (fpd-ate-color-*).
+  NEW classes only. Does not modify styles.scss, fpd-doc-fixes.css,
+  or fpd-add-text-editor.css.
+
+  1) Shadow tab must scroll so Blur / Offset X / Offset Y stay reachable.
+  2) Scoped to fpd-ate-editor + fpd-layout-small only.
+*/
+
+/* Color panel: column layout so tabs header stays put and body scrolls */
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small.fpd-panel-visible
+  .fpd-panel-color.fpd-ate-color-panel.fpd-active {
+  display: flex !important;
+  flex-direction: column !important;
+  min-height: 0 !important;
+  max-height: 100% !important;
+  overflow: hidden !important;
+}
+
+/* Vendor sets .fpd-panel-color > .fpd-scroll-area { overflow: visible }
+   which prevents the Shadow tab from scrolling to Offset Y. */
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small.fpd-panel-visible
+  .fpd-panel-color.fpd-ate-color-panel
+  > .fpd-panel-tabs-content.fpd-scroll-area.fpd-ate-color-tabs-scroll,
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small.fpd-panel-visible
+  .fpd-panel-color.fpd-ate-color-panel
+  .fpd-panel-tabs-content.fpd-ate-color-tabs-scroll {
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  max-height: min(50vh, calc(100vh - 210px)) !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+  overscroll-behavior: contain !important;
+  touch-action: pan-y !important;
+}
+
+/* Active Fill / Stroke / Shadow pane must grow with content inside the scroller */
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small.fpd-panel-visible
+  .fpd-panel-color.fpd-ate-color-panel
+  .fpd-ate-color-tabs-scroll
+  > div.fpd-active {
+  display: block !important;
+  height: auto !important;
+  max-height: none !important;
+  overflow: visible !important;
+  padding-bottom: 24px !important;
+}
+
+/* Keep range thumbs draggable; allow vertical pan to scroll the sheet */
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small.fpd-panel-visible
+  .fpd-panel-color.fpd-ate-color-panel
+  .fpd-ate-color-tabs-scroll
+  fpd-range-slider
+  input[type='range'] {
+  touch-action: pan-y !important;
+}
+
+/*
+  Align / Arrange belong on the Position (Center) tool only.
+  Existing ate CSS forces .fpd-ate-position-panel to display:flex even
+  without .fpd-active, so it leaked under Color (Fill/Stroke/Shadow).
+  Hide the inactive position sheet — do not edit fpd-add-text-editor.css.
+*/
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .fpd-sub-panel
+  > .fpd-panel-position.fpd-ate-position-panel:not(.fpd-active) {
+  display: none !important;
+  height: 0 !important;
+  min-height: 0 !important;
+  max-height: 0 !important;
+  overflow: hidden !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  pointer-events: none !important;
+  visibility: hidden !important;
+}

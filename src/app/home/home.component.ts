@@ -801,7 +801,11 @@ export class HomeComponent implements AfterViewInit {
       const closeOpacityPanel = () => {
         panel.style.display = 'none';
         btnOpacity.classList.remove('fpd-active');
-        opacityToolbarEl?.classList.remove('fpd-opacity-open', 'fpd-doc-opacity-dock');
+        opacityToolbarEl?.classList.remove(
+          'fpd-opacity-open',
+          'fpd-doc-opacity-dock',
+          'fpd-dee-opacity-open'
+        );
       };
 
       // The chevron/down-arrow above the toolbar (vendor's `.fpd-close`)
@@ -865,6 +869,11 @@ export class HomeComponent implements AfterViewInit {
         value = Math.min(1, Math.max(0, value));
         syncLegacyRange(value);
         syncDocSliderUi(value);
+        // Desktop Element Editor sheet (fpd-dee-*) — sync only, no CSS edits
+        const deeSync = (panel as any)._fpdDeeSyncOpacity as
+          | ((v: number) => void)
+          | undefined;
+        deeSync?.(value);
         if (!applyToObject) return;
         const canvas = this.designer.currentViewInstance.fabricCanvas;
         const obj = canvas.getActiveObject();
@@ -984,6 +993,10 @@ export class HomeComponent implements AfterViewInit {
             setOpacityValue(n);
           }
         });
+      } else {
+        // Desktop Element Editor — same mobile opacity look via fpd-dee-*
+        // (separate from mobile fpd-doc-* and Add Text fpd-dte-*).
+        this.ensureDesktopElementOpacitySheet(panel, setOpacityValue);
       }
 
       btnOpacity.addEventListener('click', (e) => {
@@ -998,6 +1011,13 @@ export class HomeComponent implements AfterViewInit {
         ) {
           return;
         }
+        // Add Text desktop: bindDesktopAddTextEditorActions owns the toggle.
+        if (
+          opacityToolbarEl?.classList.contains('fpd-dte-editor') &&
+          opacityToolbarEl?.classList.contains('fpd-layout-large')
+        ) {
+          return;
+        }
         if (targetSection) {
           const activeElem = targetSection.querySelector('.fpd-active');
 
@@ -1009,11 +1029,15 @@ export class HomeComponent implements AfterViewInit {
           !opacityToolbarEl?.classList.contains('fpd-opacity-open') &&
           panel.style.display !== 'block';
         if (willOpen) {
+          if (!isMobileLayout()) {
+            this.ensureDesktopElementOpacitySheet(panel, setOpacityValue);
+          }
           panel.style.display = 'block';
           btnOpacity.classList.add('fpd-active');
           opacityToolbarEl?.classList.add(
             'fpd-opacity-open',
             'fpd-doc-opacity-dock',
+            'fpd-dee-opacity-open',
             'fpd-show'
           );
         } else {
@@ -2502,7 +2526,7 @@ export class HomeComponent implements AfterViewInit {
     const clearAteToolClasses = () => {
       document
         .querySelectorAll(
-          '.fpd-ate-editor, .fpd-ate-uniform-tool, .fpd-ate-tool-label, .fpd-ate-layer-group, .fpd-ate-btn-group, .fpd-ate-show-duplicate, .fpd-ate-size-tool, .fpd-ate-size-wrap, .fpd-ate-copy-paste-row, .fpd-ate-tool-shell, .fpd-ate-labeled-opacity, .fpd-ate-fonts-scroll, .fpd-ate-font-panel, .fpd-ate-font-cell, .fpd-ate-font-preview, .fpd-ate-position-panel, .fpd-ate-position-align-grid, .fpd-ate-position-arrange-grid, .fpd-ate-position-tabs, .fpd-ate-position-tabs-content'
+          '.fpd-ate-editor, .fpd-ate-uniform-tool, .fpd-ate-tool-label, .fpd-ate-layer-group, .fpd-ate-btn-group, .fpd-ate-show-duplicate, .fpd-ate-size-tool, .fpd-ate-size-wrap, .fpd-ate-copy-paste-row, .fpd-ate-tool-shell, .fpd-ate-labeled-opacity, .fpd-ate-fonts-scroll, .fpd-ate-font-panel, .fpd-ate-font-cell, .fpd-ate-font-preview, .fpd-ate-position-panel, .fpd-ate-position-align-grid, .fpd-ate-position-arrange-grid, .fpd-ate-position-tabs, .fpd-ate-position-tabs-content, .fpd-ate-color-panel, .fpd-ate-color-tabs-scroll'
         )
         .forEach((el) => {
           el.classList.remove(
@@ -2525,7 +2549,9 @@ export class HomeComponent implements AfterViewInit {
             'fpd-ate-position-align-grid',
             'fpd-ate-position-arrange-grid',
             'fpd-ate-position-tabs',
-            'fpd-ate-position-tabs-content'
+            'fpd-ate-position-tabs-content',
+            'fpd-ate-color-panel',
+            'fpd-ate-color-tabs-scroll'
           );
         });
       document
@@ -2774,6 +2800,316 @@ export class HomeComponent implements AfterViewInit {
 
     tb.classList.add('fpd-dte-editor');
     tb.querySelector('#fpd-opacity-btn')?.classList.add('fpd-dte-opacity-btn');
+    const panel = tb.querySelector(
+      '#fpd-opacity-panel'
+    ) as HTMLElement | null;
+    if (panel) this.ensureDesktopOpacitySheet(panel);
+  }
+
+  /**
+   * Desktop opacity UI — same layout as mobile Color opacity sheet
+   * (title + 1.00 box + fpd-range-slider), using NEW fpd-dte-* classes only.
+   * Does not modify mobile fpd-doc-* markup or existing CSS files.
+   */
+  ensureDesktopOpacitySheet(panel: HTMLElement): void {
+    if (window.matchMedia('(max-width: 768px)').matches) return;
+    if (panel.classList.contains('fpd-doc-opacity-sheet')) return;
+
+    panel.classList.add('fpd-dte-opacity-sheet');
+
+    const legacyRange = panel.querySelector(
+      '#fpd-opacity-range'
+    ) as HTMLInputElement | null;
+
+    let existingLabel = panel.querySelector(
+      ':scope > span.fpd-label, .fpd-opacity-title-row > span.fpd-label, .fpd-dte-opacity-title-row > span.fpd-label'
+    ) as HTMLElement | null;
+    if (existingLabel) {
+      existingLabel.classList.add('fpd-dte-opacity-panel-title');
+      existingLabel.textContent = 'Opacity';
+      existingLabel.setAttribute('data-defaulttext', 'Opacity');
+      if (
+        !existingLabel.closest('.fpd-dte-opacity-title-row') &&
+        !existingLabel.closest('.fpd-opacity-title-row')
+      ) {
+        const titleRow = document.createElement('div');
+        titleRow.className = 'fpd-dte-opacity-title-row';
+        panel.insertBefore(titleRow, existingLabel);
+        titleRow.appendChild(existingLabel);
+      } else {
+        existingLabel
+          .closest('.fpd-opacity-title-row')
+          ?.classList.add('fpd-dte-opacity-title-row');
+      }
+    }
+
+    let control = panel.querySelector(
+      '.fpd-dte-opacity-control'
+    ) as HTMLElement | null;
+    if (!control) {
+      control = document.createElement('div');
+      control.className = 'fpd-dte-opacity-control fpd-input';
+
+      const fieldLabel = document.createElement('span');
+      fieldLabel.className = 'fpd-label';
+      fieldLabel.textContent = 'Opacity';
+      fieldLabel.setAttribute('data-defaulttext', 'Opacity');
+
+      const rangeSlider = document.createElement('fpd-range-slider');
+      rangeSlider.className = 'fpd-progress';
+      rangeSlider.id = 'fpd-dte-opacity-slider';
+      rangeSlider.setAttribute('value', legacyRange?.value || '1');
+      rangeSlider.setAttribute('min', '0');
+      rangeSlider.setAttribute('max', '1');
+      rangeSlider.setAttribute('step', '0.01');
+
+      const numberInput = document.createElement('input');
+      numberInput.className = 'fpd-slider-number fpd-number fpd-dte-opacity-value';
+      numberInput.type = 'number';
+      numberInput.id = 'fpd-dte-opacity-value';
+      numberInput.min = '0';
+      numberInput.max = '1';
+      numberInput.step = '0.01';
+      numberInput.value = legacyRange?.value || '1';
+
+      control.append(fieldLabel, rangeSlider, numberInput);
+      panel.appendChild(control);
+    }
+
+    if (legacyRange) {
+      legacyRange.classList.add('fpd-dte-opacity-range-legacy');
+      legacyRange.setAttribute('aria-hidden', 'true');
+    }
+
+    const setOpacityValue = (value: number) => {
+      value = Math.min(1, Math.max(0, value));
+      const v = value.toFixed(2);
+      const sliderEl = panel.querySelector(
+        '#fpd-dte-opacity-slider'
+      ) as HTMLElement | null;
+      const numEl = panel.querySelector(
+        '#fpd-dte-opacity-value'
+      ) as HTMLInputElement | null;
+      const rangeInput = sliderEl?.querySelector(
+        'input[type="range"]'
+      ) as HTMLInputElement | null;
+      sliderEl?.setAttribute('value', v);
+      if (rangeInput) {
+        rangeInput.value = v;
+        rangeInput.style.setProperty('--value', v);
+        rangeInput.style.setProperty('--min', '0');
+        rangeInput.style.setProperty('--max', '1');
+      }
+      if (numEl) numEl.value = v;
+      if (legacyRange) {
+        legacyRange.value = v;
+        const percent = (value / parseFloat(legacyRange.max || '1')) * 100;
+        legacyRange.style.setProperty('--progress', percent + '%');
+      }
+      const canvas = this.designer?.currentViewInstance?.fabricCanvas;
+      const obj = canvas?.getActiveObject?.();
+      if (!canvas || !obj) return;
+      obj.set('opacity', value);
+      canvas.requestRenderAll();
+      canvas.fire('object:modified', { target: obj });
+    };
+
+    const bindDteSlider = () => {
+      const rangeInput = panel.querySelector(
+        '#fpd-dte-opacity-slider input[type="range"]'
+      ) as HTMLInputElement | null;
+      if (!rangeInput || (rangeInput as any)._fpdDteBound) return;
+      (rangeInput as any)._fpdDteBound = true;
+      rangeInput.addEventListener('input', () => {
+        setOpacityValue(parseFloat(rangeInput.value));
+      });
+    };
+    bindDteSlider();
+    setTimeout(bindDteSlider, 0);
+    setTimeout(bindDteSlider, 100);
+
+    const numEl = panel.querySelector(
+      '#fpd-dte-opacity-value'
+    ) as HTMLInputElement | null;
+    if (numEl && !(numEl as any)._fpdDteBound) {
+      (numEl as any)._fpdDteBound = true;
+      const onNum = () => {
+        const n = parseFloat(numEl.value);
+        if (Number.isFinite(n)) setOpacityValue(n);
+      };
+      numEl.addEventListener('change', onNum);
+      numEl.addEventListener('input', onNum);
+    }
+
+    // Sync UI to active object without applying (caller may pass value)
+    (panel as any)._fpdDteSyncOpacity = (value: number) => {
+      const v = Math.min(1, Math.max(0, value)).toFixed(2);
+      const sliderEl = panel.querySelector(
+        '#fpd-dte-opacity-slider'
+      ) as HTMLElement | null;
+      const rangeInput = sliderEl?.querySelector(
+        'input[type="range"]'
+      ) as HTMLInputElement | null;
+      sliderEl?.setAttribute('value', v);
+      if (rangeInput) {
+        rangeInput.value = v;
+        rangeInput.style.setProperty('--value', v);
+        rangeInput.style.setProperty('--min', '0');
+        rangeInput.style.setProperty('--max', '1');
+      }
+      if (numEl) numEl.value = v;
+      if (legacyRange) {
+        legacyRange.value = v;
+        const percent =
+          (parseFloat(v) / parseFloat(legacyRange.max || '1')) * 100;
+        legacyRange.style.setProperty('--progress', percent + '%');
+      }
+    };
+  }
+
+  /**
+   * Desktop Element Editor opacity — match mobile Color opacity sheet.
+   * NEW fpd-dee-* classes only. Does not touch mobile fpd-doc-* or Add Text
+   * fpd-dte-* sheets / CSS.
+   */
+  ensureDesktopElementOpacitySheet(
+    panel: HTMLElement,
+    setOpacityValue?: (value: number, applyToObject?: boolean) => void
+  ): void {
+    if (window.matchMedia('(max-width: 768px)').matches) return;
+    // Leave mobile / Add Text sheets alone
+    if (panel.classList.contains('fpd-doc-opacity-sheet')) return;
+    if (panel.classList.contains('fpd-dte-opacity-sheet')) return;
+
+    panel.classList.add('fpd-dee-opacity-sheet');
+
+    const legacyRange = panel.querySelector(
+      '#fpd-opacity-range'
+    ) as HTMLInputElement | null;
+
+    let existingLabel = panel.querySelector(
+      ':scope > span.fpd-label, .fpd-dee-opacity-title-row > span.fpd-label'
+    ) as HTMLElement | null;
+    if (existingLabel) {
+      existingLabel.classList.add('fpd-dee-opacity-panel-title');
+      existingLabel.textContent = 'Opacity';
+      existingLabel.setAttribute('data-defaulttext', 'Opacity');
+      if (!existingLabel.closest('.fpd-dee-opacity-title-row')) {
+        const titleRow = document.createElement('div');
+        titleRow.className = 'fpd-dee-opacity-title-row';
+        panel.insertBefore(titleRow, existingLabel);
+        titleRow.appendChild(existingLabel);
+      }
+    }
+
+    let control = panel.querySelector(
+      '.fpd-dee-opacity-control'
+    ) as HTMLElement | null;
+    if (!control) {
+      control = document.createElement('div');
+      control.className = 'fpd-dee-opacity-control fpd-input';
+
+      const fieldLabel = document.createElement('span');
+      fieldLabel.className = 'fpd-label';
+      fieldLabel.textContent = 'Opacity';
+      fieldLabel.setAttribute('data-defaulttext', 'Opacity');
+
+      const rangeSlider = document.createElement('fpd-range-slider');
+      rangeSlider.className = 'fpd-progress';
+      rangeSlider.id = 'fpd-dee-opacity-slider';
+      rangeSlider.setAttribute('value', legacyRange?.value || '1');
+      rangeSlider.setAttribute('min', '0');
+      rangeSlider.setAttribute('max', '1');
+      rangeSlider.setAttribute('step', '0.01');
+
+      const numberInput = document.createElement('input');
+      numberInput.className =
+        'fpd-slider-number fpd-number fpd-dee-opacity-value';
+      numberInput.type = 'number';
+      numberInput.id = 'fpd-dee-opacity-value';
+      numberInput.min = '0';
+      numberInput.max = '1';
+      numberInput.step = '0.01';
+      numberInput.value = legacyRange?.value || '1';
+
+      control.append(fieldLabel, rangeSlider, numberInput);
+      panel.appendChild(control);
+    }
+
+    if (legacyRange) {
+      legacyRange.classList.add('fpd-dee-opacity-range-legacy');
+      legacyRange.setAttribute('aria-hidden', 'true');
+    }
+
+    const applyValue =
+      setOpacityValue ||
+      ((value: number) => {
+        value = Math.min(1, Math.max(0, value));
+        const canvas = this.designer?.currentViewInstance?.fabricCanvas;
+        const obj = canvas?.getActiveObject?.();
+        if (!canvas || !obj) return;
+        obj.set('opacity', value);
+        canvas.requestRenderAll();
+        canvas.fire('object:modified', { target: obj });
+      });
+
+    const syncUiOnly = (value: number) => {
+      const v = Math.min(1, Math.max(0, value)).toFixed(2);
+      const sliderEl = panel.querySelector(
+        '#fpd-dee-opacity-slider'
+      ) as HTMLElement | null;
+      const rangeInput = sliderEl?.querySelector(
+        'input[type="range"]'
+      ) as HTMLInputElement | null;
+      const numEl = panel.querySelector(
+        '#fpd-dee-opacity-value'
+      ) as HTMLInputElement | null;
+      sliderEl?.setAttribute('value', v);
+      if (rangeInput) {
+        rangeInput.value = v;
+        rangeInput.style.setProperty('--value', v);
+        rangeInput.style.setProperty('--min', '0');
+        rangeInput.style.setProperty('--max', '1');
+      }
+      if (numEl) numEl.value = v;
+      if (legacyRange) {
+        legacyRange.value = v;
+        const percent =
+          (parseFloat(v) / parseFloat(legacyRange.max || '1')) * 100;
+        legacyRange.style.setProperty('--progress', percent + '%');
+      }
+    };
+
+    (panel as any)._fpdDeeSyncOpacity = (value: number) => {
+      syncUiOnly(value);
+    };
+
+    const bindDeeSlider = () => {
+      const rangeInput = panel.querySelector(
+        '#fpd-dee-opacity-slider input[type="range"]'
+      ) as HTMLInputElement | null;
+      if (!rangeInput || (rangeInput as any)._fpdDeeBound) return;
+      (rangeInput as any)._fpdDeeBound = true;
+      rangeInput.addEventListener('input', () => {
+        applyValue(parseFloat(rangeInput.value), true);
+      });
+    };
+    bindDeeSlider();
+    setTimeout(bindDeeSlider, 0);
+    setTimeout(bindDeeSlider, 100);
+
+    const numEl = panel.querySelector(
+      '#fpd-dee-opacity-value'
+    ) as HTMLInputElement | null;
+    if (numEl && !(numEl as any)._fpdDeeBound) {
+      (numEl as any)._fpdDeeBound = true;
+      const onNum = () => {
+        const n = parseFloat(numEl.value);
+        if (Number.isFinite(n)) applyValue(n, true);
+      };
+      numEl.addEventListener('change', onNum);
+      numEl.addEventListener('input', onNum);
+    }
   }
 
   /**
@@ -2844,7 +3180,8 @@ export class HomeComponent implements AfterViewInit {
             opacityBtn.classList.remove('fpd-active');
             toolbar.classList.remove(
               'fpd-opacity-open',
-              'fpd-doc-opacity-dock'
+              'fpd-doc-opacity-dock',
+              'fpd-dte-opacity-open'
             );
           } else {
             toolbar
@@ -2852,36 +3189,21 @@ export class HomeComponent implements AfterViewInit {
               ?.querySelectorAll(':scope > .fpd-active')
               .forEach((el) => el.classList.remove('fpd-active'));
             toolbar.classList.remove('fpd-panel-visible');
+            this.ensureDesktopOpacitySheet(panel);
             panel.style.display = 'block';
             opacityBtn.classList.add('fpd-active');
             toolbar.classList.add(
               'fpd-opacity-open',
-              'fpd-doc-opacity-dock',
+              'fpd-dte-opacity-open',
               'fpd-show'
             );
             const obj = getObj();
-            const slider = panel.querySelector(
-              '#fpd-opacity-range'
-            ) as HTMLInputElement | null;
-            if (obj && slider) {
+            if (obj) {
               const value = Math.min(1, Math.max(0, obj.opacity ?? 1));
-              slider.value = value.toFixed(2);
-              if (!(slider as any)._fpdDteBound) {
-                (slider as any)._fpdDteBound = true;
-                slider.addEventListener('input', () => {
-                  const o = getObj();
-                  const c = getCanvas();
-                  if (!o || !c) return;
-                  const v = Math.min(
-                    1,
-                    Math.max(0, parseFloat(slider.value) || 0)
-                  );
-                  o.set('opacity', v);
-                  c.requestRenderAll();
-                  c.fire('object:modified', { target: o });
-                });
-              }
-              slider.dispatchEvent(new Event('input', { bubbles: true }));
+              const sync = (panel as any)._fpdDteSyncOpacity as
+                | ((v: number) => void)
+                | undefined;
+              sync?.(value);
             }
           }
           return;
@@ -3473,6 +3795,35 @@ export class HomeComponent implements AfterViewInit {
         .forEach((content) =>
           content.classList.add('fpd-ate-position-tabs-content')
         );
+    });
+
+    // Color panel (Fill / Stroke / Shadow): enable Shadow-tab scroll +
+    // safer Stroke Width range for text (outline, not a solid blob).
+    toolbar.querySelectorAll('.fpd-panel-color').forEach((panel) => {
+      panel.classList.add('fpd-ate-color-panel');
+      panel
+        .querySelectorAll(':scope > .fpd-panel-tabs-content.fpd-scroll-area')
+        .forEach((content) =>
+          content.classList.add('fpd-ate-color-tabs-scroll')
+        );
+      panel
+        .querySelectorAll(
+          'fpd-range-slider[data-control="strokeWidth"], input.fpd-slider-number[data-control="strokeWidth"]'
+        )
+        .forEach((el) => {
+          el.setAttribute('max', '5');
+          const cur = parseFloat(
+            (el as HTMLInputElement).value ||
+              el.getAttribute('value') ||
+              '0'
+          );
+          if (Number.isFinite(cur) && cur > 5) {
+            if (el.tagName === 'INPUT') {
+              (el as HTMLInputElement).value = '5';
+            }
+            el.setAttribute('value', '5');
+          }
+        });
     });
 
     // Preview the selected face in the Font dropdown (vendor only sets .value).

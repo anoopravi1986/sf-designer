@@ -5339,20 +5339,39 @@
             else {
               let i = {}
               e.shadow && (i = e.shadow.toObject())
+              // Blur/offset alone used to build a shadow with undefined color,
+              // so Fabric drew nothing — default color/offsets so Blur works.
               let n = {
                 color: t.hasOwnProperty('shadowColor')
                   ? t.shadowColor
-                  : i.color,
-                blur: t.hasOwnProperty('shadowBlur') ? t.shadowBlur : i.blur,
+                  : i.color || '#000000',
+                blur: t.hasOwnProperty('shadowBlur')
+                  ? Number(t.shadowBlur) || 0
+                  : i.blur != null
+                    ? i.blur
+                    : 0,
                 offsetX: t.hasOwnProperty('shadowOffsetX')
-                  ? t.shadowOffsetX
-                  : i.offsetX,
+                  ? Number(t.shadowOffsetX) || 0
+                  : i.offsetX != null
+                    ? i.offsetX
+                    : 0,
                 offsetY: t.hasOwnProperty('shadowOffsetY')
-                  ? t.shadowOffsetY
-                  : i.offsetY
+                  ? Number(t.shadowOffsetY) || 0
+                  : i.offsetY != null
+                    ? i.offsetY
+                    : 0
               }
               e.set('shadow', n)
             }
+          // Stroke Width on text: high values (vendor max 20) merge glyphs into
+          // a solid blob. Cap for text so Width stays a readable outline.
+          if (
+            'text' === i &&
+            t.hasOwnProperty('strokeWidth') &&
+            Number(t.strokeWidth) > 5
+          ) {
+            t.strokeWidth = 5
+          }
           if (
             (delete t.paths,
             e.setOptions(t),

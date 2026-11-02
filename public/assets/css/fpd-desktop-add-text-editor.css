@@ -106,3 +106,187 @@ fpd-element-toolbar.fpd-dte-editor.fpd-layout-large:not(.fpd-layout-small):not(
   #fpd-opacity-range {
   pointer-events: auto !important;
 }
+
+/* ==========================================================================
+   Desktop Opacity sheet — match mobile Color opacity look exactly.
+   NEW classes only (fpd-dte-*). Does not edit styles.scss / fpd-doc-fixes.
+   Layout: centered "Opacity" title, 1.00 value box, full-width orange slider.
+   ========================================================================== */
+
+#fpd-opacity-range.fpd-dte-opacity-range-legacy,
+#fpd-opacity-panel.fpd-dte-opacity-sheet > #fpd-opacity-range {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  border: 0 !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+fpd-element-toolbar.fpd-dte-editor.fpd-layout-large.fpd-opacity-open
+  #fpd-opacity-panel.fpd-dte-opacity-sheet,
+fpd-element-toolbar.fpd-dte-opacity-open
+  #fpd-opacity-panel.fpd-dte-opacity-sheet {
+  display: block !important;
+  box-sizing: border-box !important;
+  padding: 8px 14px 14px !important;
+  min-width: 280px !important;
+  background: #fff !important;
+  border-radius: 8px !important;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15) !important;
+}
+
+#fpd-opacity-panel.fpd-dte-opacity-sheet .fpd-dte-opacity-title-row,
+#fpd-opacity-panel.fpd-dte-opacity-sheet .fpd-opacity-title-row {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
+  padding: 6px 0 8px !important;
+  margin: 0 !important;
+}
+
+#fpd-opacity-panel.fpd-dte-opacity-sheet .fpd-dte-opacity-panel-title,
+#fpd-opacity-panel.fpd-dte-opacity-sheet
+  span.fpd-label.fpd-dte-opacity-panel-title {
+  display: block !important;
+  text-align: center !important;
+  font-size: 16px !important;
+  font-weight: 600 !important;
+  color: #4b5563 !important;
+  margin: 0 !important;
+}
+
+#fpd-opacity-panel.fpd-dte-opacity-sheet .fpd-dte-opacity-control {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: wrap !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+  padding: 0 0 4px !important;
+  margin: 0 !important;
+  gap: 0 !important;
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+/* Title already says Opacity — hide redundant field label */
+#fpd-opacity-panel.fpd-dte-opacity-sheet
+  .fpd-dte-opacity-control
+  > .fpd-label {
+  display: none !important;
+}
+
+/* Value box (1.00) — left, above the track */
+#fpd-opacity-panel.fpd-dte-opacity-sheet
+  .fpd-dte-opacity-control
+  > .fpd-dte-opacity-value,
+#fpd-opacity-panel.fpd-dte-opacity-sheet
+  .fpd-dte-opacity-control
+  > .fpd-slider-number {
+  order: 1 !important;
+  flex: 0 0 70px !important;
+  width: 70px !important;
+  min-width: 70px !important;
+  max-width: 70px !important;
+  height: 32px !important;
+  margin: 0 0 10px !important;
+  padding: 0 4px !important;
+  text-align: center !important;
+  border: 1px solid var(--fpd-border-color, #d7dade) !important;
+  border-radius: 8px !important;
+  box-sizing: border-box !important;
+  background: #fff !important;
+  color: #4b5563 !important;
+  font-size: 14px !important;
+}
+
+#fpd-opacity-panel.fpd-dte-opacity-sheet
+  .fpd-dte-opacity-control
+  > fpd-range-slider {
+  order: 3 !important;
+  flex: 1 1 100% !important;
+  flex-basis: 100% !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  display: block !important;
+  height: 32px !important;
+  margin: 0 !important;
+  box-sizing: border-box !important;
+}
+
+#fpd-opacity-panel.fpd-dte-opacity-sheet
+  .fpd-dte-opacity-control
+  fpd-range-slider.fpd-progress
+  input[type='range'] {
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  touch-action: none !important;
+  --sx: calc(0.5 * 32px + var(--ratio) * (100% - 32px)) !important;
+}
+
+#fpd-opacity-panel.fpd-dte-opacity-sheet
+  .fpd-dte-opacity-control
+  fpd-range-slider
+  input[type='range']::-webkit-slider-runnable-track {
+  height: var(--fpd-track-height, 8px) !important;
+  border-radius: 4px !important;
+  background: linear-gradient(
+      var(--fpd-secondary-color, var(--theme-color, #e85624)),
+      var(--fpd-secondary-color, var(--theme-color, #e85624))
+    )
+    0 / var(--sx) 100% no-repeat,
+    var(--fpd-light-bg-color, #eeeeee) !important;
+}
+
+#fpd-opacity-panel.fpd-dte-opacity-sheet
+  .fpd-dte-opacity-control
+  fpd-range-slider
+  input[type='range']::-webkit-slider-thumb {
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  width: 32px !important;
+  height: 32px !important;
+  border-radius: 50% !important;
+  background: #fff !important;
+  border: 2px solid var(--fpd-secondary-color, var(--theme-color, #e85624)) !important;
+  box-shadow: none !important;
+  margin-top: calc(
+    (var(--fpd-track-height, 8px) * 0.5 - 1px) - (32px * 0.5)
+  ) !important;
+}
+
+#fpd-opacity-panel.fpd-dte-opacity-sheet
+  .fpd-dte-opacity-control
+  fpd-range-slider
+  input[type='range']::-moz-range-thumb {
+  width: 32px !important;
+  height: 32px !important;
+  border-radius: 50% !important;
+  background: #fff !important;
+  border: 2px solid var(--fpd-secondary-color, var(--theme-color, #e85624)) !important;
+  box-shadow: none !important;
+}
+
+#fpd-opacity-panel.fpd-dte-opacity-sheet
+  .fpd-dte-opacity-control
+  fpd-range-slider
+  input[type='range']::-moz-range-track {
+  height: var(--fpd-track-height, 8px) !important;
+  border-radius: 4px !important;
+  background: linear-gradient(
+      var(--fpd-secondary-color, var(--theme-color, #e85624)),
+      var(--fpd-secondary-color, var(--theme-color, #e85624))
+    )
+    0 / var(--sx) 100% no-repeat,
+    var(--fpd-light-bg-color, #eeeeee) !important;
+}
