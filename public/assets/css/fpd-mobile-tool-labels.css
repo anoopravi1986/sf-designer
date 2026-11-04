@@ -1,0 +1,151 @@
+/*
+  Mobile Element Editor + Add Text Editor — tool labels under icons.
+  NEW class only: .fpd-mtl-bold-black
+  Does not modify fpd-doc-fixes.css, fpd-add-text-editor.css, or styles.scss.
+
+  Must beat existing caption rules that set gray (#6b6e73) / weight 500,
+  Color's fpd-show + .fpd-tool-color .fpd-label chain, #TextTransform,
+  and Remove's inherited red (.fpd-tool-remove { color:#e0393a }).
+*/
+
+/* ---------- Element Editor (fpd-doc-*) ---------- */
+fpd-element-toolbar.fpd-smart.fpd-layout-small
+  .fpd-doc-uniform-tool
+  > span.fpd-mtl-bold-black,
+fpd-element-toolbar.fpd-smart.fpd-layout-small
+  .fpd-doc-uniform-tool
+  > span.fpd-label.fpd-mtl-bold-black,
+fpd-element-toolbar.fpd-smart.fpd-layout-small
+  .fpd-doc-uniform-tool
+  > span.fpd-doc-tool-caption.fpd-mtl-bold-black,
+fpd-element-toolbar.fpd-smart.fpd-layout-small
+  .fpd-doc-uniform-tool
+  > span.fpd-doc-opacity-label.fpd-mtl-bold-black,
+fpd-element-toolbar.fpd-smart.fpd-layout-small.fpd-show
+  .fpd-tool-color.fpd-doc-uniform-tool
+  > span.fpd-label.fpd-mtl-bold-black,
+fpd-element-toolbar.fpd-smart.fpd-layout-small.fpd-show
+  .fpd-tool-color.fpd-doc-uniform-tool
+  > span.fpd-mtl-bold-black,
+fpd-element-toolbar.fpd-smart.fpd-layout-small[data-fabric-type='image']
+  .fpd-doc-uniform-tool
+  > span.fpd-label.fpd-mtl-bold-black,
+fpd-element-toolbar.fpd-smart.fpd-layout-small[data-fabric-type='group']
+  .fpd-doc-uniform-tool
+  > span.fpd-label.fpd-mtl-bold-black,
+fpd-element-toolbar.fpd-smart.fpd-layout-small[data-element-type='text']
+  .fpd-doc-uniform-tool
+  > span.fpd-label.fpd-mtl-bold-black,
+fpd-element-toolbar.fpd-smart.fpd-layout-small
+  .fpd-tool-remove.fpd-doc-uniform-tool
+  > span.fpd-mtl-bold-black,
+fpd-element-toolbar.fpd-smart.fpd-layout-small
+  .fpd-tool-remove.fpd-doc-uniform-tool
+  > span.fpd-label.fpd-mtl-bold-black,
+fpd-element-toolbar.fpd-smart.fpd-layout-small
+  .fpd-tool-remove.fpd-doc-uniform-tool
+  > span.fpd-doc-tool-caption.fpd-mtl-bold-black,
+fpd-element-toolbar.fpd-smart.fpd-layout-small
+  .fpd-tool-reset.fpd-doc-uniform-tool
+  > span.fpd-mtl-bold-black,
+fpd-element-toolbar.fpd-smart.fpd-layout-small
+  .fpd-tool-transform.fpd-doc-uniform-tool
+  > span.fpd-mtl-bold-black,
+fpd-element-toolbar.fpd-smart.fpd-layout-small
+  .fpd-tool-duplicate.fpd-doc-uniform-tool
+  > span.fpd-mtl-bold-black,
+fpd-element-toolbar.fpd-smart.fpd-layout-small
+  #fpd-opacity-btn.fpd-doc-labeled-opacity
+  > span.fpd-mtl-bold-black,
+fpd-element-toolbar.fpd-smart.fpd-layout-small
+  #fpd-opacity-btn.fpd-doc-labeled-opacity
+  > span.fpd-doc-opacity-label.fpd-mtl-bold-black,
+fpd-element-toolbar.fpd-smart.fpd-layout-small
+  .fpd-doc-size-tool
+  > span.fpd-mtl-bold-black,
+fpd-element-toolbar.fpd-smart.fpd-layout-small
+  .fpd-doc-size-tool
+  > span.fpd-label.fpd-mtl-bold-black,
+fpd-element-toolbar.fpd-smart.fpd-layout-small
+  .fpd-doc-size-tool
+  > span.fpd-doc-tool-caption.fpd-mtl-bold-black,
+/* ---------- Add Text Editor (fpd-ate-*) ---------- */
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .fpd-ate-uniform-tool
+  > span.fpd-mtl-bold-black,
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .fpd-ate-uniform-tool
+  > span.fpd-label.fpd-mtl-bold-black,
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .fpd-ate-uniform-tool
+  > span.fpd-label.fpd-ate-caption-active.fpd-mtl-bold-black,
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .fpd-ate-uniform-tool
+  > span.fpd-ate-tool-caption.fpd-mtl-bold-black,
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .fpd-ate-uniform-tool
+  > span.fpd-ate-opacity-label.fpd-mtl-bold-black,
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small[data-element-type='text']
+  .fpd-tools-nav
+  .fpd-ate-uniform-tool
+  > span.fpd-label.fpd-ate-caption-active.fpd-mtl-bold-black,
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  #fpd-opacity-btn.fpd-ate-labeled-opacity
+  > span.fpd-mtl-bold-black,
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  #fpd-opacity-btn.fpd-ate-labeled-opacity
+  > span.fpd-ate-opacity-label.fpd-mtl-bold-black,
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .fpd-ate-size-tool
+  > span.fpd-mtl-bold-black,
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .fpd-ate-size-tool
+  > span.fpd-ate-tool-caption.fpd-mtl-bold-black,
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .fpd-ate-size-tool
+  > span.fpd-label.fpd-mtl-bold-black,
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  #TextTransform.fpd-ate-uniform-tool
+  > span.fpd-mtl-bold-black,
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  #TextTransform.fpd-ate-uniform-tool
+  > span.fpd-ate-tool-caption.fpd-mtl-bold-black,
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  #TextTransform.fpd-ate-uniform-tool
+  > span.fpd-label.fpd-ate-caption-active.fpd-mtl-bold-black,
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .fpd-tool-text-transform.fpd-ate-uniform-tool
+  > span.fpd-mtl-bold-black,
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .fpd-tool-text-transform.fpd-ate-uniform-tool
+  > span.fpd-ate-tool-caption.fpd-mtl-bold-black,
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .fpd-tool-text-transform.fpd-ate-uniform-tool
+  > span.fpd-label.fpd-ate-caption-active.fpd-mtl-bold-black,
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .fpd-tool-color.fpd-ate-uniform-tool
+  > span.fpd-mtl-bold-black,
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small.fpd-show
+  .fpd-tool-color.fpd-ate-uniform-tool
+  > span.fpd-label.fpd-mtl-bold-black,
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .fpd-tool-remove.fpd-ate-uniform-tool
+  > span.fpd-mtl-bold-black,
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .fpd-tool-remove.fpd-ate-uniform-tool
+  > span.fpd-label.fpd-mtl-bold-black,
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .fpd-tool-reset.fpd-ate-uniform-tool
+  > span.fpd-mtl-bold-black,
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .fpd-tool-font-family.fpd-ate-uniform-tool
+  > span.fpd-mtl-bold-black,
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .fpd-tool-duplicate.fpd-ate-uniform-tool
+  > span.fpd-mtl-bold-black,
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small
+  .fpd-tool-transform.fpd-ate-uniform-tool
+  > span.fpd-mtl-bold-black {
+  color: #000000 !important;
+  font-weight: 700 !important;
+}

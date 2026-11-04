@@ -2589,6 +2589,7 @@ export class HomeComponent implements AfterViewInit {
         ':scope > .fpd-label'
       ) as HTMLElement | null;
       if (existingLabel) {
+        existingLabel.classList.add('fpd-mtl-bold-black');
         if (text) {
           existingLabel.textContent = text;
           return;
@@ -2612,7 +2613,7 @@ export class HomeComponent implements AfterViewInit {
       ) as HTMLElement | null;
 
       if (!cap && dataSpan) {
-        dataSpan.classList.add('fpd-doc-tool-caption');
+        dataSpan.classList.add('fpd-doc-tool-caption', 'fpd-mtl-bold-black');
         const def = dataSpan.getAttribute('data-defaulttext') || text;
         dataSpan.textContent = text || def;
         return;
@@ -2620,12 +2621,13 @@ export class HomeComponent implements AfterViewInit {
 
       if (!cap) {
         cap = document.createElement('span');
-        cap.className = 'fpd-doc-tool-caption';
+        cap.className = 'fpd-doc-tool-caption fpd-mtl-bold-black';
         cap.textContent = text;
         el.appendChild(cap);
         return;
       }
 
+      cap.classList.add('fpd-mtl-bold-black');
       if (text) {
         cap.textContent = text;
       } else if (
@@ -2669,10 +2671,11 @@ export class HomeComponent implements AfterViewInit {
       ) as HTMLElement | null;
       if (!opLab) {
         opLab = document.createElement('span');
-        opLab.className = 'fpd-doc-opacity-label';
+        opLab.className = 'fpd-doc-opacity-label fpd-mtl-bold-black';
         opLab.textContent = 'Opacity';
         opacityBtn.appendChild(opLab);
       } else {
+        opLab.classList.add('fpd-mtl-bold-black');
         opLab.textContent = 'Opacity';
         opacityBtn.appendChild(opLab);
       }
@@ -3872,14 +3875,20 @@ export class HomeComponent implements AfterViewInit {
       ) as HTMLElement | null;
       if (existingLabel) {
         if (text) existingLabel.textContent = text;
-        existingLabel.classList.add('fpd-ate-caption-active');
+        existingLabel.classList.add(
+          'fpd-ate-caption-active',
+          'fpd-mtl-bold-black'
+        );
         // Remove any extra sibling labels/captions that may have accumulated.
         el.querySelectorAll(
           ':scope > .fpd-ate-tool-caption, :scope > .fpd-ate-opacity-label, :scope > .fpd-doc-tool-caption, :scope > .fpd-doc-opacity-label'
         ).forEach((n) => n.remove());
         el.querySelectorAll(':scope > .fpd-label').forEach((lab, i) => {
           if (i === 0) return;
-          (lab as HTMLElement).classList.remove('fpd-ate-caption-active');
+          (lab as HTMLElement).classList.remove(
+            'fpd-ate-caption-active',
+            'fpd-mtl-bold-black'
+          );
         });
         return;
       }
@@ -3890,9 +3899,10 @@ export class HomeComponent implements AfterViewInit {
 
       if (!cap) {
         cap = document.createElement('span');
-        cap.className = 'fpd-ate-tool-caption';
+        cap.className = 'fpd-ate-tool-caption fpd-mtl-bold-black';
         el.appendChild(cap);
       }
+      cap.classList.add('fpd-mtl-bold-black');
       cap.textContent = text;
 
       // Keep exactly one caption child.
@@ -3950,7 +3960,7 @@ export class HomeComponent implements AfterViewInit {
         )
         .forEach((n) => n.remove());
       const opLab = document.createElement('span');
-      opLab.className = 'fpd-ate-opacity-label';
+      opLab.className = 'fpd-ate-opacity-label fpd-mtl-bold-black';
       opLab.textContent = 'Opacity';
       opacityBtn.appendChild(opLab);
       stamped.add(opacityBtn);
