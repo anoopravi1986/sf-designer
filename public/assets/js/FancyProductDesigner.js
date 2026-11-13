@@ -28932,6 +28932,24 @@
             elementMyDataMy.innerHTML = ''
           })
 
+          // Client point 2: picking a Product in the Products tab only opens
+          // its Skin list (selectProduct with UE=true lists the faces, it
+          // does not touch the canvas), so it must not ask "Are you sure to
+          // replace the product?". That confirmation now runs when a Skin is
+          // picked (see the .skins-det click handler in part 6/6). This is
+          // exactly the old "YES, PLEASE!" action, just without the popup.
+          // Design-tab tiles load straight onto the canvas, so they keep
+          // their confirmation below unchanged.
+          if (parentDivId === 'ProductModule') {
+            e.preventDefault()
+            localStorage.setItem('UE', true)
+            this.fpdInstance.selectProduct(
+              Number(e.currentTarget.dataset.index),
+              this.currentCategoryIndex
+            )
+            return
+          }
+
           if (
             (e.preventDefault(),
             this.fpdInstance.mainOptions.swapProductConfirmation)
@@ -38360,6 +38378,13 @@ function updateFPDLayersToSingleGroup(group) {
  * assigns window.FancyProductDesigner.
  */
 
+      // Shared confirm/prompt modal helper (module-level `t`, defined in
+      // part 2/6 and used by the Products module). Aliased here because
+      // inside selectProduct(t, e) the name `t` is shadowed by the product
+      // index parameter, so the skin-replacement confirmation below can
+      // reuse the same popup instead of duplicating its markup.
+      const sfConfirmModal = t
+
       class Ho extends EventTarget {
         constructor (t) {
           let e =
@@ -38706,7 +38731,9 @@ function updateFPDLayersToSingleGroup(group) {
 
                     r.addEventListener('click', e => {
                       if (e.isTrusted) window.__fpdUserInteracted = true
-                      document.body.classList.add('popup-open-hide-body');
+                      // Client point 2: the replace confirmation belongs on the
+                      // Skin pick (that is what actually swaps the design), so
+                      // the loading mask is only shown once the user confirms.
                       try {
                       ;
                       ;
@@ -38729,65 +38756,66 @@ function updateFPDLayersToSingleGroup(group) {
                       ;
                       ;
                       ;
-                      localStorage.setItem('valueofTitle', valueofTitle)
                       // e = sortedProducts ? sortedProducts : e;
-                      if (
-                        (e.preventDefault(),
-                        fpdInstance.mainOptions.swapProductConfirmation)
-                      ) {
-                        var n = t(
-                          fpdInstance.translator.getTranslation(
-                            'modules',
-                            'products_confirm_replacement'
-                          ),
-                          !1,
-                          'confirm',
-                          this.fpdInstance.container
-                        )
-                        const eBtn = n.querySelector('.fpd-confirm')
-                        eBtn.innerText = fpdInstance.translator.getTranslation(
-                          'modules',
-                          'products_confirm_button'
-                        )
+                      e.preventDefault()
 
-                        G(eBtn, ['click'], () => {
-                          ;
-                          fpdInstance.selectProduct(
-                            i,
-                            this.currentCategoryIndex
-                          )
-                          n.remove()
-                        })
-                      } else {
-                        ;
-                        localStorage.setItem('rdatasetindex', r.dataset.index)
-                        fpdInstance.selectProduct(
-                          Number(r.dataset.index),
-                          this.currentCategoryIndex
-                        )
-                        // const modal = t(
-                        //     fpdInstance.translator.getTranslation("modules", "products_confirm_replacement"),
-                        //     false,
-                        //     "confirm",
-                        //     fpdInstance.container
-                        // );
-                        // const confirmBtn = modal.querySelector(".fpd-confirm");
-                        // confirmBtn.innerText = fpdInstance.translator.getTranslation("modules", "products_confirm_button");
-
-                        // const target = e.currentTarget;
-                        // G(confirmBtn, ["click"], () => {
-                        //     modal.remove();
-                        //     console.log("Anoop Data 5-1");
-                        //     localStorage.setItem('UE', true);
-                        //     fpdInstance.selectProduct(Number(target.dataset.index), this.currentCategoryIndex);
-                        // });
+                      // Confirm before swapping the skin. Previously this was
+                      // only behind `swapProductConfirmation` (off in this app,
+                      // and that branch called the shadowed `t`, so it could
+                      // not have worked) - the popup was shown on the Product
+                      // tile instead, where nothing is replaced yet.
+                      // Closing the popup leaves the current skin untouched.
+                      const skinIndex = Number(r.dataset.index)
+                      const categoryIndex = this.currentCategoryIndex
+                      const replaceSkin = () => {
+                        document.body.classList.add('popup-open-hide-body')
+                        try {
+                          localStorage.setItem('valueofTitle', valueofTitle)
+                          localStorage.setItem('rdatasetindex', r.dataset.index)
+                          fpdInstance.selectProduct(skinIndex, categoryIndex)
+                        } catch (err) {
+                          console.error('Error while swapping product face:', err);
+                        } finally {
+                          setTimeout(() => {
+                            document.body.classList.remove('popup-open-hide-body');
+                          }, 2000);
+                        }
                       }
+
+                      // Only a real user tap asks for confirmation. The
+                      // page-load restore sequence (part 3/6, "productIndex /
+                      // childIndex" restore) re-selects the last skin with a
+                      // synthetic .click(); that must load straight away as it
+                      // always did, otherwise the popup sits open on load over
+                      // the previous product.
+                      if (!e.isTrusted) {
+                        replaceSkin()
+                        return
+                      }
+
+                      const confirmModal = sfConfirmModal(
+                        fpdInstance.translator.getTranslation(
+                          'modules',
+                          'products_confirm_replacement'
+                        ),
+                        !1,
+                        'confirm',
+                        fpdInstance.container
+                      )
+                      const confirmBtn = confirmModal.querySelector('.fpd-confirm')
+                      confirmBtn.innerText = fpdInstance.translator.getTranslation(
+                        'modules',
+                        'products_confirm_button'
+                      )
+
+                      G(confirmBtn, ['click'], () => {
+                        if (confirmBtn.disabled) return
+                        confirmBtn.disabled = true
+                        confirmModal.remove()
+                        replaceSkin()
+                      })
                       } catch (err) {
                         console.error('Error while swapping product face:', err);
-                      } finally {
-                      setTimeout(() => {
-                        document.body.classList.remove('popup-open-hide-body');
-                      }, 2000);
                       }
                       //  const i = Array.from(r.querySelectorAll(".fpd-item")).indexOf(s);
                       // fpdInstance.selectView(i), this.reset();

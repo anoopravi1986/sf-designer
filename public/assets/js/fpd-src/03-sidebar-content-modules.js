@@ -2957,6 +2957,24 @@
             elementMyDataMy.innerHTML = ''
           })
 
+          // Client point 2: picking a Product in the Products tab only opens
+          // its Skin list (selectProduct with UE=true lists the faces, it
+          // does not touch the canvas), so it must not ask "Are you sure to
+          // replace the product?". That confirmation now runs when a Skin is
+          // picked (see the .skins-det click handler in part 6/6). This is
+          // exactly the old "YES, PLEASE!" action, just without the popup.
+          // Design-tab tiles load straight onto the canvas, so they keep
+          // their confirmation below unchanged.
+          if (parentDivId === 'ProductModule') {
+            e.preventDefault()
+            localStorage.setItem('UE', true)
+            this.fpdInstance.selectProduct(
+              Number(e.currentTarget.dataset.index),
+              this.currentCategoryIndex
+            )
+            return
+          }
+
           if (
             (e.preventDefault(),
             this.fpdInstance.mainOptions.swapProductConfirmation)
