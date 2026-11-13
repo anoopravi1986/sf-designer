@@ -2361,25 +2361,41 @@ export class HomeComponent implements AfterViewInit {
         document.querySelector('.fpd-tool-transform.fpd-active')?.classList.remove('fpd-active');
       }
 
-      // classList is a live collection — removing an item mid-forEach
-      // shifts the remaining indices and silently skips the next one, so
-      // a toolbar that picked up more than one stale "my-*" class in the
-      // same tap only ever got the first removed. Snapshot to a plain
-      // array first so every match actually gets cleared, instead of
-      // "my-*" classes slowly accumulating on the toolbar over a session.
-      const staleMyClasses = Array.from(toolbar.classList as DOMTokenList).filter((c: any) => (c as string).startsWith('my-'));
-      if (staleMyClasses.length) {
-        toolbar.classList.remove(...staleMyClasses);
-      }
+      // Desktop image/SVG/group toolbar only: a click *inside* an already
+      // open panel (releasing the Rotate slider, an Align button, a Color
+      // swatch, the Opacity slider...) is not a tool selection. Re-deriving
+      // the "my-*" panel tag from it dropped e.g. `my-transform` the moment
+      // the Rotate slider was released, which flipped the panel onto the
+      // `.fpd-toolbar-transform-our .fpd-sub-panel { left: 370px }` rule and
+      // pushed it off-screen to the right. Keep the tag of the panel that is
+      // open. Text toolbars (Add Text Editor) and mobile keep the original
+      // behaviour below unchanged.
+      const keepOpenPanelTag =
+        window.matchMedia('(min-width: 991px)').matches &&
+        toolbar.dataset.elementType === 'image' &&
+        !!e.target.closest('.fpd-sub-panel, #fpd-opacity-panel');
 
-      if (toolbar.classList.contains("fpd-show")) {
-        const target = e.target.closest("[title], [data-panel]");
-        if (!target) return;
+      if (!keepOpenPanelTag) {
+        // classList is a live collection — removing an item mid-forEach
+        // shifts the remaining indices and silently skips the next one, so
+        // a toolbar that picked up more than one stale "my-*" class in the
+        // same tap only ever got the first removed. Snapshot to a plain
+        // array first so every match actually gets cleared, instead of
+        // "my-*" classes slowly accumulating on the toolbar over a session.
+        const staleMyClasses = Array.from(toolbar.classList as DOMTokenList).filter((c: any) => (c as string).startsWith('my-'));
+        if (staleMyClasses.length) {
+          toolbar.classList.remove(...staleMyClasses);
+        }
 
-        const value = target.getAttribute("title") || target.getAttribute("data-panel");
-        if (!value) return;
+        if (toolbar.classList.contains("fpd-show")) {
+          const target = e.target.closest("[title], [data-panel]");
+          if (!target) return;
 
-        toolbar.classList.add("my-" + value.toLowerCase().replace(/\s+/g, '-'));
+          const value = target.getAttribute("title") || target.getAttribute("data-panel");
+          if (!value) return;
+
+          toolbar.classList.add("my-" + value.toLowerCase().replace(/\s+/g, '-'));
+        }
       }
 
       const staleTypeClasses = Array.from(document.body.classList as DOMTokenList).filter((c: any) => (c as string).startsWith('fpd-type-'));

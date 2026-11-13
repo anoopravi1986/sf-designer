@@ -1,0 +1,83 @@
+/*
+  Desktop Panel Dock — isolated fpd-dpd-* only.
+  Positions are computed by assets/js/fpd-desktop-panel-dock.js and passed in
+  through CSS custom properties (--fpd-dpd-left/top/width/max-h).
+
+  NEW classes only. Does NOT modify styles.scss, FancyProductDesigner.min.css,
+  fpd-doc-fixes.css, fpd-desktop-element-editor.css or any Add Text Editor
+  stylesheet. Desktop only: the classes are only ever added for the desktop
+  image/SVG/group toolbar, and every rule is additionally gated behind the
+  same 991px breakpoint the existing desktop toolbar rules use. Mobile CSS is
+  untouched.
+
+  Docked panels: the toolbar sub-panel (Color, Rotate/Transform incl.
+  Scale/Flip, Align/Arrange) and the Opacity sheet. All of them open in the
+  free gap between the left sidebar and the product preview.
+*/
+
+@media only screen and (min-width: 991px) {
+  /* Geometry only — every panel keeps its own content styling. Selectors are
+     specific enough (plus !important, matching the existing desktop sheets)
+     to win over the per-panel left/top rules that depended on my-* classes:
+     .fpd-toolbar-transform-our .fpd-sub-panel { left: 370px }
+     fpd-element-toolbar.my-color .fpd-panel-color.fpd-active { left: 70px }
+     #fpd-opacity-panel.fpd-opacity-panel { top: 45px; left: 10px } */
+  body fpd-element-toolbar.fpd-dpd-host.fpd-show > .fpd-sub-panel.fpd-dpd-docked,
+  body fpd-element-toolbar.fpd-dpd-host.fpd-show #fpd-opacity-panel.fpd-dpd-docked {
+    position: fixed !important;
+    left: var(--fpd-dpd-left, 12px) !important;
+    top: var(--fpd-dpd-top, 80px) !important;
+    right: auto !important;
+    bottom: auto !important;
+    width: var(--fpd-dpd-width, 300px) !important;
+    min-width: 0 !important;
+    max-width: var(--fpd-dpd-width, 300px) !important;
+    max-height: var(--fpd-dpd-max-h, calc(100vh - 92px)) !important;
+    margin: 0 !important;
+    transform: none !important;
+    box-sizing: border-box !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    overscroll-behavior: contain;
+    border-radius: 8px !important;
+    box-shadow: 0 4px 16px rgba(17, 24, 39, 0.14) !important;
+  }
+
+  /* Color panel used its own `position: fixed; left: 70px; top: 56px` over
+     the sidebar. Inside the docked sub-panel it flows normally instead, so
+     it opens in the same place as Rotate / Align. */
+  body fpd-element-toolbar.fpd-dpd-host.fpd-show
+    > .fpd-sub-panel.fpd-dpd-docked
+    > .fpd-panel-color.fpd-active {
+    position: static !important;
+    left: auto !important;
+    top: auto !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    max-height: none !important;
+    overflow: visible !important;
+    margin-top: 0 !important;
+    z-index: auto !important;
+  }
+
+  /* Align/Arrange keeps its own border + shadow; inside the docked container
+     it should fill the width rather than sit as a box-in-a-box. */
+  body fpd-element-toolbar.fpd-dpd-host.fpd-show
+    > .fpd-sub-panel.fpd-dpd-docked
+    > .fpd-panel-position.fpd-active {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    border: 0 !important;
+    box-shadow: none !important;
+  }
+
+  /* Flip Horizontal / Flip Vertical: wrap instead of being clipped when the
+     gap is narrower than the old 350px panel. */
+  body fpd-element-toolbar.fpd-dpd-host.fpd-show
+    > .fpd-sub-panel.fpd-dpd-docked
+    .fpd-panel-transform.fpd-active
+    .fpd-tool-flip {
+    flex-wrap: wrap !important;
+  }
+}
