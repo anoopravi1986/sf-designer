@@ -4715,10 +4715,30 @@
           }
         }),
         (St.fabric.Canvas.prototype._bringToppedElementsToFront = function () {
+          // ===== CUSTOM (StyleFlip): only "Knob" layers are forced on top.
+          // This runs on every 'object:added', so whatever it brings to the
+          // front ends up above any newly added text / uploaded image. It
+          // used to do that for EVERY `topped` element - including design
+          // artwork that was saved with `topped: 1` (e.g. the "Custom Guitar
+          // Skins New" design's draggable, removable "Image" layer), so after
+          // opening such a design every new text/image landed BEHIND the
+          // artwork. Now only Knob layers - the locked product chrome drawn
+          // over the customer's design (Overlay = knobs/pickups/bezel,
+          // Group Text / Group Outline = printed labels and outlines) - are
+          // re-raised, keeping their relative order. Any other `topped`
+          // layer keeps its own position like a normal layer, so new
+          // elements go above it and below the Knob layers.
+          const isKnobLayer = o =>
+            !!o &&
+            !!o.topped &&
+            (/^(overlay|group text\b|group outline\b)|knob/i.test(
+              String(o.title || '').trim()
+            ) ||
+              (!o.isCustom && !!o.locked))
           let t = this.getObjects(),
             e = []
           t.forEach(t => {
-            ;(t.topped ||
+            ;(isKnobLayer(t) ||
               (t.uploadZone && this.viewOptions.uploadZonesTopped)) &&
               e.push(t)
           }),

@@ -394,7 +394,28 @@
         ;(e.className = 'fpd-list-row !bg-white'), (e.id = t.id)
         let i = document.createElement('span'),
           n = null
-        if (!t.uploadZone && t.hasColorSelection()) {
+        // Customer-added raster images (uploaded PNG/JPG photos, PNG/JPG
+        // library images) get no Color option in the element toolbar - Color
+        // is only offered for SVG-like elements (same test as the toolbar's
+        // body.is-svg gate in part 5/6: .svg source, isSVG(), group, Info)
+        // and for text. Their Layers row showed a colour dot anyway, which
+        // looked like a colour option that does not exist, so skip it for
+        // them. Product layers (e.g. Base, whose dot sets the product
+        // colour), text, SVG and grouped elements keep their dot.
+        const isCustomRasterImage =
+          t.isCustom &&
+          'image' === t.getType() &&
+          !(
+            /\.svg$/.test(
+              String(t.source || '')
+                .toLowerCase()
+                .split('?')[0]
+            ) ||
+            (t.isSVG && t.isSVG()) ||
+            'group' === t.type ||
+            'Info' === t.title
+          )
+        if (!t.uploadZone && !isCustomRasterImage && t.hasColorSelection()) {
           n = rt(t, this.fpdInstance)
           const s = at(t)
           ;(i.style.background = s),
