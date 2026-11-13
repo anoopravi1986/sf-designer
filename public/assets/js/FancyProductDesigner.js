@@ -29097,15 +29097,20 @@
                       const element = canvas.addElement('text', n, n, options);
 
                       if (element) {
-                        // Place the new text horizontally centered near the
-                        // top of the stage instead of the canvas center.
+                        // Client requirement: a newly added text lands at the
+                        // exact centre of the canvas, horizontally and
+                        // vertically. Measured from the stage (the canvas's
+                        // own design area, in canvas units), so it is
+                        // independent of zoom and screen size and is the same
+                        // on desktop and mobile. Only this new element is
+                        // moved; existing text/elements are untouched.
                         const stageWidth = canvas.viewOptions.stageWidth
-                        const topMargin = 100
+                        const stageHeight = canvas.viewOptions.stageHeight
 
                         element.setPositionByOrigin(
-                          new St.fabric.Point(stageWidth / 2, topMargin),
+                          new St.fabric.Point(stageWidth / 2, stageHeight / 2),
                           'center',
-                          'top'
+                          'center'
                         )
                         element.setCoords()
 
