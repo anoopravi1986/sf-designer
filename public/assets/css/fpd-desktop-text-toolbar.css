@@ -1,0 +1,511 @@
+/*
+  Desktop Text Toolbar — clean layout, isolated fpd-dtt-* only.
+
+  Scope: the toolbar only gets `fpd-dtt-ui` from
+  HomeComponent.applyDesktopAddTextEditorClasses(), together with
+  `fpd-dte-editor`, i.e. desktop (layout-large) + a TEXT element. Mobile
+  (fpd-layout-small / fpd-ate-editor), image/SVG/group toolbars (Element
+  Editor) and every other tool never match. Every selector below also
+  repeats those guards.
+
+  Does NOT modify styles.scss, FancyProductDesigner.min.css,
+  fpd-desktop-add-text-editor.css or any other existing stylesheet; it only
+  overrides them inside this scope (hence the specific prefix + !important,
+  same pattern as the other fpd-d*-* desktop sheets).
+
+  Why: the old layout was built from per-item nudges — margin-left: 50px on
+  the Bold group, top: -1px / 2px / 3px offsets on single icons, 1px divider
+  lines absolutely positioned per item, mixed 20/28/32/40px boxes with
+  different paddings — so icons sat off-centre and spacing changed with the
+  page width. Here every tool is the same 32x32 cell with its icon centred
+  by flexbox, groups are separated by one consistent divider, and the look
+  matches the Element Editor (borderless icons, hover/active fill, bordered
+  copy/paste pair).
+*/
+
+/* ---------- Bar + groups ------------------------------------------------ */
+
+body fpd-element-toolbar.fpd-dtt-ui.fpd-dte-editor.fpd-layout-large:not(.fpd-layout-small):not(.fpd-ate-editor)[data-element-type='text']
+  > .fpd-tools-nav {
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  align-items: center !important;
+  gap: 0 !important;
+  min-height: 52px !important;
+  padding: 0 10px !important;
+  margin: 0 !important;
+  box-sizing: border-box !important;
+}
+
+body fpd-element-toolbar.fpd-dtt-ui.fpd-dte-editor.fpd-layout-large:not(.fpd-layout-small):not(.fpd-ate-editor)[data-element-type='text']
+  > .fpd-tools-nav
+  > .fpd-primary-tools,
+body fpd-element-toolbar.fpd-dtt-ui.fpd-dte-editor.fpd-layout-large:not(.fpd-layout-small):not(.fpd-ate-editor)[data-element-type='text']
+  > .fpd-tools-nav
+  > .fpd-panel-text-format,
+body fpd-element-toolbar.fpd-dtt-ui.fpd-dte-editor.fpd-layout-large:not(.fpd-layout-small):not(.fpd-ate-editor)[data-element-type='text']
+  > .fpd-tools-nav
+  > .fpd-panel-text-format
+  > .fpd-tools-group,
+body fpd-element-toolbar.fpd-dtt-ui.fpd-dte-editor.fpd-layout-large:not(.fpd-layout-small):not(.fpd-ate-editor)[data-element-type='text']
+  #SecondaryIconBoxHeader {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  align-items: center !important;
+  gap: 2px !important;
+  position: static !important;
+  top: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  height: auto !important;
+  min-height: 0 !important;
+  border: 0 !important;
+  overflow: visible !important;
+}
+
+/* One divider between the three groups (replaces the 50px gap and the
+   per-icon absolutely-positioned lines). */
+body fpd-element-toolbar.fpd-dtt-ui.fpd-dte-editor.fpd-layout-large:not(.fpd-layout-small):not(.fpd-ate-editor)[data-element-type='text']
+  > .fpd-tools-nav
+  > .fpd-panel-text-format,
+body fpd-element-toolbar.fpd-dtt-ui.fpd-dte-editor.fpd-layout-large:not(.fpd-layout-small):not(.fpd-ate-editor)[data-element-type='text']
+  #SecondaryIconBoxHeader {
+  margin-left: 8px !important;
+  padding-left: 8px !important;
+  border-left: 1px solid #e5e7eb !important;
+}
+
+/* Opacity sits next to Color (it lives at the end of the Bold group in the
+   DOM; flex order moves it visually without touching the markup). */
+body fpd-element-toolbar.fpd-dtt-ui.fpd-dte-editor.fpd-layout-large:not(.fpd-layout-small):not(.fpd-ate-editor)[data-element-type='text']
+  #fpd-opacity-btn {
+  order: -1 !important;
+}
+
+/* ---------- Uniform 32x32 icon cells ------------------------------------ */
+
+body fpd-element-toolbar.fpd-dtt-ui.fpd-dte-editor.fpd-layout-large:not(.fpd-layout-small):not(.fpd-ate-editor)[data-element-type='text']
+  .fpd-primary-tools
+  > .fpd-tool-color,
+body fpd-element-toolbar.fpd-dtt-ui.fpd-dte-editor.fpd-layout-large:not(.fpd-layout-small):not(.fpd-ate-editor)[data-element-type='text']
+  #fpd-opacity-btn,
+body fpd-element-toolbar.fpd-dtt-ui.fpd-dte-editor.fpd-layout-large:not(.fpd-layout-small):not(.fpd-ate-editor)[data-element-type='text']
+  #boldOutside,
+body fpd-element-toolbar.fpd-dtt-ui.fpd-dte-editor.fpd-layout-large:not(.fpd-layout-small):not(.fpd-ate-editor)[data-element-type='text']
+  #fontItalic,
+body fpd-element-toolbar.fpd-dtt-ui.fpd-dte-editor.fpd-layout-large:not(.fpd-layout-small):not(.fpd-ate-editor)[data-element-type='text']
+  #UnderlineText,
+body fpd-element-toolbar.fpd-dtt-ui.fpd-dte-editor.fpd-layout-large:not(.fpd-layout-small):not(.fpd-ate-editor)[data-element-type='text']
+  #TextTransform,
+body fpd-element-toolbar.fpd-dtt-ui.fpd-dte-editor.fpd-layout-large:not(.fpd-layout-small):not(.fpd-ate-editor)[data-element-type='text']
+  .fpd-panel-text-format
+  .extra-icon,
+body fpd-element-toolbar.fpd-dtt-ui.fpd-dte-editor.fpd-layout-large:not(.fpd-layout-small):not(.fpd-ate-editor)[data-element-type='text']
+  #textAlignCust,
+body fpd-element-toolbar.fpd-dtt-ui.fpd-dte-editor.fpd-layout-large:not(.fpd-layout-small):not(.fpd-ate-editor)[data-element-type='text']
+  #CenterTools,
+body fpd-element-toolbar.fpd-dtt-ui.fpd-dte-editor.fpd-layout-large:not(.fpd-layout-small):not(.fpd-ate-editor)[data-element-type='text']
+  #SecondaryIconBoxHeader
+  > .fpd-tool-transform,
+body fpd-element-toolbar.fpd-dtt-ui.fpd-dte-editor.fpd-layout-large:not(.fpd-layout-small):not(.fpd-ate-editor)[data-element-type='text']
+  #TextMoveUp,
+body fpd-element-toolbar.fpd-dtt-ui.fpd-dte-editor.fpd-layout-large:not(.fpd-layout-small):not(.fpd-ate-editor)[data-element-type='text']
+  #TextMoveDown,
+body fpd-element-toolbar.fpd-dtt-ui.fpd-dte-editor.fpd-layout-large:not(.fpd-layout-small):not(.fpd-ate-editor)[data-element-type='text']
+  #SecondaryIconBoxHeader
+  > .fpd-ungroup,
+body fpd-element-toolbar.fpd-dtt-ui.fpd-dte-editor.fpd-layout-large:not(.fpd-layout-small):not(.fpd-ate-editor)[data-element-type='text']
+  #SecondaryIconBoxHeader
+  > .fpd-tool-remove {
+  flex: 0 0 32px !important;
+  width: 32px !important;
+  min-width: 32px !important;
+  max-width: 32px !important;
+  height: 32px !important;
+  min-height: 32px !important;
+  box-sizing: border-box !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-direction: row !important;
+  position: relative !important;
+  top: 0 !important;
+  left: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 1px solid transparent !important;
+  border-radius: 8px !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  cursor: pointer !important;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+/* Cells whose base display is `block` need flex to centre their icon. */
+body fpd-element-toolbar.fpd-dtt-ui.fpd-dte-editor.fpd-layout-large:not(.fpd-layout-small):not(.fpd-ate-editor)[data-element-type='text']
+  #TextMoveUp,
+body fpd-element-toolbar.fpd-dtt-ui.fpd-dte-editor.fpd-layout-large:not(.fpd-layout-small):not(.fpd-ate-editor)[data-element-type='text']
+  #TextMoveDown {
+  display: inline-flex !important;
+}
+
+/* Layer up/down: a plain pair, no extra side padding or nudges. */
+body fpd-element-toolbar.fpd-dtt-ui.fpd-dte-editor.fpd-layout-large:not(.fpd-layout-small):not(.fpd-ate-editor)[data-element-type='text']
+  #SecondaryIconBoxHeader
+  > .fpd-tool-layer-depth {
+  gap: 2px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  position: static !important;
+  top: auto !important;
+  align-items: center !important;
+}
+
+/* Hover / active — same feedback for every cell. */
+body fpd-element-toolbar.fpd-dtt-ui.fpd-dte-editor.fpd-layout-large:not(.fpd-layout-small):not(.fpd-ate-editor)[data-element-type='text']
+  :is(#fpd-opacity-btn, #boldOutside, #fontItalic, #UnderlineText, #TextTransform, #textAlignCust, #CenterTools, #TextMoveUp, #TextMoveDown, .fpd-panel-text-format .extra-icon, #SecondaryIconBoxHeader > .fpd-tool-transform, #SecondaryIconBoxHeader > .fpd-ungroup, #SecondaryIconBoxHeader > .fpd-tool-remove, .fpd-primary-tools > .fpd-tool-color):hover {
+  background: #f3f4f6 !important;
+}
+
+body fpd-element-toolbar.fpd-dtt-ui.fpd-dte-editor.fpd-layout-large:not(.fpd-layout-small):not(.fpd-ate-editor)[data-element-type='text']
+  :is(#fpd-opacity-btn.fpd-active, #boldOutside.fpd-enabled, #fontItalic.fpd-enabled, #UnderlineText.fpd-enabled, #CenterTools.letter-spac-active, .fpd-panel-text-format .extra-icon:has(.letter-spac-active), #SecondaryIconBoxHeader > .fpd-tool-transform.fpd-active, .fpd-primary-tools > .fpd-tool-color.fpd-active) {
+  background: rgba(232, 86, 36, 0.1) !important;
+  border-color: rgba(232, 86, 36, 0.35) !important;
+}
+
+/* ---------- Icons: 20x20, centred, no per-icon offsets ------------------ */
+
+body fpd-element-toolbar.fpd-dtt-ui.fpd-dte-editor.fpd-layout-large:not(.fpd-layout-small):not(.fpd-ate-editor)[data-element-type='text']
+  :is(#fpd-opacity-btn, #boldOutside, #fontItalic, #UnderlineText, #TextMoveUp, #TextMoveDown, #SecondaryIconBoxHeader > .fpd-tool-remove)
+  > svg,
+body fpd-element-toolbar.fpd-dtt-ui.fpd-dte-editor.fpd-layout-large:not(.fpd-layout-small):not(.fpd-ate-editor)[data-element-type='text']
+  .fpd-panel-text-format
+  .extra-icon
+  svg,
+body fpd-element-toolbar.fpd-dtt-ui.fpd-dte-editor.fpd-layout-large:not(.fpd-layout-small):not(.fpd-ate-editor)[data-element-type='text']
+  #SecondaryIconBoxHeader
+  > .fpd-ungroup
+  > span
+  > svg {
+  display: block !important;
+  width: 20px !important;
+  min-width: 20px !important;
+  height: 20px !important;
+  margin: 0 !important;
+  position: static !important;
+  top: auto !important;
+  left: auto !important;
+  flex: 0 0 auto !important;
+}
+
+/* Icon wrappers (spans/divs) collapse to the icon and centre it. */
+body fpd-element-toolbar.fpd-dtt-ui.fpd-dte-editor.fpd-layout-large:not(.fpd-layout-small):not(.fpd-ate-editor)[data-element-type='text']
+  .fpd-panel-text-format
+  .extra-icon
+  > span,
+body fpd-element-toolbar.fpd-dtt-ui.fpd-dte-editor.fpd-layout-large:not(.fpd-layout-small):not(.fpd-ate-editor)[data-element-type='text']
+  #CenterTools
+  > div,
+body fpd-element-toolbar.fpd-dtt-ui.fpd-dte-editor.fpd-layout-large:not(.fpd-layout-small):not(.fpd-ate-editor)[data-element-type='text']
+  #SecondaryIconBoxHeader
+  > .fpd-ungroup
+  > span[title],
+body fpd-element-toolbar.fpd-dtt-ui.fpd-dte-editor.fpd-layout-large:not(.fpd-layout-small):not(.fpd-ate-editor)[data-element-type='text']
+  #SecondaryIconBoxHeader
+  > .fpd-tool-transform
+  > span:first-child {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 20px !important;
+  height: 20px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  position: static !important;
+  top: auto !important;
+  left: auto !important;
+}
+
+/* Icon-font glyphs (Text Transform, Text Align, Position). */
+body fpd-element-toolbar.fpd-dtt-ui.fpd-dte-editor.fpd-layout-large:not(.fpd-layout-small):not(.fpd-ate-editor)[data-element-type='text']
+  :is(#TextTransform, #textAlignCust, #CenterTools > div)
+  > span[class^='fpd-icon-'] {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 20px !important;
+  height: 20px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  font-size: 20px !important;
+  line-height: 1 !important;
+  position: static !important;
+  top: auto !important;
+}
+
+/* Transform: its icon is the span's ::before background image, which was
+   pushed down 3px; centre it like every other icon. */
+body fpd-element-toolbar.fpd-dtt-ui.fpd-dte-editor.fpd-layout-large:not(.fpd-layout-small):not(.fpd-ate-editor)[data-element-type='text']
+  #SecondaryIconBoxHeader
+  > .fpd-tool-transform
+  > span:first-child::before {
+  display: block !important;
+  width: 20px !important;
+  height: 20px !important;
+  position: static !important;
+  top: auto !important;
+  background-size: contain !important;
+  background-repeat: no-repeat !important;
+  background-position: center !important;
+}
+
+/* Old per-icon divider lines (absolutely positioned with ad-hoc offsets)
+   are replaced by the group dividers above. */
+body fpd-element-toolbar.fpd-dtt-ui.fpd-dte-editor.fpd-layout-large:not(.fpd-layout-small):not(.fpd-ate-editor)[data-element-type='text']
+  #SecondaryIconBoxHeader
+  > .fpd-tool-transform::before,
+body fpd-element-toolbar.fpd-dtt-ui.fpd-dte-editor.fpd-layout-large:not(.fpd-layout-small):not(.fpd-ate-editor)[data-element-type='text']
+  #SecondaryIconBoxHeader
+  > .fpd-tool-transform::after,
+body fpd-element-toolbar.fpd-dtt-ui.fpd-dte-editor.fpd-layout-large:not(.fpd-layout-small):not(.fpd-ate-editor)[data-element-type='text']
+  #SecondaryIconBoxHeader
+  > .fpd-tool-layer-depth::before,
+body fpd-element-toolbar.fpd-dtt-ui.fpd-dte-editor.fpd-layout-large:not(.fpd-layout-small):not(.fpd-ate-editor)[data-element-type='text']
+  #SecondaryIconBoxHeader
+  > .fpd-tool-layer-depth::after,
+body fpd-element-toolbar.fpd-dtt-ui.fpd-dte-editor.fpd-layout-large:not(.fpd-layout-small):not(.fpd-ate-editor)[data-element-type='text']
+  #SecondaryIconBoxHeader
+  > .fpd-ungroup::before,
+body fpd-element-toolbar.fpd-dtt-ui.fpd-dte-editor.fpd-layout-large:not(.fpd-layout-small):not(.fpd-ate-editor)[data-element-type='text']
+  #SecondaryIconBoxHeader
+  > .fpd-ungroup::after {
+  display: none !important;
+}
+
+/* ---------- Color swatch ------------------------------------------------ */
+
+body fpd-element-toolbar.fpd-dtt-ui.fpd-dte-editor.fpd-layout-large:not(.fpd-layout-small):not(.fpd-ate-editor)[data-element-type='text']
+  .fpd-primary-tools
+  > .fpd-tool-color
+  > .fpd-current-fill {
+  display: block !important;
+  width: 22px !important;
+  height: 22px !important;
+  margin: 0 !important;
+  border-radius: 50% !important;
+  box-sizing: border-box !important;
+  border: 1px solid rgba(0, 0, 0, 0.15) !important;
+  flex: 0 0 auto !important;
+}
+
+/* ---------- Font family + size stepper ---------------------------------- */
+
+body fpd-element-toolbar.fpd-dtt-ui.fpd-dte-editor.fpd-layout-large:not(.fpd-layout-small):not(.fpd-ate-editor)[data-element-type='text']
+  .fpd-primary-tools
+  > .fpd-tool-font-family {
+  align-self: center !important;
+  height: 32px !important;
+  min-height: 32px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  box-sizing: border-box !important;
+  border-radius: 8px !important;
+  justify-content: center !important;
+}
+
+body fpd-element-toolbar.fpd-dtt-ui.fpd-dte-editor.fpd-layout-large:not(.fpd-layout-small):not(.fpd-ate-editor)[data-element-type='text']
+  .fpd-primary-tools
+  > .fpd-tool-font-family
+  > fpd-dropdown {
+  height: 30px !important;
+  min-height: 30px !important;
+  align-items: center !important;
+}
+
+body fpd-element-toolbar.fpd-dtt-ui.fpd-dte-editor.fpd-layout-large:not(.fpd-layout-small):not(.fpd-ate-editor)[data-element-type='text']
+  #minusCust.flex-plus-minus-icon {
+  flex: 0 0 auto !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 2px !important;
+  height: 32px !important;
+  min-height: 32px !important;
+  margin: 0 !important;
+  padding: 0 4px !important;
+  box-sizing: border-box !important;
+  border: 1px solid #d7dade !important;
+  border-radius: 8px !important;
+  position: static !important;
+  top: auto !important;
+}
+
+body fpd-element-toolbar.fpd-dtt-ui.fpd-dte-editor.fpd-layout-large:not(.fpd-layout-small):not(.fpd-ate-editor)[data-element-type='text']
+  #minusCust
+  > .fpd-tool-text-size-customize-icon {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 24px !important;
+  height: 24px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border-radius: 6px !important;
+  font-size: 18px !important;
+  line-height: 1 !important;
+}
+
+body fpd-element-toolbar.fpd-dtt-ui.fpd-dte-editor.fpd-layout-large:not(.fpd-layout-small):not(.fpd-ate-editor)[data-element-type='text']
+  #minusCust
+  > .fpd-tool-text-size-customize-icon:hover {
+  background: #f3f4f6 !important;
+}
+
+body fpd-element-toolbar.fpd-dtt-ui.fpd-dte-editor.fpd-layout-large:not(.fpd-layout-small):not(.fpd-ate-editor)[data-element-type='text']
+  #minusCust
+  > .fpd-tool-text-size-customize {
+  flex: 0 0 36px !important;
+  width: 36px !important;
+  height: 30px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+body fpd-element-toolbar.fpd-dtt-ui.fpd-dte-editor.fpd-layout-large:not(.fpd-layout-small):not(.fpd-ate-editor)[data-element-type='text']
+  #minusCust
+  > .fpd-tool-text-size-customize
+  > input {
+  width: 36px !important;
+  max-width: 36px !important;
+  height: 28px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  text-align: center !important;
+  line-height: 28px !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+
+/* ---------- Copy / paste pair (bordered group, like the Element Editor) -- */
+
+body fpd-element-toolbar.fpd-dtt-ui.fpd-dte-editor.fpd-layout-large:not(.fpd-layout-small):not(.fpd-ate-editor)[data-element-type='text']
+  #SecondaryIconBoxHeader
+  > .extra-icon-main-div-box {
+  display: flex !important;
+  align-items: center !important;
+  gap: 2px !important;
+  height: 32px !important;
+  margin: 0 !important;
+  padding: 2px !important;
+  box-sizing: border-box !important;
+  border: 1px solid #d7dade !important;
+  border-radius: 8px !important;
+  position: static !important;
+  top: auto !important;
+}
+
+body fpd-element-toolbar.fpd-dtt-ui.fpd-dte-editor.fpd-layout-large:not(.fpd-layout-small):not(.fpd-ate-editor)[data-element-type='text']
+  #SecondaryIconBoxHeader
+  > .extra-icon-main-div-box
+  > .extra-icon {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 26px !important;
+  height: 26px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border-radius: 6px !important;
+  cursor: pointer !important;
+}
+
+body fpd-element-toolbar.fpd-dtt-ui.fpd-dte-editor.fpd-layout-large:not(.fpd-layout-small):not(.fpd-ate-editor)[data-element-type='text']
+  #SecondaryIconBoxHeader
+  > .extra-icon-main-div-box
+  > .extra-icon:hover {
+  background: #f3f4f6 !important;
+}
+
+body fpd-element-toolbar.fpd-dtt-ui.fpd-dte-editor.fpd-layout-large:not(.fpd-layout-small):not(.fpd-ate-editor)[data-element-type='text']
+  #SecondaryIconBoxHeader
+  > .extra-icon-main-div-box
+  > .extra-icon
+  > span {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 20px !important;
+  height: 20px !important;
+}
+
+body fpd-element-toolbar.fpd-dtt-ui.fpd-dte-editor.fpd-layout-large:not(.fpd-layout-small):not(.fpd-ate-editor)[data-element-type='text']
+  #SecondaryIconBoxHeader
+  > .extra-icon-main-div-box
+  > .extra-icon
+  svg {
+  display: block !important;
+  width: 20px !important;
+  height: 20px !important;
+  margin: 0 !important;
+}
+
+/* ---------- Opacity panel: exactly one slider per element type ----------
+
+   #fpd-opacity-panel is a single panel shared by every element type. The
+   Element Editor builds its slider into it (fpd-dee-*), and the desktop text
+   toolbar builds its own (fpd-dte-*) into the same panel, so once both have
+   run the panel shows two sliders. Each one already applies to the selected
+   element; show only the one that belongs to the current element type. */
+
+/* Text element: hide the Element Editor's copy. */
+body fpd-element-toolbar.fpd-dtt-ui.fpd-dte-editor.fpd-layout-large:not(.fpd-layout-small):not(.fpd-ate-editor)[data-element-type='text']
+  #fpd-opacity-panel:has(> .fpd-dte-opacity-control)
+  > .fpd-dee-opacity-control {
+  display: none !important;
+}
+
+/* Image / SVG / group element (desktop): hide the text toolbar's copy, so the
+   Element Editor keeps showing only its own slider after a text was edited. */
+body fpd-element-toolbar.fpd-layout-large:not(.fpd-layout-small):not(.fpd-ate-editor):not(.fpd-dtt-ui)[data-element-type='image']
+  #fpd-opacity-panel:has(> .fpd-dee-opacity-control)
+  > .fpd-dte-opacity-control {
+  display: none !important;
+}
+
+/* ---------- Fit beside the sidebar at any desktop width ------------------
+
+   styles.scss pins the toolbar at `left: 441px` with `min-width: 740px` for
+   text, so on narrower desktops (e.g. 1024px) the bar ran off the right edge
+   and Transform / layers / copy / delete were unreachable. Limit it to the
+   space right of the sidebar and let whole groups wrap onto a second row.
+   Same 991px breakpoint as the existing desktop toolbar rules. */
+@media only screen and (min-width: 991px) {
+  body fpd-element-toolbar.fpd-dtt-ui.fpd-dte-editor.fpd-layout-large:not(.fpd-layout-small):not(.fpd-ate-editor)[data-element-type='text'] {
+    min-width: 0 !important;
+    max-width: calc(100vw - 441px - 12px) !important;
+  }
+
+  body fpd-element-toolbar.fpd-dtt-ui.fpd-dte-editor.fpd-layout-large:not(.fpd-layout-small):not(.fpd-ate-editor)[data-element-type='text']
+    > .fpd-tools-nav {
+    flex-wrap: wrap !important;
+    row-gap: 6px !important;
+    padding-top: 9px !important;
+    padding-bottom: 9px !important;
+    max-width: 100% !important;
+    overflow: visible !important;
+  }
+}
+
+/* Panels open right under the bar (also under a wrapped second row) instead
+   of at a fixed 46px, which overlapped the bar's bottom edge by 6px. Only the
+   vertical anchor changes; each panel keeps its own horizontal position. */
+body fpd-element-toolbar.fpd-dtt-ui.fpd-dte-editor.fpd-layout-large:not(.fpd-layout-small):not(.fpd-ate-editor)[data-element-type='text']
+  > .fpd-sub-panel:not(.fpd-dpd-docked),
+body fpd-element-toolbar.fpd-dtt-ui.fpd-dte-editor.fpd-layout-large:not(.fpd-layout-small):not(.fpd-ate-editor)[data-element-type='text']
+  #fpd-opacity-panel {
+  top: calc(100% + 6px) !important;
+}

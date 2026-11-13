@@ -81,3 +81,28 @@
     flex-wrap: wrap !important;
   }
 }
+
+/* Color panel (image and text toolbars): ONE scroll container.
+   The panel's tab content is also a scroll area with its own height cap
+   (calc(100vh - 119px), plus 250px / 200px caps from other rules). Nested in
+   the docked box, which is already capped to the space left in the viewport,
+   the inner area could not scroll to its end (Shadow > Remove Shadow / Stroke
+   width were cut off). The docked box is the only scroller; the inner content
+   grows to its natural height. */
+@media only screen and (min-width: 991px) {
+  body fpd-element-toolbar.fpd-dpd-host.fpd-show
+    > .fpd-sub-panel.fpd-dpd-docked
+    > .fpd-panel-color.fpd-active
+    .fpd-scroll-area {
+    max-height: none !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  body fpd-element-toolbar.fpd-dpd-host.fpd-show
+    > .fpd-sub-panel.fpd-dpd-docked
+    > .fpd-panel-color.fpd-active {
+    padding-top: 0 !important;
+    padding-bottom: 12px !important;
+  }
+}

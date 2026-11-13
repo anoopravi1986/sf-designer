@@ -804,7 +804,12 @@ export class HomeComponent implements AfterViewInit {
         opacityToolbarEl?.classList.remove(
           'fpd-opacity-open',
           'fpd-doc-opacity-dock',
-          'fpd-dee-opacity-open'
+          'fpd-dee-opacity-open',
+          // Desktop text toolbar opens with this class too, and
+          // fpd-desktop-add-text-editor.css keeps the sheet
+          // `display: block !important` while it is present - so without it
+          // the text Opacity popup never closed.
+          'fpd-dte-opacity-open'
         );
       };
 
@@ -1059,6 +1064,34 @@ export class HomeComponent implements AfterViewInit {
         if (panel.contains(e.target) || btnOpacity.contains(e.target)) return;
         closeOpacityPanel();
       });
+
+      // Desktop only: close Opacity when any other editor option (or anything
+      // outside the popup) is clicked. The bubble-phase listener above never
+      // hears clicks whose tool handler calls stopPropagation() (Bold,
+      // Italic, Text Transform, Size +/-, ...), so it runs in the capture
+      // phase, before any tool handler. The clicked tool then opens normally.
+      // A slider drag that starts inside the popup and is released outside it
+      // still counts as inside. Mobile keeps its existing sheet behaviour.
+      let opacityPressStartedInside = false;
+      document.addEventListener(
+        'pointerdown',
+        (e: any) => {
+          opacityPressStartedInside =
+            !!e.target && (panel.contains(e.target) || btnOpacity.contains(e.target));
+        },
+        true
+      );
+      document.addEventListener(
+        'click',
+        (e: any) => {
+          if (isMobileLayout() || opacityToolbarEl?.classList.contains('fpd-layout-small')) return;
+          if (!opacityToolbarEl?.classList.contains('fpd-opacity-open')) return;
+          if (!e.target || panel.contains(e.target) || btnOpacity.contains(e.target)) return;
+          if (opacityPressStartedInside) return;
+          closeOpacityPanel();
+        },
+        true
+      );
     }, 5000);
     setTimeout(() => {
       const backBtn = document.getElementById('backButton');
@@ -2821,14 +2854,19 @@ export class HomeComponent implements AfterViewInit {
         ?.classList.contains('fpd-layout-small');
 
     if (!isDesktopText) {
-      tb.classList.remove('fpd-dte-editor');
+      // Only touch the class list when needed: a no-op classList.remove/add
+      // still writes the attribute and wakes class observers.
+      if (tb.classList.contains('fpd-dte-editor')) tb.classList.remove('fpd-dte-editor');
+      if (tb.classList.contains('fpd-dtt-ui')) tb.classList.remove('fpd-dtt-ui');
       tb.querySelector('#fpd-opacity-btn')?.classList.remove(
         'fpd-dte-opacity-btn'
       );
       return;
     }
 
-    tb.classList.add('fpd-dte-editor');
+    if (!tb.classList.contains('fpd-dte-editor')) tb.classList.add('fpd-dte-editor');
+    // Clean desktop text toolbar layout (fpd-desktop-text-toolbar.css).
+    if (!tb.classList.contains('fpd-dtt-ui')) tb.classList.add('fpd-dtt-ui');
     tb.querySelector('#fpd-opacity-btn')?.classList.add('fpd-dte-opacity-btn');
     const panel = tb.querySelector(
       '#fpd-opacity-panel'
@@ -3170,6 +3208,16 @@ export class HomeComponent implements AfterViewInit {
     document.addEventListener('uiLayoutChange', () =>
       this.applyDesktopAddTextEditorClasses()
     );
+    // Root cause of the missing desktop text Opacity: the classes above were
+    // only stamped on load (before any text existed), resize, layout change
+    // and clicks inside the toolbar - never when a text element was added or
+    // selected, so `[data-element-type="text"] #fpd-opacity-btn {display:none}`
+    // kept winning. Re-stamp on every selection, after FPD's own toolbar
+    // render (its listener was registered first), and once more next frame.
+    this.designer?.addEventListener?.('elementSelect', () => {
+      this.applyDesktopAddTextEditorClasses();
+      requestAnimationFrame(() => this.applyDesktopAddTextEditorClasses());
+    });
 
     document.addEventListener(
       'click',

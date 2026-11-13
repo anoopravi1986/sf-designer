@@ -2,10 +2,12 @@
   Desktop Panel Dock — isolated fpd-dpd-* only (see fpd-desktop-panel-dock.css).
 
   Scope: DESKTOP (>= 991px, non fpd-layout-small) element toolbar for
-  image / SVG / group elements (data-element-type="image"). Text elements
-  (Add Text Editor), mobile layouts and every other tool are never touched:
-  when the toolbar is not eligible, all fpd-dpd-* classes and inline vars
-  are removed again, so the original styling applies exactly as before.
+  image / SVG / group elements (data-element-type="image"): all panels.
+  Text elements: ONLY the Color panel (Fill / Stroke / Shadow), and only
+  while it is the open panel; every other text panel is left alone.
+  Mobile layouts and every other tool are never touched: when the toolbar is
+  not eligible, all fpd-dpd-* classes and inline vars are removed again, so
+  the original styling applies exactly as before.
 
   Why this exists
   ---------------
@@ -55,13 +57,25 @@
     return mq ? mq.matches : window.innerWidth >= 991;
   }
 
+  // Text toolbar: only the Color panel (Fill / Stroke / Shadow) is docked.
+  // It used `position: fixed; left: 70px` via `my-color`, and clicking a
+  // Stroke/Shadow tab strips `my-color` (home.component.ts click handler),
+  // so it jumped under the toolbar and ran off the bottom of the screen.
+  // Every other text panel keeps its own position.
+  function textColorPanelOpen (tb) {
+    return !!tb.querySelector(':scope > .fpd-sub-panel > .fpd-panel-color.fpd-active');
+  }
+
   function isEligible (tb) {
-    return !!tb &&
-      isDesktop() &&
-      tb.classList.contains('fpd-smart') &&
-      tb.classList.contains('fpd-show') &&
-      !tb.classList.contains('fpd-layout-small') &&
-      tb.dataset.elementType === 'image';
+    if (!tb ||
+      !isDesktop() ||
+      !tb.classList.contains('fpd-smart') ||
+      !tb.classList.contains('fpd-show') ||
+      tb.classList.contains('fpd-layout-small')) return false;
+    if (tb.dataset.elementType === 'image') return true;
+    return tb.dataset.elementType === 'text' &&
+      !tb.classList.contains('fpd-ate-editor') &&
+      textColorPanelOpen(tb);
   }
 
   function visibleRect (el) {
@@ -133,6 +147,22 @@
     return list;
   }
 
+  // Panels that should be docked right now (subset of panelsOf).
+  function panelsToDock (tb) {
+    if (tb.dataset.elementType === 'text') {
+      var sub = tb.querySelector(':scope > .fpd-sub-panel');
+      return sub ? [sub] : [];
+    }
+    return panelsOf(tb);
+  }
+
+  function undockPanel (el) {
+    if (el.classList.contains(DOCK_CLASS)) el.classList.remove(DOCK_CLASS);
+    VARS.forEach(function (v) {
+      if (el.style.getPropertyValue(v)) el.style.removeProperty(v);
+    });
+  }
+
   function computeDock (tb) {
     var host = findDesignerHost();
     var vw = document.documentElement.clientWidth || window.innerWidth;
@@ -177,12 +207,7 @@
   function undock (tb) {
     if (!tb) return;
     if (tb.classList.contains(HOST_CLASS)) tb.classList.remove(HOST_CLASS);
-    panelsOf(tb).forEach(function (el) {
-      if (el.classList.contains(DOCK_CLASS)) el.classList.remove(DOCK_CLASS);
-      VARS.forEach(function (v) {
-        if (el.style.getPropertyValue(v)) el.style.removeProperty(v);
-      });
-    });
+    panelsOf(tb).forEach(undockPanel);
   }
 
   function update () {
@@ -199,7 +224,9 @@
 
     var dock = computeDock(toolbar);
     if (!toolbar.classList.contains(HOST_CLASS)) toolbar.classList.add(HOST_CLASS);
+    var docked = panelsToDock(toolbar);
     panelsOf(toolbar).forEach(function (el) {
+      if (docked.indexOf(el) === -1) { undockPanel(el); return; }
       if (!el.classList.contains(DOCK_CLASS)) el.classList.add(DOCK_CLASS);
       // Only writes when a value actually changed, so the toolbar
       // MutationObserver below cannot feed back into itself.
