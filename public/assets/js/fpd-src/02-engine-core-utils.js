@@ -5257,6 +5257,7 @@
             // Info / Base / Overlay are product chrome — never move or stretch
             // in customer mode (Google Doc desktop item 2). Applied after the
             // unlock block so those flags cannot reopen the locks.
+            // Info also: no reorder / copy / delete — Color change only.
             !this.viewOptions.editorMode &&
               e.title &&
               ['Info', 'Base', 'Overlay'].includes(e.title) &&
@@ -5266,7 +5267,12 @@
               (t.lockRotation = !0),
               (t.hasControls = !1),
               'Info' === e.title &&
-                ((t.evented = !1), (t.selectable = !1), (t.isEditable = !1))),
+                ((t.evented = !1),
+                (t.selectable = !1),
+                (t.isEditable = !1),
+                (t.zChangeable = !1),
+                (t.copyable = !1),
+                (t.removable = !1))),
             t.fixed && Q(t.replace) && (t.replace = e.title),
             !this.viewOptions.editorMode && t.replace && '' != t.replace)
           ) {

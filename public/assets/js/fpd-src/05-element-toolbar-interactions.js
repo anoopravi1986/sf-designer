@@ -1918,20 +1918,22 @@ function updateFPDLayersToSingleGroup(group) {
             }
           })
           r.append(a);
-            ;
-            if(t.source){
-              ;
-              document.querySelector('body').classList.add('notgroup')
-              if (t.source.toLowerCase().endsWith('.svg')) {
-                  document.querySelector('body').classList.add('is-svg');
-              }
-              else{
-                  document.querySelector('body').classList.remove('is-svg');
-              }
-            }
-            else{
-              document.querySelector('body').classList.remove('notgroup')
-            }
+            // Body classes gate Color visibility in styles.scss
+            // (.fpd-type-image .fpd-tool-color needs body.notgroup.is-svg).
+            // Groups / re-select often have no t.source — keep classes so
+            // Color does not vanish after deselect → select.
+            ;(() => {
+              const body = document.body
+              const src = String(t.source || '').toLowerCase()
+              const svgLike =
+                src.endsWith('.svg') ||
+                (t.isSVG && t.isSVG()) ||
+                t.type === 'group' ||
+                t.title === 'Info'
+              body.classList.add('notgroup')
+              if (svgLike) body.classList.add('is-svg')
+              else body.classList.remove('is-svg')
+            })()
             ;
             Kr(this, ia, ya).call(this, 'color'),
             Kr(this, sa, wa).call(this, 'color', 'fill', !0),
@@ -1991,14 +1993,17 @@ function updateFPDLayersToSingleGroup(group) {
             'flip',
             Boolean(i || t.__editorMode)
           ));
-          if(t.source == undefined){
-              ;
-              document.querySelector('body').classList.remove('notgroup')
-            }
-            else{
-              ;
-              document.querySelector('body').classList.add('notgroup')
-            }
+          // Do not strip body.notgroup when source is missing — that was
+          // the re-select bug: Color enabled in JS, then CSS hid it.
+          if (t.source != undefined) {
+            document.querySelector('body').classList.add('notgroup')
+          } else if (
+            !(t.hasColorSelection && t.hasColorSelection()) &&
+            t.type !== 'group' &&
+            t.title !== 'Info'
+          ) {
+            document.querySelector('body').classList.remove('notgroup')
+          }
           (t.draggable || t.zChangeable || t.__editorMode) &&
           
             (Kr(this, ia, ya).call(this, 'position'),
@@ -2037,7 +2042,12 @@ function updateFPDLayersToSingleGroup(group) {
                 'edit-text',
                 !t.textPlaceholder && !t.numberPlaceholder
               ))
-            : 'text' !== t.getType() && X(this.container, ['fpd-type-image']),
+            // ROOT CAUSE: fpd-type-image + styles.scss hides .fpd-tool-color.
+            // Never stamp that class on colorizable elements (first select
+            // or re-select). Non-colorizable images still get it as before.
+            : 'text' !== t.getType() &&
+              !(t.hasColorSelection && t.hasColorSelection()) &&
+              X(this.container, ['fpd-type-image']),
           // Comma after console.log previously discarded the condition and
           // always enabled advanced-editing (filters/crop) for every type.
           t.advancedEditing &&
@@ -2077,6 +2087,46 @@ function updateFPDLayersToSingleGroup(group) {
           // code comment by anoop and added the static value
           //Kr(this, ia, ya).call(this, 'remove', t.removable || t.__editorMode),
           Kr(this, ia, ya).call(this, 'remove', 'true'),
+          // Final Color pass on every select/re-select:
+          // 1) Drop fpd-type-image when colorizable (that class hides Color)
+          // 2) Re-enable the Color tool
+          // 3) Keep body.notgroup.is-svg for any remaining CSS gates
+          Z(this.container, ['fpd-doc-colorable', 'fpd-doc-info-layer'])
+          const canColor =
+            Boolean(t.hasColorSelection && t.hasColorSelection())
+          if (canColor) {
+            Z(this.container, ['fpd-type-image'])
+            X(this.container, ['fpd-doc-colorable'])
+            Kr(this, ia, ya).call(this, 'color', !0)
+            const body = document.body
+            const src = String(t.source || '').toLowerCase()
+            body.classList.add('notgroup')
+            if (
+              (t.isSVG && t.isSVG()) ||
+              src.endsWith('.svg') ||
+              t.type === 'group' ||
+              t.title === 'Info'
+            ) {
+              body.classList.add('is-svg')
+            }
+            // Ensure fill swatch paints even if earlier at() missed
+            const fill = at(t)
+            const swatch = this.navElem.querySelector('.fpd-current-fill')
+            if (fill && swatch) swatch.style.background = fill
+          }
+          // Info chrome (customer mode): JUST COLOR CHANGE — hide every
+          // other edit tool. Stamp fpd-doc-info-layer for CSS (opacity btn).
+          !this.fpdInstance.mainOptions.editorMode &&
+            'Info' === t.title &&
+            (X(this.container, ['fpd-doc-info-layer']),
+            Kr(this, ia, ya).call(this, 'transform', !1),
+            Kr(this, ia, ya).call(this, 'position', !1),
+            Kr(this, ia, ya).call(this, 'advanced-editing', !1),
+            Kr(this, ia, ya).call(this, 'remove-bg', !1),
+            Kr(this, ia, ya).call(this, 'reset', !1),
+            Kr(this, ia, ya).call(this, 'duplicate', !1),
+            Kr(this, ia, ya).call(this, 'remove', !1),
+            Kr(this, ia, ya).call(this, 'color', canColor)),
           this.subPanel.querySelectorAll('.fpd-panel-tabs').forEach(t => {
             const e = t.querySelectorAll('[data-tab]:not(.fpd-hidden)')
             J(t, ['fpd-hidden'], e.length <= 1), e.item(0) && e.item(0).click()
@@ -2951,6 +3001,17 @@ function updateFPDLayersToSingleGroup(group) {
             ),
             this.dispatchEvent(new CustomEvent('ready')),
             window.addEventListener('resize', lo(this, ho, go).bind(this)),
+            // iOS often fires orientationchange before the viewport settles;
+            // re-run layout after a short delay so landscape keeps layout-small.
+            window.addEventListener('orientationchange', () => {
+              setTimeout(() => lo(this, ho, go).call(this), 150)
+              setTimeout(() => {
+                lo(this, ho, go).call(this)
+                try {
+                  this.fpdInstance?.currentViewInstance?.fabricCanvas?.resetSize?.()
+                } catch (err) {}
+              }, 400)
+            }),
             lo(this, ho, go).call(this),
             lo(this, uo, mo).call(this),
             lo(this, fo, vo).call(this)

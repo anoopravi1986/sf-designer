@@ -1,0 +1,53 @@
+/*
+  Color tool visibility + Layers color open (fpd-doc-colorable*).
+  NEW classes only — does not modify styles.scss.
+
+  Problem 1: styles.scss hides .fpd-type-image .fpd-tool-color unless
+  body.notgroup.is-svg. Re-selecting groups/Info often drops those classes
+  so Color vanishes even when hasColorSelection() is true.
+
+  Problem 2: vendor locks set pointer-events:none on locked layer cells,
+  so Color swatches on locked/bottom rows cannot open.
+*/
+
+/* Toolbar Color — beat fpd-type-image { display:none } without editing it */
+fpd-element-toolbar.fpd-doc-colorable.fpd-type-image .fpd-tool-color,
+fpd-element-toolbar.fpd-doc-colorable .fpd-tools-nav .fpd-tool-color,
+fpd-element-toolbar.fpd-doc-info-layer.fpd-doc-colorable .fpd-tool-color,
+body.notgroup.is-svg
+  fpd-element-toolbar.fpd-doc-colorable.fpd-type-image
+  .fpd-tool-color {
+  display: flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+fpd-element-toolbar.fpd-doc-colorable .fpd-tool-color .fpd-current-fill,
+fpd-element-toolbar.fpd-doc-info-layer .fpd-tool-color .fpd-current-fill {
+  display: block !important;
+  visibility: visible !important;
+}
+
+/* Layers: locked but colorizable rows stay clickable (open Color / select) */
+.fpd-container
+  fpd-module-manage-layers
+  .fpd-list
+  .fpd-list-row.fpd-locked.fpd-doc-layer-colorable
+  > div:nth-child(-n + 2),
+.fpd-manage-layers-panel
+  .fpd-list-row.fpd-locked.fpd-doc-layer-colorable
+  > div:nth-child(-n + 2) {
+  opacity: 1 !important;
+  pointer-events: auto !important;
+}
+
+/* Base / other locked rows: still allow selecting the row label */
+.fpd-container
+  fpd-module-manage-layers
+  .fpd-list
+  .fpd-list-row.fpd-locked
+  > .fpd-cell-1,
+.fpd-manage-layers-panel .fpd-list-row.fpd-locked > .fpd-cell-1 {
+  pointer-events: auto !important;
+  opacity: 1 !important;
+}

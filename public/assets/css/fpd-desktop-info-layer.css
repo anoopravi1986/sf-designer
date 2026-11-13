@@ -1,0 +1,63 @@
+/*
+  Desktop — Info layer Color-only tools (fpd-doc-info-layer*).
+  NEW classes only. Does not modify styles.scss or other fpd-*.css.
+  Scoped to fpd-layout-large (and not layout-small) so mobile is untouched.
+*/
+
+fpd-element-toolbar.fpd-layout-large.fpd-doc-info-layer:not(.fpd-layout-small)
+  .fpd-tools-nav
+  .fpd-tool-transform,
+fpd-element-toolbar.fpd-layout-large.fpd-doc-info-layer:not(.fpd-layout-small)
+  .fpd-tools-nav
+  .fpd-tool-position,
+fpd-element-toolbar.fpd-layout-large.fpd-doc-info-layer:not(.fpd-layout-small)
+  .fpd-tools-nav
+  .fpd-tool-advanced-editing,
+fpd-element-toolbar.fpd-layout-large.fpd-doc-info-layer:not(.fpd-layout-small)
+  .fpd-tools-nav
+  .fpd-tool-remove-bg,
+fpd-element-toolbar.fpd-layout-large.fpd-doc-info-layer:not(.fpd-layout-small)
+  .fpd-tools-nav
+  .fpd-tool-reset,
+fpd-element-toolbar.fpd-layout-large.fpd-doc-info-layer:not(.fpd-layout-small)
+  .fpd-tools-nav
+  .fpd-tool-duplicate,
+fpd-element-toolbar.fpd-layout-large.fpd-doc-info-layer:not(.fpd-layout-small)
+  .fpd-tools-nav
+  .fpd-tool-remove,
+fpd-element-toolbar.fpd-layout-large.fpd-doc-info-layer:not(.fpd-layout-small)
+  #fpd-opacity-btn,
+fpd-element-toolbar.fpd-layout-large.fpd-doc-info-layer:not(.fpd-layout-small)
+  .fpd-tools-nav
+  .fpd-tool-edit-text,
+fpd-element-toolbar.fpd-layout-large.fpd-doc-info-layer:not(.fpd-layout-small)
+  .fpd-tools-nav
+  .fpd-tool-font-family,
+fpd-element-toolbar.fpd-layout-large.fpd-doc-info-layer:not(.fpd-layout-small)
+  .fpd-tools-nav
+  .fpd-tool-text-size,
+fpd-element-toolbar.fpd-layout-large.fpd-doc-info-layer:not(.fpd-layout-small)
+  .fpd-tools-nav
+  .fpd-tool-text-format,
+fpd-element-toolbar.fpd-layout-large.fpd-doc-info-layer:not(.fpd-layout-small)
+  .fpd-tools-nav
+  .fpd-tool-curved-text {
+  display: none !important;
+}
+
+/* Keep Color visible (beats styles.scss .fpd-type-image hide) */
+fpd-element-toolbar.fpd-layout-large.fpd-doc-info-layer:not(.fpd-layout-small)
+  .fpd-tools-nav
+  .fpd-tool-color,
+fpd-element-toolbar.fpd-layout-large.fpd-doc-info-layer.fpd-type-image:not(
+    .fpd-layout-small
+  )
+  .fpd-tool-color,
+fpd-element-toolbar.fpd-layout-large.fpd-doc-info-layer.fpd-doc-colorable:not(
+    .fpd-layout-small
+  )
+  .fpd-tool-color {
+  display: flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}

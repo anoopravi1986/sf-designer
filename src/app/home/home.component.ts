@@ -2559,13 +2559,24 @@ export class HomeComponent implements AfterViewInit {
         .forEach((el) => el.remove());
     };
 
+    if (!toolbar) {
+      if (!isMobileUi) {
+        clearDocToolClasses();
+        clearAteToolClasses();
+      }
+      return;
+    }
+
+    // Color Fill / Shadow field labels — image|group CSS hides ALL
+    // span.fpd-label, so stamp + show via fpd-doc-color-* (new classes).
+    // Must run for Element Editor (guitar/images), not only Add Text.
+    this.stampColorPanelFieldLabels(toolbar);
+
     if (!isMobileUi) {
       clearDocToolClasses();
       clearAteToolClasses();
       return;
     }
-
-    if (!toolbar) return;
 
     // Add Text Editor uses its own fpd-ate-* classes (mobile only).
     // Element Editor keeps fpd-doc-* — paths stay isolated.
@@ -3740,6 +3751,42 @@ export class HomeComponent implements AfterViewInit {
   }
 
   /**
+   * Restore Color Fill / Stroke / Shadow field labels (Opacity, Blur,
+   * Offset X/Y). Vendor CSS hides every span.fpd-label for image|group;
+   * we stamp fpd-doc-color-* and show them from fpd-ate-color-panel.css
+   * without editing styles.scss.
+   */
+  stampColorPanelFieldLabels(toolbar: HTMLElement): void {
+    const colorFieldLabels: Array<[string, string]> = [
+      ['.fpd-tool-fill-opacity', 'Opacity'],
+      ['.fpd-tool-stroke-width', 'Stroke Width'],
+      ['.fpd-tool-shadow-blur', 'Blur'],
+      ['.fpd-tool-shadow-offsetX', 'Offset X'],
+      ['.fpd-tool-shadow-offsetY', 'Offset Y'],
+    ];
+
+    toolbar.querySelectorAll('.fpd-panel-color').forEach((panel) => {
+      panel.classList.add('fpd-doc-color-panel');
+      colorFieldLabels.forEach(([sel, caption]) => {
+        panel.querySelectorAll(sel).forEach((field) => {
+          field.classList.add('fpd-doc-color-field');
+          let lab = field.querySelector(
+            ':scope > .fpd-label'
+          ) as HTMLElement | null;
+          if (!lab) {
+            lab = document.createElement('span');
+            lab.className = 'fpd-label';
+            field.insertBefore(lab, field.firstChild);
+          }
+          lab.classList.add('fpd-doc-color-field-label');
+          lab.textContent = caption;
+          lab.setAttribute('data-defaulttext', caption);
+        });
+      });
+    });
+  }
+
+  /**
    * Add Text Editor (mobile) — stamp isolated fpd-ate-* classes so the
    * text toolbar matches Element Editor layout without touching fpd-doc-*
    * or styles.scss. Only runs when data-element-type="text" + layout-small.
@@ -3802,6 +3849,8 @@ export class HomeComponent implements AfterViewInit {
 
     // Color panel (Fill / Stroke / Shadow): enable Shadow-tab scroll +
     // safer Stroke Width range for text (outline, not a solid blob).
+    // Field labels (Opacity / Blur / Offset) via stampColorPanelFieldLabels.
+    this.stampColorPanelFieldLabels(toolbar);
     toolbar.querySelectorAll('.fpd-panel-color').forEach((panel) => {
       panel.classList.add('fpd-ate-color-panel');
       panel

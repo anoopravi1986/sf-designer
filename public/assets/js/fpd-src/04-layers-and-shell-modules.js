@@ -333,11 +333,15 @@
 
         var t, e, i
         this.listElem.innerHTML = ''
+        // Guard falsy rows — bare `t.checkEditable()` crashed Layers when
+        // a null/undefined entry slipped into normalizedElements (knob /
+        // chrome edge cases).
         normalizedElements.forEach(t => {
-          if (t && t.title != 'Overlay') {
+          if (!t) return
+          if (t.title != 'Overlay') {
             Wn(this, Yn, Kn).call(this, t)
           } else {
-            t.checkEditable() && Wn(this, Yn, Kn).call(this, t)
+            t.checkEditable && t.checkEditable() && Wn(this, Yn, Kn).call(this, t)
           }
         }),
           Hn(this, Vn) && Hn(this, Vn).dispose(),
@@ -362,8 +366,13 @@
             onChange: t => {
               const e = this.fpdInstance.currentViewInstance.fabricCanvas,
                 i = e.getElementByID(t.id)
+              if (!i || !i.getZIndex) return
               let n = this.listElem.querySelector('.fpd-sortable-closest'),
-                s = e.getElementByID(n ? n.id : t.id).getZIndex()
+                closest = n ? e.getElementByID(n.id) : null,
+                s = (closest && closest.getZIndex
+                  ? closest
+                  : i
+                ).getZIndex()
               // setElementOptions clamps z against Base/Overlay
               n || s++, e.setElementOptions({ z: s }, i)
             },
@@ -391,6 +400,9 @@
           ;(i.style.background = s),
             (i.className = 'fpd-current-color'),
             (e.colors = n)
+          // Locked rows use pointer-events:none on cells 0–1 (vendor CSS),
+          // which blocked opening Color — stamp so new CSS can re-enable.
+          X(e, ['fpd-doc-layer-colorable'])
         }
         const s = document.createElement('div')
         ;(s.className = 'fpd-cell-0'), s.append(i), e.append(s)
@@ -445,8 +457,17 @@
             o.append(n),
             G(n, 'click', i => {
               i.stopPropagation(),
-                Z(e, ['fpd-show-colors']),
-                (t.evented = !t.evented),
+                Z(e, ['fpd-show-colors'])
+              // Info / Base / Overlay stay chrome-locked — unlocking here
+              // used to re-enable evented and break the no-move rule.
+              if (
+                !t.__editorMode &&
+                t.title &&
+                ['Info', 'Base', 'Overlay'].includes(t.title)
+              ) {
+                return
+              }
+              ;(t.evented = !t.evented),
                 (t.locked = !t.evented)
               const n = i.currentTarget.querySelector('span')
               J(n, ['fpd-icon-unlocked'], t.evented),
@@ -535,16 +556,16 @@
         }
         G(e.querySelector('.fpd-cell-1'), 'click', t => {
           const e = t.currentTarget.parentNode
-          if (
-            e.classList.contains('fpd-locked') ||
-            'TEXTAREA' == t.target.nodeName
-          )
-            return
+          if ('TEXTAREA' == t.target.nodeName) return
           const i =
             this.fpdInstance.currentViewInstance.fabricCanvas.getElementByID(
               e.id
             )
-          i && i.canvas.setActiveObject(i).renderAll()
+          // Guard missing element — was a Layers-tab crash path.
+          // Locked rows must still be selectable from Layers (Color / Info);
+          // fabric lock flags still block move/stretch on the canvas.
+          if (!i || !i.canvas) return
+          i.canvas.setActiveObject(i).renderAll()
         }),
           Wn(this, Zn, is).call(this, t)
       }

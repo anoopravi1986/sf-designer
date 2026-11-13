@@ -35,7 +35,8 @@
             "styles": [
               "node_modules/@fortawesome/fontawesome-free/css/all.min.css",
               "src/styles.scss",
-              "public/assets/css/demos.css"
+              "public/assets/css/demos.css",
+              "public/assets/css/fpd-doc-colorable-tools.css"
             ],
             "scripts": []
           },

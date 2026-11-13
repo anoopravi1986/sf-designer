@@ -4549,14 +4549,45 @@
           allTooltips.push(tooltip)
           document.body.appendChild(tooltip)
 
-          // Toggle visibility and close others
-          dots.addEventListener('click', e => {
+          // Keep tooltip inside the viewport (landscape / narrow sheets
+          // previously placed it at rect.right+8 and it opened off-screen,
+          // so ⋯ taps looked dead).
+          const placeElementsTooltip = () => {
+            const rect = dots.getBoundingClientRect()
+            tooltip.classList.remove('hidden')
+            tooltip.style.visibility = 'hidden'
+            tooltip.style.display = 'block'
+            const tipW = tooltip.offsetWidth || 240
+            const tipH = tooltip.offsetHeight || 160
+            const pad = 8
+            let left = rect.right + pad
+            let top = rect.top
+            if (left + tipW > window.innerWidth - pad) {
+              left = Math.max(pad, rect.left - tipW - pad)
+            }
+            if (left < pad) left = pad
+            if (top + tipH > window.innerHeight - pad) {
+              top = Math.max(pad, window.innerHeight - tipH - pad)
+            }
+            if (top < pad) top = pad
+            tooltip.style.left = `${Math.round(left)}px`
+            tooltip.style.top = `${Math.round(top)}px`
+            tooltip.style.visibility = 'visible'
+          }
+
+          let lastElementsTipToggle = 0
+          const toggleElementsTooltip = e => {
             e.stopPropagation()
             e.preventDefault()
-            // Close all other tooltips
+            // Debounce touchend+click double-fire on iOS
+            const now = Date.now()
+            if (now - lastElementsTipToggle < 400) return
+            lastElementsTipToggle = now
+
             allTooltips.forEach(tip => {
               if (tip !== tooltip) {
                 tip.classList.add('hidden')
+                tip.style.display = ''
               }
             })
             const parent = e.currentTarget.closest('.fpd-active')
@@ -4567,18 +4598,34 @@
 
             const willShow = tooltip.classList.contains('hidden')
             if (willShow) {
-              const rect = dots.getBoundingClientRect()
-              tooltip.style.left = `${Math.round(rect.right + 8)}px`
-              tooltip.style.top = `${Math.round(rect.top)}px`
-              tooltip.classList.remove('hidden')
+              placeElementsTooltip()
             } else {
               tooltip.classList.add('hidden')
+              tooltip.style.display = ''
             }
-          })
+          }
 
-          // Optional: Hide tooltip if user clicks outside
-          document.addEventListener('click', () => {
+          // click + touchend: iOS sometimes eats the click after stopPropagation
+          dots.addEventListener('click', toggleElementsTooltip)
+          dots.addEventListener(
+            'touchend',
+            e => {
+              if (e.cancelable) e.preventDefault()
+              toggleElementsTooltip(e)
+            },
+            { passive: false }
+          )
+
+          // Hide tooltip if user taps outside (ignore taps on this tip / dots)
+          document.addEventListener('click', ev => {
+            if (
+              tooltip.contains(ev.target) ||
+              dots.contains(ev.target)
+            ) {
+              return
+            }
             tooltip.classList.add('hidden')
+            tooltip.style.display = ''
           })
 
           div.appendChild(picture)

@@ -1,11 +1,99 @@
 /*
-  Add Text Editor (mobile) — Color panel fixes (fpd-ate-color-*).
-  NEW classes only. Does not modify styles.scss, fpd-doc-fixes.css,
-  or fpd-add-text-editor.css.
+  Color panel fixes — NEW classes only (fpd-ate-color-* / fpd-doc-color-*).
+  Does not modify styles.scss, fpd-doc-fixes.css, or fpd-add-text-editor.css.
 
-  1) Shadow tab must scroll so Blur / Offset X / Offset Y stay reachable.
-  2) Scoped to fpd-ate-editor + fpd-layout-small only.
+  1) Shadow tab scroll (Add Text / ate).
+  2) Restore Fill Opacity + Shadow Blur / Offset X / Offset Y labels
+     hidden by image|group span.fpd-label { display:none }.
 */
+
+/*
+  Color Fill / Stroke / Shadow field labels (Opacity, Blur, Offset X/Y).
+  Beats the image/group blanket hide without editing styles.scss.
+*/
+fpd-element-toolbar[data-fabric-type='image']
+  .fpd-panel-color.fpd-doc-color-panel
+  .fpd-doc-color-field
+  > .fpd-doc-color-field-label,
+fpd-element-toolbar[data-fabric-type='group']
+  .fpd-panel-color.fpd-doc-color-panel
+  .fpd-doc-color-field
+  > .fpd-doc-color-field-label,
+fpd-element-toolbar
+  .fpd-panel-color.fpd-doc-color-panel
+  .fpd-doc-color-field
+  > .fpd-doc-color-field-label,
+fpd-element-toolbar.fpd-layout-small
+  .fpd-panel-color.fpd-doc-color-panel
+  .fpd-doc-color-field
+  > .fpd-doc-color-field-label,
+fpd-element-toolbar.fpd-ate-editor.fpd-layout-small
+  .fpd-panel-color.fpd-doc-color-panel
+  .fpd-doc-color-field
+  > .fpd-doc-color-field-label {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  position: static !important;
+  flex: 1 1 100% !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  order: 0 !important;
+  margin: 0 0 8px 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  border-right: none !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  line-height: 1.3 !important;
+  color: #485563 !important;
+  text-align: left !important;
+  white-space: nowrap !important;
+  height: auto !important;
+  min-height: 0 !important;
+  overflow: visible !important;
+}
+
+/* Keep number + slider under the label, same stack as other app fields */
+fpd-element-toolbar
+  .fpd-panel-color.fpd-doc-color-panel
+  .fpd-doc-color-field,
+fpd-element-toolbar
+  .fpd-panel-color.fpd-doc-color-panel
+  .fpd-doc-color-field.fpd-input {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 0 !important;
+  overflow: visible !important;
+  box-shadow: none !important;
+  border: none !important;
+  background: transparent !important;
+  padding: 0 0 12px !important;
+  margin: 0 !important;
+  width: 100% !important;
+}
+
+fpd-element-toolbar
+  .fpd-panel-color.fpd-doc-color-panel
+  .fpd-doc-color-field
+  > .fpd-slider-number {
+  order: 1 !important;
+  flex: 0 0 70px !important;
+  margin: 0 0 8px 0 !important;
+}
+
+fpd-element-toolbar
+  .fpd-panel-color.fpd-doc-color-panel
+  .fpd-doc-color-field
+  > fpd-range-slider {
+  order: 3 !important;
+  flex: 1 1 100% !important;
+  flex-basis: 100% !important;
+  width: 100% !important;
+  margin: 0 !important;
+}
 
 /* Color panel: column layout so tabs header stays put and body scrolls */
 fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small.fpd-panel-visible

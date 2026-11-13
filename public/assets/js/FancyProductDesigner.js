@@ -25032,6 +25032,7 @@
             // Info / Base / Overlay are product chrome — never move or stretch
             // in customer mode (Google Doc desktop item 2). Applied after the
             // unlock block so those flags cannot reopen the locks.
+            // Info also: no reorder / copy / delete — Color change only.
             !this.viewOptions.editorMode &&
               e.title &&
               ['Info', 'Base', 'Overlay'].includes(e.title) &&
@@ -25041,7 +25042,12 @@
               (t.lockRotation = !0),
               (t.hasControls = !1),
               'Info' === e.title &&
-                ((t.evented = !1), (t.selectable = !1), (t.isEditable = !1))),
+                ((t.evented = !1),
+                (t.selectable = !1),
+                (t.isEditable = !1),
+                (t.zChangeable = !1),
+                (t.copyable = !1),
+                (t.removable = !1))),
             t.fixed && Q(t.replace) && (t.replace = e.title),
             !this.viewOptions.editorMode && t.replace && '' != t.replace)
           ) {
@@ -30518,14 +30524,45 @@
           allTooltips.push(tooltip)
           document.body.appendChild(tooltip)
 
-          // Toggle visibility and close others
-          dots.addEventListener('click', e => {
+          // Keep tooltip inside the viewport (landscape / narrow sheets
+          // previously placed it at rect.right+8 and it opened off-screen,
+          // so ⋯ taps looked dead).
+          const placeElementsTooltip = () => {
+            const rect = dots.getBoundingClientRect()
+            tooltip.classList.remove('hidden')
+            tooltip.style.visibility = 'hidden'
+            tooltip.style.display = 'block'
+            const tipW = tooltip.offsetWidth || 240
+            const tipH = tooltip.offsetHeight || 160
+            const pad = 8
+            let left = rect.right + pad
+            let top = rect.top
+            if (left + tipW > window.innerWidth - pad) {
+              left = Math.max(pad, rect.left - tipW - pad)
+            }
+            if (left < pad) left = pad
+            if (top + tipH > window.innerHeight - pad) {
+              top = Math.max(pad, window.innerHeight - tipH - pad)
+            }
+            if (top < pad) top = pad
+            tooltip.style.left = `${Math.round(left)}px`
+            tooltip.style.top = `${Math.round(top)}px`
+            tooltip.style.visibility = 'visible'
+          }
+
+          let lastElementsTipToggle = 0
+          const toggleElementsTooltip = e => {
             e.stopPropagation()
             e.preventDefault()
-            // Close all other tooltips
+            // Debounce touchend+click double-fire on iOS
+            const now = Date.now()
+            if (now - lastElementsTipToggle < 400) return
+            lastElementsTipToggle = now
+
             allTooltips.forEach(tip => {
               if (tip !== tooltip) {
                 tip.classList.add('hidden')
+                tip.style.display = ''
               }
             })
             const parent = e.currentTarget.closest('.fpd-active')
@@ -30536,18 +30573,34 @@
 
             const willShow = tooltip.classList.contains('hidden')
             if (willShow) {
-              const rect = dots.getBoundingClientRect()
-              tooltip.style.left = `${Math.round(rect.right + 8)}px`
-              tooltip.style.top = `${Math.round(rect.top)}px`
-              tooltip.classList.remove('hidden')
+              placeElementsTooltip()
             } else {
               tooltip.classList.add('hidden')
+              tooltip.style.display = ''
             }
-          })
+          }
 
-          // Optional: Hide tooltip if user clicks outside
-          document.addEventListener('click', () => {
+          // click + touchend: iOS sometimes eats the click after stopPropagation
+          dots.addEventListener('click', toggleElementsTooltip)
+          dots.addEventListener(
+            'touchend',
+            e => {
+              if (e.cancelable) e.preventDefault()
+              toggleElementsTooltip(e)
+            },
+            { passive: false }
+          )
+
+          // Hide tooltip if user taps outside (ignore taps on this tip / dots)
+          document.addEventListener('click', ev => {
+            if (
+              tooltip.contains(ev.target) ||
+              dots.contains(ev.target)
+            ) {
+              return
+            }
             tooltip.classList.add('hidden')
+            tooltip.style.display = ''
           })
 
           div.appendChild(picture)
@@ -32460,11 +32513,15 @@
 
         var t, e, i
         this.listElem.innerHTML = ''
+        // Guard falsy rows — bare `t.checkEditable()` crashed Layers when
+        // a null/undefined entry slipped into normalizedElements (knob /
+        // chrome edge cases).
         normalizedElements.forEach(t => {
-          if (t && t.title != 'Overlay') {
+          if (!t) return
+          if (t.title != 'Overlay') {
             Wn(this, Yn, Kn).call(this, t)
           } else {
-            t.checkEditable() && Wn(this, Yn, Kn).call(this, t)
+            t.checkEditable && t.checkEditable() && Wn(this, Yn, Kn).call(this, t)
           }
         }),
           Hn(this, Vn) && Hn(this, Vn).dispose(),
@@ -32489,8 +32546,13 @@
             onChange: t => {
               const e = this.fpdInstance.currentViewInstance.fabricCanvas,
                 i = e.getElementByID(t.id)
+              if (!i || !i.getZIndex) return
               let n = this.listElem.querySelector('.fpd-sortable-closest'),
-                s = e.getElementByID(n ? n.id : t.id).getZIndex()
+                closest = n ? e.getElementByID(n.id) : null,
+                s = (closest && closest.getZIndex
+                  ? closest
+                  : i
+                ).getZIndex()
               // setElementOptions clamps z against Base/Overlay
               n || s++, e.setElementOptions({ z: s }, i)
             },
@@ -32518,6 +32580,9 @@
           ;(i.style.background = s),
             (i.className = 'fpd-current-color'),
             (e.colors = n)
+          // Locked rows use pointer-events:none on cells 0–1 (vendor CSS),
+          // which blocked opening Color — stamp so new CSS can re-enable.
+          X(e, ['fpd-doc-layer-colorable'])
         }
         const s = document.createElement('div')
         ;(s.className = 'fpd-cell-0'), s.append(i), e.append(s)
@@ -32572,8 +32637,17 @@
             o.append(n),
             G(n, 'click', i => {
               i.stopPropagation(),
-                Z(e, ['fpd-show-colors']),
-                (t.evented = !t.evented),
+                Z(e, ['fpd-show-colors'])
+              // Info / Base / Overlay stay chrome-locked — unlocking here
+              // used to re-enable evented and break the no-move rule.
+              if (
+                !t.__editorMode &&
+                t.title &&
+                ['Info', 'Base', 'Overlay'].includes(t.title)
+              ) {
+                return
+              }
+              ;(t.evented = !t.evented),
                 (t.locked = !t.evented)
               const n = i.currentTarget.querySelector('span')
               J(n, ['fpd-icon-unlocked'], t.evented),
@@ -32662,16 +32736,16 @@
         }
         G(e.querySelector('.fpd-cell-1'), 'click', t => {
           const e = t.currentTarget.parentNode
-          if (
-            e.classList.contains('fpd-locked') ||
-            'TEXTAREA' == t.target.nodeName
-          )
-            return
+          if ('TEXTAREA' == t.target.nodeName) return
           const i =
             this.fpdInstance.currentViewInstance.fabricCanvas.getElementByID(
               e.id
             )
-          i && i.canvas.setActiveObject(i).renderAll()
+          // Guard missing element — was a Layers-tab crash path.
+          // Locked rows must still be selectable from Layers (Color / Info);
+          // fabric lock flags still block move/stretch on the canvas.
+          if (!i || !i.canvas) return
+          i.canvas.setActiveObject(i).renderAll()
         }),
           Wn(this, Zn, is).call(this, t)
       }
@@ -36903,20 +36977,22 @@ function updateFPDLayersToSingleGroup(group) {
             }
           })
           r.append(a);
-            ;
-            if(t.source){
-              ;
-              document.querySelector('body').classList.add('notgroup')
-              if (t.source.toLowerCase().endsWith('.svg')) {
-                  document.querySelector('body').classList.add('is-svg');
-              }
-              else{
-                  document.querySelector('body').classList.remove('is-svg');
-              }
-            }
-            else{
-              document.querySelector('body').classList.remove('notgroup')
-            }
+            // Body classes gate Color visibility in styles.scss
+            // (.fpd-type-image .fpd-tool-color needs body.notgroup.is-svg).
+            // Groups / re-select often have no t.source — keep classes so
+            // Color does not vanish after deselect → select.
+            ;(() => {
+              const body = document.body
+              const src = String(t.source || '').toLowerCase()
+              const svgLike =
+                src.endsWith('.svg') ||
+                (t.isSVG && t.isSVG()) ||
+                t.type === 'group' ||
+                t.title === 'Info'
+              body.classList.add('notgroup')
+              if (svgLike) body.classList.add('is-svg')
+              else body.classList.remove('is-svg')
+            })()
             ;
             Kr(this, ia, ya).call(this, 'color'),
             Kr(this, sa, wa).call(this, 'color', 'fill', !0),
@@ -36976,14 +37052,17 @@ function updateFPDLayersToSingleGroup(group) {
             'flip',
             Boolean(i || t.__editorMode)
           ));
-          if(t.source == undefined){
-              ;
-              document.querySelector('body').classList.remove('notgroup')
-            }
-            else{
-              ;
-              document.querySelector('body').classList.add('notgroup')
-            }
+          // Do not strip body.notgroup when source is missing — that was
+          // the re-select bug: Color enabled in JS, then CSS hid it.
+          if (t.source != undefined) {
+            document.querySelector('body').classList.add('notgroup')
+          } else if (
+            !(t.hasColorSelection && t.hasColorSelection()) &&
+            t.type !== 'group' &&
+            t.title !== 'Info'
+          ) {
+            document.querySelector('body').classList.remove('notgroup')
+          }
           (t.draggable || t.zChangeable || t.__editorMode) &&
           
             (Kr(this, ia, ya).call(this, 'position'),
@@ -37022,7 +37101,12 @@ function updateFPDLayersToSingleGroup(group) {
                 'edit-text',
                 !t.textPlaceholder && !t.numberPlaceholder
               ))
-            : 'text' !== t.getType() && X(this.container, ['fpd-type-image']),
+            // ROOT CAUSE: fpd-type-image + styles.scss hides .fpd-tool-color.
+            // Never stamp that class on colorizable elements (first select
+            // or re-select). Non-colorizable images still get it as before.
+            : 'text' !== t.getType() &&
+              !(t.hasColorSelection && t.hasColorSelection()) &&
+              X(this.container, ['fpd-type-image']),
           // Comma after console.log previously discarded the condition and
           // always enabled advanced-editing (filters/crop) for every type.
           t.advancedEditing &&
@@ -37062,6 +37146,46 @@ function updateFPDLayersToSingleGroup(group) {
           // code comment by anoop and added the static value
           //Kr(this, ia, ya).call(this, 'remove', t.removable || t.__editorMode),
           Kr(this, ia, ya).call(this, 'remove', 'true'),
+          // Final Color pass on every select/re-select:
+          // 1) Drop fpd-type-image when colorizable (that class hides Color)
+          // 2) Re-enable the Color tool
+          // 3) Keep body.notgroup.is-svg for any remaining CSS gates
+          Z(this.container, ['fpd-doc-colorable', 'fpd-doc-info-layer'])
+          const canColor =
+            Boolean(t.hasColorSelection && t.hasColorSelection())
+          if (canColor) {
+            Z(this.container, ['fpd-type-image'])
+            X(this.container, ['fpd-doc-colorable'])
+            Kr(this, ia, ya).call(this, 'color', !0)
+            const body = document.body
+            const src = String(t.source || '').toLowerCase()
+            body.classList.add('notgroup')
+            if (
+              (t.isSVG && t.isSVG()) ||
+              src.endsWith('.svg') ||
+              t.type === 'group' ||
+              t.title === 'Info'
+            ) {
+              body.classList.add('is-svg')
+            }
+            // Ensure fill swatch paints even if earlier at() missed
+            const fill = at(t)
+            const swatch = this.navElem.querySelector('.fpd-current-fill')
+            if (fill && swatch) swatch.style.background = fill
+          }
+          // Info chrome (customer mode): JUST COLOR CHANGE — hide every
+          // other edit tool. Stamp fpd-doc-info-layer for CSS (opacity btn).
+          !this.fpdInstance.mainOptions.editorMode &&
+            'Info' === t.title &&
+            (X(this.container, ['fpd-doc-info-layer']),
+            Kr(this, ia, ya).call(this, 'transform', !1),
+            Kr(this, ia, ya).call(this, 'position', !1),
+            Kr(this, ia, ya).call(this, 'advanced-editing', !1),
+            Kr(this, ia, ya).call(this, 'remove-bg', !1),
+            Kr(this, ia, ya).call(this, 'reset', !1),
+            Kr(this, ia, ya).call(this, 'duplicate', !1),
+            Kr(this, ia, ya).call(this, 'remove', !1),
+            Kr(this, ia, ya).call(this, 'color', canColor)),
           this.subPanel.querySelectorAll('.fpd-panel-tabs').forEach(t => {
             const e = t.querySelectorAll('[data-tab]:not(.fpd-hidden)')
             J(t, ['fpd-hidden'], e.length <= 1), e.item(0) && e.item(0).click()
@@ -37936,6 +38060,17 @@ function updateFPDLayersToSingleGroup(group) {
             ),
             this.dispatchEvent(new CustomEvent('ready')),
             window.addEventListener('resize', lo(this, ho, go).bind(this)),
+            // iOS often fires orientationchange before the viewport settles;
+            // re-run layout after a short delay so landscape keeps layout-small.
+            window.addEventListener('orientationchange', () => {
+              setTimeout(() => lo(this, ho, go).call(this), 150)
+              setTimeout(() => {
+                lo(this, ho, go).call(this)
+                try {
+                  this.fpdInstance?.currentViewInstance?.fabricCanvas?.resetSize?.()
+                } catch (err) {}
+              }, 400)
+            }),
             lo(this, ho, go).call(this),
             lo(this, uo, mo).call(this),
             lo(this, fo, vo).call(this)

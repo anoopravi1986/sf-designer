@@ -542,26 +542,119 @@ fpd-element-toolbar.fpd-opacity-open #fpd-opacity-panel.fpd-doc-opacity-sheet {
     var(--fpd-light-bg-color, #eeeeee) !important;
 }
 
+/*
+  iOS / phone landscape — viewport WIDTH is often >768px, so the normal
+  @media (max-width: 768px) stage/module rules never apply even though JS
+  correctly keeps fpd-layout-small (short-side). These rules activate when
+  go() stamps html.fpd-doc-landscape-sheet.
+*/
 @media (orientation: landscape) and (max-height: 560px) {
-  html.fpd-doc-landscape-sheet .fpd-container.fpd-sidebar.fpd-layout-small.fpd-module-visible fpd-main-bar {
-    max-height: 42vh;
-  }
-
-  html.fpd-doc-landscape-sheet .fpd-container.fpd-sidebar.fpd-layout-small.fpd-module-visible .fpd-module-content {
-    max-height: 42vh;
-    overflow: auto;
-  }
-
-  html.fpd-doc-landscape-sheet .fpd-product-stage {
-    max-height: 58vh;
+  html.fpd-doc-landscape-sheet,
+  html.fpd-doc-landscape-sheet body {
+    height: 100dvh !important;
+    overflow: hidden !important;
   }
 
   html.fpd-doc-landscape-sheet .fpd-mobile-topbar {
-    max-height: 40px;
+    max-height: 40px !important;
+  }
+
+  html.fpd-doc-landscape-sheet .fpd-main-wrapper {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: flex-start !important;
+    padding-top: 44px !important;
+    padding-bottom: 0 !important;
+    height: auto !important;
+    max-height: none !important;
+  }
+
+  /* Keep the product canvas visible in short landscape viewports */
+  html.fpd-doc-landscape-sheet .fpd-product-stage {
+    height: calc(100dvh - 44px - 64px) !important;
+    max-height: calc(100dvh - 44px - 64px) !important;
+    min-height: 120px !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: flex-start !important;
+    position: relative !important;
+    overflow: hidden !important;
+  }
+
+  html.fpd-doc-landscape-sheet .fpd-view-stage {
+    width: 100% !important;
+    height: 100% !important;
+    min-width: unset !important;
+    transform: none !important;
+    transform-origin: top center !important;
+    margin-top: 0 !important;
+  }
+
+  html.fpd-doc-landscape-sheet .fpd-container.fpd-sidebar.fpd-layout-small.fpd-module-visible fpd-main-bar {
+    max-height: 48vh !important;
+  }
+
+  /* Elements uses fpd-module-designsnew — include it (designs/images alone
+     left Elements on height:101vh which overflows landscape). */
+  html.fpd-doc-landscape-sheet
+    .fpd-container.fpd-sidebar.fpd-layout-small.fpd-module-visible
+    .fpd-module-content {
+    height: calc(100dvh - 64px) !important;
+    max-height: calc(100dvh - 64px) !important;
+    min-height: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+    padding-bottom: 64px !important;
+  }
+
+  html.fpd-doc-landscape-sheet
+    .fpd-container.fpd-sidebar.fpd-layout-small.fpd-module-visible
+    .fpd-module-content
+    > fpd-module-designs.fpd-active,
+  html.fpd-doc-landscape-sheet
+    .fpd-container.fpd-sidebar.fpd-layout-small.fpd-module-visible
+    .fpd-module-content
+    > fpd-module-designsnew.fpd-active,
+  html.fpd-doc-landscape-sheet
+    .fpd-container.fpd-sidebar.fpd-layout-small.fpd-module-visible
+    .fpd-module-content
+    > fpd-module-images.fpd-active {
+    display: flex !important;
+    flex-direction: column !important;
+    flex: 1 1 auto !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+  }
+
+  html.fpd-doc-landscape-sheet
+    .fpd-container.fpd-sidebar.fpd-layout-small.fpd-module-visible
+    .fpd-module-content
+    .fpd-scroll-area {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    overflow: auto !important;
+    -webkit-overflow-scrolling: touch !important;
   }
 
   html.fpd-doc-landscape-sheet fpd-element-toolbar.fpd-smart.fpd-layout-small {
-    max-height: 48vh;
-    overflow: auto;
+    max-height: 48vh !important;
+    overflow: auto !important;
   }
+
+  /* Elements ⋯ info popover must stay on-screen and tappable */
+  html.fpd-doc-landscape-sheet .fpd-doc-elements-tooltip:not(.hidden) {
+    display: block !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+    z-index: 100000 !important;
+    max-width: min(240px, calc(100vw - 16px)) !important;
+  }
+}
+
+.fpd-doc-elements-tooltip:not(.hidden) {
+  display: block !important;
+  pointer-events: auto !important;
+  z-index: 100000 !important;
 }
