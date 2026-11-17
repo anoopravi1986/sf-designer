@@ -1,0 +1,29 @@
+/*
+  Mobile Element Editor - Transform "Curve" options + bottom gap.
+
+  Root cause (both issues): opening Transform adds body.fpd-toolbar-transform-our,
+  and styles.scss (mobile block) forces the curved-text panel visible with
+  `body.fpd-toolbar-transform-our .fpd-panel-curved-text { display:block }`.
+   1) That rule has no element-type check, so the curve options (ABCD /
+      arc up / arc down + radius) showed for images, SVGs and groups too -
+      curving only applies to text.
+   2) Closing Transform with the X keeps the body class, so the curve panel
+      stays rendered inside the (otherwise empty) sub-panel. The sub-panel is
+      a flex sibling of the tool row, so its height stretched the whole
+      bottom sheet and left a large blank band below the tools.
+
+  Fix: on mobile, the curve panel shows only for text elements AND only while
+  the Transform panel is actually open. NEW rules only; desktop untouched.
+*/
+@media only screen and (max-width: 990.98px) {
+  /* 1) Element Editor (non-text elements): never show the curve options */
+  body fpd-element-toolbar.fpd-layout-small:not([data-element-type='text'])
+    .fpd-sub-panel
+    .fpd-panel-curved-text,
+  /* 2) Any element: hide it when the Transform panel is not open */
+  body fpd-element-toolbar.fpd-layout-small
+    .fpd-sub-panel:not(:has(.fpd-panel-transform.fpd-active))
+    .fpd-panel-curved-text {
+    display: none !important;
+  }
+}
