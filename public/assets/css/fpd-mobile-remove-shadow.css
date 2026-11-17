@@ -1,0 +1,31 @@
+/*
+  Mobile "Remove Shadow" button (Color > Shadow tab) - same active look as
+  desktop (fpd-desktop-remove-shadow.css). The vendor `.fpd-btn.fpd-secondary`
+  style (light grey background, grey text) made this working button look
+  disabled on mobile, because the desktop rule is desktop-only.
+  NEW rules only, on the existing fpd-doc-remove-shadow-btn class.
+  Mobile only (below the desktop 991px breakpoint, fpd-layout-small).
+*/
+@media only screen and (max-width: 990.98px) {
+  fpd-element-toolbar.fpd-layout-small .fpd-panel-color .fpd-btn.fpd-doc-remove-shadow-btn {
+    background: var(--fpd-secondary-color, #e85624) !important;
+    color: #fff !important;
+    border: 1px solid var(--fpd-secondary-color, #e85624) !important;
+    opacity: 1 !important;
+    cursor: pointer !important;
+    pointer-events: auto !important;
+    font-weight: 600 !important;
+    -webkit-tap-highlight-color: transparent;
+    transition: filter 0.15s ease;
+  }
+
+  /* Pressed feedback (touch has no hover) */
+  fpd-element-toolbar.fpd-layout-small .fpd-panel-color .fpd-btn.fpd-doc-remove-shadow-btn:active {
+    filter: brightness(0.85);
+  }
+
+  fpd-element-toolbar.fpd-layout-small .fpd-panel-color .fpd-btn.fpd-doc-remove-shadow-btn:focus-visible {
+    outline: 2px solid var(--fpd-secondary-color, #e85624) !important;
+    outline-offset: 2px;
+  }
+}

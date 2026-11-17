@@ -1,0 +1,30 @@
+/*
+  Mobile Add Text Editor - restore the Transform icon.
+
+  Root cause: fpd-add-text-editor.css clears ::before on EVERY span of the
+  Transform tile (`.fpd-ate-uniform-tool.fpd-tool-transform > span::before
+  { content:none; display:none }`, meant for caption pseudo-elements). The
+  Transform icon is an icon-font glyph drawn by span.fpd-icon-transform::before
+  (FancyProductDesigner.min.css, FontFPD "\e940"), so the icon disappeared and
+  the span collapsed to 0x0. The Element Editor tile has the same markup
+  without that rule, which is why its icon shows.
+
+  Fix: re-enable the glyph for the icon span only (captions stay cleared).
+  NEW rules only; mobile (fpd-layout-small) Add Text Editor only.
+*/
+body fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small:not(.fpd-layout-large)
+  .fpd-ate-uniform-tool.fpd-tool-transform
+  > span.fpd-icon-transform::before {
+  content: '\e940' !important;
+  display: inline-block !important;
+  font-family: FontFPD !important;
+  color: inherit !important;
+}
+
+/* Same icon size as the mobile Element Editor Transform tile (28px computed). */
+body fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small:not(.fpd-layout-large)
+  .fpd-ate-uniform-tool.fpd-tool-transform
+  > span.fpd-icon-transform {
+  font-size: 28px !important;
+  line-height: 1 !important;
+}
