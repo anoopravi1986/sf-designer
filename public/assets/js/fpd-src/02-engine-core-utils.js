@@ -5506,7 +5506,18 @@
               ? (e.evented = 0 !== e.opacity)
               : e.isEditable &&
                 !this.viewOptions.editorMode &&
-                (e.evented = !t.locked),
+                // ===== CUSTOM (StyleFlip): `t` is only the options being
+                // changed (e.g. `{ fill }` from a Layers colour change), so
+                // `!t.locked` turned every such change into `evented = true`
+                // - even on locked layers. Locked, colourable, full-size
+                // product layers that sit on top (Group Text / Group Outline)
+                // then swallowed every canvas click, so clicking the
+                // customer's element selected that layer instead (no Color
+                // option, element "not selectable"). Fall back to the
+                // element's own lock state when the options don't set it;
+                // the Layers lock toggle keeps `locked` in sync with
+                // `evented`, so user lock/unlock is respected.
+                (e.evented = !(void 0 !== t.locked ? t.locked : e.locked)),
             (e.textPlaceholder || e.numberPlaceholder) && (e.removable = !1)
           for (var n = this.getObjects(), s = 0; s < n.length; ++s) {
             var r = n[s]
