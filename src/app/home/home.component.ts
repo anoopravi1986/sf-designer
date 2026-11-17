@@ -2274,7 +2274,7 @@ export class HomeComponent implements AfterViewInit {
         return;
       }
 
-      fetch(`/api/sharedproduct/search?title=${encodeURIComponent(dataTitle)}&design_id=${encodeURIComponent(matchedData[0]?.design_id ?? '')}`, {
+      fetch(`https://styleflip-backend-jdm5.ithemes.xyz/api/sharedproduct/search?title=${encodeURIComponent(dataTitle)}&design_id=${encodeURIComponent(matchedData[0]?.design_id ?? '')}`, {
         method: 'GET'
       })
         .then(response => response.json())
@@ -4689,7 +4689,7 @@ export class HomeComponent implements AfterViewInit {
         ;
         ;
         ;
-        fetch(`/api/sharedproduct/search?title=${encodeURIComponent(title)}&design_id=${encodeURIComponent(id ?? '')}`, {
+        fetch(`https://styleflip-backend-jdm5.ithemes.xyz/api/sharedproduct/search?title=${encodeURIComponent(title)}&design_id=${encodeURIComponent(id ?? '')}`, {
           method: 'GET'
         })
           .then(response => response.json())
