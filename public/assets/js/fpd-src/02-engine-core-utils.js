@@ -1883,7 +1883,10 @@
                 buttonShare.addEventListener('click', function (e) {
                   e.stopPropagation();
 
-                  fetch(`/api/sharedproduct/search?title=${encodeURIComponent(t.title)}&design_id=${encodeURIComponent(t?.design_id ?? '')}`, {
+                  // API base from fpd-saved-designs-api.js (a relative /api is
+                  // not served by Firebase Hosting).
+                  const sfApiBase = (window.SFSavedDesigns && window.SFSavedDesigns.apiBase()) || '/api';
+                  fetch(`${sfApiBase}/sharedproduct/search?title=${encodeURIComponent(t.title)}&design_id=${encodeURIComponent(t?.design_id ?? '')}`, {
                     method: 'GET'
                   })
                     .then(response => response.json())

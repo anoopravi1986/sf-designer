@@ -239,7 +239,7 @@ export class HomeComponent implements AfterViewInit {
 
   goBack() {
     
-    if (window.location.href.includes('http://localhost:4200/apple/macbook-13-inch-non-unibody-2006-2009')) {
+    if (window.location.href.includes('https://www.styleflip.com/apple/macbook-13-inch-non-unibody-2006-2009')) {
       
       window.location.href = this.targetBackUrl;
     } else {
@@ -383,6 +383,11 @@ export class HomeComponent implements AfterViewInit {
     // a class here on tap keeps the menu hidden by default without
     // reintroducing that hover dependency.
     document.addEventListener('click', (e: any) => {
+      // Only real taps/clicks. The element toolbar resets its Fill/Align tabs
+      // with programmatic .click() calls when a loaded design's element gets
+      // selected - those must not count as "tapped elsewhere", or opening a
+      // saved design immediately hides its ⋯ menu (Share/Delete unreachable).
+      if (!e.isTrusted) return;
       const item = e.target?.closest?.('.fpd-item');
       // Clear sticky taps on siblings so only the current item shows ⋯
       document.querySelectorAll('.fpd-item.fpd-dot-menu-tapped').forEach((el) => {
@@ -4694,33 +4699,27 @@ export class HomeComponent implements AfterViewInit {
         })
           .then(response => response.json())
           .then(data => {
-            ;
-            let existing = localStorage.getItem('clothing-designer');
-            let parsed = existing ? JSON.parse(existing) : [];
+            // Load the shared design straight from the API response. It is
+            // not written into this browser's Saved Designs cache: that list
+            // now belongs to the viewer's own account (backend), and a cache
+            // entry would no longer carry the product data anyway.
+            const sharedProduct =
+              data && Array.isArray(data.product) && data.product.length ? data.product : null;
 
-            if (parsed.length === 0) {
-              parsed.push(data);
-              localStorage.setItem('clothing-designer', JSON.stringify(parsed));
-            }
-            const designTitleData = localStorage.getItem('clothing-designer');
-            ;
-            let matchedDesign = null;
-            if (designTitleData) {
-              const parsedDesigns = JSON.parse(designTitleData);
-              matchedDesign = parsedDesigns.find((i: any) => i.title === title);
-            }
-
-            if (matchedDesign) {
+            if (sharedProduct) {
               setTimeout(() => {
-                ;
                 this.designer.currentViewInstance.fabricCanvas.clear();
-                this.designer.loadProduct(matchedDesign.product)
+                this.designer.loadProduct(sharedProduct)
                 this.showFPDLoading(false);
-                const gridContainer = document.querySelector('.fpd-saved-designs');
               }, 10000);
             } else {
-              ;
+              console.error('Shared design not found', data);
+              this.showFPDLoading(false);
             }
+          })
+          .catch(err => {
+            console.error('Could not load shared design', err);
+            this.showFPDLoading(false);
           });
       });
     }
@@ -5434,74 +5433,35 @@ export class HomeComponent implements AfterViewInit {
     }
   }
 
+  // Header Save Design. Uses the same save engine as the Saved Designs tab
+  // (FPDSaveLoadModule.saveCurrentDesign in fpd-src/03): backend + AWS S3,
+  // and re-saving the open saved design under the same title updates it.
   saveDesign(customTitle?: string) {
-    ;
     if (
-      this.designer &&
-      this.designer.currentViewInstance &&
-      this.designer.currentViewInstance.fabricCanvas
+      !this.designer ||
+      !this.designer.currentViewInstance ||
+      !this.designer.currentViewInstance.fabricCanvas
     ) {
-      const stageWidth = 1800;
-      const stageHeight =
-        this.designer.currentViewInstance.options.stageHeight || 1000;
-      const targetWidth = 300;
-      const targetHeight = 300;
-      const scale = Math.max(
-        targetWidth / stageWidth,
-        targetHeight / stageHeight
-      );
-
-      this.designer.currentViewInstance.toDataURL(
-        (thumbnail: string) => {
-          const product = this.designer.getProduct
-            ? this.designer.getProduct()
-            : {};
-
-          const title = customTitle || `Design_${Date.now()}`;
-
-          ;
-
-          const savedItem = {
-            thumbnail,
-            product,
-            title,
-          };
-
-          if (product && this.designer.mainOptions?.saveActionBrowserStorage) {
-            const storageKey =
-              this.designer.container?.id || 'fpd-saved-designs';
-            let savedList: any[] = [];
-            try {
-              savedList = JSON.parse(
-                window.localStorage.getItem(storageKey) || '[]'
-              );
-            } catch {
-              savedList = [];
-            }
-           savedList.push(savedItem);
-            window.localStorage.setItem(storageKey, JSON.stringify(savedList));
-  const saveLoadModule = this.designer['moduleInstance_save-load'];
-            if (saveLoadModule?.addSavedProduct) {
-              saveLoadModule.addSavedProduct(savedItem);
-            } else {
-              this.loadSavedProducts();
-            }
-          }
-
-          if (product) {
-            this.designer.dispatchEvent?.(
-              new CustomEvent('actionSave', { detail: savedItem })
-            );
-            this.designer.doUnsavedAlert = false;
-          }
-
-          this.showSuccessMessage('Design saved successfully!');
-        },
-        { multiplier: scale, format: 'png', backgroundColor: 'transparent' }
-      );
-    } else {
       console.error('Designer or current canvas is not ready.');
+      return;
     }
+    const saveLoadModule = this.designer['moduleInstance_save-load'];
+    if (!saveLoadModule?.saveCurrentDesign) {
+      console.error('Saved Designs module is not available.');
+      alert('Saving is not available right now. Please reload the page and try again.');
+      return;
+    }
+    const title = customTitle || `Design_${Date.now()}`;
+    saveLoadModule
+      .saveCurrentDesign(title, { notify: false })
+      .then((result: any) => {
+        if (result?.ok) {
+          this.showSuccessMessage(
+            result.isUpdate ? 'Design updated successfully!' : 'Design saved successfully!'
+          );
+        }
+        // Failures are already reported by the module's snackbar.
+      });
   }
 
   // #save-confirm-popup and #title-popup both live at the top level of
@@ -5655,6 +5615,13 @@ export class HomeComponent implements AfterViewInit {
 
     this.ensurePopupAboveMainBar(popup);
     popup.style.display = 'flex';
+
+    // A saved design is open: offer its title, so saving updates that design
+    // (a different title saves a new design).
+    const activeSaved = this.designer?.['moduleInstance_save-load']?.activeDesign;
+    if (!input.value.trim() && activeSaved?.title) {
+      input.value = activeSaved.title;
+    }
 
     // Fresh popup-open - re-arm the one-time "preparing your design" loader
     // (see titlePopupLoaderShown's declaration comment).

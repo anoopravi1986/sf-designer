@@ -1539,159 +1539,352 @@
       }
       customElements.define('fpd-module-save-load', ye)
       var we = new WeakSet()
+      // Saved designs are stored by the backend in AWS S3 - see
+      // assets/js/fpd-saved-designs-api.js (API base + user id live there).
+      // localStorage is only a lightweight cache of the list.
+      const sfEscapeHtml = s =>
+        String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]))
+      const sfSnackbar = msg => n(sfEscapeHtml(msg))
+      const sfApi = () => {
+        if (!window.SFSavedDesigns) throw new Error('Saved designs service is not loaded.')
+        return window.SFSavedDesigns
+      }
+      const sfLegacyFingerprint = e =>
+        [e.design_id || '', e.title || '', String(e.thumbnail || e.base64save || '').length, JSON.stringify(e.product || []).length].join('|')
       class Ce extends EventTarget {
         constructor (t, e) {
-          if (
-            (super(),
-            (function (t, e) {
-              if (e.has(t))
-                throw new TypeError(
-                  'Cannot initialize the same private elements twice on an object'
-                )
-            })((i = this), (s = we)),
-            s.add(i),
-            (this.fpdInstance = t),
-            (this.container = document.createElement('fpd-module-save-load')),
-            e.append(this.container),
-            (this.inputElem = this.container.querySelector('input')),
-            (this.gridElem = this.container.querySelector('.fpd-grid')),
-            G(this.container.querySelector('.fpd-btn'), 'click', e => {
-              const i = kt(
-                this.fpdInstance.currentViewInstance.options.stageWidth,
-                this.fpdInstance.currentViewInstance.options.stageHeight,
-                300,
-                300,
-                'cover'
-              )
-              ;
-              t.viewInstances[0].toDataURL(
-                t => {
-                  const e = this.fpdInstance.getProduct(),
-                  
-                    i = {
-                      thumbnail: t,
-                      product: e,
-                      title: this.inputElem.value || '',
-                      uploadedAt: new Date().toISOString(),
-                        design_id: Date.now().toString(36) + Math.random().toString(36).substr(2, 5)
+          super()
+          we.add(this)
+          this.fpdInstance = t
+          this.container = document.createElement('fpd-module-save-load')
+          e.append(this.container)
+          this.inputElem = this.container.querySelector('input')
+          this.gridElem = this.container.querySelector('.fpd-grid')
+          this.saveBtn = this.container.querySelector('.fpd-btn')
+          // Saved design currently open in the designer ({design_id, title}).
+          // Saving again under the same title updates it instead of creating a copy.
+          this.activeDesign = null
+          this._pendingActive = null
+          this._saving = null
+          this._listToken = 0
+          this._migrating = false
 
-                    }
-                  if (
-                    e &&
-                    this.fpdInstance.mainOptions.saveActionBrowserStorage
-                  ) {
-                    let t = xe(this, we, Se).call(this)
-                    t || (t = []),
-                      this.addSavedProduct(i)
+          G(this.saveBtn, 'click', () => {
+            this.saveCurrentDesign(this.inputElem.value)
+          })
+          // productSelect fires synchronously at the start of every loadProduct:
+          // a saved-design tile sets _pendingActive just before it, anything else
+          // (Products tab, share link, ...) clears the active design.
+          t.addEventListener('productSelect', () => {
+            this.activeDesign = this._pendingActive
+            this._pendingActive = null
+          })
 
-                      fetch('https://styleflip-backend-jdm5.ithemes.xyz/api/sharedproduct/save', {
-                        method: 'POST',
-                        headers: {
-                          'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                          title: i.title,
-                          base64save: i.thumbnail,
-                          product: i.product, // ✅ Added here
-                          uploadedAt: i.uploadedAt,
-                          design_id: i.design_id
-                        })
-                      })
-                        .then(res => res.json())
-                        .then(response => {
-                          ;
-                          i._id = response.product._id;
-                          ;
-                          
-                        })
-                        .catch(err => {
-                          console.error('Error saving shared product:', err);
-                        });
-                        ;
-                        ;  // 👈 Check if _id is still here
-;
-                    t.push(i),
-                      window.localStorage.setItem(
-                        this.fpdInstance.container.id,
-                        JSON.stringify(t)
-                      ),
-                      n(
-                        this.fpdInstance.translator.getTranslation(
-                          'misc',
-                          'product_saved'
-                        )
-                      )
-                  }
-                  e &&
-                    (this.fpdInstance.dispatchEvent(
-                      new CustomEvent('actionSave', { detail: i })
-                    ),
-                    (this.fpdInstance.doUnsavedAlert = !1))
-                },
-                { multiplier: i, format: 'png', backgroundColor: 'transparent' }
+          if (t.mainOptions.saveActionBrowserStorage) {
+            // Cached list first (instant, works offline), then the server list.
+            try {
+              const api = sfApi()
+              const uid = api.getUserId()
+              this._renderList(
+                api.readCache().filter(c => (c && c._sf && String(c.userId) === uid) || api.isLegacyEntry(c))
               )
-            }),
-            this.fpdInstance.mainOptions.saveActionBrowserStorage)
-          ) {
-            ;
-            let t = xe(this, we, Se).call(this)
-            t &&
-              t.length > 0 &&
-              t.forEach(t => {
-                this.addSavedProduct(t)
-              })
+            } catch (err) {}
+            this.refreshFromServer()
+            window.addEventListener(
+              (window.SFSavedDesigns && window.SFSavedDesigns.USER_CHANGE_EVENT) || 'sf-saved-designs:userchange',
+              () => {
+                this.activeDesign = null
+                this.refreshFromServer()
+              }
+            )
           }
-          var i, s
         }
+
+        /** Loads the user's designs from the backend (source of truth). */
+        refreshFromServer () {
+          const token = ++this._listToken
+          let api
+          try {
+            api = sfApi()
+          } catch (err) {
+            console.error(err)
+            return Promise.resolve([])
+          }
+          return api
+            .list()
+            .then(designs => {
+              if (token !== this._listToken) return designs
+              api.syncCache(designs)
+              this._renderList(designs.concat(api.legacyEntries()))
+              this._migrateLegacy()
+              return designs
+            })
+            .catch(err => {
+              console.error('Saved designs: could not load from server', err)
+              sfSnackbar('Could not load your saved designs: ' + err.message)
+              return []
+            })
+        }
+
+        /**
+         * One-time upload of designs that were saved only in this browser
+         * (old localStorage format). Each local copy is removed only after the
+         * server confirms it is stored - nothing is deleted on failure.
+         */
+        _migrateLegacy () {
+          if (this._migrating) return
+          const api = sfApi()
+          const legacy = api.legacyEntries()
+          if (!legacy.length) return
+          this._migrating = true
+          const done = new Set()
+          const safeId = id => typeof id === 'string' && /^[A-Za-z0-9_-]{1,64}$/.test(id)
+          const upload = entry => {
+            const payload = {
+              title: String(entry.title || '').trim() || 'Design ' + new Date(entry.uploadedAt || Date.now()).toLocaleDateString(),
+              thumbnail: entry.thumbnail || entry.base64save,
+              product: entry.product,
+              uploadedAt: entry.uploadedAt
+            }
+            if (safeId(entry.design_id)) payload.design_id = entry.design_id
+            return api.create(payload).catch(err => {
+              // id taken by someone else (e.g. a shared design): keep it under a new id
+              if (err.status === 409 && payload.design_id) {
+                delete payload.design_id
+                return api.create(payload)
+              }
+              throw err
+            })
+          }
+          legacy
+            .reduce(
+              (p, entry) =>
+                p.then(() =>
+                  upload(entry)
+                    .then(() => done.add(sfLegacyFingerprint(entry)))
+                    .catch(err => console.error('Saved designs: could not upload a browser-only design (kept locally)', entry.title, err))
+                ),
+              Promise.resolve()
+            )
+            .then(() => {
+              if (!done.size) return
+              api.writeCache(api.readCache().filter(c => !(api.isLegacyEntry(c) && done.has(sfLegacyFingerprint(c)))))
+              this._migrating = false
+              return this.refreshFromServer()
+            })
+            .finally(() => {
+              this._migrating = false
+            })
+        }
+
+        _renderList (entries) {
+          this.gridElem.innerHTML = ''
+          entries.forEach(entry => this.addSavedProduct(entry))
+        }
+
+        _tileFor (designId) {
+          return Array.from(this.gridElem.querySelectorAll('.fpd-item')).find(el => el.designId === designId)
+        }
+
+        _setBusy (busy) {
+          if (!this.saveBtn) return
+          const disabled = busy || !this.inputElem.value.trim()
+          this.saveBtn.style.pointerEvents = disabled ? 'none' : ''
+          this.saveBtn.style.opacity = disabled ? '0.5' : ''
+        }
+
+        _setActive (design) {
+          this.activeDesign = design ? { design_id: design.design_id, title: design.title || '' } : null
+          if (design && this.inputElem) {
+            this.inputElem.value = design.title || ''
+            this.inputElem.dispatchEvent(new Event('input'))
+          }
+        }
+
+        /**
+         * Saves the current design for the configured user. Used by the Saved
+         * Designs tab and by the header Save button (home.component.ts).
+         * Same title as the open saved design -> updates it (same design id).
+         * Resolves {ok, design, isUpdate} or {ok:false, error}; never rejects.
+         * options.notify: false = caller shows the success message itself.
+         */
+        saveCurrentDesign (rawTitle, options) {
+          const opts = Object.assign({ notify: true }, options || {})
+          const title = String(rawTitle || '').trim()
+          if (!title) {
+            sfSnackbar('Please enter a title')
+            return Promise.resolve({ ok: false, error: new Error('Please enter a title') })
+          }
+          if (this._saving) return this._saving
+          const fpd = this.fpdInstance
+          const multiplier = kt(
+            fpd.currentViewInstance.options.stageWidth,
+            fpd.currentViewInstance.options.stageHeight,
+            300,
+            300,
+            'cover'
+          )
+          this._setBusy(true)
+          this._saving = new Promise(resolve =>
+            fpd.viewInstances[0].toDataURL(resolve, { multiplier: multiplier, format: 'png', backgroundColor: 'transparent' })
+          )
+            .then(thumbnail => {
+              const product = fpd.getProduct()
+              if (!product || !product.length) throw new Error('There is no design to save yet.')
+              if (!fpd.mainOptions.saveActionBrowserStorage) {
+                return { design: { title: title }, product, thumbnail, isUpdate: false, stored: false }
+              }
+              const api = sfApi()
+              const active = this.activeDesign
+              const isUpdate = !!(active && active.design_id && active.title.trim().toLowerCase() === title.toLowerCase())
+              const payload = { title: title, thumbnail: thumbnail, product: product }
+              const call = isUpdate
+                ? api.update(active.design_id, payload)
+                : api.create(Object.assign(payload, { uploadedAt: new Date().toISOString() }))
+              return call.then(design => ({ design, product, thumbnail, isUpdate, stored: true }))
+            })
+            .then(r => {
+              if (r.stored) {
+                const api = sfApi()
+                const old = this._tileFor(r.design.design_id)
+                const tile = this.addSavedProduct(Object.assign({ _sf: 1 }, r.design, { product: r.product }))
+                if (old && tile) old.replaceWith(tile)
+                this._setActive(r.design)
+                const cache = api.readCache().filter(c => !(c && c._sf && c.design_id === r.design.design_id))
+                cache.push(api.toCacheEntry(r.design))
+                api.writeCache(cache)
+                if (opts.notify) {
+                  sfSnackbar(r.isUpdate ? 'Design updated' : this.fpdInstance.translator.getTranslation('misc', 'product_saved'))
+                }
+              }
+              fpd.dispatchEvent(
+                new CustomEvent('actionSave', {
+                  detail: Object.assign({}, r.design, { thumbnail: r.thumbnail, product: r.product, title: r.design.title, isUpdate: r.isUpdate })
+                })
+              )
+              fpd.doUnsavedAlert = !1
+              return { ok: true, design: r.design, isUpdate: r.isUpdate }
+            })
+            .catch(err => {
+              console.error('Saved designs: save failed', err)
+              sfSnackbar('Your design was not saved: ' + err.message)
+              return { ok: false, error: err }
+            })
+            .finally(() => {
+              this._saving = null
+              this._setBusy(false)
+            })
+          return this._saving
+        }
+
+        /** Permanently deletes a design (S3 + record). Tile stays if it fails. */
+        deleteDesign (tile) {
+          if (!tile || tile._sfDeleting) return Promise.resolve(false)
+          const index = Array.from(this.gridElem.querySelectorAll('.fpd-item')).indexOf(tile)
+          const finish = () => {
+            if (this.activeDesign && this.activeDesign.design_id === tile.designId) this.activeDesign = null
+            this.fpdInstance.dispatchEvent(new CustomEvent('actionLoad:Remove', { detail: { index: index, item: tile } }))
+            tile.remove()
+            return true
+          }
+          let api
+          try {
+            api = sfApi()
+          } catch (err) {
+            sfSnackbar(err.message)
+            return Promise.resolve(false)
+          }
+          if (tile.sfLegacy) {
+            // Browser-only design not uploaded yet: remove the local copy only.
+            api.writeCache(api.readCache().filter(c => !(api.isLegacyEntry(c) && sfLegacyFingerprint(c) === tile.sfLegacy)))
+            return Promise.resolve(finish())
+          }
+          tile._sfDeleting = true
+          tile.style.opacity = '0.5'
+          return api
+            .remove(tile.designId)
+            .then(() => {
+              api.writeCache(api.readCache().filter(c => !(c && c._sf && c.design_id === tile.designId)))
+              sfSnackbar('Design deleted')
+              return finish()
+            })
+            .catch(err => {
+              console.error('Saved designs: delete failed', err)
+              tile.style.opacity = ''
+              sfSnackbar('Design was not deleted: ' + err.message)
+              return false
+            })
+            .finally(() => {
+              tile._sfDeleting = false
+            })
+        }
+
+        _openDesign (tile) {
+          const load = product => {
+            this._pendingActive = tile.sfLegacy || !tile.designId ? null : { design_id: tile.designId, title: tile.dataset.title || '' }
+            this.fpdInstance.loadProduct(product)
+            this.fpdInstance.currentProductIndex = -1
+            if (this.activeDesign) this._setActive(this.activeDesign)
+          }
+          if (tile.product) return load(tile.product)
+          if (tile._sfOpening) return
+          tile._sfOpening = true
+          this.fpdInstance.toggleSpinner && this.fpdInstance.toggleSpinner(true)
+          sfApi()
+            .get(tile.designId)
+            .then(design => {
+              tile.product = design.product
+              load(design.product)
+            })
+            .catch(err => {
+              this.fpdInstance.toggleSpinner && this.fpdInstance.toggleSpinner(false)
+              sfSnackbar('Could not open this design: ' + err.message)
+            })
+            .finally(() => {
+              tile._sfOpening = false
+            })
+        }
+
+        /** Adds one tile. Accepts server summaries, cache entries or legacy entries. */
         addSavedProduct (t) {
-          ;
-          let e = t.thumbnail || t.base64save;
-          let { product: i, title: n = '' } = t;
-          // let e = 
-          // let { thumbnail: e, product: i, title: n = '' } = t
+          // Legacy = browser-only entry never stored on the server. Anything the
+          // server returned (has userId / _sf) is a stored design, even when the
+          // product data is attached to the tile after a save.
+          const legacy = !!(window.SFSavedDesigns && !t._sf && !t.userId && window.SFSavedDesigns.isLegacyEntry(t))
           const s = $({
-            url: e,
-            title: n,
+            url: t.thumbnailUrl || t.thumbnail || t.base64save,
+            title: t.title || '',
             uploadedAt: t.uploadedAt,
             design_id: t.design_id,
             removable: !0,
             disablePrice: !0,
             disableDraggable: !0
           })
-          return (
-            this.fpdInstance.lazyBackgroundObserver.observe(
-              s.querySelector('picture')
-            ),
-            (s.product = i),
-            this.gridElem.append(s),
-            G(s, 'click', t => {
-              ;
-              this.fpdInstance.loadProduct(s.product),
-                (this.fpdInstance.currentProductIndex = -1)
-            }),
-            G(s.querySelector('.fa-trash'), 'click', t => {
-              t.stopPropagation()
-              const e = t.currentTarget.parentNode,
-                i = Array.from(
-                  this.gridElem.querySelectorAll('.fpd-item')
-                ).indexOf(e)
-              if (this.fpdInstance.mainOptions.saveActionBrowserStorage) {
-                let t = xe(this, we, Se).call(this)
-                t.splice(i, 1),
-                  window.localStorage.setItem(
-                    this.fpdInstance.container.id,
-                    JSON.stringify(t)
-                  )
-              }
-              this.fpdInstance.dispatchEvent(
-                new CustomEvent('actionLoad:Remove', {
-                  detail: { index: i, item: e }
-                })
-              ),
-                e.remove()
-            }),
-            s
+          if (!s) return null
+          this.fpdInstance.lazyBackgroundObserver.observe(s.querySelector('picture'))
+          s.product = Array.isArray(t.product) && t.product.length ? t.product : null
+          s.designId = t.design_id || ''
+          s.sfLegacy = legacy ? sfLegacyFingerprint(t) : ''
+          if (s.designId) s.dataset.designId = s.designId
+          this.gridElem.append(s)
+          G(s, 'click', () => this._openDesign(s))
+          // Trash icon and the tile menu's "Delete" go through the backend.
+          // Capture phase on the tile, so the generic tile menu's
+          // localStorage-only delete handler never runs for saved designs.
+          s.addEventListener(
+            'click',
+            ev => {
+              const del = ev.target && ev.target.closest && ev.target.closest('.fa-trash, .delete-button')
+              if (!del || !s.contains(del)) return
+              ev.stopPropagation()
+              ev.preventDefault()
+              const menu = s.querySelector('.fpd-share-menu')
+              if (menu) menu.style.display = 'none'
+              this.deleteDesign(s)
+            },
+            !0
           )
+          return s
         }
       }
       function Se () {
