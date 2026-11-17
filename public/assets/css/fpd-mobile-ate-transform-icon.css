@@ -1,27 +1,34 @@
 /*
-  Mobile Add Text Editor - restore the Transform icon.
+  Mobile Add Text Editor - Transform icon, identical to the Element Editor.
 
   Root cause: fpd-add-text-editor.css clears ::before on EVERY span of the
   Transform tile (`.fpd-ate-uniform-tool.fpd-tool-transform > span::before
-  { content:none; display:none }`, meant for caption pseudo-elements). The
-  Transform icon is an icon-font glyph drawn by span.fpd-icon-transform::before
-  (FancyProductDesigner.min.css, FontFPD "\e940"), so the icon disappeared and
-  the span collapsed to 0x0. The Element Editor tile has the same markup
-  without that rule, which is why its icon shows.
+  { content:none; display:none }`, meant for caption pseudo-elements), so the
+  icon disappeared and the span collapsed to 0x0.
 
-  Fix: re-enable the glyph for the icon span only (captions stay cleared).
+  In the Element Editor the Transform icon is NOT the FontFPD glyph: styles.scss
+  (`#SecondaryIconBoxHeader .fpd-tool-transform span:before`, ~line 1149 +
+  mobile size ~line 1328) draws /assets/icon/Transform-Icon.svg as a 35x33
+  background with `filter: brightness(0) invert(0)`. Restoring the heavier
+  font glyph made the Add Text icon look bolder, so this restores that same
+  SVG icon with the same size/offset/filter instead.
+
   NEW rules only; mobile (fpd-layout-small) Add Text Editor only.
 */
 body fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small:not(.fpd-layout-large)
   .fpd-ate-uniform-tool.fpd-tool-transform
   > span.fpd-icon-transform::before {
-  content: '\e940' !important;
+  content: '' !important;
   display: inline-block !important;
-  font-family: FontFPD !important;
-  color: inherit !important;
+  background-image: url('/assets/icon/Transform-Icon.svg') !important;
+  width: 35px !important;
+  height: 33px !important;
+  position: relative !important;
+  top: 3px !important;
+  filter: brightness(0) invert(0) !important;
 }
 
-/* Same icon size as the mobile Element Editor Transform tile (28px computed). */
+/* Same span box as the Element Editor tile (28px / 32x32). */
 body fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small:not(.fpd-layout-large)
   .fpd-ate-uniform-tool.fpd-tool-transform
   > span.fpd-icon-transform {

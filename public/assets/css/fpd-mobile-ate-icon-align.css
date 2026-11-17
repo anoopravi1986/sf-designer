@@ -1,0 +1,85 @@
+/*
+  Mobile Add Text Editor - icon alignment matching the Element Editor tiles
+  (icon centred in a ~32px box at the top, caption directly below at ~50px).
+
+  Root causes:
+  - Align (#textAlignCust) and Center (#CenterTools) are .fpd-btn-group tiles.
+    styles.scss (mobile block, ~line 3390) gives EVERY child of a
+    .fpd-btn-group `min-height: 40px`, so both the icon and the caption were
+    stretched to 40px: the icon was pushed to the top edge of the tile and the
+    caption sat out of line with the other tiles.
+  - Text (aA, #TextTransform) uses a 22px glyph box, so its caption sat 3px
+    higher than every other tile.
+
+  NEW rules only; mobile (fpd-layout-small) Add Text Editor only.
+  Icons, colours and click behaviour are unchanged.
+*/
+
+/* Align + Center: undo the 40px stretch on the tile's own children */
+body fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small:not(.fpd-layout-large)
+  #textAlignCust.fpd-ate-uniform-tool > *,
+body fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small:not(.fpd-layout-large)
+  #CenterTools.fpd-ate-uniform-tool > * {
+  min-height: 0 !important;
+}
+
+/* Icon box: 32px tall, glyph centred - same as the Element Editor icon row */
+body fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small:not(.fpd-layout-large)
+  #textAlignCust.fpd-ate-uniform-tool > span[class*='fpd-icon-'],
+body fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small:not(.fpd-layout-large)
+  #CenterTools.fpd-ate-uniform-tool > div {
+  height: 32px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  line-height: 1 !important;
+}
+
+/* Center: wrapper is also sized by an ID rule in fpd-add-text-editor.css,
+   so the ID is repeated here to win. The icon span gets the same 32x32 box
+   as the Element Editor's Align icon (same 35x33 SVG drawn inside it). */
+body fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small:not(.fpd-layout-large)
+  #CenterTools#CenterTools.fpd-ate-uniform-tool > div {
+  height: 32px !important;
+  min-height: 0 !important;
+  max-height: 32px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+body fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small:not(.fpd-layout-large)
+  #CenterTools#CenterTools.fpd-ate-uniform-tool > div > span.fpd-icon-align-vertical-middle {
+  width: 32px !important;
+  height: 32px !important;
+  min-height: 0 !important;
+  line-height: 28px !important;
+}
+
+/* Spacing: #letter-spacing is itself stamped as a full 68x76 tile (with its
+   own caption) inside the .extra-icon shell tile, which also has 8px/6px
+   padding - the overflow was centred, lifting icon + caption ~6px above the
+   other tiles. Remove the shell padding and anchor the inner tile at the top
+   so it sits exactly like the other tiles. The inner tile keeps its full size,
+   so the whole tile stays tappable (the click handler is on #letter-spacing). */
+body fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small:not(.fpd-layout-large)
+  .extra-icon.extra-icon.fpd-ate-tool-shell.fpd-ate-uniform-tool {
+  padding: 0 !important;
+  justify-content: flex-start !important;
+}
+
+/* Text (aA): 28px icon box like the other glyph tiles, so the caption lines up */
+body fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small:not(.fpd-layout-large)
+  #TextTransform.fpd-ate-uniform-tool > span.fpd-icon-text-transform {
+  height: 28px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* Captions of these tiles: single 10px text line like every other tile */
+body fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small:not(.fpd-layout-large)
+  #textAlignCust.fpd-ate-uniform-tool > .fpd-ate-tool-caption,
+body fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small:not(.fpd-layout-large)
+  #CenterTools.fpd-ate-uniform-tool > .fpd-ate-tool-caption {
+  height: auto !important;
+  min-height: 0 !important;
+}
