@@ -1561,7 +1561,7 @@
             this.getElements(t, 'all', !1).forEach(t => {
               const i = t.isColorizable()
               i &&
-                ('svg' === i && 'group' === t.type
+                ((('svg' === i || 'text-group' === i) && 'group' === t.type)
                   ? t.getObjects().forEach(t => {
                       o(t.fill).isValid() && e.push(o(t.fill).toHexString())
                     })

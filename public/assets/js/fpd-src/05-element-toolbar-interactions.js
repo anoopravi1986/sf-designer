@@ -1839,7 +1839,10 @@ function updateFPDLayersToSingleGroup(group) {
             e = Ln({
               colors: i,
               colorNames: this.fpdInstance.mainOptions.hexNames,
-              palette: t.colors,
+              palette:
+                t.isTextGroup && t.isTextGroup() && !Array.isArray(t.colors)
+                  ? this.fpdInstance.mainOptions.colorPickerPalette
+                  : t.colors,
               subPalette: n,
               enablePicker: !!this.fpdInstance.mainOptions.editorMode || !n,
               onChange: (e, i) => {
@@ -2639,7 +2642,10 @@ function updateFPDLayersToSingleGroup(group) {
             i = Ln({
               colors: n,
               colorNames: this.fpdInstance.mainOptions.hexNames,
-              palette: t.colors,
+              palette:
+                t.isTextGroup && t.isTextGroup() && !Array.isArray(t.colors)
+                  ? this.fpdInstance.mainOptions.colorPickerPalette
+                  : t.colors,
               subPalette: e,
               enablePicker: !e,
               onChange: (e, i) => {

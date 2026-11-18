@@ -3773,276 +3773,110 @@
                       newDiv.appendChild(spanTag);
                     });
 
+                    // Suggested text -> real text element(s), created through the
+                    // exact same addElement('text', ...) call and text parameters
+                    // as the "Add Text" button, so the SAME editor opens for both:
+                    // FPD's text toolbar (Font, Size, Color, Bold/Italic/Underline,
+                    // case, spacing, align, Stroke/Shadow, Opacity, ...) plus the
+                    // app's Add Text editor layer, which keys on
+                    // data-element-type="text" - on desktop and mobile.
+                    // Previously each suggestion was wrapped in a fabric.Group,
+                    // which FPD classifies as an image (getType() !== 'text'), so
+                    // it got the reduced image/group toolbar instead.
+                    // Multi-line suggestions add one text element per line,
+                    // stacked and centred on the stage like Add Text.
+                    // addElement() also fires beforeElementAdd, which closes the
+                    // mobile bottom sheet (small layout) like every other add.
                     newDiv.addEventListener('click', () => {
-                        document.querySelector('.fpd-group-copy-by').classList.remove('fpd-hidden');
-                        document.querySelector('.fpd-group-paste-by').classList.remove('fpd-hidden');
-                        document.querySelector('.fpd-ungroup1')?.classList.remove('fpd-hidden')
-                        document.querySelector('.fpd-ungroup')?.classList.add('fpd-hidden')
-                        if (!t.currentViewInstance) return
+                      const view = t.currentViewInstance
+                      if (!view) return
+                      const canvas = view.fabricCanvas
 
-                        const viewOptions = t.currentViewInstance.options
-                        const innerSpans = newDiv.querySelectorAll('span')
-                        const insertedTextObjects = []
-
-                        const fabricCanvas =
-                          t.currentViewInstance.fabricCanvas.canvas ||
-                          t.currentViewInstance.fabricCanvas
-
-                        innerSpans.forEach((innerSpan, index) => {
-                          const textContent = innerSpan.textContent?.trim() || ''
-                          const originalSpan = spans[index]
-                          let parsedParams = {}
-
-                          try {
-                            const rawParams = originalSpan.getAttribute('data-parameters') || '{}'
-                            parsedParams = JSON.parse(rawParams)
-                          } catch (err) {
-                            console.error('Invalid JSON in data-parameters', err)
-                          }
-
-                          if (parsedParams.text && parsedParams.text.trim() !== textContent) {
-                            console.warn(
-                              `Text mismatch at index: ${textContent} !== ${parsedParams.text}`
-                            )
-                            return
-                          }
-
-                          const props = {
-                            ...parsedParams,
-                            text: textContent,
-                            isCustom: true,
-                            textBox: Boolean(this.fpdInstance.mainOptions.customTextAsTextbox),
-                            resizable: true,
-                            boundingBox: 'base',
-                            _addToUZ: t.currentViewInstance.currentUploadZone,
-                            _calcWidth: true,
-                            advancedEditing: false
-                          }
-
-                          // Save last 2 props to localStorage
-                          let existingProps = []
-                          try {
-                            const data = JSON.parse(localStorage.getItem('propstext') || '[]')
-                            existingProps = Array.isArray(data) ? data : []
-                          } catch (e) {
-                            existingProps = []
-                          }
-                          existingProps.push(props)
-                          if (existingProps.length > 2) {
-                            existingProps = existingProps.slice(-2)
-                          }
-                          localStorage.setItem('propstext', JSON.stringify(existingProps))
-
-                          let styledProps =
-                            typeof z === 'function'
-                              ? z(viewOptions.customTextParameters, props)
-                              : props
-
-                          styledProps = {
-                            ...styledProps,
-                            autoCenter: false,
-                            fill: props.colors || '#ff0000',
-                            colors: props.colors || '#ff0000',
-                            fontFamily: props.font || 'Arial',
-                            fontSize: props.textSize || 24,
-                            curved: props.curved || false,
-                            curveSpacing: props.curveSpacing || 5,
-                            curveRadius: props.curveRadius || 180,
-                            curveReverse: props.curveReverse || false,
-                            textAlign: 'left',
-                            originX: 'left',
-                            originY: 'top',
-                            boundingBox: undefined,
-                            top: parsedParams.top || 0,
-                            left: parsedParams.left || 0
-                          }
-
-                          const fabricText = styledProps.curved
-                            ? new fabric.CurvedText(textContent, styledProps)
-                            : new fabric.Text(textContent, styledProps)
-
-                          fabricText.set({
-                            curvable: 1,
-                            curved: props.curved || false,
-                            curveReverse: props.curveReverse || false,
-                            curveRadius: props.curveRadius || 0,
-                            curveSpacing: props.curveSpacing || 0,
-                            boundingBox: 'Base'
-                          })
-
-                          insertedTextObjects.push(fabricText)
-                        })
-
-                        if (insertedTextObjects.length > 0) {
-                          const group = new fabric.Group(insertedTextObjects, {
-                            selectable: true,
-                            hasControls: true,
-                            resizable: true,
-                            draggable: true,
-                            removable: true,
-                            positioned: true,
-                            textAlign: 'center',
-                            autoCenter: true,
-                            originX: 'center',
-                            originY: 'center',
-                            scaleX: 1,
-                            scaleY: 1,
-                            rotatable:1,
-                            advancedEditing: false,
-                            title: title + '' + Math.floor(Math.random() * 100000),
-                          })
-
-                          // Hide transform toolbar
-                          const transformToolbar = document.querySelector('[data-panel="transform"]')
-                          if (transformToolbar) {
-                            transformToolbar.classList.add('fpd-hidden')
-                          }
-
-                          // Fit group inside stage (max 1000×1000)
-                          const stageWidth = 1000
-                          const stageHeight = 1000
-                          const scaleX = stageWidth / group.width
-                          const scaleY = stageHeight / group.height
-                          const scale = Math.min(scaleX, scaleY, 1)
-                          group.set({
-                            scaleX: scale,
-                            scaleY: scale,
-                            left: stageWidth / 2,
-                            top: stageHeight / 2,
-                            originX: 'center',
-                            originY: 'center',
-                            boundingBox: 'Base',
-                            lockUniScaling: true,
-                          })
-
-                          // Lock base image & set clipPath for group
-                          const baseImage = fabricCanvas.getObjects().find(o => o.title === 'Overlay')
-                          if (baseImage) {
-                            baseImage.set({
-                              selectable: false,
-                              evented: false,
-                              lockMovementX: true,
-                              lockMovementY: true,
-                              lockRotation: true,
-                              lockScalingX: true,
-                              lockScalingY: true
-                            })
-                            baseImage.moveTo(0)
-
-                            group.clipPath = new fabric.Rect({
-                              left: baseImage.left - (baseImage.width * baseImage.scaleX) / 2,
-                              top: baseImage.top - (baseImage.height * baseImage.scaleY) / 2,
-                              width: baseImage.width * baseImage.scaleX,
-                              height: baseImage.height * baseImage.scaleY,
-                              absolutePositioned: true
-                            })
-                          }
-
-                          fabricCanvas.add(group)
-                          fabricCanvas.setActiveObject(group)
-                          fabricCanvas.requestRenderAll()
-                          ;
-                          const elements = this.fpdInstance.getElements(this.fpdInstance.currentViewIndex, 'all', false)
-                          ;
-
-                          // loop through and check
-                          elements.forEach(el => {
-                            ;
-                            if(el._objects){
-                              ;
-                              // Find the layers list container
-                              const layersList = document.querySelector('fpd-module-manage-layers .fpd-list');
-
-                              if (layersList) {
-                                // Create row element
-                                const newRow = document.createElement('div');
-                                newRow.className = "fpd-list-row !bg-white fpd-locked";
-                                newRow.id = "layer-" + el.title.replace(/\s+/g, '-');  // use unique id if needed
-
-                                // Inner HTML structure
-                                newRow.innerHTML = `
-                                <div class="fpd-cell-0"><span></span></div>
-                                <div class="fpd-cell-1">${el.title}</div>
-                                <div class="fpd-cell-2">
-                                  <span class="fpd-lock-element"><span class="fpd-icon-unlocked"></span></span>
-                                  <span class="fpd-visible-element"><span class="fa-solid fa-eye"></span></span>
-                                  <span class="fpd-remove-element" style="cursor:pointer;">
-                                    <span class="fa-solid fa-trash"></span>
-                                  </span>
-                                </div>
-                              `;
-
-                                // Append to the layers list
-                                // layersList.appendChild(newRow);
-                                // Insert at the top (before first child if exists)
-                                if (layersList.firstChild) {
-                                  layersList.insertBefore(newRow, layersList.firstChild);
-                                } else {
-                                  layersList.appendChild(newRow);
-                                }
-
-                                const removeBtn = newRow.querySelector(".fpd-remove-element");
-                                if (removeBtn) {
-                                  removeBtn.addEventListener("click", () => {
-                                    const canvas = this.fpdInstance.currentViewInstance.fabricCanvas;
-
-                                    // Remove element from Fabric.js canvas
-                                    canvas.remove(el);
-                                    canvas.requestRenderAll();
-
-                                    // Remove the row from the panel
-                                    newRow.remove();
-
-                                    ;
-                                  });
-                                }
-                                // 🔹 Lock button
-                                const lockBtn = newRow.querySelector(".fpd-lock-element");
-                                if (lockBtn) {
-                                  lockBtn.addEventListener("click", () => {
-                                    el.selectable = !el.selectable; // toggle lock
-                                    if (el.selectable) {
-                                      lockBtn.innerHTML = `<span class="fpd-icon-unlocked"></span>`;
-                                      ;
-                                    } else {
-                                      lockBtn.innerHTML = `<span class="fpd-icon-locked"></span>`;
-                                      ;
-                                    }
-                                    canvas.requestRenderAll();
-                                  });
-                                }
-                                const visibleBtn = newRow.querySelector(".fpd-visible-element");
-                                if (visibleBtn) {
-                                  visibleBtn.addEventListener("click", () => {
-                                    const canvas = this.fpdInstance.currentViewInstance.fabricCanvas;
-                                    el.visible = !el.visible; // toggle visibility
-                                    if (el.visible) {
-                                      visibleBtn.innerHTML = `<span class="fa-solid fa-eye"></span>`;
-                                      ;
-                                    } else {
-                                      visibleBtn.innerHTML = `<span class="fa-solid fa-eye-slash"></span>`;
-                                      ;
-                                    }
-                                    canvas.requestRenderAll();
-                                  });
-                                }
-
-                                ;
-                              } else {
-                                console.warn("Layers list not found in DOM ❌");
-                              }
-
-                            }
-                            if (el.title === "Base") {
-                              ;
-                            }
-                          });
-                          ;
-                          
-                        //  this.fpdInstance.currentViewInstance.fabricCanvas.fire('elementAdd', { element: group });
-
+                      const lines = []
+                      spans.forEach(span => {
+                        const text = (span?.textContent || '').trim()
+                        if (!text) return
+                        let p = {}
+                        try {
+                          p =
+                            JSON.parse(
+                              span.getAttribute('data-parameters') || '{}'
+                            ) || {}
+                        } catch (err) {
+                          console.error('Invalid JSON in data-parameters', err)
                         }
+                        lines.push({ text, p })
                       })
+                      if (!lines.length) return
+
+                      const added = []
+                      lines.forEach(({ text, p }) => {
+                        const fill =
+                          typeof p.colors === 'string' && p.colors.trim()
+                            ? p.colors.trim()
+                            : '#000000'
+                        const options = z(view.options.customTextParameters, {
+                          // --- identical to the Add Text button ---
+                          textBox: Boolean(t.mainOptions.customTextAsTextbox),
+                          resizable: 1,
+                          isCustom: 1,
+                          curvable: 1,
+                          _addToUZ: view.currentUploadZone,
+                          _calcWidth: true,
+                          colors: '#000',
+                          removable: true,
+                          selectable: true,
+                          editable: true,
+                          hasControls: true,
+                          evented: true,
+                          transformable: true,
+                          objectCaching: false,
+                          autoCenter: false,
+                          // --- the suggestion's own styling ---
+                          fill,
+                          fontFamily: p.font || 'Lobster',
+                          fontSize: Number(p.textSize) || 50,
+                          fontWeight: p.bold ? 'bold' : 'normal',
+                          fontStyle: p.italic ? 'italic' : 'normal',
+                          underline: Boolean(p.underline),
+                          textTransform: p.textTransform || 'none'
+                        })
+                        const el = canvas.addElement('text', text, text, options)
+                        if (el) added.push(el)
+                      })
+                      if (!added.length) return
+
+                      // Stack the lines, centred on the stage (same centre the
+                      // Add Text button uses), independent of zoom/screen size.
+                      const stageWidth = canvas.viewOptions.stageWidth
+                      const stageHeight = canvas.viewOptions.stageHeight
+                      const gap = 10
+                      const heights = added.map(el => el.getScaledHeight())
+                      const total =
+                        heights.reduce((a, b) => a + b, 0) +
+                        gap * (added.length - 1)
+                      let y = stageHeight / 2 - total / 2
+                      added.forEach((el, i) => {
+                        el.setPositionByOrigin(
+                          new St.fabric.Point(stageWidth / 2, y + heights[i] / 2),
+                          'center',
+                          'center'
+                        )
+                        el.setCoords()
+                        y += heights[i] + gap
+                      })
+
+                      // Text state for the group-only toolbar buttons: the
+                      // canvas only syncs these on mouse:down, which a
+                      // programmatic selection does not fire.
+                      document.querySelector('.fpd-ungroup1')?.classList.add('fpd-hidden')
+                      document.querySelector('.fpd-ungroup')?.classList.remove('fpd-hidden')
+                      document.querySelector('.fpd-group-copy-by')?.classList.add('fpd-hidden')
+                      document.querySelector('.fpd-group-paste-by')?.classList.add('fpd-hidden')
+
+                      canvas.setActiveObject(added[0])
+                      canvas.renderAll()
+                    })
 
                       
 
