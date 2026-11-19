@@ -3687,3 +3687,50 @@ fpd-module-images .fpd-item.fpd-dot-menu-tapped .fpd-three-dot-menu,
 fpd-module-save-load .fpd-item.fpd-dot-menu-tapped .fpd-three-dot-menu {
   display: block !important;
 }
+
+/* Mobile: the uploaded-image ⋯ menu (.titleInformation, on <body>, z 999)
+   rendered UNDER the bottom sheet (fpd-main-bar, z 2147483647), so its
+   Download/Delete could not be seen or tapped; the dimming overlay used the
+   desktop sidebar's coordinates (83px/56px/365px). Same max z-index (the
+   menu is added later in the DOM, so it paints on top) and a full-sheet
+   overlay. Desktop is unchanged. */
+@media (max-width: 768px) {
+  .titleInformation {
+    position: fixed !important;
+    z-index: 2147483647 !important;
+  }
+  .photo-box-open fpd-module-images:before {
+    left: 0 !important;
+    top: 0 !important;
+    max-width: none !important;
+  }
+}
+
+/* Uploaded-images list: ⋯ while the mouse is over the tile (class set only
+   for mouse pointers in home.component.ts, so no :hover - see above), while
+   that tile's menu is open, and always on touch devices (no hover there, and
+   tapping the tile itself adds the image to the canvas). */
+fpd-module-images #extracontainer-data .fpd-item.fpd-dot-menu-hover .fpd-three-dot-menu,
+fpd-module-images #extracontainer-data .fpd-item.fpd-menu-open .fpd-three-dot-menu,
+html.sf-touch fpd-module-images #extracontainer-data .fpd-item .fpd-three-dot-menu {
+  display: block !important;
+}
+
+/* Mobile: FPD's snackbar (e.g. "Image not uploaded ... 6 MB or smaller")
+   lives on <body> at z-index 100000, but the mobile bottom sheet
+   (fpd-main-bar) sits at z-index 2147483647 and its nav bar covers the
+   bottom 72px - so on phones the message was hidden. Same max z-index (the
+   snackbar comes later in the DOM, so it paints on top) and lifted above the
+   nav bar + iOS safe area. Desktop is unchanged. */
+@media (max-width: 768px) {
+  .fpd-snackbar-wrapper {
+    z-index: 2147483647 !important;
+    left: 12px;
+    right: 12px;
+    bottom: calc(80px + env(safe-area-inset-bottom, 0px));
+  }
+  .fpd-snackbar-wrapper .fpd-snackbar {
+    min-width: 0;
+    max-width: 100%;
+  }
+}

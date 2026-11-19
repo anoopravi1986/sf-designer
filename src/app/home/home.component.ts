@@ -398,6 +398,31 @@ export class HomeComponent implements AfterViewInit {
       }
     });
 
+    // Uploaded-images list (Images tab): show the ⋯ menu while the MOUSE is
+    // over a tile, so Delete is reachable without first selecting (= adding
+    // to the canvas) the image. Mouse pointers only: touch taps never get a
+    // hover state, so the iOS "first tap only resolves hover" problem
+    // described above cannot come back. While a tile's menu is open it keeps
+    // its ⋯ via .fpd-menu-open (set in FancyProductDesigner.js).
+    const uploadTileOf = (el: any) => el?.closest?.('#extracontainer-data .fpd-item') as HTMLElement | null;
+    document.addEventListener('pointerover', (e: PointerEvent) => {
+      if (e.pointerType !== 'mouse') return;
+      uploadTileOf(e.target)?.classList.add('fpd-dot-menu-hover');
+    });
+    document.addEventListener('pointerout', (e: PointerEvent) => {
+      if (e.pointerType !== 'mouse') return;
+      const tile = uploadTileOf(e.target);
+      if (tile && !tile.contains(e.relatedTarget as Node)) tile.classList.remove('fpd-dot-menu-hover');
+    });
+    // Touch devices have no hover, and tapping a tile adds the image to the
+    // canvas - so there the ⋯ on uploaded-image tiles stays visible and is
+    // tapped directly.
+    const markTouch = () => document.documentElement.classList.add('sf-touch');
+    if (navigator.maxTouchPoints > 0 && window.matchMedia('(pointer: coarse)').matches) markTouch();
+    document.addEventListener('pointerdown', (e: PointerEvent) => {
+      if (e.pointerType === 'touch') markTouch();
+    }, { passive: true });
+
     // Mobile bottom nav (.fpd-nav-item, one per mainBarModules entry -
     // Products/Designs/Elements/Add Text/Image) is rebuilt by the vendor
     // library itself, so this is delegated on document rather than bound

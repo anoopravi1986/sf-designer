@@ -98,6 +98,9 @@
             (this.container = t),
             (this.container.instance = this),
             (this.mainOptions = dt.merge(dt.defaults, e))
+          // Lets canvas.addElement() re-resolve expired Pixabay links in saved
+          // designs (same prototype hand-off as proxyFileServer).
+          fabric.Canvas.prototype.pixabayApiKey = this.mainOptions.pixabayApiKey
           let i = {}
           Object.keys(this.mainOptions.hexNames).forEach(t => {
             i[t.toLowerCase()] = this.mainOptions.hexNames[t]

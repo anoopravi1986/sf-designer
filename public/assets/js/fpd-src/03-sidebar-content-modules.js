@@ -5017,7 +5017,7 @@
         }
         connectedCallback () {
           this.innerHTML =
-            '<div class="fpd-upload-image !bg-white"> <span data-defaulttext="Drop images here">modules.upload_zone</span> <span class="fpd-btn !bg-[var(--theme-color)] w-[100%] text-center !text-sm !normal-case" data-defaulttext="Browse File">modules.browse_file</span><span>Only Images(jpg, jpeg, png, gif) files are allowed.</span> <span class="fpd-price"></span> </div> <input type="file" multiple="multiple" class="fpd-upload-input fpd-hidden" name="files[]" accept="image/jpeg,image/jpg,image/png,image/svg+xml,application/pdf"/> <div class="fpd-scroll-area"> <div class="fpd-grid fpd-grid-cover fpd-photo-grid"></div><div id="extracontainer-data" class="fpd-grid fpd-grid-cover fpd-photo-grid"></div> </div>'
+            '<div class="fpd-upload-image !bg-white"> <span data-defaulttext="Drop images here">modules.upload_zone</span> <span class="fpd-btn !bg-[var(--theme-color)] w-[100%] text-center !text-sm !normal-case" data-defaulttext="Browse File">modules.browse_file</span><span>Only images (JPG, JPEG, PNG, GIF, WEBP, SVG) are allowed. Max file size: 6 MB.</span> <span class="fpd-price"></span> </div> <input type="file" multiple="multiple" class="fpd-upload-input fpd-hidden" name="files[]" accept="image/jpeg,image/jpg,image/png,image/gif,image/webp,image/svg+xml"/> <div class="fpd-scroll-area"> <div class="fpd-grid fpd-grid-cover fpd-photo-grid"></div><div id="extracontainer-data" class="fpd-grid fpd-grid-cover fpd-photo-grid"></div> </div>'
         }
       }
       function vi (t, e) {
@@ -5199,11 +5199,25 @@
           this.fpdInstance.getElements(e).forEach(t => {
             t.uploadZone && wi(this, Ii).push({ uz: t.title, viewIndex: e })
           })
-        ;(this.fpdInstance.loadingCustomImage = !0),
-          Array.from(t).forEach((t, e) => {
-            wi(this, Ti).includes(it(t.name)) &&
-              xi(this, Pi, zi).call(this, t, 0 == e)
-          }),
+        this.fpdInstance.loadingCustomImage = !0
+        // Files whose type is not allowed (e.g. a dropped PDF) used to be
+        // skipped silently - and if every file was skipped,
+        // loadingCustomImage stayed true, which blocks adding grid images.
+        const skipped = []
+        let started = 0
+        Array.from(t).forEach((t, e) => {
+          if (wi(this, Ti).includes(it(t.name))) {
+            started++
+            xi(this, Pi, zi).call(this, t, 0 == e)
+          } else skipped.push(t.name)
+        })
+        if (!started) this.fpdInstance.loadingCustomImage = !1
+        if (skipped.length) {
+          const names = skipped.map(f => '"' + String(f).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])) + '"').join(', ')
+          console.warn('Image upload skipped: unsupported file type', skipped)
+          n(`Image not uploaded: ${names}. Only images (JPG, JPEG, PNG, GIF, WEBP, SVG) are allowed.`)
+        }
+        ;
           this.container
             .querySelector('.fpd-upload-image')
             .classList.remove('fpd-hover'),
@@ -5214,19 +5228,21 @@
           1024 *
           this.fpdInstance.mainOptions.customImageParameters.maxSize *
           1024
-        if (t.size > i)
+        // Fail fast: an oversized file is rejected here, before it is read,
+        // before any grid placeholder/spinner exists and before any upload
+        // request (the backend enforces the same limit). The snackbar uses
+        // innerHTML, so the file name is escaped.
+        if (t.size > i) {
+          const mb = this.fpdInstance.mainOptions.customImageParameters.maxSize
+          const name = String(t.name).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]))
+          console.warn('Image upload blocked: file too large', t.name, t.size, 'bytes')
           return (
             n(
-              this.fpdInstance.translator
-                .getTranslation('misc', 'maximum_size_info')
-                .replace('%filename', t.name)
-                .replace(
-                  '%mb',
-                  this.fpdInstance.mainOptions.customImageParameters.maxSize
-                )
+              `Image not uploaded: "${name}" is ${(t.size / 1048576).toFixed(1)} MB. Please choose an image ${mb} MB or smaller.`
             ),
             void (this.fpdInstance.loadingCustomImage = !1)
           )
+        }
         'application/pdf' === t.type
           ? xi(this, Di, Vi).call(this, t, e)
           : xi(this, _i, Wi).call(this, t, e)
@@ -5361,7 +5377,22 @@
                     if (s.readyState === XMLHttpRequest.DONE) {
                       const t = s.status
                       ;
-                      if (0 === t || (t >= 200 && t < 400)) {
+                      // Failed upload (rejected type/size, server or network
+                      // error, or no image URL returned): previously status 0
+                      // counted as success and >= 400 was ignored, so the
+                      // spinner kept running and no image ever appeared.
+                      const res = s.response
+                      if (!(t >= 200 && t < 300) || !res || !res.image_src) {
+                        this.fpdInstance.loadingCustomImage = !1
+                        a.remove()
+                        console.error('Image upload failed', t, res)
+                        n(
+                          (res && res.message) ||
+                            'Upload failed. Please try again or check your web console!'
+                        )
+                        return
+                      }
+                      if (t >= 200 && t < 300) {
                         const t = s.response
                         ;
                         a.classList.remove('fpd-loading')
@@ -5370,7 +5401,10 @@
                           (xi(this, Li, Ui).call(this, t.image_src, t.filename),
                           (a.dataset.source = t.image_src),
                           a.classList.remove('fpd-loading'),
-                          a.querySelector('.fpd-loading-bar').remove(),
+                          // The bar may already be gone (a 10 s timer removes
+                          // it); .remove() on null threw here and aborted the
+                          // rest of this handler, incl. the list reload.
+                          a.querySelector('.fpd-loading-bar')?.remove(),
                           xi(this, Fi, Gi).call(this, a, e),
                           Ci(this, Ei, ((i = wi(this, Ei)), ++i)),
                           (a.xhr = null)),
@@ -5382,7 +5416,38 @@
                         // window.fpdReloadUploadedImages's definition
                         // (loadItems, ~line 20949) for why a global
                         // exposure was needed to reach it from here.
-                        ;t.image_src && window.fpdReloadUploadedImages && window.fpdReloadUploadedImages(true);
+                        //
+                        // The image list (#extracontainer-data) is the one
+                        // place uploads are shown - it renders the image with
+                        // its delete/share menu, newest first. This grid item
+                        // `a` is only the upload-progress placeholder; it
+                        // used to stay after the upload, so every new image
+                        // was shown twice (here AND in the list). Remove it
+                        // once the reloaded list contains the new image; if
+                        // the reload fails it is kept, so the image is never
+                        // lost from view.
+                        ;if (t.image_src && window.fpdReloadUploadedImages) {
+                          const src = t.image_src
+                          // Preload the S3 file first so the list tile paints
+                          // immediately (no blank tile after the placeholder
+                          // goes); capped so a slow image never blocks this.
+                          const preload = new Promise(done => {
+                            const img = new Image()
+                            const timer = setTimeout(done, 8000)
+                            img.onload = img.onerror = () => { clearTimeout(timer); done() }
+                            img.src = src
+                          })
+                          preload
+                            .then(() => window.fpdReloadUploadedImages(true, true)) // data changed: never dropped
+                            .catch(() => {})
+                            .then(() => {
+                              const listed = Array.from(
+                                document.querySelectorAll('#extracontainer-data .fpd-item')
+                              ).some(el => el.dataset.source === src)
+                              if (listed) a.remove()
+                              else console.warn('Uploaded image not in the reloaded list yet; keeping its placeholder', src)
+                            })
+                        }
                       }
                     }
                   }),
@@ -5991,9 +6056,19 @@
                 X(this.loader, ['fpd-hidden']),
                   t.hits.length > 0 &&
                     t.hits.forEach(t => {
+                      // largeImageURL / webformatURL are temporary
+                      // "pixabay.com/get/" links that Pixabay expires and then
+                      // blocks (HTTP 429, no CORS header), which broke saved
+                      // designs. The permanent cdn.pixabay.com file at the
+                      // same size is CORS-enabled - derive it from previewURL
+                      // (..._150.jpg -> ..._1280.jpg / _640.jpg).
+                      const cdn = size =>
+                        t.previewURL && /_150\.(jpe?g|png)$/i.test(t.previewURL)
+                          ? t.previewURL.replace(/_150\.(jpe?g|png)$/i, '_' + size + '.$1')
+                          : null
                       const e = $({
-                        url: t.imageURL || t.largeImageURL || t.fullHDURL || t.webformatURL,
-                        thumbnailUrl: t.webformatURL,
+                        url: t.imageURL || cdn(1280) || t.largeImageURL || t.fullHDURL || t.webformatURL,
+                        thumbnailUrl: cdn(640) || t.webformatURL,
                         title: t.id ? t.id : t.id_hash,
                         price: tt(this.fpdInstance, this.container)
                       })

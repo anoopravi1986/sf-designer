@@ -20778,6 +20778,24 @@
       function R (t) {
         return !!j.CSS_UNIT.exec(t)
       }
+      // Message for the uploaded-images list (delete result). Same markup and
+      // look as FPD's own snackbar; text set via textContent (no HTML).
+      function sfUploadToast(text) {
+        let w = document.body.querySelector('.fpd-snackbar-wrapper');
+        if (!w) {
+          w = document.createElement('div');
+          w.className = 'fpd-snackbar-wrapper';
+          document.body.append(w);
+        }
+        const s = document.createElement('div');
+        s.className = 'fpd-snackbar fpd-shadow-1';
+        const p = document.createElement('p');
+        p.textContent = text;
+        s.append(p);
+        s.addEventListener('click', () => s.remove());
+        w.append(s);
+        setTimeout(() => s.remove(), 5000);
+      }
       let itemsLoaded = false;
       let itemsLoadInFlight = false;
       let uploadedImagesMenuListener = null;
@@ -20790,7 +20808,31 @@
       // each item with a custom three-dot menu (share / delete / download
       // / "Uploaded by ..." label).
       // ===================================================================
-      async function loadItems(force) {
+      // Returns a promise that resolves once the list is rendered.
+      // dataChanged=true (after an upload/delete): if a load is already
+      // running it may have fetched before the change, so one more load is
+      // queued (two uploads finishing close together left the second image
+      // out). Without it (e.g. the Images tab asking twice on open) the extra
+      // call is dropped: re-rendering identical data replaced the tiles while
+      // a just-opened ⋯ menu still pointed at the old ones, so Delete removed
+      // a detached copy and the visible tile stayed.
+      let itemsLoadPromise = null;
+      let itemsReloadQueued = false;
+      function loadItems(force, dataChanged) {
+        if (itemsLoadInFlight) {
+          if (force && dataChanged) itemsReloadQueued = true;
+          return itemsLoadPromise || Promise.resolve();
+        }
+        if (itemsLoaded && !force) return Promise.resolve();
+        itemsLoadPromise = loadItemsOnce(force).then(() => {
+          if (itemsReloadQueued) {
+            itemsReloadQueued = false;
+            return loadItems(true);
+          }
+        });
+        return itemsLoadPromise;
+      }
+      async function loadItemsOnce(force) {
         // force=true bypasses the one-time-per-session gate below and
         // re-fetches/re-renders even if this already ran once - used
         // for an explicit reload (after an upload finishes, or every
@@ -20807,7 +20849,11 @@
           // 👇 Call your API (replace with your real endpoint)
           const response = await fetch("https://styleflip-backend-jdm5.ithemes.xyz/api/image/getByUserId/70011");
           const data = await response.json();
-          ;
+          // Newest upload first (the API returns oldest first), so a fresh
+          // upload shows at the top of the list.
+          if (Array.isArray(data)) {
+            data.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+          }
 
           // The uploads grid also restores a separate cache from
           // localStorage['fpd_uploaded_images'] on init (see the Ri class
@@ -21206,31 +21252,41 @@
                     // Delete the .fpd-item element
                     buttonDel.addEventListener('click', function (e) {
                       e.stopPropagation(); // Prevent triggering the outside click close
-                      if (parentItem) {
-                        ;
-                        ;
-                        parentItem.remove();
-                        titleInformation.remove();
-                        document.body.classList.remove('photo-box-open');
-                        let imageId = parentItem?.getAttribute('data-image-id');
-
-                         fetch(`https://styleflip-backend-jdm5.ithemes.xyz/api/image/deleteByUserId/${imageId}`, {
-                            method: "DELETE", // or DELETE if backend expects delete
-                            headers: {
-                              "Content-Type": "application/json",
-                            },
-                          })
-                            .then((response) => {
-                              if (!response.ok) throw new Error("Failed to delete");
-                              return response.json();
-                            })
-                            .then((data) => {
-                              ;
-                            })
-                            .catch((error) => {
-                              console.error("❌ API Error:", error);
-                            });
-                      }
+                      // The backend now deletes the S3 file AND the record
+                      // (owner-checked). The tile used to be removed before
+                      // the request even ran and failures only reached the
+                      // console - a failed delete looked successful and the
+                      // image came back on the next reload. Now the tile is
+                      // removed only after the server confirms, and the
+                      // reason is shown if it fails.
+                      const imageId = parentItem && parentItem.getAttribute('data-image-id');
+                      if (!imageId || buttonDel.disabled) return;
+                      buttonDel.disabled = true;
+                      titleInformation.remove();
+                      document.body.classList.remove('photo-box-open');
+                      // Look the tile(s) up by id now: the list may have been
+                      // re-rendered since this menu opened.
+                      const tilesFor = () => Array.from(document.querySelectorAll('#extracontainer-data .fpd-item')).filter(x => x.getAttribute('data-image-id') === imageId);
+                      tilesFor().forEach(x => { x.classList.remove('fpd-menu-open'); x.style.opacity = '0.5'; x.style.pointerEvents = 'none'; });
+                      const api = (window.SFSavedDesigns && window.SFSavedDesigns.apiBase()) || 'https://styleflip-backend-jdm5.ithemes.xyz/api';
+                      const owner = (window.SFSavedDesigns && window.SFSavedDesigns.getUserId()) || '70011';
+                      fetch(`${api}/image/deleteByUserId/${encodeURIComponent(imageId)}?userId=${encodeURIComponent(owner)}`, { method: 'DELETE' })
+                        .then(async (response) => {
+                          const body = await response.json().catch(() => null);
+                          if (!response.ok) throw new Error((body && body.message) || `Delete failed (HTTP ${response.status})`);
+                          return body;
+                        })
+                        .then(() => {
+                          tilesFor().forEach(x => x.remove());
+                          sfUploadToast('Image deleted');
+                        })
+                        .catch((error) => {
+                          console.error('Uploaded image delete failed:', error);
+                          tilesFor().forEach(x => { x.style.opacity = ''; x.style.pointerEvents = ''; });
+                          const msg = error instanceof TypeError ? 'Could not reach the server. Please try again.' : error.message;
+                          sfUploadToast('Image was not deleted: ' + msg);
+                        })
+                        .finally(() => { buttonDel.disabled = false; });
                     });
 
                     // Download the image from data-source
@@ -21279,18 +21335,30 @@
 
                     document.body.appendChild(titleInformation);
                     document.body.classList.add('photo-box-open');
+                    // Keep this tile's ⋯ visible while its menu is open (it is
+                    // otherwise shown only on hover - see styles.scss).
+                    document.querySelectorAll('.fpd-item.fpd-menu-open').forEach(x => x.classList.remove('fpd-menu-open'));
+                    parentItem.classList.add('fpd-menu-open');
 
                     // Position next to the clicked element
                     const rect = ev.target.getBoundingClientRect();
                     titleInformation.style.position = 'absolute';
                     titleInformation.style.top = `${rect.bottom + window.scrollY + 5}px`;
                     titleInformation.style.left = `${rect.left + window.scrollX}px`;
+                    // Keep the menu on screen (a tile in the right column on a
+                    // phone pushed it past the right edge; near the bottom it
+                    // opens above the ⋯ instead).
+                    const vw = document.documentElement.clientWidth, vh = window.innerHeight;
+                    const bw = titleInformation.offsetWidth, bh = titleInformation.offsetHeight;
+                    if (rect.left + bw > vw - 8) titleInformation.style.left = `${Math.max(8, vw - bw - 8) + window.scrollX}px`;
+                    if (rect.bottom + 5 + bh > vh - 8 && rect.top - bh - 5 > 8) titleInformation.style.top = `${rect.top - bh - 5 + window.scrollY}px`;
 
                     // Close on outside click
                     const closeBox = (e) => {
                       const target = e.target;
                       if (!titleInformation.contains(target) && !threeDot.contains(target)) {
                         titleInformation.remove();
+                        parentItem.classList.remove('fpd-menu-open');
                         document.body.classList.remove('photo-box-open');
                         document.removeEventListener('click', closeBox);
                       }
@@ -22250,7 +22318,11 @@
           autoOpenInfo: !1,
           guidedTour: null,
           replaceColorsInColorGroup: !1,
-          allowedImageTypes: ['jpeg', 'png', 'svg', 'pdf'],
+          // Drives the Images-tab picker's accept list AND which picked/dropped
+          // files are processed (the template's accept="" is overwritten from
+          // this). No PDF. Must match the backend image-only filter
+          // (styleflip-api src/middleware/upload.js) and the upload-area text.
+          allowedImageTypes: ['jpeg', 'png', 'gif', 'webp', 'svg'],
           pixabayApiKey: '51058342-7d101f741357da817a692cac0',
           pixabayHighResImages: !1,
           pixabayLang: 'en',
@@ -22406,7 +22478,9 @@
             maxW: 1e4,
             maxH: 1e4,
             minDPI: 72,
-            maxSize: 10,
+            // MB (1 MB = 1024*1024 bytes). Must match the backend limit in
+            // styleflip-api src/middleware/upload.js (MAX_IMAGE_BYTES).
+            maxSize: 6,
             autoCenter: !0
           },
           customTextParameters: { autoCenter: !0, copyable: !0 },
@@ -24604,6 +24678,47 @@
                 ? arguments[3]
                 : {}
           if (void 0 === t || void 0 === e || void 0 === i) return
+          // Pixabay "pixabay.com/get/..." links are temporary per-request
+          // hotlinks: once expired Pixabay answers 429 without a CORS header,
+          // so designs saved with one showed FPD's "blocked by CORS" popup.
+          // The Pixabay module stores the Pixabay image id as the element
+          // title, so look the image up again and load its permanent
+          // cdn.pixabay.com file (CORS-enabled) at the same size instead.
+          // Re-enters addElement with the original arguments, so nothing else
+          // about the element changes; falls back to the old URL on failure.
+          if (
+            'string' == typeof e &&
+            -1 !== e.indexOf('://pixabay.com/get/') &&
+            /^\d+$/.test(String(i)) &&
+            this.pixabayApiKey &&
+            !r._pixabayResolved
+          ) {
+            const sizeMatch = /_(\d+)\.(jpe?g|png)(?:\?.*)?$/i.exec(e)
+            const size = sizeMatch ? sizeMatch[1] : '1280'
+            const retry = src =>
+              this.addElement(t, src, i, Object.assign({}, r, { _pixabayResolved: !0 }))
+            fetch(
+              'https://pixabay.com/api/?key=' +
+                encodeURIComponent(this.pixabayApiKey) +
+                '&id=' +
+                encodeURIComponent(String(i))
+            )
+              .then(res => (res.ok ? res.json() : null))
+              .then(data => {
+                const preview = data && data.hits && data.hits[0] && data.hits[0].previewURL
+                retry(
+                  preview && /_150\.(jpe?g|png)$/i.test(preview)
+                    ? preview.replace(/_150\.(jpe?g|png)$/i, '_' + size + '.$1')
+                    : e
+                )
+              })
+              .catch(() => retry(e))
+            return
+          }
+          if (r._pixabayResolved) {
+            r = Object.assign({}, r)
+            delete r._pixabayResolved
+          }
           if (
             (this.fire('beforeElementAdd', {
               type: t,
@@ -24724,6 +24839,23 @@
                 n.fire('imageFail', { url: e }),
                 void n.fire('elementAdd', { element: void 0 })
               )
+            // The old CloudFront distribution d24u86aviuwdnf no longer serves
+            // product art (HTTP 404, no CORS header -> FPD's "blocked by CORS"
+            // popup). The same objects are public on S3 with
+            // Access-Control-Allow-Origin: * (getAllProducts already rewrites
+            // this host for products). Saved designs / share links / old
+            // caches still carry the dead host, so map it here, for every
+            // canvas image, and store the working URL as the element source
+            // so the next save is clean too.
+            if (
+              'string' == typeof e &&
+              -1 !== e.indexOf('://d24u86aviuwdnf.cloudfront.net/')
+            ) {
+              e = c.source = e.replace(
+                '://d24u86aviuwdnf.cloudfront.net/',
+                '://styleflip-bucket.s3.amazonaws.com/'
+              )
+            }
             if (-1 !== e.search('<svg'))
               St.fabric.loadSVGFromString(e, (e, i) => {
                 var n = St.fabric.util.groupSVGElements(e, i)
@@ -31064,7 +31196,7 @@
         }
         connectedCallback () {
           this.innerHTML =
-            '<div class="fpd-upload-image !bg-white"> <span data-defaulttext="Drop images here">modules.upload_zone</span> <span class="fpd-btn !bg-[var(--theme-color)] w-[100%] text-center !text-sm !normal-case" data-defaulttext="Browse File">modules.browse_file</span><span>Only Images(jpg, jpeg, png, gif) files are allowed.</span> <span class="fpd-price"></span> </div> <input type="file" multiple="multiple" class="fpd-upload-input fpd-hidden" name="files[]" accept="image/jpeg,image/jpg,image/png,image/svg+xml,application/pdf"/> <div class="fpd-scroll-area"> <div class="fpd-grid fpd-grid-cover fpd-photo-grid"></div><div id="extracontainer-data" class="fpd-grid fpd-grid-cover fpd-photo-grid"></div> </div>'
+            '<div class="fpd-upload-image !bg-white"> <span data-defaulttext="Drop images here">modules.upload_zone</span> <span class="fpd-btn !bg-[var(--theme-color)] w-[100%] text-center !text-sm !normal-case" data-defaulttext="Browse File">modules.browse_file</span><span>Only images (JPG, JPEG, PNG, GIF, WEBP, SVG) are allowed. Max file size: 6 MB.</span> <span class="fpd-price"></span> </div> <input type="file" multiple="multiple" class="fpd-upload-input fpd-hidden" name="files[]" accept="image/jpeg,image/jpg,image/png,image/gif,image/webp,image/svg+xml"/> <div class="fpd-scroll-area"> <div class="fpd-grid fpd-grid-cover fpd-photo-grid"></div><div id="extracontainer-data" class="fpd-grid fpd-grid-cover fpd-photo-grid"></div> </div>'
         }
       }
       function vi (t, e) {
@@ -31246,11 +31378,25 @@
           this.fpdInstance.getElements(e).forEach(t => {
             t.uploadZone && wi(this, Ii).push({ uz: t.title, viewIndex: e })
           })
-        ;(this.fpdInstance.loadingCustomImage = !0),
-          Array.from(t).forEach((t, e) => {
-            wi(this, Ti).includes(it(t.name)) &&
-              xi(this, Pi, zi).call(this, t, 0 == e)
-          }),
+        this.fpdInstance.loadingCustomImage = !0
+        // Files whose type is not allowed (e.g. a dropped PDF) used to be
+        // skipped silently - and if every file was skipped,
+        // loadingCustomImage stayed true, which blocks adding grid images.
+        const skipped = []
+        let started = 0
+        Array.from(t).forEach((t, e) => {
+          if (wi(this, Ti).includes(it(t.name))) {
+            started++
+            xi(this, Pi, zi).call(this, t, 0 == e)
+          } else skipped.push(t.name)
+        })
+        if (!started) this.fpdInstance.loadingCustomImage = !1
+        if (skipped.length) {
+          const names = skipped.map(f => '"' + String(f).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])) + '"').join(', ')
+          console.warn('Image upload skipped: unsupported file type', skipped)
+          n(`Image not uploaded: ${names}. Only images (JPG, JPEG, PNG, GIF, WEBP, SVG) are allowed.`)
+        }
+        ;
           this.container
             .querySelector('.fpd-upload-image')
             .classList.remove('fpd-hover'),
@@ -31261,19 +31407,21 @@
           1024 *
           this.fpdInstance.mainOptions.customImageParameters.maxSize *
           1024
-        if (t.size > i)
+        // Fail fast: an oversized file is rejected here, before it is read,
+        // before any grid placeholder/spinner exists and before any upload
+        // request (the backend enforces the same limit). The snackbar uses
+        // innerHTML, so the file name is escaped.
+        if (t.size > i) {
+          const mb = this.fpdInstance.mainOptions.customImageParameters.maxSize
+          const name = String(t.name).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]))
+          console.warn('Image upload blocked: file too large', t.name, t.size, 'bytes')
           return (
             n(
-              this.fpdInstance.translator
-                .getTranslation('misc', 'maximum_size_info')
-                .replace('%filename', t.name)
-                .replace(
-                  '%mb',
-                  this.fpdInstance.mainOptions.customImageParameters.maxSize
-                )
+              `Image not uploaded: "${name}" is ${(t.size / 1048576).toFixed(1)} MB. Please choose an image ${mb} MB or smaller.`
             ),
             void (this.fpdInstance.loadingCustomImage = !1)
           )
+        }
         'application/pdf' === t.type
           ? xi(this, Di, Vi).call(this, t, e)
           : xi(this, _i, Wi).call(this, t, e)
@@ -31408,7 +31556,22 @@
                     if (s.readyState === XMLHttpRequest.DONE) {
                       const t = s.status
                       ;
-                      if (0 === t || (t >= 200 && t < 400)) {
+                      // Failed upload (rejected type/size, server or network
+                      // error, or no image URL returned): previously status 0
+                      // counted as success and >= 400 was ignored, so the
+                      // spinner kept running and no image ever appeared.
+                      const res = s.response
+                      if (!(t >= 200 && t < 300) || !res || !res.image_src) {
+                        this.fpdInstance.loadingCustomImage = !1
+                        a.remove()
+                        console.error('Image upload failed', t, res)
+                        n(
+                          (res && res.message) ||
+                            'Upload failed. Please try again or check your web console!'
+                        )
+                        return
+                      }
+                      if (t >= 200 && t < 300) {
                         const t = s.response
                         ;
                         a.classList.remove('fpd-loading')
@@ -31417,7 +31580,10 @@
                           (xi(this, Li, Ui).call(this, t.image_src, t.filename),
                           (a.dataset.source = t.image_src),
                           a.classList.remove('fpd-loading'),
-                          a.querySelector('.fpd-loading-bar').remove(),
+                          // The bar may already be gone (a 10 s timer removes
+                          // it); .remove() on null threw here and aborted the
+                          // rest of this handler, incl. the list reload.
+                          a.querySelector('.fpd-loading-bar')?.remove(),
                           xi(this, Fi, Gi).call(this, a, e),
                           Ci(this, Ei, ((i = wi(this, Ei)), ++i)),
                           (a.xhr = null)),
@@ -31429,7 +31595,38 @@
                         // window.fpdReloadUploadedImages's definition
                         // (loadItems, ~line 20949) for why a global
                         // exposure was needed to reach it from here.
-                        ;t.image_src && window.fpdReloadUploadedImages && window.fpdReloadUploadedImages(true);
+                        //
+                        // The image list (#extracontainer-data) is the one
+                        // place uploads are shown - it renders the image with
+                        // its delete/share menu, newest first. This grid item
+                        // `a` is only the upload-progress placeholder; it
+                        // used to stay after the upload, so every new image
+                        // was shown twice (here AND in the list). Remove it
+                        // once the reloaded list contains the new image; if
+                        // the reload fails it is kept, so the image is never
+                        // lost from view.
+                        ;if (t.image_src && window.fpdReloadUploadedImages) {
+                          const src = t.image_src
+                          // Preload the S3 file first so the list tile paints
+                          // immediately (no blank tile after the placeholder
+                          // goes); capped so a slow image never blocks this.
+                          const preload = new Promise(done => {
+                            const img = new Image()
+                            const timer = setTimeout(done, 8000)
+                            img.onload = img.onerror = () => { clearTimeout(timer); done() }
+                            img.src = src
+                          })
+                          preload
+                            .then(() => window.fpdReloadUploadedImages(true, true)) // data changed: never dropped
+                            .catch(() => {})
+                            .then(() => {
+                              const listed = Array.from(
+                                document.querySelectorAll('#extracontainer-data .fpd-item')
+                              ).some(el => el.dataset.source === src)
+                              if (listed) a.remove()
+                              else console.warn('Uploaded image not in the reloaded list yet; keeping its placeholder', src)
+                            })
+                        }
                       }
                     }
                   }),
@@ -32038,9 +32235,19 @@
                 X(this.loader, ['fpd-hidden']),
                   t.hits.length > 0 &&
                     t.hits.forEach(t => {
+                      // largeImageURL / webformatURL are temporary
+                      // "pixabay.com/get/" links that Pixabay expires and then
+                      // blocks (HTTP 429, no CORS header), which broke saved
+                      // designs. The permanent cdn.pixabay.com file at the
+                      // same size is CORS-enabled - derive it from previewURL
+                      // (..._150.jpg -> ..._1280.jpg / _640.jpg).
+                      const cdn = size =>
+                        t.previewURL && /_150\.(jpe?g|png)$/i.test(t.previewURL)
+                          ? t.previewURL.replace(/_150\.(jpe?g|png)$/i, '_' + size + '.$1')
+                          : null
                       const e = $({
-                        url: t.imageURL || t.largeImageURL || t.fullHDURL || t.webformatURL,
-                        thumbnailUrl: t.webformatURL,
+                        url: t.imageURL || cdn(1280) || t.largeImageURL || t.fullHDURL || t.webformatURL,
+                        thumbnailUrl: cdn(640) || t.webformatURL,
                         title: t.id ? t.id : t.id_hash,
                         price: tt(this.fpdInstance, this.container)
                       })
@@ -38603,6 +38810,9 @@ function updateFPDLayersToSingleGroup(group) {
             (this.container = t),
             (this.container.instance = this),
             (this.mainOptions = dt.merge(dt.defaults, e))
+          // Lets canvas.addElement() re-resolve expired Pixabay links in saved
+          // designs (same prototype hand-off as proxyFileServer).
+          fabric.Canvas.prototype.pixabayApiKey = this.mainOptions.pixabayApiKey
           let i = {}
           Object.keys(this.mainOptions.hexNames).forEach(t => {
             i[t.toLowerCase()] = this.mainOptions.hexNames[t]

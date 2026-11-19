@@ -1003,6 +1003,24 @@
       function R (t) {
         return !!j.CSS_UNIT.exec(t)
       }
+      // Message for the uploaded-images list (delete result). Same markup and
+      // look as FPD's own snackbar; text set via textContent (no HTML).
+      function sfUploadToast(text) {
+        let w = document.body.querySelector('.fpd-snackbar-wrapper');
+        if (!w) {
+          w = document.createElement('div');
+          w.className = 'fpd-snackbar-wrapper';
+          document.body.append(w);
+        }
+        const s = document.createElement('div');
+        s.className = 'fpd-snackbar fpd-shadow-1';
+        const p = document.createElement('p');
+        p.textContent = text;
+        s.append(p);
+        s.addEventListener('click', () => s.remove());
+        w.append(s);
+        setTimeout(() => s.remove(), 5000);
+      }
       let itemsLoaded = false;
       let itemsLoadInFlight = false;
       let uploadedImagesMenuListener = null;
@@ -1015,7 +1033,31 @@
       // each item with a custom three-dot menu (share / delete / download
       // / "Uploaded by ..." label).
       // ===================================================================
-      async function loadItems(force) {
+      // Returns a promise that resolves once the list is rendered.
+      // dataChanged=true (after an upload/delete): if a load is already
+      // running it may have fetched before the change, so one more load is
+      // queued (two uploads finishing close together left the second image
+      // out). Without it (e.g. the Images tab asking twice on open) the extra
+      // call is dropped: re-rendering identical data replaced the tiles while
+      // a just-opened ⋯ menu still pointed at the old ones, so Delete removed
+      // a detached copy and the visible tile stayed.
+      let itemsLoadPromise = null;
+      let itemsReloadQueued = false;
+      function loadItems(force, dataChanged) {
+        if (itemsLoadInFlight) {
+          if (force && dataChanged) itemsReloadQueued = true;
+          return itemsLoadPromise || Promise.resolve();
+        }
+        if (itemsLoaded && !force) return Promise.resolve();
+        itemsLoadPromise = loadItemsOnce(force).then(() => {
+          if (itemsReloadQueued) {
+            itemsReloadQueued = false;
+            return loadItems(true);
+          }
+        });
+        return itemsLoadPromise;
+      }
+      async function loadItemsOnce(force) {
         // force=true bypasses the one-time-per-session gate below and
         // re-fetches/re-renders even if this already ran once - used
         // for an explicit reload (after an upload finishes, or every
@@ -1032,7 +1074,11 @@
           // 👇 Call your API (replace with your real endpoint)
           const response = await fetch("https://styleflip-backend-jdm5.ithemes.xyz/api/image/getByUserId/70011");
           const data = await response.json();
-          ;
+          // Newest upload first (the API returns oldest first), so a fresh
+          // upload shows at the top of the list.
+          if (Array.isArray(data)) {
+            data.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+          }
 
           // The uploads grid also restores a separate cache from
           // localStorage['fpd_uploaded_images'] on init (see the Ri class
@@ -1431,31 +1477,41 @@
                     // Delete the .fpd-item element
                     buttonDel.addEventListener('click', function (e) {
                       e.stopPropagation(); // Prevent triggering the outside click close
-                      if (parentItem) {
-                        ;
-                        ;
-                        parentItem.remove();
-                        titleInformation.remove();
-                        document.body.classList.remove('photo-box-open');
-                        let imageId = parentItem?.getAttribute('data-image-id');
-
-                         fetch(`https://styleflip-backend-jdm5.ithemes.xyz/api/image/deleteByUserId/${imageId}`, {
-                            method: "DELETE", // or DELETE if backend expects delete
-                            headers: {
-                              "Content-Type": "application/json",
-                            },
-                          })
-                            .then((response) => {
-                              if (!response.ok) throw new Error("Failed to delete");
-                              return response.json();
-                            })
-                            .then((data) => {
-                              ;
-                            })
-                            .catch((error) => {
-                              console.error("❌ API Error:", error);
-                            });
-                      }
+                      // The backend now deletes the S3 file AND the record
+                      // (owner-checked). The tile used to be removed before
+                      // the request even ran and failures only reached the
+                      // console - a failed delete looked successful and the
+                      // image came back on the next reload. Now the tile is
+                      // removed only after the server confirms, and the
+                      // reason is shown if it fails.
+                      const imageId = parentItem && parentItem.getAttribute('data-image-id');
+                      if (!imageId || buttonDel.disabled) return;
+                      buttonDel.disabled = true;
+                      titleInformation.remove();
+                      document.body.classList.remove('photo-box-open');
+                      // Look the tile(s) up by id now: the list may have been
+                      // re-rendered since this menu opened.
+                      const tilesFor = () => Array.from(document.querySelectorAll('#extracontainer-data .fpd-item')).filter(x => x.getAttribute('data-image-id') === imageId);
+                      tilesFor().forEach(x => { x.classList.remove('fpd-menu-open'); x.style.opacity = '0.5'; x.style.pointerEvents = 'none'; });
+                      const api = (window.SFSavedDesigns && window.SFSavedDesigns.apiBase()) || 'https://styleflip-backend-jdm5.ithemes.xyz/api';
+                      const owner = (window.SFSavedDesigns && window.SFSavedDesigns.getUserId()) || '70011';
+                      fetch(`${api}/image/deleteByUserId/${encodeURIComponent(imageId)}?userId=${encodeURIComponent(owner)}`, { method: 'DELETE' })
+                        .then(async (response) => {
+                          const body = await response.json().catch(() => null);
+                          if (!response.ok) throw new Error((body && body.message) || `Delete failed (HTTP ${response.status})`);
+                          return body;
+                        })
+                        .then(() => {
+                          tilesFor().forEach(x => x.remove());
+                          sfUploadToast('Image deleted');
+                        })
+                        .catch((error) => {
+                          console.error('Uploaded image delete failed:', error);
+                          tilesFor().forEach(x => { x.style.opacity = ''; x.style.pointerEvents = ''; });
+                          const msg = error instanceof TypeError ? 'Could not reach the server. Please try again.' : error.message;
+                          sfUploadToast('Image was not deleted: ' + msg);
+                        })
+                        .finally(() => { buttonDel.disabled = false; });
                     });
 
                     // Download the image from data-source
@@ -1504,18 +1560,30 @@
 
                     document.body.appendChild(titleInformation);
                     document.body.classList.add('photo-box-open');
+                    // Keep this tile's ⋯ visible while its menu is open (it is
+                    // otherwise shown only on hover - see styles.scss).
+                    document.querySelectorAll('.fpd-item.fpd-menu-open').forEach(x => x.classList.remove('fpd-menu-open'));
+                    parentItem.classList.add('fpd-menu-open');
 
                     // Position next to the clicked element
                     const rect = ev.target.getBoundingClientRect();
                     titleInformation.style.position = 'absolute';
                     titleInformation.style.top = `${rect.bottom + window.scrollY + 5}px`;
                     titleInformation.style.left = `${rect.left + window.scrollX}px`;
+                    // Keep the menu on screen (a tile in the right column on a
+                    // phone pushed it past the right edge; near the bottom it
+                    // opens above the ⋯ instead).
+                    const vw = document.documentElement.clientWidth, vh = window.innerHeight;
+                    const bw = titleInformation.offsetWidth, bh = titleInformation.offsetHeight;
+                    if (rect.left + bw > vw - 8) titleInformation.style.left = `${Math.max(8, vw - bw - 8) + window.scrollX}px`;
+                    if (rect.bottom + 5 + bh > vh - 8 && rect.top - bh - 5 > 8) titleInformation.style.top = `${rect.top - bh - 5 + window.scrollY}px`;
 
                     // Close on outside click
                     const closeBox = (e) => {
                       const target = e.target;
                       if (!titleInformation.contains(target) && !threeDot.contains(target)) {
                         titleInformation.remove();
+                        parentItem.classList.remove('fpd-menu-open');
                         document.body.classList.remove('photo-box-open');
                         document.removeEventListener('click', closeBox);
                       }
@@ -2475,7 +2543,11 @@
           autoOpenInfo: !1,
           guidedTour: null,
           replaceColorsInColorGroup: !1,
-          allowedImageTypes: ['jpeg', 'png', 'svg', 'pdf'],
+          // Drives the Images-tab picker's accept list AND which picked/dropped
+          // files are processed (the template's accept="" is overwritten from
+          // this). No PDF. Must match the backend image-only filter
+          // (styleflip-api src/middleware/upload.js) and the upload-area text.
+          allowedImageTypes: ['jpeg', 'png', 'gif', 'webp', 'svg'],
           pixabayApiKey: '51058342-7d101f741357da817a692cac0',
           pixabayHighResImages: !1,
           pixabayLang: 'en',
@@ -2631,7 +2703,9 @@
             maxW: 1e4,
             maxH: 1e4,
             minDPI: 72,
-            maxSize: 10,
+            // MB (1 MB = 1024*1024 bytes). Must match the backend limit in
+            // styleflip-api src/middleware/upload.js (MAX_IMAGE_BYTES).
+            maxSize: 6,
             autoCenter: !0
           },
           customTextParameters: { autoCenter: !0, copyable: !0 },
@@ -4829,6 +4903,47 @@
                 ? arguments[3]
                 : {}
           if (void 0 === t || void 0 === e || void 0 === i) return
+          // Pixabay "pixabay.com/get/..." links are temporary per-request
+          // hotlinks: once expired Pixabay answers 429 without a CORS header,
+          // so designs saved with one showed FPD's "blocked by CORS" popup.
+          // The Pixabay module stores the Pixabay image id as the element
+          // title, so look the image up again and load its permanent
+          // cdn.pixabay.com file (CORS-enabled) at the same size instead.
+          // Re-enters addElement with the original arguments, so nothing else
+          // about the element changes; falls back to the old URL on failure.
+          if (
+            'string' == typeof e &&
+            -1 !== e.indexOf('://pixabay.com/get/') &&
+            /^\d+$/.test(String(i)) &&
+            this.pixabayApiKey &&
+            !r._pixabayResolved
+          ) {
+            const sizeMatch = /_(\d+)\.(jpe?g|png)(?:\?.*)?$/i.exec(e)
+            const size = sizeMatch ? sizeMatch[1] : '1280'
+            const retry = src =>
+              this.addElement(t, src, i, Object.assign({}, r, { _pixabayResolved: !0 }))
+            fetch(
+              'https://pixabay.com/api/?key=' +
+                encodeURIComponent(this.pixabayApiKey) +
+                '&id=' +
+                encodeURIComponent(String(i))
+            )
+              .then(res => (res.ok ? res.json() : null))
+              .then(data => {
+                const preview = data && data.hits && data.hits[0] && data.hits[0].previewURL
+                retry(
+                  preview && /_150\.(jpe?g|png)$/i.test(preview)
+                    ? preview.replace(/_150\.(jpe?g|png)$/i, '_' + size + '.$1')
+                    : e
+                )
+              })
+              .catch(() => retry(e))
+            return
+          }
+          if (r._pixabayResolved) {
+            r = Object.assign({}, r)
+            delete r._pixabayResolved
+          }
           if (
             (this.fire('beforeElementAdd', {
               type: t,
@@ -4949,6 +5064,23 @@
                 n.fire('imageFail', { url: e }),
                 void n.fire('elementAdd', { element: void 0 })
               )
+            // The old CloudFront distribution d24u86aviuwdnf no longer serves
+            // product art (HTTP 404, no CORS header -> FPD's "blocked by CORS"
+            // popup). The same objects are public on S3 with
+            // Access-Control-Allow-Origin: * (getAllProducts already rewrites
+            // this host for products). Saved designs / share links / old
+            // caches still carry the dead host, so map it here, for every
+            // canvas image, and store the working URL as the element source
+            // so the next save is clean too.
+            if (
+              'string' == typeof e &&
+              -1 !== e.indexOf('://d24u86aviuwdnf.cloudfront.net/')
+            ) {
+              e = c.source = e.replace(
+                '://d24u86aviuwdnf.cloudfront.net/',
+                '://styleflip-bucket.s3.amazonaws.com/'
+              )
+            }
             if (-1 !== e.search('<svg'))
               St.fabric.loadSVGFromString(e, (e, i) => {
                 var n = St.fabric.util.groupSVGElements(e, i)
