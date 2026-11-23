@@ -33098,6 +33098,16 @@
           // Locked rows must still be selectable from Layers (Color / Info);
           // fabric lock flags still block move/stretch on the canvas.
           if (!i || !i.canvas) return
+          // ===== CUSTOM (StyleFlip): on mobile the Layers sheet covers the
+          // product, so the selected layer and its toolbar were hidden behind
+          // it. Close the sheet first (closing deselects), then select.
+          const fpd = this.fpdInstance
+          if (
+            fpd.mainBar &&
+            fpd.uiManager &&
+            'small' == fpd.uiManager.currentLayout
+          )
+            fpd.mainBar.toggleContentDisplay(!1)
           i.canvas.setActiveObject(i).renderAll()
         }),
           Wn(this, Zn, is).call(this, t)
@@ -37507,6 +37517,10 @@ function updateFPDLayersToSingleGroup(group) {
           // 2) Re-enable the Color tool
           // 3) Keep body.notgroup.is-svg for any remaining CSS gates
           Z(this.container, ['fpd-doc-colorable', 'fpd-doc-info-layer'])
+          // ===== CUSTOM (StyleFlip): marks the toolbar while the Base layer is
+          // selected, so fpd-base-layer-toolbar.css styles only that toolbar
+          // and never the regular Element Editor.
+          J(this.container, ['fpd-bl-toolbar'], t.title === 'Base')
           const canColor =
             Boolean(t.hasColorSelection && t.hasColorSelection())
           if (canColor) {

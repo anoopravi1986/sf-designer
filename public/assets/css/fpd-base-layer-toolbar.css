@@ -1,0 +1,399 @@
+/*
+  Base layer toolbar clean-up (selecting "Base" from Layers).
+
+  Scope: ONLY the new `fpd-bl-toolbar` class, which the toolbar render in
+  fpd-src/05-element-toolbar-interactions.js sets while the selected
+  element's title is 'Base' and removes for every other element. The
+  regular Element Editor (uploaded images, SVGs, groups, text) never gets
+  the class, so none of these rules reach it. Desktop rules also require
+  layout-large; the two mobile rules at the end require layout-small.
+
+  Why: the image toolbar was built from per-item paddings (8px / 10-15px /
+  6px / 15px) and the copy/paste pair inherited `border-width: medium` from
+  the vendor reset, so it rendered as a 3px grey box that also overlapped
+  the layer buttons by 5px. The close "x" sat 19px above the bar's top-right
+  corner, detached from it. Here every tool is a 32x32 centred cell like the
+  desktop text toolbar, the copy/paste pair gets the same 1px border, and the
+  close button sits inside the bar, vertically centred.
+
+  Does NOT modify styles.scss or the vendor stylesheet; overrides only.
+*/
+
+/* ---------- Bar ---------------------------------------------------------- */
+
+body fpd-element-toolbar.fpd-smart.fpd-layout-large:not(.fpd-layout-small):not(.fpd-ate-editor):not(.fpd-dtt-ui).fpd-bl-toolbar {
+  padding-right: 44px !important;
+  box-sizing: border-box !important;
+}
+
+body fpd-element-toolbar.fpd-smart.fpd-layout-large:not(.fpd-layout-small):not(.fpd-ate-editor):not(.fpd-dtt-ui).fpd-bl-toolbar
+  > .fpd-tools-nav {
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  align-items: center !important;
+  gap: 4px !important;
+  min-height: 52px !important;
+  padding: 0 4px 0 10px !important;
+  margin: 0 !important;
+  box-sizing: border-box !important;
+}
+
+body fpd-element-toolbar.fpd-smart.fpd-layout-large:not(.fpd-layout-small):not(.fpd-ate-editor):not(.fpd-dtt-ui).fpd-bl-toolbar
+  #SecondaryIconBoxHeader {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  align-items: center !important;
+  gap: 4px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  height: auto !important;
+  border: 0 !important;
+}
+
+/* ---------- Uniform 32x32 cells ----------------------------------------- */
+
+body fpd-element-toolbar.fpd-smart.fpd-layout-large:not(.fpd-layout-small):not(.fpd-ate-editor):not(.fpd-dtt-ui).fpd-bl-toolbar
+  :is(#fpd-opacity-btn, #SecondaryIconBoxHeader > .fpd-tool-transform, #TextMoveUp, #TextMoveDown, #SecondaryIconBoxHeader > .fpd-tool-remove) {
+  display: inline-flex !important;
+  flex: 0 0 32px !important;
+  width: 32px !important;
+  min-width: 32px !important;
+  max-width: 32px !important;
+  height: 32px !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-direction: row !important;
+  position: relative !important;
+  top: 0 !important;
+  left: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 1px solid transparent !important;
+  border-radius: 8px !important;
+  background: transparent !important;
+  box-sizing: border-box !important;
+  cursor: pointer !important;
+  transition: background-color 0.15s ease;
+}
+
+body fpd-element-toolbar.fpd-smart.fpd-layout-large:not(.fpd-layout-small):not(.fpd-ate-editor):not(.fpd-dtt-ui).fpd-bl-toolbar
+  :is(#fpd-opacity-btn, #SecondaryIconBoxHeader > .fpd-tool-transform, #TextMoveUp, #TextMoveDown, #SecondaryIconBoxHeader > .fpd-tool-remove):hover {
+  background: #f3f4f6 !important;
+}
+
+body fpd-element-toolbar.fpd-smart.fpd-layout-large:not(.fpd-layout-small):not(.fpd-ate-editor):not(.fpd-dtt-ui).fpd-bl-toolbar
+  :is(#fpd-opacity-btn.fpd-active, #SecondaryIconBoxHeader > .fpd-tool-transform.fpd-active) {
+  background: rgba(232, 86, 36, 0.1) !important;
+  border-color: rgba(232, 86, 36, 0.35) !important;
+}
+
+/* Icons: 20x20, centred, no per-icon offsets. */
+body fpd-element-toolbar.fpd-smart.fpd-layout-large:not(.fpd-layout-small):not(.fpd-ate-editor):not(.fpd-dtt-ui).fpd-bl-toolbar
+  :is(#fpd-opacity-btn, #TextMoveUp, #TextMoveDown, #SecondaryIconBoxHeader > .fpd-tool-remove)
+  > svg,
+body fpd-element-toolbar.fpd-smart.fpd-layout-large:not(.fpd-layout-small):not(.fpd-ate-editor):not(.fpd-dtt-ui).fpd-bl-toolbar
+  #SecondaryIconBoxHeader
+  > .fpd-tool-transform
+  > span:first-child {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 20px !important;
+  min-width: 20px !important;
+  height: 20px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  position: static !important;
+  top: auto !important;
+  left: auto !important;
+  flex: 0 0 auto !important;
+}
+
+body fpd-element-toolbar.fpd-smart.fpd-layout-large:not(.fpd-layout-small):not(.fpd-ate-editor):not(.fpd-dtt-ui).fpd-bl-toolbar
+  #SecondaryIconBoxHeader
+  > .fpd-tool-transform
+  > span:first-child::before {
+  display: block !important;
+  width: 20px !important;
+  height: 20px !important;
+  position: static !important;
+  top: auto !important;
+  background-size: contain !important;
+  background-repeat: no-repeat !important;
+  background-position: center !important;
+}
+
+/* Divider after Transform: centred in the gap instead of on the icon edge. */
+body fpd-element-toolbar.fpd-smart.fpd-layout-large:not(.fpd-layout-small):not(.fpd-ate-editor):not(.fpd-dtt-ui).fpd-bl-toolbar
+  #SecondaryIconBoxHeader
+  > .fpd-tool-transform {
+  margin-right: 9px !important;
+}
+
+body fpd-element-toolbar.fpd-smart.fpd-layout-large:not(.fpd-layout-small):not(.fpd-ate-editor):not(.fpd-dtt-ui).fpd-bl-toolbar
+  #SecondaryIconBoxHeader
+  > .fpd-tool-transform::after {
+  content: '' !important;
+  display: block !important;
+  position: absolute !important;
+  right: -7px !important;
+  top: 5px !important;
+  width: 1px !important;
+  height: 20px !important;
+  background: #e5e7eb !important;
+}
+
+/* Layer up/down: a plain pair. */
+body fpd-element-toolbar.fpd-smart.fpd-layout-large:not(.fpd-layout-small):not(.fpd-ate-editor):not(.fpd-dtt-ui).fpd-bl-toolbar
+  #SecondaryIconBoxHeader
+  > .fpd-tool-layer-depth {
+  flex: 0 0 auto !important;
+  gap: 4px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  position: static !important;
+  top: auto !important;
+  align-items: center !important;
+}
+
+body fpd-element-toolbar.fpd-smart.fpd-layout-large:not(.fpd-layout-small):not(.fpd-ate-editor):not(.fpd-dtt-ui).fpd-bl-toolbar
+  #SecondaryIconBoxHeader
+  > .fpd-tool-layer-depth::before,
+body fpd-element-toolbar.fpd-smart.fpd-layout-large:not(.fpd-layout-small):not(.fpd-ate-editor):not(.fpd-dtt-ui).fpd-bl-toolbar
+  #SecondaryIconBoxHeader
+  > .fpd-tool-layer-depth::after {
+  display: none !important;
+}
+
+/* ---------- Copy / paste pair: 1px border (was 3px) --------------------- */
+
+body fpd-element-toolbar.fpd-smart.fpd-layout-large:not(.fpd-layout-small):not(.fpd-ate-editor):not(.fpd-dtt-ui).fpd-bl-toolbar
+  #SecondaryIconBoxHeader
+  > .groupby-text {
+  display: flex !important;
+  flex: 0 0 auto !important;
+  align-items: center !important;
+  gap: 2px !important;
+  height: 32px !important;
+  margin: 0 !important;
+  padding: 2px !important;
+  box-sizing: border-box !important;
+  border: 1px solid #d7dade !important;
+  border-radius: 8px !important;
+  position: static !important;
+}
+
+/* Nothing to show in it (both buttons hidden) → no empty box. */
+body fpd-element-toolbar.fpd-smart.fpd-layout-large:not(.fpd-layout-small):not(.fpd-ate-editor):not(.fpd-dtt-ui).fpd-bl-toolbar
+  #SecondaryIconBoxHeader
+  > .groupby-text:not(:has(> :is(.fpd-group-copy-by, .fpd-group-paste-by):not([style*='display: none']))) {
+  display: none !important;
+}
+
+body fpd-element-toolbar.fpd-smart.fpd-layout-large:not(.fpd-layout-small):not(.fpd-ate-editor):not(.fpd-dtt-ui).fpd-bl-toolbar
+  #SecondaryIconBoxHeader
+  > .groupby-text
+  > :is(.fpd-group-copy-by, .fpd-group-paste-by) {
+  display: inline-flex !important;
+  flex: 0 0 26px !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 26px !important;
+  height: 26px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border-radius: 6px !important;
+  cursor: pointer !important;
+}
+
+body fpd-element-toolbar.fpd-smart.fpd-layout-large:not(.fpd-layout-small):not(.fpd-ate-editor):not(.fpd-dtt-ui).fpd-bl-toolbar
+  #SecondaryIconBoxHeader
+  > .groupby-text
+  > :is(.fpd-group-copy-by, .fpd-group-paste-by):hover {
+  background: #f3f4f6 !important;
+}
+
+body fpd-element-toolbar.fpd-smart.fpd-layout-large:not(.fpd-layout-small):not(.fpd-ate-editor):not(.fpd-dtt-ui).fpd-bl-toolbar
+  #SecondaryIconBoxHeader
+  > .groupby-text
+  > :is(.fpd-group-copy-by, .fpd-group-paste-by)
+  svg {
+  display: block !important;
+  width: 20px !important;
+  max-width: 20px !important;
+  height: 20px !important;
+  margin: 0 !important;
+  position: static !important;
+}
+
+/* ---------- Close button inside the bar --------------------------------- */
+
+body fpd-element-toolbar.fpd-smart.fpd-layout-large:not(.fpd-layout-small):not(.fpd-ate-editor):not(.fpd-dtt-ui).fpd-bl-toolbar
+  > .fpd-close {
+  position: absolute !important;
+  top: 50% !important;
+  right: 8px !important;
+  bottom: auto !important;
+  left: auto !important;
+  transform: translateY(-50%) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 28px !important;
+  min-width: 28px !important;
+  height: 28px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  line-height: 1 !important;
+  border-radius: 8px !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+body fpd-element-toolbar.fpd-smart.fpd-layout-large:not(.fpd-layout-small):not(.fpd-ate-editor):not(.fpd-dtt-ui).fpd-bl-toolbar
+  > .fpd-close::before {
+  content: '' !important;
+  position: absolute !important;
+  left: -6px !important;
+  top: 4px !important;
+  width: 1px !important;
+  height: 20px !important;
+  background: #e5e7eb !important;
+}
+
+body fpd-element-toolbar.fpd-smart.fpd-layout-large:not(.fpd-layout-small):not(.fpd-ate-editor):not(.fpd-dtt-ui).fpd-bl-toolbar
+  > .fpd-close:hover {
+  background: #f3f4f6 !important;
+}
+
+/* ---------- Mobile: no blank slot in the action row ---------------------
+
+   .extra-icon-main-div-box holds the text-only copy/paste-format icons.
+   For a plain image (e.g. Base) both icons are hidden but the empty
+   wrapper still took a 52px slot between Reset and Duplicate. styles.scss
+   already hides it for groups; do the same for every image-type element. */
+fpd-element-toolbar.fpd-layout-small.fpd-bl-toolbar .extra-icon-main-div-box {
+  display: none !important;
+}
+
+/* Up/Down pair was shifted 5px right (15px gap before it, 5px after);
+   let the row's own gap space it like every other tile. */
+fpd-element-toolbar.fpd-layout-small.fpd-bl-toolbar #SecondaryIconBoxHeader > .fpd-tool-layer-depth {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  left: 0 !important;
+}
+
+/* ---------- Desktop: Color for colorizable images (e.g. Base) -----------
+
+   The toolbar already enables .fpd-tool-color and adds fpd-doc-colorable
+   when hasColorSelection() is true, but styles.scss hides the whole
+   .fpd-primary-tools wrapper for every image, so Color never appeared on
+   desktop. Show the wrapper (only Color in it is visible for images) and
+   give Color the same 32x32 cell + round swatch as the text toolbar. */
+body fpd-element-toolbar.fpd-smart.fpd-layout-large.fpd-doc-colorable:not(.fpd-layout-small):not(.fpd-ate-editor):not(.fpd-dtt-ui).fpd-bl-toolbar
+  > .fpd-tools-nav
+  > .fpd-primary-tools {
+  display: flex !important;
+  flex: 0 0 auto !important;
+  align-items: center !important;
+  gap: 4px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+body fpd-element-toolbar.fpd-smart.fpd-layout-large.fpd-doc-colorable:not(.fpd-layout-small):not(.fpd-ate-editor):not(.fpd-dtt-ui).fpd-bl-toolbar
+  .fpd-primary-tools
+  > .fpd-tool-color {
+  display: inline-flex !important;
+  flex: 0 0 32px !important;
+  width: 32px !important;
+  min-width: 32px !important;
+  height: 32px !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 1px solid transparent !important;
+  border-radius: 8px !important;
+  box-sizing: border-box !important;
+  cursor: pointer !important;
+}
+
+body fpd-element-toolbar.fpd-smart.fpd-layout-large.fpd-doc-colorable:not(.fpd-layout-small):not(.fpd-ate-editor):not(.fpd-dtt-ui).fpd-bl-toolbar
+  .fpd-primary-tools
+  > .fpd-tool-color:hover {
+  background: #f3f4f6 !important;
+}
+
+body fpd-element-toolbar.fpd-smart.fpd-layout-large.fpd-doc-colorable:not(.fpd-layout-small):not(.fpd-ate-editor):not(.fpd-dtt-ui).fpd-bl-toolbar
+  .fpd-primary-tools
+  > .fpd-tool-color.fpd-active {
+  background: rgba(232, 86, 36, 0.1) !important;
+  border-color: rgba(232, 86, 36, 0.35) !important;
+}
+
+body fpd-element-toolbar.fpd-smart.fpd-layout-large.fpd-doc-colorable:not(.fpd-layout-small):not(.fpd-ate-editor):not(.fpd-dtt-ui).fpd-bl-toolbar
+  .fpd-primary-tools
+  > .fpd-tool-color
+  > .fpd-current-fill {
+  display: block !important;
+  width: 22px !important;
+  height: 22px !important;
+  margin: 0 !important;
+  border-radius: 50% !important;
+  box-sizing: border-box !important;
+  border: 1px solid rgba(0, 0, 0, 0.15) !important;
+  flex: 0 0 auto !important;
+}
+
+body fpd-element-toolbar.fpd-smart.fpd-layout-large.fpd-doc-colorable:not(.fpd-layout-small):not(.fpd-ate-editor):not(.fpd-dtt-ui).fpd-bl-toolbar
+  .fpd-primary-tools
+  > .fpd-tool-color
+  > .fpd-label {
+  display: none !important;
+}
+
+/* While a panel (Color, Opacity…) is open the vendor also shows
+   .fpd-close-sub-panel, which floated above the bar next to the toolbar
+   close. Show just one "x": the panel close, in the same in-bar spot. */
+body fpd-element-toolbar.fpd-smart.fpd-layout-large.fpd-panel-visible:not(.fpd-layout-small):not(.fpd-ate-editor):not(.fpd-dtt-ui).fpd-bl-toolbar
+  > .fpd-close {
+  display: none !important;
+}
+
+body fpd-element-toolbar.fpd-smart.fpd-layout-large.fpd-panel-visible:not(.fpd-layout-small):not(.fpd-ate-editor):not(.fpd-dtt-ui).fpd-bl-toolbar
+  > .fpd-close-sub-panel {
+  position: absolute !important;
+  top: 50% !important;
+  right: 8px !important;
+  bottom: auto !important;
+  left: auto !important;
+  transform: translateY(-50%) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 28px !important;
+  min-width: 28px !important;
+  max-width: 28px !important;
+  height: 28px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  line-height: 1 !important;
+  border-radius: 8px !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  z-index: 2 !important;
+}
+
+body fpd-element-toolbar.fpd-smart.fpd-layout-large.fpd-panel-visible:not(.fpd-layout-small):not(.fpd-ate-editor):not(.fpd-dtt-ui).fpd-bl-toolbar
+  > .fpd-close-sub-panel
+  > .fpd-label {
+  display: none !important;
+}
+
+body fpd-element-toolbar.fpd-smart.fpd-layout-large.fpd-panel-visible:not(.fpd-layout-small):not(.fpd-ate-editor):not(.fpd-dtt-ui).fpd-bl-toolbar
+  > .fpd-close-sub-panel:hover {
+  background: #f3f4f6 !important;
+}
