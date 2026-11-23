@@ -867,6 +867,44 @@
   const fabricCanvas = this.fpdInstance.currentViewInstance?.fabricCanvas;
   if (!fabricCanvas) return;
 
+  // Mobile only. A phone cannot Shift+Click, so Group gathers every text
+  // on the design, shows the multi-select outline, then groups them.
+  // Desktop still groups only the texts the user Shift+Clicked.
+  const desktopGroup = window.matchMedia('(min-width: 991px)').matches
+  if (!desktopGroup) {
+    const isLooseText = o =>
+      o &&
+      o.visible !== false &&
+      o.selectable !== false &&
+      o.getType &&
+      o.getType() === 'text'
+    const activeNow = fabricCanvas.getActiveObject()
+    const picked =
+      activeNow && activeNow.type === 'activeSelection'
+        ? activeNow._objects || []
+        : []
+    const ready =
+      picked.length > 1 && picked.every(isLooseText)
+    if (!ready) {
+      const texts = fabricCanvas.getObjects().filter(isLooseText)
+      if (texts.length < 2) {
+        showToast('Add at least two text elements to create a group.', 5000)
+        return
+      }
+      fabricCanvas.discardActiveObject()
+      fabricCanvas.setActiveObject(
+        new fabric.ActiveSelection(texts, { canvas: fabricCanvas })
+      )
+      fabricCanvas.requestRenderAll()
+      setTimeout(() => {
+        const cur = fabricCanvas.getActiveObject()
+        if (!cur || cur.type !== 'activeSelection') return
+        document.querySelector('fpd-element-toolbar .fpd-ungroup')?.click()
+      }, 350)
+      return
+    }
+  }
+
   const activeObject = fabricCanvas.getActiveObject();
 
   // --- VALIDATION ---
