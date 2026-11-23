@@ -1291,6 +1291,10 @@ function updateFPDLayersToSingleGroup(group) {
               });
 
               function keepBelowOverlay(canvas, obj) {
+                if (canvas.placeBelowKnobs) {
+                  canvas.placeBelowKnobs(obj);
+                  return;
+                }
                 const overlay = canvas.getObjects().find(o =>
                   o.title === 'Overlay' || o.boundingBox === 'Base'
                 );

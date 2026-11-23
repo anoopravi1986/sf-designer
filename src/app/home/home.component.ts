@@ -1871,26 +1871,7 @@ export class HomeComponent implements AfterViewInit {
     }
 
     document.getElementById('TextMoveUp')?.addEventListener('click', () => {
-      const canvas = this.designer.currentViewInstance.fabricCanvas;
-      const obj = canvas.getActiveObject();
-      if (!obj) return;
-
-      // Same path as Arrange layer-up — setElementOptions clamps vs Overlay.
-      const nextZ = (obj.getZIndex?.() ?? canvas.getObjects().indexOf(obj)) + 1;
-      const overlayObj = canvas.getObjects().find((o: any) => o.title === 'Overlay');
-      if (overlayObj) {
-        const overlayZ = overlayObj.getZIndex?.() ?? canvas.getObjects().indexOf(overlayObj);
-        if (nextZ >= overlayZ) {
-          this.showToast('Not possible to move above Overlay layer!');
-          return;
-        }
-      }
-      canvas.setElementOptions({ z: nextZ }, obj);
-      moveLayerRowUp(obj.id);
-      obj.setCoords();
-      canvas.fire('object:modified', { target: obj });
-      canvas.fire('elementModify', { element: obj, options: {} });
-      canvas.requestRenderAll();
+      this.moveActiveLayer('up');
     });
 
     function moveLayerRowUp(elementId: string) {
@@ -1928,23 +1909,7 @@ export class HomeComponent implements AfterViewInit {
     }
 
     document.getElementById('TextMoveDown')?.addEventListener('click', () => {
-      const canvas = this.designer.currentViewInstance.fabricCanvas;
-      const obj = canvas.getActiveObject();
-      if (!obj) return;
-
-      // Same path as Arrange layer-down — setElementOptions clamps vs Base.
-      const nextZ = (obj.getZIndex?.() ?? canvas.getObjects().indexOf(obj)) - 1;
-      const baseObj = canvas.getObjects().find((o: any) => o.title === 'Base');
-      if (baseObj) {
-        const baseZ = baseObj.getZIndex?.() ?? canvas.getObjects().indexOf(baseObj);
-        if (nextZ <= baseZ) {
-          this.showToast('Reached just above base, not moving further down.');
-          return;
-        }
-      }
-      canvas.setElementOptions({ z: Math.max(0, nextZ) }, obj);
-      moveLayerRowDown(obj.id);
-      canvas.requestRenderAll();
+      this.moveActiveLayer('down');
     });
 
     const minusEl = document.getElementById('minusElement');
@@ -3443,6 +3408,23 @@ export class HomeComponent implements AfterViewInit {
           textTransform.classList.toggle('active', next !== 'none');
           return;
         }
+
+        const layerBtn = raw.closest(
+          '#TextMoveUp, #TextMoveDown, [data-do="layer-up"], [data-do="layer-down"]'
+        ) as HTMLElement | null;
+        if (
+          layerBtn &&
+          layerBtn.closest('.fpd-tools-nav') &&
+          !layerBtn.closest('.fpd-sub-panel')
+        ) {
+          e.preventDefault();
+          e.stopPropagation();
+          const up =
+            layerBtn.id === 'TextMoveUp' ||
+            layerBtn.getAttribute('data-do') === 'layer-up';
+          this.moveActiveLayer(up ? 'up' : 'down');
+          return;
+        }
       },
       true
     );
@@ -3712,6 +3694,25 @@ export class HomeComponent implements AfterViewInit {
           e.stopPropagation();
           const option = alignOpt.getAttribute('data-option') || 'left';
           this.applyAteTextAlign(toolbar, option);
+          return;
+        }
+
+        // Move Up / Move Down — capture so stamped mobile tiles still work
+        // (direct getElementById listeners miss retargeted taps).
+        const layerBtn = raw.closest(
+          '#TextMoveUp, #TextMoveDown, [data-do="layer-up"], [data-do="layer-down"]'
+        ) as HTMLElement | null;
+        if (
+          layerBtn &&
+          layerBtn.closest('.fpd-tools-nav') &&
+          !layerBtn.closest('.fpd-sub-panel')
+        ) {
+          e.preventDefault();
+          e.stopPropagation();
+          const up =
+            layerBtn.id === 'TextMoveUp' ||
+            layerBtn.getAttribute('data-do') === 'layer-up';
+          this.moveActiveLayer(up ? 'up' : 'down');
           return;
         }
       },
@@ -4598,25 +4599,25 @@ export class HomeComponent implements AfterViewInit {
     // after they're added, without touching the product data itself.
     this.designer.addEventListener('elementAdd', (evt: any) => {
       const element = evt?.detail?.element;
-      if (!element || element.type !== 'image') return;
-
-      // Product mockups can have a "topped" (or upload-zone) layer meant to
-      // always render above everything else (e.g. a laptop's keyboard/bezel
-      // overlay, so an uploaded design reads as sitting under the glass
-      // instead of pasted on top of it). The vendor canvas already re-asserts
-      // that ordering via _bringToppedElementsToFront() on its own
-      // 'object:added' fabric event, but for a freshly-uploaded image that
-      // reorder wasn't taking effect until the user separately clicked/
-      // selected the element (which happens to trigger the same reorder via
-      // a different vendor code path). Call it again here, unconditionally,
-      // so newly added images land in the correct stacking order immediately
-      // rather than needing a click to "fix" it.
       const view = this.designer.currentViewInstance;
-      if (view?.fabricCanvas?._bringToppedElementsToFront) {
-        view.fabricCanvas._bringToppedElementsToFront();
-        view.fabricCanvas.requestRenderAll();
+
+      // LYR-013/014: every add (text / element / photo) must land below
+      // knobs and above existing regular items, and Layers must rebuild.
+      if (element && view?.fabricCanvas) {
+        if (view.fabricCanvas.placeBelowKnobs) {
+          view.fabricCanvas.placeBelowKnobs(element);
+        } else if (view.fabricCanvas._bringToppedElementsToFront) {
+          view.fabricCanvas._bringToppedElementsToFront();
+        }
+        view.fabricCanvas.requestRenderAll?.();
+        const layersMod = (
+          document.querySelector('fpd-module-manage-layers') as any
+        )?.fpdLayersModule;
+        // Defer so FPD's own elementAdd listener finishes first.
+        setTimeout(() => layersMod?.rebuildList?.(), 0);
       }
 
+      if (!element || element.type !== 'image') return;
       if (!element.locked && !element.adminLocked) return;
 
       const stageWidth = view?.options?.stageWidth;
@@ -4808,6 +4809,49 @@ export class HomeComponent implements AfterViewInit {
       ;
       localStorage.setItem('valueofTitle', '');
     }
+  }
+
+  /**
+   * LYR-013 / LYR-014: Move the active object up or down one step, clamped
+   * so regular content never crosses Base or Knob/Overlay layers. Rebuilds
+   * the Layers list so the panel matches canvas stacking.
+   */
+  moveActiveLayer(direction: 'up' | 'down'): void {
+    const canvas = this.designer?.currentViewInstance?.fabricCanvas;
+    const obj = canvas?.getActiveObject?.();
+    if (!canvas || !obj) return;
+    if (obj.isKnobLayer && obj.isKnobLayer()) {
+      this.showToast('Knob layers stay on top and cannot be reordered.');
+      return;
+    }
+
+    const currentZ =
+      obj.getZIndex?.() ?? canvas.getObjects().indexOf(obj);
+    const requested =
+      direction === 'up' ? currentZ + 1 : Math.max(0, currentZ - 1);
+    const nextZ = canvas.clampZBelowKnobs
+      ? canvas.clampZBelowKnobs(obj, requested)
+      : requested;
+
+    if (direction === 'up' && nextZ <= currentZ) {
+      this.showToast('Not possible to move above Overlay layer!');
+      return;
+    }
+    if (direction === 'down' && nextZ >= currentZ) {
+      this.showToast('Reached just above base, not moving further down.');
+      return;
+    }
+
+    canvas.setElementOptions({ z: nextZ }, obj);
+    obj.setCoords?.();
+    canvas.fire?.('object:modified', { target: obj });
+    canvas.fire?.('elementModify', { element: obj, options: { z: nextZ } });
+    canvas.requestRenderAll?.();
+
+    const layersMod = (
+      document.querySelector('fpd-module-manage-layers') as any
+    )?.fpdLayersModule;
+    layersMod?.rebuildList?.();
   }
 
   showToast(message: string = 'Copied successfully!') {

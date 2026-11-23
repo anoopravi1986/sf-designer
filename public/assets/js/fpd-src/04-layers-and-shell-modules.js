@@ -296,45 +296,24 @@
         }
       }
       function Qn (elementOnly) {
-        const elements = this.fpdInstance.getElements('all');
-        if (!Array.isArray(elements) || !elements.length) return;
-
-        if (elementOnly) {
-          // Fast path for a single newly added element: avoid tearing down
-          // and rebuilding every existing row, which is what made adding a
-          // new element (e.g. "Add Text") feel slow when there were many
-          // layers already on the canvas.
-          if (elementOnly.title === 'Overlay' && !elementOnly.checkEditable())
-            return
-          if (
-            this.listElem.querySelector(
-              '.fpd-list-row[id="' + elementOnly.id + '"]'
-            )
-          )
-            return
-          const elementTitle = elementOnly.title && elementOnly.title.trim()
-          // Texts / text groups may legitimately share a title (see below).
-          const isTextLikeOnly =
-            ('function' == typeof elementOnly.getType &&
-              'text' === elementOnly.getType()) ||
-            (elementOnly.isTextGroup && elementOnly.isTextGroup())
-          const isDuplicateTitle =
-            !isTextLikeOnly &&
-            elementTitle &&
-            elements.some(
-              el => el !== elementOnly && el?.title?.trim() === elementTitle
-            )
-          if (isDuplicateTitle) return
-          Wn(this, Yn, Kn).call(this, elementOnly)
-          return
+        const canvas =
+          this.fpdInstance.currentViewInstance &&
+          this.fpdInstance.currentViewInstance.fabricCanvas
+        // LYR-013/014: always rebuild from live canvas stacking (bottom→top)
+        // so the panel matches what is drawn. Fast-path prepend could leave
+        // a new photo above texts while knobs were missing from the list.
+        if (canvas && canvas.placeBelowKnobs && elementOnly) {
+          canvas.placeBelowKnobs(elementOnly)
+        } else if (canvas && canvas._bringToppedElementsToFront) {
+          canvas._bringToppedElementsToFront()
         }
 
-        // Move Base to index 0
-        const baseIndex = elements.findIndex(el => el?.title === 'Base')
-        if (baseIndex > 0) {
-          const [baseLayer] = elements.splice(baseIndex, 1)
-          elements.unshift(baseLayer)
-        }
+        // Prefer canvas objects (true z-order) over getElements(), which also
+        // deselects and can disagree with stacking after Move Up / drag.
+        let elements = canvas
+          ? canvas.getObjects().filter(o => o && !o._ignore)
+          : this.fpdInstance.getElements('all')
+        if (!Array.isArray(elements) || !elements.length) return
 
         // Hide repeated titles — product layers only. Customer texts (and
         // text groups) often share a title (a duplicated / pasted text keeps
@@ -354,6 +333,12 @@
             normalizedElements.push(el)
             return
           }
+          // Always keep knob / Overlay rows (LYR-013) even if a duplicate
+          // title filter would have dropped them.
+          if (el.isKnobLayer && el.isKnobLayer()) {
+            normalizedElements.push(el)
+            return
+          }
           const title = el?.title?.trim()
           if (title && seenTitles.has(title)) return
           if (title) seenTitles.add(title)
@@ -364,14 +349,11 @@
         this.listElem.innerHTML = ''
         // Guard falsy rows — bare `t.checkEditable()` crashed Layers when
         // a null/undefined entry slipped into normalizedElements (knob /
-        // chrome edge cases).
+        // chrome edge cases). Always render Overlay/knobs so the panel
+        // shows them on top (LYR-013); Kn() prepends so last=top.
         normalizedElements.forEach(t => {
           if (!t) return
-          if (t.title != 'Overlay') {
-            Wn(this, Yn, Kn).call(this, t)
-          } else {
-            t.checkEditable && t.checkEditable() && Wn(this, Yn, Kn).call(this, t)
-          }
+          Wn(this, Yn, Kn).call(this, t)
         }),
           Hn(this, Vn) && Hn(this, Vn).dispose(),
           (t = this),
@@ -396,14 +378,28 @@
               const e = this.fpdInstance.currentViewInstance.fabricCanvas,
                 i = e.getElementByID(t.id)
               if (!i || !i.getZIndex) return
+              // Knob layers are not reorderable — restore the list.
+              if (i.isKnobLayer && i.isKnobLayer()) {
+                Wn(this, Un, Qn).call(this)
+                return
+              }
               let n = this.listElem.querySelector('.fpd-sortable-closest'),
                 closest = n ? e.getElementByID(n.id) : null,
                 s = (closest && closest.getZIndex
                   ? closest
                   : i
                 ).getZIndex()
-              // setElementOptions clamps z against Base/Overlay
-              n || s++, e.setElementOptions({ z: s }, i)
+              // Dropping onto / above a knob keeps the item below knobs.
+              if (closest && closest.isKnobLayer && closest.isKnobLayer()) {
+                s = e.getLowestKnobIndex
+                  ? Math.max(0, e.getLowestKnobIndex() - 1)
+                  : s - 1
+              }
+              n || s++
+              // setElementOptions clamps z against Base + every Knob layer
+              e.setElementOptions({ z: s }, i)
+              // Refresh so the panel matches canvas stacking after the clamp.
+              Wn(this, Un, Qn).call(this)
             },
             onEnd: t => {
               window.onscroll = () => {}
@@ -530,7 +526,14 @@
           const t = document.createElement('span')
           ;(t.className = 'fpd-icon-add'), o.append(t)
         } else {
-          if (t.zChangeable) {
+          // Knob / Overlay layers stay on top — no drag handle (LYR-013).
+          const isKnob = t.isKnobLayer && t.isKnobLayer()
+          if (isKnob) {
+            t.zChangeable = !1
+            t.locked = !0
+            X(e, ['fpd-locked', 'fpd-knob-layer'])
+          }
+          if (t.zChangeable && !isKnob) {
             const t = document.createElement('span')
             ;(t.className = 'fpd-icon-reorder'), o.append(t)
           }

@@ -4882,31 +4882,154 @@
               this.renderAll()
           }
         }),
+        // ===== CUSTOM (StyleFlip): centralized layer order =================
+        // Priority (canvas bottom → top):
+        //   1. Base
+        //   2. Regular images / design elements (by add order)
+        //   3. Text / text groups (by add order) — never buried under a
+        //      newly added photo or element
+        //   4. Knob layers (Overlay / Group Text / Group Outline / topped
+        //      product chrome) — always on top
+        // Photos are NOT knobs. New knobs always rise to the top.
+        (St.fabric.Object.prototype.isKnobLayer = function () {
+          if (!this || this._ignore) return !1
+          const title = String(this.title || '').trim()
+          if (/^overlay$/i.test(title)) return !0
+          if (/^(group text\b|group outline\b)|knob/i.test(title)) return !0
+          if (this.topped && !this.isCustom) return !0
+          return !1
+        }),
+        (St.fabric.Object.prototype.isTextLikeLayer = function () {
+          if (!this || this._ignore) return !1
+          if (this.isTextGroup && this.isTextGroup()) return !0
+          return !!(this.getType && 'text' === this.getType())
+        }),
+        // Photos (Images / Pixabay / uploads) vs Elements (SVG / clipart).
+        // Photos must not cover Elements — same idea as not covering text.
+        (St.fabric.Object.prototype.isPhotoLayer = function () {
+          if (!this || this._ignore) return !1
+          if (this.isKnobLayer && this.isKnobLayer()) return !1
+          if (this.isTextLikeLayer && this.isTextLikeLayer()) return !1
+          if (this.title === 'Base' || this.adminLocked) return !1
+          if (this._layerKind === 'photo') return !0
+          if (this._layerKind === 'element') return !1
+          const src = String(this.source || '')
+          const clean = src.toLowerCase().split('?')[0]
+          if (!src || src.indexOf('<svg') !== -1 || /\.svg$/i.test(clean))
+            return !1
+          if (this.isSVG && this.isSVG()) return !1
+          if (
+            this.type &&
+            /^(group|path|circle|rect|polygon|polyline|ellipse|line)$/i.test(
+              this.type
+            ) &&
+            !(this.isTextGroup && this.isTextGroup())
+          )
+            return !1
+          if (
+            /pixabay\.com|picsum\.photos|data:image\/|blob:/i.test(src) ||
+            /\.(jpe?g|png|gif|webp|bmp)$/i.test(clean)
+          )
+            return !0
+          return 'image' === this.type
+        }),
+        (St.fabric.Object.prototype.isDesignElementLayer = function () {
+          if (!this || this._ignore) return !1
+          if (this.isKnobLayer && this.isKnobLayer()) return !1
+          if (this.isTextLikeLayer && this.isTextLikeLayer()) return !1
+          if (this.title === 'Base' || this.adminLocked) return !1
+          return !(this.isPhotoLayer && this.isPhotoLayer())
+        }),
+        (St.fabric.Canvas.prototype.getLowestKnobIndex = function () {
+          let min = -1
+          this.getObjects().forEach((o, i) => {
+            if (o && o.isKnobLayer && o.isKnobLayer()) {
+              if (min < 0 || i < min) min = i
+            }
+          })
+          return min
+        }),
+        (St.fabric.Canvas.prototype.clampZBelowKnobs = function (obj, z) {
+          if (!obj) return z
+          let out = Number(z)
+          if (isNaN(out) || out < 0) out = 0
+          if (obj.isKnobLayer && obj.isKnobLayer()) return out
+          const objects = this.getObjects()
+          const baseObj = objects.find(o => o && o.title === 'Base')
+          if (baseObj && obj !== baseObj) {
+            const baseZ = baseObj.getZIndex()
+            if (out <= baseZ) out = baseZ + 1
+          }
+          const knobZ = this.getLowestKnobIndex()
+          if (knobZ >= 0 && out >= knobZ) out = Math.max(0, knobZ - 1)
+          if (baseObj && obj !== baseObj) {
+            const baseZ = baseObj.getZIndex()
+            if (out <= baseZ) out = baseZ + 1
+          }
+          return out
+        }),
+        // Stamp when add is requested (before async image load) so a late
+        // photo keeps its place among images and cannot leap above text.
+        (St.fabric.Canvas.prototype._nextLayerAddedAt = 1),
+        (St.fabric.Canvas.prototype.stampLayerAddedAt = function (objOrParams) {
+          if (!objOrParams) return 0
+          if (objOrParams._layerAddedAt == null) {
+            objOrParams._layerAddedAt = this._nextLayerAddedAt++
+          }
+          return objOrParams._layerAddedAt
+        }),
+        (St.fabric.Canvas.prototype.normalizeLayerStack = function () {
+          const objs = this.getObjects().filter(o => o && !o._ignore)
+          if (!objs.length) return
+          const isKnob = o => o.isKnobLayer && o.isKnobLayer()
+          const isBase = o => o.title === 'Base' || !!o.adminLocked
+          const isText = o => o.isTextLikeLayer && o.isTextLikeLayer()
+          const isPhoto = o => o.isPhotoLayer && o.isPhotoLayer()
+          const byAdd = (a, b) =>
+            (a._layerAddedAt || 0) - (b._layerAddedAt || 0) ||
+            a.getZIndex() - b.getZIndex()
+          const bases = []
+          const knobs = []
+          const texts = []
+          const elements = []
+          const photos = []
+          objs.forEach(o => {
+            if (isKnob(o)) knobs.push(o)
+            else if (isBase(o)) bases.push(o)
+            else {
+              if (o._layerAddedAt == null) o._layerAddedAt = o.getZIndex()
+              if (isText(o)) texts.push(o)
+              else if (isPhoto(o)) photos.push(o)
+              else elements.push(o)
+            }
+          })
+          texts.sort(byAdd)
+          elements.sort(byAdd)
+          photos.sort(byAdd)
+          // Bottom → top: Base, photos, elements, texts, knobs.
+          // Photos never cover Elements or Text. Layers (top-first):
+          // Overlay → texts → elements → photos → Base.
+          const desired = bases.concat(photos, elements, texts, knobs)
+          desired.forEach((o, i) => {
+            if (this.getObjects().indexOf(o) !== i) this.moveTo(o, i)
+          })
+          this.currentBoundingObject &&
+            this.currentBoundingObject.bringToFront()
+          this.printingBoxObject && this.printingBoxObject.bringToFront()
+        }),
+        (St.fabric.Canvas.prototype.placeBelowKnobs = function (obj) {
+          if (obj) this.stampLayerAddedAt(obj)
+          // Full stack rules on every add / async image settle.
+          this.normalizeLayerStack()
+        }),
         (St.fabric.Canvas.prototype._bringToppedElementsToFront = function () {
-          // ===== CUSTOM (StyleFlip): only "Knob" layers are forced on top.
-          // This runs on every 'object:added', so whatever it brings to the
-          // front ends up above any newly added text / uploaded image. It
-          // used to do that for EVERY `topped` element - including design
-          // artwork that was saved with `topped: 1` (e.g. the "Custom Guitar
-          // Skins New" design's draggable, removable "Image" layer), so after
-          // opening such a design every new text/image landed BEHIND the
-          // artwork. Now only Knob layers - the locked product chrome drawn
-          // over the customer's design (Overlay = knobs/pickups/bezel,
-          // Group Text / Group Outline = printed labels and outlines) - are
-          // re-raised, keeping their relative order. Any other `topped`
-          // layer keeps its own position like a normal layer, so new
-          // elements go above it and below the Knob layers.
-          const isKnobLayer = o =>
-            !!o &&
-            !!o.topped &&
-            (/^(overlay|group text\b|group outline\b)|knob/i.test(
-              String(o.title || '').trim()
-            ) ||
-              (!o.isCustom && !!o.locked))
+          // Only re-raise knobs (and topped upload zones). Do NOT re-sort
+          // regulars here — Move Up / drag must keep a manual order until
+          // the next add triggers normalizeLayerStack.
           let t = this.getObjects(),
             e = []
           t.forEach(t => {
-            ;(isKnobLayer(t) ||
+            ;((t.isKnobLayer && t.isKnobLayer()) ||
               (t.uploadZone && this.viewOptions.uploadZonesTopped)) &&
               e.push(t)
           }),
@@ -5063,6 +5186,9 @@
                 lockScalingFlip: !0
               })),
             (c = z(r, c)),
+            // Stamp add-order before async image load so a slow photo cannot
+            // leap above texts clicked/typed after it (LYR-014).
+            this.stampLayerAddedAt(c),
             c.isCustom &&
               ('engraving' == W(this.viewOptions, 'industry.type') &&
                 (c.opacity = W(this.viewOptions, 'industry.opts.opacity', 0.5)),
@@ -5104,6 +5230,9 @@
               t
                 ? ((e.originParams = z(e, s)),
                   t.setOptions(e),
+                  // Keep the pre-load stamp on the fabric object itself.
+                  (t._layerAddedAt = e._layerAddedAt),
+                  (t._layerKind = e._layerKind),
                   n.add(t),
                   n.setElementOptions(e, t),
                   (t.originParams.angle = t.angle),
@@ -5231,6 +5360,7 @@
                 (this[
                   c.textPlaceholder ? 'textPlaceholder' : 'numberPlaceholder'
                 ] = u),
+              (u._layerAddedAt = c._layerAddedAt),
               this.add(u),
               this.setElementOptions(c, u),
               (u.originParams = z(u.toJSON(), u.originParams)),
@@ -5787,18 +5917,12 @@
             e.canvas &&
               t.z >= 0 &&
               (() => {
-                let z = t.z
-                const objects = e.canvas.getObjects()
-                const baseObj = objects.find(o => o.title === 'Base')
-                const overlayObj = objects.find(o => o.title === 'Overlay')
-                if (baseObj && e !== baseObj) {
-                  const baseZ = baseObj.getZIndex()
-                  if (z <= baseZ) z = baseZ + 1
-                }
-                if (overlayObj && e !== overlayObj) {
-                  const overlayZ = overlayObj.getZIndex()
-                  if (z >= overlayZ) z = overlayZ - 1
-                }
+                // Clamp against Base and every Knob layer (not only a layer
+                // titled Overlay), then re-raise knobs so Move Up / Layers
+                // drag cannot put regular content above them.
+                const z = e.canvas.clampZBelowKnobs
+                  ? e.canvas.clampZBelowKnobs(e, t.z)
+                  : t.z
                 e.moveTo(z)
                 this._bringToppedElementsToFront()
               })(),
@@ -6242,14 +6366,17 @@
                 this.changePrice(i, '+');
               }
 
-              // **Keep base locked layer always at the bottom**
-              const baseLayer = this.fabricCanvas.getObjects().find(obj => obj.adminLocked === 1);
+              // Keep Base at the bottom. Do NOT bring the new object to the
+              // absolute front — that put text/photos above Knob/Overlay
+              // layers (LYR-013/014). Place it under knobs instead.
+              const baseLayer = this.fabricCanvas.getObjects().find(obj => obj.adminLocked === 1 || obj.title === 'Base');
               if (baseLayer) {
                 this.fabricCanvas.sendToBack(baseLayer);
-                // Make sure newly added object is above the base layer
-                if (e !== baseLayer) {
-                  this.fabricCanvas.bringToFront(e);
-                }
+              }
+              if (e !== baseLayer && this.fabricCanvas.placeBelowKnobs) {
+                this.fabricCanvas.placeBelowKnobs(e);
+              } else if (this.fabricCanvas._bringToppedElementsToFront) {
+                this.fabricCanvas._bringToppedElementsToFront();
               }
             },
 

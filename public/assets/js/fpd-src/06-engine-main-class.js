@@ -1295,6 +1295,23 @@
               },
               i
             )),
+            // Stamp before the image URL finishes loading so later Add Text
+            // clicks stay above this photo when it finally lands (LYR-014).
+            this.currentViewInstance.fabricCanvas.stampLayerAddedAt(i),
+            // Tag photo vs element for stack tiers (photos must not cover
+            // Elements clipart / SVGs).
+            (() => {
+              if (i._layerKind) return
+              const src = String(t || '')
+              const clean = src.toLowerCase().split('?')[0]
+              const isSvg =
+                -1 !== src.indexOf('<svg') || /\.svg$/i.test(clean)
+              const isRaster =
+                !isSvg &&
+                (/pixabay\.com|picsum\.photos|data:image\/|blob:/i.test(src) ||
+                  /\.(jpe?g|png|gif|webp|bmp)$/i.test(clean))
+              i._layerKind = isRaster ? 'photo' : 'element'
+            })(),
             document.querySelector('.fpd-ungroup1')?.classList.add('fpd-hidden'),
             (i.isCustom = !0),
             this.currentViewInstance.currentUploadZone &&
