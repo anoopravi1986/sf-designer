@@ -1,0 +1,51 @@
+/*
+  Base layer — Color + Opacity only (mobile and desktop).
+
+  Scope: ONLY the `fpd-bl-toolbar` class, which the toolbar render in
+  fpd-src/05-element-toolbar-interactions.js sets while the selected
+  element's title is 'Base' and removes for every other element. No other
+  editor or layer gets this class, so these rules never reach them.
+
+  Keeps:  #fpd-opacity-btn + #fpd-opacity-panel (Opacity) and
+          .fpd-primary-tools > .fpd-tool-color (Color), plus the close "x".
+  Hides:  Transform, Move Up/Down, Copy/Paste, Reset, Duplicate, Delete,
+          Position, Effects and anything else in the secondary row.
+
+  Specificity: fpd-base-layer-toolbar.css forces #SecondaryIconBoxHeader
+  (and its tools) to display:flex !important with selectors worth
+  (1 id, 6 classes). The doubled ID below (2 ids) outranks those, so the
+  hide wins on desktop and mobile without editing that file.
+
+  The sub-panels (.fpd-sub-panel) are not touched, so the Color and
+  Opacity panels open and work exactly as before.
+  Does NOT modify styles.scss or any existing stylesheet; new file only.
+*/
+
+/* Whole secondary row: Transform, Move Up/Down, Copy/Paste, Reset,
+   Duplicate, Delete, etc. */
+fpd-element-toolbar.fpd-bl-toolbar .fpd-tools-nav #SecondaryIconBoxHeader#SecondaryIconBoxHeader {
+  display: none !important;
+}
+
+/* Primary row: only Color stays (font / text-size / text tools hidden). */
+fpd-element-toolbar.fpd-bl-toolbar
+  .fpd-tools-nav
+  > .fpd-primary-tools
+  > :not(.fpd-tool-color):not(#fpd-opacity-btn) {
+  display: none !important;
+}
+
+/* Desktop: the vendor gives every smart toolbar min-width: 300px, so with
+   only Color + Opacity left the white bar kept an empty gap before the
+   close "x". Let the Base bar shrink to its content (styles.scss already
+   sets width: max-content). Mobile stays full-width as before. */
+body fpd-element-toolbar.fpd-smart.fpd-layout-large.fpd-bl-toolbar:not(.fpd-layout-small) {
+  min-width: 0 !important;
+}
+
+/* Anything else placed straight in the tools row. */
+fpd-element-toolbar.fpd-bl-toolbar
+  .fpd-tools-nav
+  > :not(#fpd-opacity-btn):not(#fpd-opacity-panel):not(.fpd-primary-tools):not(#SecondaryIconBoxHeader) {
+  display: none !important;
+}
