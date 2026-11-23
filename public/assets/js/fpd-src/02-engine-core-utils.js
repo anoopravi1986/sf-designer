@@ -4240,14 +4240,31 @@
             'selection:created': t => {
               let { selected: e } = t
               1 == e.length ? this._onSelected(e[0]) : this._onMultiSelected(e)
+              // Shift-click reports only the newly added text (length 1), so
+              // the branch above treats a real multi-selection as one text.
+              // Group from the active object, which is the ActiveSelection.
+              this._maybeGroupTextSelection()
             },
             'selection:updated': t => {
               let { selected: e } = t
               1 == e.length ? this._onSelected(e[0]) : this._onMultiSelected(e)
+              this._maybeGroupTextSelection()
             },
             'mouse:down': t => {
               ;
-              if(t.target && t.target.text){
+              // A click on grouped text used to see `.text` on a child and
+              // hide Ungroup. A text group (or a child inside one) keeps Ungroup.
+              const tgt = t.target
+              const textGroupClick =
+                tgt &&
+                ((tgt.isTextGroup && tgt.isTextGroup()) ||
+                  (tgt.group &&
+                    tgt.group.isTextGroup &&
+                    tgt.group.isTextGroup()))
+              if (textGroupClick) {
+                document.querySelector('.fpd-ungroup1')?.classList.remove('fpd-hidden')
+                document.querySelector('.fpd-ungroup')?.classList.add('fpd-hidden')
+              } else if (tgt && tgt.text) {
                 document.querySelector('.fpd-ungroup1')?.classList.add('fpd-hidden');
                 document.querySelector('.fpd-ungroup')?.classList.remove('fpd-hidden');
               }
@@ -4632,6 +4649,42 @@
             }),
             e.setControlsVisibility({ tr: !1, tl: !1, mtr: !1 }),
             this.fire('multiSelect', { activeSelection: e }))
+        }),
+        // Desktop only. A shift-click of two texts stays an activeSelection:
+        // the text toolbar then edits one text, Layers lists both separately,
+        // and Ungroup stays hidden. Mobile keeps that selection until its
+        // Group tile is tapped. Reuse the Group button so the result is the
+        // same Group Text the tile already creates.
+        (St.fabric.Canvas.prototype._maybeGroupTextSelection = function () {
+          if (
+            typeof window === 'undefined' ||
+            !window.matchMedia ||
+            !window.matchMedia('(min-width: 991px)').matches
+          )
+            return
+          const sel = this.getActiveObject()
+          const objs =
+            sel && sel.type === 'activeSelection' ? sel._objects || [] : []
+          if (
+            objs.length < 2 ||
+            !objs.every(o => o && o.getType && 'text' === o.getType())
+          )
+            return
+          const canvas = this
+          setTimeout(() => {
+            const cur = canvas.getActiveObject()
+            if (!cur || cur.type !== 'activeSelection') return
+            const still = cur._objects || []
+            if (
+              still.length < 2 ||
+              !still.every(o => o && o.getType && 'text' === o.getType())
+            )
+              return
+            const btn = document.querySelector(
+              'fpd-element-toolbar .fpd-ungroup'
+            )
+            btn && btn.click()
+          }, 0)
         }),
         (St.fabric.Canvas.prototype._renderElementBoundingBox = function (t) {
           var e = this
@@ -5335,9 +5388,78 @@
             return !1
           'string' == typeof e && (e = this.getElementByTitle(e))
           const i = e.getType()
+          // ===== CUSTOM (StyleFlip): grouped text (Group Text N) ============
+          // A text group is a fabric.Group, so text options (font, size,
+          // bold, italic, underline, spacing, stroke…) set on it did nothing
+          // visible. Apply them to every child text, then refit the group.
+          // The keys stay on `t`, so the group keeps mirror values that the
+          // toolbar reads for its active states (e.g. obj.fontWeight).
+          if (e.isTextGroup && e.isTextGroup()) {
+            const tgOpts = {}
+            ;[
+              'fontFamily',
+              'fontSize',
+              'fontWeight',
+              'fontStyle',
+              'underline',
+              'textDecoration',
+              'linethrough',
+              'overline',
+              'textAlign',
+              'lineHeight',
+              'letterSpacing',
+              'charSpacing',
+              'stroke',
+              'strokeWidth',
+              'textTransform'
+            ].forEach(k => {
+              t.hasOwnProperty(k) && (tgOpts[k] = t[k])
+            })
+            if (Object.keys(tgOpts).length) {
+              tgOpts.hasOwnProperty('textDecoration') &&
+                ((tgOpts.underline = 'underline' === tgOpts.textDecoration),
+                delete tgOpts.textDecoration)
+              tgOpts.hasOwnProperty('letterSpacing') &&
+                ((tgOpts.charSpacing = 100 * Number(tgOpts.letterSpacing)),
+                delete tgOpts.letterSpacing)
+              tgOpts.hasOwnProperty('strokeWidth') &&
+                Number(tgOpts.strokeWidth) > 5 &&
+                (tgOpts.strokeWidth = 5)
+              e.getObjects().forEach(c => {
+                const o = Object.assign({}, tgOpts)
+                if (o.hasOwnProperty('fontSize')) {
+                  let fs = Number(o.fontSize) || c.fontSize
+                  c.minFontSize && fs < c.minFontSize && (fs = c.minFontSize)
+                  c.maxFontSize && fs > c.maxFontSize && (fs = c.maxFontSize)
+                  o.fontSize = fs
+                }
+                if (o.hasOwnProperty('textTransform')) {
+                  let txt = String(c.text || '')
+                  'uppercase' === o.textTransform
+                    ? (txt = txt.toUpperCase())
+                    : 'lowercase' === o.textTransform && (txt = txt.toLowerCase())
+                  o.text = txt
+                }
+                c.set(o)
+                c.initDimensions && c.initDimensions()
+                c.dirty = !0
+              })
+              // Refit the group box around the resized children.
+              e.addWithUpdate()
+              e.setCoords()
+              e.dirty = !0
+            }
+            // Group-level stroke would widen the group's own box.
+            delete t.stroke
+            delete t.strokeWidth
+          }
           if (
             (void 0 !== t.scale && (t.scaleX = t.scaleY = Number(t.scale)),
             'image' == i &&
+              // Grouped text reports getType() 'image' but is not a freshly
+              // added image: the fit-to-box below computed scale NaN for it
+              // on its first edit (e.g. first colour change).
+              !(e.isTextGroup && e.isTextGroup()) &&
               !e._isInitial &&
               !e._optionsSet &&
               !e._addToUZ &&
@@ -5534,10 +5656,22 @@
             t.hasOwnProperty('shadowOffsetX') ||
             (t.hasOwnProperty('shadowOffsetY') && !e.neonText)
           )
-            if (null === t.shadowColor) e.set('shadow', null)
-            else {
+            if (null === t.shadowColor) {
+              e.set('shadow', null)
+              // Grouped text: children carry their own shadow too (see below).
+              e.isTextGroup &&
+                e.isTextGroup() &&
+                e.getObjects().forEach(c => {
+                  c.set('shadow', null), (c.dirty = !0)
+                }),
+                (e.dirty = !0)
+            } else {
               let i = {}
-              e.shadow && (i = e.shadow.toObject())
+              // Grouped text keeps its shadow on the child texts (see below),
+              // so read the current values from the first child.
+              const tgShadow = Boolean(e.isTextGroup && e.isTextGroup())
+              const shadowSrc = tgShadow ? e.getObjects()[0] : e
+              shadowSrc && shadowSrc.shadow && (i = shadowSrc.shadow.toObject())
               // Blur/offset alone used to build a shadow with undefined color,
               // so Fabric drew nothing — default color/offsets so Blur works.
               let n = {
@@ -5560,7 +5694,21 @@
                     ? i.offsetY
                     : 0
               }
-              e.set('shadow', n)
+              if (tgShadow) {
+                // Grouped text (Group Text N): every child text already has
+                // its own empty shadow (color '', blur 0) from FPD's text
+                // defaults. When fabric draws the group, each child's
+                // _setShadow replaced the group's ctx shadow with that empty
+                // one, so Blur / Offset X / Offset Y had no visible effect.
+                // Put the shadow on each child (own instance) instead, and
+                // keep none on the group itself so a cached group can never
+                // draw it twice.
+                e.getObjects().forEach(c => {
+                  c.set('shadow', Object.assign({}, n)), (c.dirty = !0)
+                })
+                e.set('shadow', null)
+                e.dirty = !0
+              } else e.set('shadow', n)
             }
           // Stroke Width on text: high values (vendor max 20) merge glyphs into
           // a solid blob. Cap for text so Width stays a readable outline.

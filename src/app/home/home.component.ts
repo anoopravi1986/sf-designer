@@ -1716,11 +1716,12 @@ export class HomeComponent implements AfterViewInit {
     if (targetElement4) {
       targetElement4.addEventListener('click', () => {
         const obj = this.designer.currentViewInstance.fabricCanvas.getActiveObject();
-        if (!obj || !obj.text) return;
+        const grouped = Boolean(obj && obj.isTextGroup && obj.isTextGroup());
+        if (!obj || (!obj.text && !grouped)) return;
 
         const spanIcon = targetElement4.querySelector('span');
-
-        const current = obj.textTransform || 'none';
+        const source = grouped ? obj.getObjects()[0] || obj : obj;
+        const current = source.textTransform || 'none';
         const next = current === 'none' ? 'uppercase' : current === 'uppercase' ? 'lowercase' : 'none';
 
         this.designer.currentViewInstance.fabricCanvas.setElementOptions({
@@ -3417,11 +3418,13 @@ export class HomeComponent implements AfterViewInit {
           e.stopPropagation();
           const canvas = getCanvas();
           const obj = getObj();
-          if (!canvas || !obj || obj.text == null) return;
+          const grouped = Boolean(obj && obj.isTextGroup && obj.isTextGroup());
+          if (!canvas || !obj || (obj.text == null && !grouped)) return;
           const spanIcon = textTransform.querySelector(
             'span:not(.fpd-label):not(.fpd-ate-tool-caption)'
           );
-          const current = obj.textTransform || 'none';
+          const source = grouped ? obj.getObjects()[0] || obj : obj;
+          const current = source.textTransform || 'none';
           const next =
             current === 'none'
               ? 'uppercase'
@@ -3626,11 +3629,13 @@ export class HomeComponent implements AfterViewInit {
           e.stopPropagation();
           const canvas = getCanvas();
           const obj = getObj();
-          if (!canvas || !obj || obj.text == null) return;
+          const grouped = Boolean(obj && obj.isTextGroup && obj.isTextGroup());
+          if (!canvas || !obj || (obj.text == null && !grouped)) return;
           const spanIcon = textTransform.querySelector(
             'span:not(.fpd-ate-tool-caption):not(.fpd-label)'
           );
-          const current = obj.textTransform || 'none';
+          const source = grouped ? obj.getObjects()[0] || obj : obj;
+          const current = source.textTransform || 'none';
           const next =
             current === 'none'
               ? 'uppercase'

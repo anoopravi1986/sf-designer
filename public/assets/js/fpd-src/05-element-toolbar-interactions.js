@@ -239,6 +239,42 @@
               }
             });
           }
+          // ===== CUSTOM (StyleFlip): Ctrl/Cmd+G groups the selected texts,
+          // Ctrl/Cmd+Shift+G ungroups a text group. There was no shortcut,
+          // so Ctrl+G left a plain multi-selection (not a group) and every
+          // edit hit only one text. Reuses the toolbar's own Group / Ungroup
+          // handlers (.fpd-ungroup / .fpd-ungroup1) so behaviour is identical.
+          if (!ma._groupShortcutBound) {
+            ma._groupShortcutBound = true;
+            document.addEventListener('keydown', ev => {
+              if (!(ev.ctrlKey || ev.metaKey)) return;
+              const key = ev.key ? ev.key.toLowerCase() : '';
+              if (key !== 'g') return;
+              const target = ev.target;
+              const tag = target && target.nodeName;
+              if (
+                tag === 'INPUT' ||
+                tag === 'TEXTAREA' ||
+                (target && target.isContentEditable)
+              )
+                return;
+              const fabricCanvas = this.fpdInstance.currentViewInstance?.fabricCanvas;
+              const active = fabricCanvas && fabricCanvas.getActiveObject();
+              if (!active) return;
+              if (!ev.shiftKey && active.type === 'activeSelection') {
+                ev.preventDefault();
+                this.navElem.querySelector('.fpd-ungroup')?.click();
+              } else if (
+                ev.shiftKey &&
+                active.type === 'group' &&
+                active.isTextGroup &&
+                active.isTextGroup()
+              ) {
+                ev.preventDefault();
+                this.navElem.querySelector('.fpd-ungroup1')?.click();
+              }
+            });
+          }
           const r = this.subPanel.querySelector('.fpd-tool-crop-masks')
           Array.isArray(t.mainOptions.cropMasks) &&
             t.mainOptions.cropMasks.forEach(e => {
@@ -875,6 +911,13 @@
   fabricCanvas.setActiveObject(group);
 
   // --- GROUP CONFIG (NO AUTO CENTER, NO CLIPPING) ---
+  // groupCounter is local (always 1), so every group was "Group Text 1";
+  // Layers de-duplicates by title and hid the 2nd group's row. Use the
+  // next free number on the canvas instead.
+  fabricCanvas.getObjects().forEach(o => {
+    const m = /^Group Text (\d+)$/.exec(String(o.title || ''));
+    if (m) groupCounter = Math.max(groupCounter, Number(m[1]) + 1);
+  });
   const groupTitle = `Group Text ${groupCounter++}`;
   const groupId = 'group_' + Date.now();
 
@@ -903,6 +946,9 @@
     objectCaching: false
   });
 
+  // Per-group copy of the text props for Ungroup (see .fpd-ungroup1).
+  group.__savedTextProps = savedPropsArray;
+
   // ✅ RESTORE EXACT POSITION
   group.setPositionByOrigin(centerPoint, 'center', 'center');
 
@@ -927,6 +973,14 @@
   document.querySelector('.fpd-group-paste-by')?.classList.remove('fpd-hidden');
   document.querySelector('.fpd-tool-text-format')?.classList.add('fpd-hidden');
   document.querySelector('.fpd-tool-curved-text')?.classList.add('fpd-hidden');
+  // Desktop: stay on the group and let the text toolbar render Ungroup.
+  // The old tail marked the bar as an image, hid it, and dropped the
+  // selection, so Ungroup never appeared. Mobile keeps that tail.
+  if (window.matchMedia('(min-width: 991px)').matches) {
+    fabricCanvas.discardActiveObject();
+    fabricCanvas.setActiveObject(group);
+    fabricCanvas.requestRenderAll();
+  } else {
   const toolbarEl = document.querySelector('fpd-element-toolbar');
     if (toolbarEl) {
       toolbarEl.setAttribute('data-fabric-type', 'group');
@@ -942,6 +996,7 @@
     });
   }
   fabricCanvas.discardActiveObject();
+  }
 
   ;
 });
@@ -990,6 +1045,23 @@ function showToast(message, duration = 3000) {
 
 function updateFPDLayersToSingleGroup(group) {
   ;
+  // Preferred: rebuild Layers with FPD's own rows. The grouped texts are no
+  // longer canvas objects, so their rows drop out, and the group gets the
+  // native row — incl. the Color dot / picker (isTextGroup() makes it
+  // colorizable), which the hand-built row below never had.
+  const layerModules = Array.from(
+    document.querySelectorAll('fpd-module-manage-layers')
+  )
+    .map(el => el.fpdLayersModule)
+    .filter(m => m && typeof m.rebuildList === 'function');
+  if (layerModules.length) {
+    try {
+      layerModules.forEach(m => m.rebuildList());
+      return;
+    } catch (err) {
+      console.warn('[Group Text] native Layers rebuild failed, using fallback', err);
+    }
+  }
   const layersList = document.querySelector(
     'fpd-module-manage-layers .fpd-list'
   );
@@ -1398,82 +1470,99 @@ function updateFPDLayersToSingleGroup(group) {
             const savedGroupTransform = groupTransforms[canvastitle] || null;
             ;
 
-            // Load saved props array for text objects
-            const savedPropsArray = JSON.parse(localStorage.getItem('propstext') || '[]');
-            if (!Array.isArray(savedPropsArray) || savedPropsArray.length === 0) {
-              console.warn('No saved props found.');
-              return;
+            // Load saved props array for text objects.
+            // Prefer the props stored on THIS group: 'propstext' only holds
+            // the most recently grouped set, so with 2+ groups the wrong
+            // fonts/sizes were restored. If neither exists (e.g. after a
+            // reload) build them from the children — returning here used to
+            // leave the group removed and its texts gone.
+            let savedPropsArray = Array.isArray(activeObj.__savedTextProps)
+              ? activeObj.__savedTextProps
+              : JSON.parse(localStorage.getItem('propstext') || '[]');
+            if (
+              !Array.isArray(savedPropsArray) ||
+              savedPropsArray.length !== activeObj._objects.length
+            ) {
+              savedPropsArray = activeObj._objects.map(obj => ({
+                text: obj.text,
+                font: obj.fontFamily,
+                textSize: obj.fontSize,
+                colors: obj.fill,
+                curvable: obj.curvable ?? 1,
+                curved: obj.curved ?? false,
+                curveSpacing: obj.curveSpacing ?? 0,
+                curveRadius: obj.curveRadius ?? 0,
+                curveReverse: obj.curveReverse ?? false,
+                textAlign: obj.textAlign,
+                fontWeight: obj.fontWeight || 'normal',
+                underline: obj.underline || false,
+                textTransform: obj.textTransform || 'none'
+              }));
             }
 
-            // Loop through each object in group
-            // Track last placed object's top + font size
-            let lastTop = null;
-            let lastFontSize = null;
-
+            // Re-create every text from its LIVE state inside the group.
+            // _restoreObjectsState() above already turned each child's
+            // group-relative transform into an absolute one, so each text
+            // comes back exactly where it was (position, scale, angle, flip)
+            // with whatever was changed while grouped (colour, font, size,
+            // bold / italic / underline, spacing, stroke, shadow, opacity).
+            // The old code stacked every text below the first one and only
+            // restored the props captured at grouping time.
+            const groupOpacity = activeObj.opacity == null ? 1 : activeObj.opacity;
             activeObj._objects.forEach((obj, index) => {
               ;
-              const props = savedPropsArray[index];
-              if (!props) return;
+              const props = savedPropsArray[index] || {};
+              const objectText = obj.text != null ? String(obj.text) : (props.text || '');
+              if (!objectText.trim()) return;
 
-              const objectText = obj.text?.trim() || '';
-              const savedTitle = props.title?.trim() || '';
+              const title = (obj.title && String(obj.title).trim()) || objectText.trim();
+              const center = obj.getCenterPoint();
+              const elementType = obj.curved || props.curved ? 'curvedText' : 'text';
+              const shadowOpts =
+                obj.shadow && obj.shadow.color
+                  ? {
+                      shadowColor: obj.shadow.color,
+                      shadowBlur: obj.shadow.blur || 0,
+                      shadowOffsetX: obj.shadow.offsetX || 0,
+                      shadowOffsetY: obj.shadow.offsetY || 0
+                    }
+                  : {};
 
-              // Match by title if available
-              if (savedTitle && objectText !== savedTitle) {
-                console.warn(
-                  `Skipping restore at index ${index} due to title mismatch: "${objectText}" !== "${savedTitle}"`
-                );
-                return;
-              }
-
-              // ✅ Apply group transform if available, otherwise fallback
-              let scaleX, scaleY, flipX, flipY, left, top;
-
-              if (savedGroupTransform) {
-                ;
-                // let topvalueforgroup = window.localStorage.getItem('topvalueforgroup')
-                left = savedGroupTransform.left ?? 500;
-                top =  savedGroupTransform.top ?? 500;
-                scaleX = savedGroupTransform.scaleX ??  1;
-                scaleY = savedGroupTransform.scaleY ??  1;
-                flipX  = savedGroupTransform.flipX ?? obj.flipX ?? props.flipX ?? false;
-                flipY  = savedGroupTransform.flipY ?? obj.flipY ?? props.flipY ?? false;
-              } else {
-                ;
-                top = obj.top || 500;
-                left = obj.left || 500;
-                scaleX = obj.scaleX  || 1;
-                scaleY = obj.scaleY || 1;
-                flipX  = obj.flipX || props.flipX || false;
-                flipY  = obj.flipY || props.flipY || false;
-                ;
-              }
-              ;
-              // 👉 If not the first object, adjust top relative to previous object
-              if (index > 0 && lastTop !== null && lastFontSize !== null) {
-                top = lastTop + lastFontSize; // place it below previous
-              }
-
-              const fontSize = props.textSize || obj.fontSize || 120;
-              const elementType = props.curved ? 'curvedText' : 'text';
-              ;
-              const restoredText = t.currentViewInstance.fabricCanvas.addElement(
+              t.currentViewInstance.fabricCanvas.addElement(
                 elementType,
-                savedTitle || objectText, // title
-                objectText,               // actual text
+                objectText,
+                title,
                 {
-                  ...props,
-
+                  ...(Array.isArray(obj.colors) || typeof obj.colors === 'boolean' || typeof obj.colors === 'number'
+                    ? { colors: obj.colors }
+                    : {}),
                   originX: 'center',
                   originY: 'center',
-                  textAlign: 'center',
+                  left: center.x,
+                  top: center.y,
+                  scaleX: obj.scaleX || 1,
+                  scaleY: obj.scaleY || 1,
+                  angle: obj.angle || 0,
+                  flipX: Boolean(obj.flipX),
+                  flipY: Boolean(obj.flipY),
 
-                  fill: props.colors || obj.fill || '#252525',
-                  fontFamily: props.font || obj.fontFamily || 'Arial',
-                  fontSize,
-                  fontWeight: props.fontWeight || obj.fontWeight || 'bold',
-                  underline: props.underline ?? obj.underline ?? false,
-                  textTransform: props.textTransform || obj.textTransform || 'capitalize',
+                  fill: obj.fill || props.colors || '#252525',
+                  fontFamily: obj.fontFamily || props.font || 'Arial',
+                  fontSize: obj.fontSize || props.textSize || 120,
+                  fontWeight: obj.fontWeight || props.fontWeight || 'normal',
+                  fontStyle: obj.fontStyle || 'normal',
+                  underline: Boolean(obj.underline ?? props.underline),
+                  // FPD's text defaults carry textDecoration:'normal', which
+                  // setElementOptions turns back into underline:false.
+                  textDecoration: (obj.underline ?? props.underline) ? 'underline' : 'normal',
+                  textAlign: obj.textAlign || props.textAlign || 'center',
+                  lineHeight: obj.lineHeight || 1,
+                  letterSpacing: obj.charSpacing ? obj.charSpacing / 100 : 0,
+                  textTransform: obj.textTransform || props.textTransform || 'none',
+                  stroke: obj.stroke || null,
+                  strokeWidth: obj.strokeWidth || 0,
+                  opacity: (obj.opacity == null ? 1 : obj.opacity) * groupOpacity,
+                  ...shadowOpts,
 
                   editable: true,
                   selectable: true,
@@ -1481,36 +1570,41 @@ function updateFPDLayersToSingleGroup(group) {
                   evented: true,
                   removable: true,
 
-                  scaleX,
-                  scaleY,
-                  flipX,
-                  flipY,
-                  top,
-                  left,
-
-                  curvable: 1,
-                  curved: props.curved || false,
-                  curveSpacing: props.curveSpacing || 0,
-                  curveRadius: props.curveRadius || 0,
-                  curveReverse: props.curveReverse || false,
+                  curvable: obj.curvable ?? props.curvable ?? 1,
+                  curved: Boolean(obj.curved ?? props.curved),
+                  curveSpacing: obj.curveSpacing ?? props.curveSpacing ?? 0,
+                  curveRadius: obj.curveRadius ?? props.curveRadius ?? 0,
+                  curveReverse: Boolean(obj.curveReverse ?? props.curveReverse),
 
                   draggable: 1,
                   rotatable: 1,
                   resizable: 1,
-                  autoSelect: 1,
+                  autoSelect: 0,
                   autoCenter: 0,
-                  opacity: 1,
-                  angle: obj.angle || 0,
                   locked: 0,
                   z: 1,
                   boundingBox: 'Base'
                 }
               );
-
-              // Save for next loop
-              lastTop = top;
-              lastFontSize = fontSize;
             });
+
+            // addElement ids are Date.now() — texts restored in the same
+            // millisecond shared one id, so Layers (and getElementByID) only
+            // saw one of them. Make them unique before Layers is rebuilt.
+            {
+              const seenIds = new Set();
+              canvas.getObjects().forEach((o, n) => {
+                if (o.id == null) return;
+                let id = String(o.id);
+                if (seenIds.has(id)) {
+                  let k = 1;
+                  while (seenIds.has(id + '_' + k)) k++;
+                  id = id + '_' + k;
+                  o.id = id;
+                }
+                seenIds.add(id);
+              });
+            }
 
 
             canvas.discardActiveObject();
@@ -1522,6 +1616,16 @@ function updateFPDLayersToSingleGroup(group) {
             }
 
             ;
+            // canvas.remove() fires no elementRemove, so the group's Layers
+            // row stayed behind after ungrouping. Rebuild from the canvas.
+            document
+              .querySelectorAll('fpd-module-manage-layers')
+              .forEach(el => {
+                const m = el.fpdLayersModule;
+                if (m && typeof m.rebuildList === 'function') {
+                  try { m.rebuildList(); } catch (err) { console.warn(err); }
+                }
+              });
             document.querySelector('.fpd-ungroup1')?.classList.add('fpd-hidden');
             document.querySelector('.fpd-ungroup')?.classList.remove('fpd-hidden');
             document.querySelector('.fpd-group-copy-by')?.classList.add('fpd-hidden');
@@ -1825,16 +1929,55 @@ function updateFPDLayersToSingleGroup(group) {
       function Ia (t) {
         return t && !t._ignore && !t.uploadZone
       }
+      // CUSTOM (StyleFlip): grouped text — mirror the first child's text
+      // values onto the group so the Text Editor controls (font, size, B/I/U,
+      // shadow sliders) show the real state. setElementOptions applies any
+      // change to every child (see part 2, "grouped text").
+      function syncTextGroupMirror (t) {
+        if (!(t && t.isTextGroup && t.isTextGroup())) return
+        const c = t.getObjects()[0]
+        if (!c) return
+        ;[
+          'fontFamily',
+          'fontSize',
+          'fontWeight',
+          'fontStyle',
+          'underline',
+          'textAlign',
+          'lineHeight',
+          'minFontSize',
+          'maxFontSize'
+        ].forEach(k => {
+          void 0 !== c[k] && (t[k] = c[k])
+        })
+        t.letterSpacing = c.charSpacing ? c.charSpacing / 100 : 0
+        t.textDecoration = c.underline ? 'underline' : 'normal'
+        // A group has no textTransform of its own. Leaving it undefined made
+        // the toolbar set the Text Transform icon's class to "undefined",
+        // which removed the glyph on desktop and mobile.
+        t.textTransform = c.textTransform || 'none'
+        const sh = c.shadow && c.shadow.color ? c.shadow : null
+        t.shadowColor = sh ? sh.color : ''
+        t.shadowBlur = sh ? sh.blur || 0 : 0
+        t.shadowOffsetX = sh ? sh.offsetX || 0 : 0
+        t.shadowOffsetY = sh ? sh.offsetY || 0 : 0
+      }
       function Oa (t) {
         let e
         try {
+        syncTextGroupMirror(t)
         if (
           (Kr(this, ga, _a).call(this),
           Z(this.container, ['fpd-type-image']),
           t.hasColorSelection())
         ) {
-          let i = rt(t, this.fpdInstance)
-          if ('group' === t.type && t.getObjects().length > 1) {
+          // Grouped text: ONE colour for every text in the group (the per-
+          // child swatch picker only recoloured the clicked text).
+          const tgColor = Boolean(
+            t.isTextGroup && t.isTextGroup() && !Array.isArray(t.colors)
+          )
+          let i = tgColor ? [at(t) || '#000000'] : rt(t, this.fpdInstance)
+          if ('group' === t.type && t.getObjects().length > 1 && !tgColor) {
             const n = Array.isArray(t.colors) && t.colors.length > 1
             e = Ln({
               colors: i,
@@ -1854,7 +1997,7 @@ function updateFPDLayersToSingleGroup(group) {
             })
           } else
             e = Bn(this.fpdInstance, {
-              initialColor: t.fill,
+              initialColor: tgColor ? i[0] : t.fill,
               colors: i,
               patterns:
                 Array.isArray(t.patterns) &&
@@ -2099,6 +2242,43 @@ function updateFPDLayersToSingleGroup(group) {
           // selected, so fpd-base-layer-toolbar.css styles only that toolbar
           // and never the regular Element Editor.
           J(this.container, ['fpd-bl-toolbar'], t.title === 'Base')
+          // ===== CUSTOM (StyleFlip): grouped text (Group Text N) ===========
+          // Ungroup / Copy / Paste visibility was only synced on canvas
+          // mouse:down, so re-selecting a text group any other way (Layers
+          // row, programmatic select, touch on mobile) left Ungroup hidden
+          // and the group could not be split again. Sync it on every render
+          // and stamp fpd-tg-toolbar so fpd-text-group-toolbar.css can beat
+          // the `.notgroup … .fpd-ungroup1 { display:none }` rule. Only text
+          // groups are touched; plain text / images keep their old flow.
+          const isTextGrp = Boolean(t.isTextGroup && t.isTextGroup())
+          J(this.container, ['fpd-tg-toolbar'], isTextGrp)
+          // Ungroup stays in #SecondaryIconBoxHeader, in the same slot the
+          // Group button uses for a single text. Moving it into the
+          // Bold/Italic/Underline row widened that section and left a gap
+          // before the action icons. Mobile already uses this slot as its tile.
+          if (isTextGrp) {
+            Z(
+              this.navElem.querySelectorAll(
+                '.fpd-ungroup1, .fpd-group-copy-by, .fpd-group-paste-by'
+              ),
+              ['fpd-hidden']
+            )
+            X(this.navElem.querySelectorAll('.fpd-ungroup'), ['fpd-hidden'])
+            const ugBtn = this.navElem.querySelector('.fpd-ungroup1')
+            ugBtn && ugBtn.setAttribute('title', 'Ungroup')
+            // Open the group in the Text Editor: font, size and B/I/U apply
+            // to every text in it (part 2). Edit-text and curved text stay
+            // off — those are per-text and are edited from Layers.
+            Kr(this, ia, ya).call(this, 'font-family')
+            Kr(this, ia, ya).call(
+              this,
+              'text-size',
+              Boolean(t.resizable || t.__editorMode)
+            )
+            Kr(this, ia, ya).call(this, 'text-format')
+            Kr(this, ia, ya).call(this, 'edit-text', !1)
+            Kr(this, ia, ya).call(this, 'curved-text', !1)
+          }
           const canColor =
             Boolean(t.hasColorSelection && t.hasColorSelection())
           if (canColor) {
@@ -2162,7 +2342,10 @@ function updateFPDLayersToSingleGroup(group) {
               J(e, ['fpd-enabled'], t[i] === e.dataset.enabled)
             else if (e.classList.contains('fpd-btn-options')) {
               const n = JSON.parse(e.dataset.options)
-              e.querySelector('span').className = n[t[i]]
+              const cls = n[t[i]]
+              // A missing value was written as class "undefined" and removed
+              // the Text Transform glyph. Keep the current icon instead.
+              cls && (e.querySelector('span').className = cls)
             } else if (e.classList.contains('fpd-btn-group')) {
               Z(Array.from(e.children), ['fpd-active'])
               const i = e.dataset.control
@@ -2202,7 +2385,9 @@ function updateFPDLayersToSingleGroup(group) {
             t.scrollLeft = t.scrollTop = 0
           }),
           (this.container.dataset.fabricType = t.type),
-          (this.container.dataset.elementType = t.getType())
+          // Grouped text uses the Text Editor UI (desktop fpd-dte / mobile
+          // fpd-ate key off data-element-type="text").
+          (this.container.dataset.elementType = isTextGrp ? 'text' : t.getType())
         } catch (err) {
           console.error('[FPD toolbar render error]', err)
         }

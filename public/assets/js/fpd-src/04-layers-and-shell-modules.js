@@ -243,6 +243,10 @@
             )),
             e.append(this.container),
             (this.listElem = this.container.querySelector('.fpd-list')),
+            // ===== CUSTOM (StyleFlip): lets the Group Text handler (part 5)
+            // rebuild the list with FPD's own rows, so a new text group gets
+            // the native row (Color dot + picker, lock, eye, delete, select).
+            (this.container.fpdLayersModule = this),
             G(
               t,
               ['elementAdd', 'elementRemove', 'viewSelect', 'productCreate'],
@@ -285,6 +289,11 @@
               }
             })
         }
+        // CUSTOM (StyleFlip): full list rebuild from the canvas (same as
+        // elementRemove / viewSelect). Used after grouping text.
+        rebuildList () {
+          Wn(this, Un, Qn).call(this)
+        }
       }
       function Qn (elementOnly) {
         const elements = this.fpdInstance.getElements('all');
@@ -304,7 +313,13 @@
           )
             return
           const elementTitle = elementOnly.title && elementOnly.title.trim()
+          // Texts / text groups may legitimately share a title (see below).
+          const isTextLikeOnly =
+            ('function' == typeof elementOnly.getType &&
+              'text' === elementOnly.getType()) ||
+            (elementOnly.isTextGroup && elementOnly.isTextGroup())
           const isDuplicateTitle =
+            !isTextLikeOnly &&
             elementTitle &&
             elements.some(
               el => el !== elementOnly && el?.title?.trim() === elementTitle
@@ -321,10 +336,24 @@
           elements.unshift(baseLayer)
         }
 
-        // Hide repeated titles
+        // Hide repeated titles — product layers only. Customer texts (and
+        // text groups) often share a title (a duplicated / pasted text keeps
+        // the original's title), and the 2nd one vanished from Layers. For
+        // those, only drop true duplicates (same id).
         const seenTitles = new Set()
+        const seenTextIds = new Set()
         const normalizedElements = []
         elements.forEach(el => {
+          if (!el) return
+          const isTextLike =
+            ('function' == typeof el.getType && 'text' === el.getType()) ||
+            (el.isTextGroup && el.isTextGroup())
+          if (isTextLike) {
+            if (el.id && seenTextIds.has(el.id)) return
+            el.id && seenTextIds.add(el.id)
+            normalizedElements.push(el)
+            return
+          }
           const title = el?.title?.trim()
           if (title && seenTitles.has(title)) return
           if (title) seenTitles.add(title)
@@ -415,8 +444,13 @@
             'group' === t.type ||
             'Info' === t.title
           )
+        // Grouped text: one colour for every text in the group (the per-text
+        // swatch picker only recoloured one of them).
+        const isTextGrp = Boolean(
+          t.isTextGroup && t.isTextGroup() && !Array.isArray(t.colors)
+        )
         if (!t.uploadZone && !isCustomRasterImage && t.hasColorSelection()) {
-          n = rt(t, this.fpdInstance)
+          n = isTextGrp ? [at(t) || '#000000'] : rt(t, this.fpdInstance)
           const s = at(t)
           ;(i.style.background = s),
             (i.className = 'fpd-current-color'),
@@ -450,7 +484,36 @@
             }
           }))
         const a = document.createElement('div')
-        if (((a.className = 'fpd-cell-1'), a.append(r), t.isBitmap())) {
+        // Grouped text: list every text of the group under its title, each
+        // editable in place, so both texts are visible and reachable from
+        // Layers while the group stays intact.
+        if (isTextGrp) {
+          const list = document.createElement('div')
+          list.className = 'fpd-tg-children'
+          t.getObjects().forEach(child => {
+            const ta = document.createElement('textarea')
+            ta.className = 'fpd-tg-child-text'
+            ta.value = child.text || ''
+            G(ta, 'click', ev => ev.stopPropagation())
+            G(ta, 'keyup', ev => {
+              ev.stopPropagation()
+              let v = ev.target.value
+              v = v.replace(FancyProductDesigner.forbiddenTextChars, '')
+              child.set('text', v)
+              child.initDimensions && child.initDimensions()
+              child.dirty = !0
+              t.addWithUpdate()
+              t.setCoords()
+              t.canvas && t.canvas.requestRenderAll()
+            })
+            list.append(ta)
+          })
+          r = document.createElement('div')
+          r.className = 'fpd-tg-title'
+          r.innerText = t.title || 'Group Text'
+          a.append(list)
+        }
+        if (((a.className = 'fpd-cell-1'), a.prepend(r), t.isBitmap())) {
           const t = document.createElement('div')
           ;(t.className = 'fpd-img-meta'),
             (t.innerHTML =
@@ -525,7 +588,7 @@
         if ((this.listElem.prepend(e), n)) {
           if (
             ((l = document.createElement('div')),
-            'group' === t.type && t.getObjects().length > 1)
+            'group' === t.type && t.getObjects().length > 1 && !isTextGrp)
           ) {
             const e = Array.isArray(t.colors) && t.colors.length > 1
             let i = Ln({

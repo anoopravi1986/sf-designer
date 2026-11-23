@@ -1,0 +1,165 @@
+/*
+  Grouped text (Group Text N) — keep Ungroup reachable after re-select.
+
+  Scope: ONLY the new `fpd-tg-toolbar` class, which the toolbar render in
+  fpd-src/05-element-toolbar-interactions.js sets while the selected
+  element is a text group (isTextGroup()) and removes for everything else.
+
+  Why: styles.scss has
+    .notgroup fpd-element-toolbar.fpd-smart > .fpd-tools-nav > div > div.fpd-ungroup1
+      { display: none }
+  and the render adds body.notgroup for every colorizable element — text
+  groups included — so on desktop Ungroup vanished on every re-select.
+
+  Desktop only: on mobile `.fpd-doc-uniform-tool { display: grid !important }`
+  already wins over that rule, and a flex override here would break the
+  mobile icon-over-label tile. `.fpd-hidden` (JS-driven) is still respected.
+
+  Does NOT modify styles.scss or any existing stylesheet; new file only.
+*/
+
+body fpd-element-toolbar.fpd-smart.fpd-layout-large.fpd-tg-toolbar:not(.fpd-layout-small)
+  .fpd-tools-nav
+  .fpd-ungroup1:not(.fpd-hidden) {
+  display: flex !important;
+}
+
+/* Desktop Text Editor (fpd-dtt-ui) now also opens for a text group: give
+   Ungroup the same 32x32 centred cell the text toolbar gives Group. */
+body fpd-element-toolbar.fpd-smart.fpd-layout-large.fpd-tg-toolbar.fpd-dtt-ui:not(.fpd-layout-small)
+  #SecondaryIconBoxHeader
+  > .fpd-ungroup1:not(.fpd-hidden) {
+  flex: 0 0 32px !important;
+  width: 32px !important;
+  min-width: 32px !important;
+  max-width: 32px !important;
+  height: 32px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 8px !important;
+  cursor: pointer !important;
+}
+
+body fpd-element-toolbar.fpd-smart.fpd-layout-large.fpd-tg-toolbar.fpd-dtt-ui:not(.fpd-layout-small)
+  #SecondaryIconBoxHeader
+  > .fpd-ungroup1:not(.fpd-hidden):hover {
+  background: #f3f4f6 !important;
+}
+
+body fpd-element-toolbar.fpd-smart.fpd-layout-large.fpd-tg-toolbar.fpd-dtt-ui:not(.fpd-layout-small)
+  #SecondaryIconBoxHeader
+  > .fpd-ungroup1
+  svg {
+  display: block !important;
+  width: 20px !important;
+  min-width: 20px !important;
+  height: 20px !important;
+  margin: 0 !important;
+}
+
+/* Ungroup stays in the action row, where Group sits for a single text.
+   The squares ship as fill:#fff, which disappears on the white bar. */
+
+body fpd-element-toolbar.fpd-smart.fpd-layout-large.fpd-tg-toolbar.fpd-dtt-ui:not(.fpd-layout-small)
+  .fpd-ungroup1:not(.fpd-hidden)
+  svg
+  .cls-1 {
+  fill: #485563 !important;
+  stroke: #485563 !important;
+}
+
+/* A text group is still data-fabric-type="group". styles.scss zeroes
+   .fpd-panel-text-format for every group (that row is unused on image
+   groups). On a text group the same row holds Bold / Italic / Underline,
+   so width:0 let those icons paint on top of the size stepper and the
+   opacity control. Give the row its content width, desktop only. */
+body fpd-element-toolbar.fpd-smart.fpd-layout-large.fpd-tg-toolbar:not(.fpd-layout-small)
+  .fpd-tools-nav
+  > .fpd-panel-text-format {
+  width: auto !important;
+  min-width: max-content !important;
+  max-width: none !important;
+  flex: 0 0 auto !important;
+  overflow: visible !important;
+}
+
+body fpd-element-toolbar.fpd-smart.fpd-layout-large.fpd-tg-toolbar:not(.fpd-layout-small)
+  .fpd-tools-nav
+  > .fpd-panel-text-format
+  > .fpd-tools-group {
+  width: auto !important;
+  min-width: max-content !important;
+  flex: 0 0 auto !important;
+}
+
+/* The same group rule hides every .extra-icon, including letter-spacing
+   in the Bold row. A single text shows that cell, so the grouped row was
+   one control short and the section divider no longer lined up. */
+body fpd-element-toolbar.fpd-smart.fpd-layout-large.fpd-tg-toolbar.fpd-dtt-ui:not(.fpd-layout-small)
+  .fpd-panel-text-format
+  .extra-icon {
+  display: inline-flex !important;
+}
+
+/* data-fabric-type="group" forces a second Copy/Paste pair (.groupby-text)
+   to display:block. The desktop text toolbar already has the same pair a
+   single text uses, so the extra pair opened a wide gap in the action row.
+   Desktop text groups only — mobile keeps its own Copy/Paste tiles. */
+body fpd-element-toolbar.fpd-smart.fpd-layout-large.fpd-tg-toolbar.fpd-dtt-ui:not(.fpd-layout-small)
+  #SecondaryIconBoxHeader
+  > .groupby-text,
+body fpd-element-toolbar.fpd-smart.fpd-layout-large.fpd-tg-toolbar.fpd-dtt-ui:not(.fpd-layout-small)
+  #SecondaryIconBoxHeader
+  .fpd-group-copy-by,
+body fpd-element-toolbar.fpd-smart.fpd-layout-large.fpd-tg-toolbar.fpd-dtt-ui:not(.fpd-layout-small)
+  #SecondaryIconBoxHeader
+  .fpd-group-paste-by {
+  display: none !important;
+}
+
+/* Mobile: a text group now opens the mobile Text Editor (fpd-ate-editor).
+   Its tile stamper skips elements that are display:none, and the
+   `.notgroup … .fpd-ungroup1 { display:none }` rule kept Ungroup hidden,
+   so it was never stamped and never shown. Un-hide it here (same
+   display:flex the fpd-ate-uniform-tool tiles use); the stamper then adds
+   the normal tile + "Ungroup" caption. `.fpd-hidden` is still respected. */
+fpd-element-toolbar.fpd-smart.fpd-layout-small.fpd-tg-toolbar
+  .fpd-tools-nav
+  #SecondaryIconBoxHeader
+  > .fpd-ungroup1:not(.fpd-hidden) {
+  display: flex !important;
+}
+
+/* Once stamped, an fpd-ate-uniform-tool tile is display:flex !important,
+   which beats `body .fpd-hidden`. Keep the two group buttons correct on the
+   mobile Text Editor: Ungroup only for a text group, never Group on one. */
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small:not(.fpd-tg-toolbar)
+  #SecondaryIconBoxHeader
+  > .fpd-ungroup1,
+fpd-element-toolbar.fpd-ate-editor.fpd-smart.fpd-layout-small.fpd-tg-toolbar
+  #SecondaryIconBoxHeader
+  > .fpd-ungroup {
+  display: none !important;
+}
+
+/* ---------- Layers: a text group lists each of its texts ---------------- */
+
+.fpd-tg-title {
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.fpd-tg-children {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+}
+
+.fpd-tg-children > textarea.fpd-tg-child-text {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+}
