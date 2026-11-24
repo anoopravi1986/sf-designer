@@ -17,6 +17,25 @@
         }
       }
       customElements.define('fpd-module-manage-layers', Pn)
+      // PERF (StyleFlip): every colour picker binds window mousemove/mouseup
+      // and was never destroyed, so each Layers rebuild and each selection
+      // (toolbar Fill / Stroke / Shadow) leaked listeners plus the fabric
+      // object held by its closures. Call before a picker's DOM is discarded.
+      function sfDestroyPickers (root) {
+        if (!root || !root.querySelectorAll) return
+        const list = Array.from(
+          root.querySelectorAll('.fpd-colorpicker-wrapper')
+        )
+        root.classList &&
+          root.classList.contains('fpd-colorpicker-wrapper') &&
+          list.push(root)
+        list.forEach(w => {
+          try {
+            w.__picker && w.__picker._events && w.__picker._events.destroy()
+          } catch (err) {}
+          w.__picker = null
+        })
+      }
       const _n = t => {
           let e = !1,
             i = null
@@ -36,6 +55,8 @@
                 }, 500))
             }
           })
+          // PERF: kept so sfDestroyPickers() can drop its window listeners.
+          n.__picker = s
           if (void 0 !== window.EyeDropper) {
             const t = s.domElement.querySelector('.picker_sample'),
               e = document.createElement('span')
@@ -90,7 +111,7 @@
                   t.enablePicker || t.subPalette || X(a, ['fpd-tooltip']),
                   G(a, 'click', r => {
                     if ((r.stopPropagation(), t.enablePicker || t.subPalette)) {
-                      n && (n.remove(), (n = null))
+                      n && (sfDestroyPickers(n), n.remove(), (n = null))
                       const r = a.classList.contains('fpd-active')
                       r ||
                         ((n = t.enablePicker
@@ -346,6 +367,7 @@
         })
 
         var t, e, i
+        sfDestroyPickers(this.listElem)
         this.listElem.innerHTML = ''
         // Guard falsy rows — bare `t.checkEditable()` crashed Layers when
         // a null/undefined entry slipped into normalizedElements (knob /
@@ -474,11 +496,21 @@
                 t
               )
           }),
-          t.on({
-            'editing:exited': () => {
+          (() => {
+            // PERF: every rebuild added another listener to the text (and
+            // kept the old, detached textarea alive). Replace this module's
+            // previous one instead.
+            const map =
+              this.__editExitHandlers ||
+              (this.__editExitHandlers = new WeakMap())
+            const prev = map.get(t)
+            prev && t.off('editing:exited', prev)
+            const h = () => {
               r.value = t.text
             }
-          }))
+            map.set(t, h)
+            t.on('editing:exited', h)
+          })())
         const a = document.createElement('div')
         // Grouped text: list every text of the group under its title, each
         // editable in place, so both texts are visible and reachable from

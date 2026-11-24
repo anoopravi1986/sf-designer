@@ -3068,13 +3068,22 @@
           }
         })
 
-        // Hide popup on click outside
-        document.addEventListener('click', event => {
-          popup.classList.remove('visible')
-          document.querySelectorAll('.backdrop-test').forEach(el => {
-            el.classList.remove('backdrop-test')
+        // Hide popup on click outside.
+        // PERF (StyleFlip): this used to add one document click listener
+        // PER TILE (400+), each running document.querySelectorAll() over the
+        // whole page on every click anywhere — the main cause of slow Layers
+        // / editor opening (every selection also fires synthetic tab clicks).
+        // One shared listener now closes every tile popup, same behaviour.
+        if (!window.__fpdTilePopups) {
+          const tilePopups = (window.__fpdTilePopups = new Set())
+          document.addEventListener('click', () => {
+            tilePopups.forEach(p => p.classList.remove('visible'))
+            document.querySelectorAll('.backdrop-test').forEach(el => {
+              el.classList.remove('backdrop-test')
+            })
           })
-        })
+        }
+        window.__fpdTilePopups.add(popup)
 
         // ========== Main Click Logic ==========
         r.addEventListener('click', e => {

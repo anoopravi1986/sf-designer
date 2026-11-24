@@ -294,9 +294,13 @@
               Kr(this, ha, Ia).call(this, e)
                 ? (Kr(this, da, Oa).call(this, e),
                   Kr(this, ua, ka).call(this),
+                  // PERF: off() with a fresh .bind() never matched, so each
+                  // select stacked another 'changed' listener on the text.
                   'text' == e.getType() &&
-                    (e.off('changed', Kr(this, ua, ka).bind(this)),
-                    e.on('changed', Kr(this, ua, ka).bind(this))),
+                    (this.__onTextChanged ||
+                      (this.__onTextChanged = Kr(this, ua, ka).bind(this)),
+                    e.off('changed', this.__onTextChanged),
+                    e.on('changed', this.__onTextChanged)),
                   Kr(this, ta, va).call(this, e))
                 : this.toggle(!1)
             }),
@@ -2065,6 +2069,7 @@ function updateFPDLayersToSingleGroup(group) {
             })
           e && Jr(this, $r).append(e)
           const n = this.subPanel.querySelector('.fpd-stroke-color-wrapper')
+          sfDestroyPickers(n)
           n.innerHTML = ''
           const s = Bn(this.fpdInstance, {
             colors:
@@ -2086,6 +2091,7 @@ function updateFPDLayersToSingleGroup(group) {
           })
           n.append(s)
           const r = this.subPanel.querySelector('.fpd-shadow-color-wrapper')
+          sfDestroyPickers(r)
           r.innerHTML = ''
           const a = _n({
             initialColor: o(t.shadowColor).isValid()
@@ -2159,9 +2165,10 @@ function updateFPDLayersToSingleGroup(group) {
             t.uniScalingUnlockable ||
             t.__editorMode
         )
-        ;(i || t.rotatable) &&
-        console.log("eeee1112",e),
-          (Kr(this, ia, ya).call(this, 'transform'),
+        // PERF: a debug console.log of the color DOM node ran on every
+        // selection. It was joined by a comma, so the transform block below
+        // always ran regardless of (i || t.rotatable) — kept as-is.
+        ;(Kr(this, ia, ya).call(this, 'transform'),
           Kr(this, na, xa).call(this, 'transform', 'scale', i),
           Kr(this, la, Ea).call(this, t.lockUniScaling),
           Kr(this, na, xa).call(
@@ -2641,6 +2648,7 @@ function updateFPDLayersToSingleGroup(group) {
           })
       }
       function _a () {
+        sfDestroyPickers(Jr(this, $r))
         ;(Jr(this, $r).innerHTML = ''),
           Z(this.container, ['fpd-panel-visible']),
           X(this.navElem.querySelectorAll('[class^=fpd-tool-]'), [

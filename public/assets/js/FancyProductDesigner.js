@@ -29522,13 +29522,22 @@
           }
         })
 
-        // Hide popup on click outside
-        document.addEventListener('click', event => {
-          popup.classList.remove('visible')
-          document.querySelectorAll('.backdrop-test').forEach(el => {
-            el.classList.remove('backdrop-test')
+        // Hide popup on click outside.
+        // PERF (StyleFlip): this used to add one document click listener
+        // PER TILE (400+), each running document.querySelectorAll() over the
+        // whole page on every click anywhere — the main cause of slow Layers
+        // / editor opening (every selection also fires synthetic tab clicks).
+        // One shared listener now closes every tile popup, same behaviour.
+        if (!window.__fpdTilePopups) {
+          const tilePopups = (window.__fpdTilePopups = new Set())
+          document.addEventListener('click', () => {
+            tilePopups.forEach(p => p.classList.remove('visible'))
+            document.querySelectorAll('.backdrop-test').forEach(el => {
+              el.classList.remove('backdrop-test')
+            })
           })
-        })
+        }
+        window.__fpdTilePopups.add(popup)
 
         // ========== Main Click Logic ==========
         r.addEventListener('click', e => {
@@ -32801,6 +32810,25 @@
         }
       }
       customElements.define('fpd-module-manage-layers', Pn)
+      // PERF (StyleFlip): every colour picker binds window mousemove/mouseup
+      // and was never destroyed, so each Layers rebuild and each selection
+      // (toolbar Fill / Stroke / Shadow) leaked listeners plus the fabric
+      // object held by its closures. Call before a picker's DOM is discarded.
+      function sfDestroyPickers (root) {
+        if (!root || !root.querySelectorAll) return
+        const list = Array.from(
+          root.querySelectorAll('.fpd-colorpicker-wrapper')
+        )
+        root.classList &&
+          root.classList.contains('fpd-colorpicker-wrapper') &&
+          list.push(root)
+        list.forEach(w => {
+          try {
+            w.__picker && w.__picker._events && w.__picker._events.destroy()
+          } catch (err) {}
+          w.__picker = null
+        })
+      }
       const _n = t => {
           let e = !1,
             i = null
@@ -32820,6 +32848,8 @@
                 }, 500))
             }
           })
+          // PERF: kept so sfDestroyPickers() can drop its window listeners.
+          n.__picker = s
           if (void 0 !== window.EyeDropper) {
             const t = s.domElement.querySelector('.picker_sample'),
               e = document.createElement('span')
@@ -32874,7 +32904,7 @@
                   t.enablePicker || t.subPalette || X(a, ['fpd-tooltip']),
                   G(a, 'click', r => {
                     if ((r.stopPropagation(), t.enablePicker || t.subPalette)) {
-                      n && (n.remove(), (n = null))
+                      n && (sfDestroyPickers(n), n.remove(), (n = null))
                       const r = a.classList.contains('fpd-active')
                       r ||
                         ((n = t.enablePicker
@@ -33130,6 +33160,7 @@
         })
 
         var t, e, i
+        sfDestroyPickers(this.listElem)
         this.listElem.innerHTML = ''
         // Guard falsy rows — bare `t.checkEditable()` crashed Layers when
         // a null/undefined entry slipped into normalizedElements (knob /
@@ -33258,11 +33289,21 @@
                 t
               )
           }),
-          t.on({
-            'editing:exited': () => {
+          (() => {
+            // PERF: every rebuild added another listener to the text (and
+            // kept the old, detached textarea alive). Replace this module's
+            // previous one instead.
+            const map =
+              this.__editExitHandlers ||
+              (this.__editExitHandlers = new WeakMap())
+            const prev = map.get(t)
+            prev && t.off('editing:exited', prev)
+            const h = () => {
               r.value = t.text
             }
-          }))
+            map.set(t, h)
+            t.on('editing:exited', h)
+          })())
         const a = document.createElement('div')
         // Grouped text: list every text of the group under its title, each
         // editable in place, so both texts are visible and reachable from
@@ -36057,9 +36098,13 @@
               Kr(this, ha, Ia).call(this, e)
                 ? (Kr(this, da, Oa).call(this, e),
                   Kr(this, ua, ka).call(this),
+                  // PERF: off() with a fresh .bind() never matched, so each
+                  // select stacked another 'changed' listener on the text.
                   'text' == e.getType() &&
-                    (e.off('changed', Kr(this, ua, ka).bind(this)),
-                    e.on('changed', Kr(this, ua, ka).bind(this))),
+                    (this.__onTextChanged ||
+                      (this.__onTextChanged = Kr(this, ua, ka).bind(this)),
+                    e.off('changed', this.__onTextChanged),
+                    e.on('changed', this.__onTextChanged)),
                   Kr(this, ta, va).call(this, e))
                 : this.toggle(!1)
             }),
@@ -37828,6 +37873,7 @@ function updateFPDLayersToSingleGroup(group) {
             })
           e && Jr(this, $r).append(e)
           const n = this.subPanel.querySelector('.fpd-stroke-color-wrapper')
+          sfDestroyPickers(n)
           n.innerHTML = ''
           const s = Bn(this.fpdInstance, {
             colors:
@@ -37849,6 +37895,7 @@ function updateFPDLayersToSingleGroup(group) {
           })
           n.append(s)
           const r = this.subPanel.querySelector('.fpd-shadow-color-wrapper')
+          sfDestroyPickers(r)
           r.innerHTML = ''
           const a = _n({
             initialColor: o(t.shadowColor).isValid()
@@ -37922,9 +37969,10 @@ function updateFPDLayersToSingleGroup(group) {
             t.uniScalingUnlockable ||
             t.__editorMode
         )
-        ;(i || t.rotatable) &&
-        console.log("eeee1112",e),
-          (Kr(this, ia, ya).call(this, 'transform'),
+        // PERF: a debug console.log of the color DOM node ran on every
+        // selection. It was joined by a comma, so the transform block below
+        // always ran regardless of (i || t.rotatable) — kept as-is.
+        ;(Kr(this, ia, ya).call(this, 'transform'),
           Kr(this, na, xa).call(this, 'transform', 'scale', i),
           Kr(this, la, Ea).call(this, t.lockUniScaling),
           Kr(this, na, xa).call(
@@ -38404,6 +38452,7 @@ function updateFPDLayersToSingleGroup(group) {
           })
       }
       function _a () {
+        sfDestroyPickers(Jr(this, $r))
         ;(Jr(this, $r).innerHTML = ''),
           Z(this.container, ['fpd-panel-visible']),
           X(this.navElem.querySelectorAll('[class^=fpd-tool-]'), [

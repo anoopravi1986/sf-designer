@@ -586,10 +586,18 @@ export class HomeComponent implements AfterViewInit {
           const categoryInputObserver = new MutationObserver(applyCategoryInputReadonly);
           categoryInputObserver.observe(mainBar, { childList: true, subtree: true });
 
+          // PERF: the observer below used to serialize mainBar.innerHTML (the
+          // whole sidebar: Layers list, toolbar, 400+ product tiles) on EVERY
+          // mutation, i.e. on each layer select / Layers rebuild. The
+          // comparison only matters between a hide-icon click and the first
+          // change after it; otherwise the content always differs from
+          // savedContent and the reset always ran. Same result, far cheaper.
+          let awaitingChangeSinceHide = false;
           hideIcon.addEventListener('click', (event) => {
             event.stopPropagation();
             ;
             this.savedContent = mainBar.innerHTML;
+            awaitingChangeSinceHide = true;
             mainBar.style.maxWidth = '80px';
             mainBar.style.backgroundColor = '#f0f1f5';
             mainBar.classList.toggle('box-white-inactive');
@@ -597,12 +605,14 @@ export class HomeComponent implements AfterViewInit {
           });
 
           const contentObserver = new MutationObserver(() => {
-            if (mainBar.innerHTML !== this.savedContent) {
-              mainBar.style.maxWidth = '';
-              mainBar.style.backgroundColor = '#fff';
-              mainBar.classList.remove('box-white-inactive');
-              hideIcon.style.display = 'flex';
+            if (awaitingChangeSinceHide) {
+              if (mainBar.innerHTML === this.savedContent) return;
+              awaitingChangeSinceHide = false;
             }
+            mainBar.style.maxWidth = '';
+            mainBar.style.backgroundColor = '#fff';
+            mainBar.classList.remove('box-white-inactive');
+            hideIcon.style.display = 'flex';
           });
 
           contentObserver.observe(mainBar, {
@@ -4613,8 +4623,14 @@ export class HomeComponent implements AfterViewInit {
         const layersMod = (
           document.querySelector('fpd-module-manage-layers') as any
         )?.fpdLayersModule;
-        // Defer so FPD's own elementAdd listener finishes first.
-        setTimeout(() => layersMod?.rebuildList?.(), 0);
+        // PERF: once the product is created, FPD's own Layers elementAdd
+        // listener already ran placeBelowKnobs + a full rebuild for this add
+        // (stack order is idempotent), so a second full rebuild only re-made
+        // every row and colour picker. Keep the deferred rebuild for adds
+        // before productCreated, where FPD's listener intentionally skips.
+        if (!this.designer?.productCreated) {
+          setTimeout(() => layersMod?.rebuildList?.(), 0);
+        }
       }
 
       if (!element || element.type !== 'image') return;
