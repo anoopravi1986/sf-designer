@@ -1,0 +1,325 @@
+/*
+  Group Outline / Group Text layer toolbar: only Opacity, Color, Rotate (Transform) and
+  Delete.
+
+  Scope: ONLY the `fpd-go-toolbar` class, which the toolbar render in
+  fpd-src/05-element-toolbar-interactions.js sets while the selected
+  element is a product "Group Outline N" or "Group Text N" layer (canvas or
+  Layers selection; customer text groups are excluded)
+  and removes for every other element. No other toolbar gets it.
+
+  Color: these layers are colorizable (hasColorSelection() is true, the
+  toolbar enables .fpd-tool-color and adds fpd-doc-colorable), but
+  styles.scss hides the whole .fpd-primary-tools wrapper for images on
+  desktop, so Color never appeared. Show the wrapper here with only Color
+  in it. Behaviour of all four controls is unchanged.
+
+  The class is repeated only to out-rank existing show/hide rules in
+  styles.scss and the other fpd-*.css overrides.
+*/
+
+/* ---------- Hide everything except Opacity / Color / Transform / Remove -- */
+
+html body fpd-element-toolbar.fpd-go-toolbar.fpd-go-toolbar.fpd-go-toolbar
+  .fpd-tools-nav
+  > :not(#fpd-opacity-btn):not(#fpd-opacity-panel):not(.fpd-primary-tools):not(#SecondaryIconBoxHeader),
+html body fpd-element-toolbar.fpd-go-toolbar.fpd-go-toolbar.fpd-go-toolbar
+  .fpd-tools-nav
+  > .fpd-primary-tools
+  > :not(.fpd-tool-color):not(#fpd-opacity-btn),
+html body fpd-element-toolbar.fpd-go-toolbar.fpd-go-toolbar.fpd-go-toolbar
+  #SecondaryIconBoxHeader
+  > :not(.fpd-tool-transform):not(.fpd-tool-remove) {
+  display: none !important;
+}
+
+/* Color visible on every layout while the element is colorizable. */
+html body fpd-element-toolbar.fpd-go-toolbar.fpd-go-toolbar.fpd-go-toolbar.fpd-doc-colorable
+  .fpd-tools-nav
+  > .fpd-primary-tools {
+  display: flex !important;
+  flex: 0 0 auto !important;
+  align-items: center !important;
+}
+
+html body fpd-element-toolbar.fpd-go-toolbar.fpd-go-toolbar.fpd-go-toolbar.fpd-doc-colorable
+  .fpd-tools-nav
+  > .fpd-primary-tools
+  > .fpd-tool-color:not(.fpd-hidden) {
+  display: flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+/* ---------- Desktop layout ---------------------------------------------- */
+
+body fpd-element-toolbar.fpd-smart.fpd-layout-large.fpd-go-toolbar:not(.fpd-layout-small) {
+  min-width: 0 !important;
+  padding-right: 44px !important;
+  box-sizing: border-box !important;
+}
+
+body fpd-element-toolbar.fpd-smart.fpd-layout-large.fpd-go-toolbar:not(.fpd-layout-small)
+  > .fpd-tools-nav {
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  align-items: center !important;
+  gap: 4px !important;
+  min-height: 52px !important;
+  padding: 0 4px 0 10px !important;
+  margin: 0 !important;
+  box-sizing: border-box !important;
+}
+
+body fpd-element-toolbar.fpd-smart.fpd-layout-large.fpd-go-toolbar:not(.fpd-layout-small)
+  > .fpd-tools-nav
+  > .fpd-primary-tools {
+  gap: 4px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+body fpd-element-toolbar.fpd-smart.fpd-layout-large.fpd-go-toolbar:not(.fpd-layout-small)
+  #SecondaryIconBoxHeader {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  align-items: center !important;
+  gap: 4px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  height: auto !important;
+  border: 0 !important;
+}
+
+/* Uniform 32x32 cells. */
+body fpd-element-toolbar.fpd-smart.fpd-layout-large.fpd-go-toolbar:not(.fpd-layout-small)
+  :is(
+    #fpd-opacity-btn,
+    .fpd-primary-tools > .fpd-tool-color:not(.fpd-hidden),
+    #SecondaryIconBoxHeader > .fpd-tool-transform,
+    #SecondaryIconBoxHeader > .fpd-tool-remove
+  ) {
+  display: inline-flex !important;
+  flex: 0 0 32px !important;
+  width: 32px !important;
+  min-width: 32px !important;
+  max-width: 32px !important;
+  height: 32px !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-direction: row !important;
+  position: relative !important;
+  top: 0 !important;
+  left: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 1px solid transparent !important;
+  border-radius: 8px !important;
+  background: transparent !important;
+  box-sizing: border-box !important;
+  cursor: pointer !important;
+  transition: background-color 0.15s ease;
+}
+
+body fpd-element-toolbar.fpd-smart.fpd-layout-large.fpd-go-toolbar:not(.fpd-layout-small)
+  :is(
+    #fpd-opacity-btn,
+    .fpd-primary-tools > .fpd-tool-color,
+    #SecondaryIconBoxHeader > .fpd-tool-transform,
+    #SecondaryIconBoxHeader > .fpd-tool-remove
+  ):hover {
+  background: #f3f4f6 !important;
+}
+
+body fpd-element-toolbar.fpd-smart.fpd-layout-large.fpd-go-toolbar:not(.fpd-layout-small)
+  :is(
+    #fpd-opacity-btn.fpd-active,
+    .fpd-primary-tools > .fpd-tool-color.fpd-active,
+    #SecondaryIconBoxHeader > .fpd-tool-transform.fpd-active
+  ) {
+  background: rgba(232, 86, 36, 0.1) !important;
+  border-color: rgba(232, 86, 36, 0.35) !important;
+}
+
+/* Color swatch: round 22px dot, like the Base / text toolbars. */
+body fpd-element-toolbar.fpd-smart.fpd-layout-large.fpd-go-toolbar:not(.fpd-layout-small)
+  .fpd-primary-tools
+  > .fpd-tool-color
+  > .fpd-current-fill {
+  display: block !important;
+  width: 22px !important;
+  height: 22px !important;
+  margin: 0 !important;
+  position: static !important;
+  top: auto !important;
+  border-radius: 50% !important;
+  box-sizing: border-box !important;
+  border: 1px solid rgba(0, 0, 0, 0.15) !important;
+  flex: 0 0 auto !important;
+}
+
+/* Icons: 20x20, centred, no per-icon offsets; labels hidden. */
+body fpd-element-toolbar.fpd-smart.fpd-layout-large.fpd-go-toolbar:not(.fpd-layout-small)
+  :is(#fpd-opacity-btn, #SecondaryIconBoxHeader > .fpd-tool-remove)
+  > svg,
+body fpd-element-toolbar.fpd-smart.fpd-layout-large.fpd-go-toolbar:not(.fpd-layout-small)
+  #SecondaryIconBoxHeader
+  > .fpd-tool-transform
+  > span:first-child {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 20px !important;
+  min-width: 20px !important;
+  height: 20px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  position: static !important;
+  top: auto !important;
+  left: auto !important;
+  flex: 0 0 auto !important;
+}
+
+body fpd-element-toolbar.fpd-smart.fpd-layout-large.fpd-go-toolbar:not(.fpd-layout-small)
+  #SecondaryIconBoxHeader
+  > .fpd-tool-transform
+  > span:first-child::before {
+  display: block !important;
+  width: 20px !important;
+  height: 20px !important;
+  position: static !important;
+  top: auto !important;
+  background-size: contain !important;
+  background-repeat: no-repeat !important;
+  background-position: center !important;
+}
+
+body fpd-element-toolbar.fpd-smart.fpd-layout-large.fpd-go-toolbar:not(.fpd-layout-small)
+  :is(
+    .fpd-primary-tools > .fpd-tool-color,
+    #SecondaryIconBoxHeader > .fpd-tool-transform,
+    #SecondaryIconBoxHeader > .fpd-tool-remove
+  )
+  > .fpd-label {
+  display: none !important;
+}
+
+/* One divider, between Rotate and Delete. */
+body fpd-element-toolbar.fpd-smart.fpd-layout-large.fpd-go-toolbar:not(.fpd-layout-small)
+  #SecondaryIconBoxHeader
+  > .fpd-tool-transform::after,
+body fpd-element-toolbar.fpd-smart.fpd-layout-large.fpd-go-toolbar:not(.fpd-layout-small)
+  #SecondaryIconBoxHeader
+  > .fpd-tool-transform::before {
+  display: none !important;
+}
+
+body fpd-element-toolbar.fpd-smart.fpd-layout-large.fpd-go-toolbar:not(.fpd-layout-small)
+  #SecondaryIconBoxHeader
+  > .fpd-tool-remove {
+  margin-left: 9px !important;
+}
+
+body fpd-element-toolbar.fpd-smart.fpd-layout-large.fpd-go-toolbar:not(.fpd-layout-small)
+  #SecondaryIconBoxHeader
+  > .fpd-tool-remove::before {
+  content: '' !important;
+  display: block !important;
+  position: absolute !important;
+  left: -7px !important;
+  top: 5px !important;
+  width: 1px !important;
+  height: 20px !important;
+  background: #e5e7eb !important;
+}
+
+/* Close "x" inside the bar, vertically centred (as on the Base toolbar). */
+body fpd-element-toolbar.fpd-smart.fpd-layout-large.fpd-go-toolbar:not(.fpd-layout-small)
+  > .fpd-close {
+  position: absolute !important;
+  top: 50% !important;
+  right: 8px !important;
+  bottom: auto !important;
+  left: auto !important;
+  transform: translateY(-50%) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 28px !important;
+  min-width: 28px !important;
+  height: 28px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  line-height: 1 !important;
+  border-radius: 8px !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+body fpd-element-toolbar.fpd-smart.fpd-layout-large.fpd-go-toolbar:not(.fpd-layout-small)
+  > .fpd-close::before {
+  content: '' !important;
+  position: absolute !important;
+  left: -6px !important;
+  top: 4px !important;
+  width: 1px !important;
+  height: 20px !important;
+  background: #e5e7eb !important;
+}
+
+body fpd-element-toolbar.fpd-smart.fpd-layout-large.fpd-go-toolbar:not(.fpd-layout-small)
+  > .fpd-close:hover {
+  background: #f3f4f6 !important;
+}
+
+/* While a panel (Color, Opacity, Transform) is open, show just one "x" —
+   the panel close — in the same in-bar spot. */
+body fpd-element-toolbar.fpd-smart.fpd-layout-large.fpd-panel-visible.fpd-go-toolbar:not(.fpd-layout-small)
+  > .fpd-close {
+  display: none !important;
+}
+
+body fpd-element-toolbar.fpd-smart.fpd-layout-large.fpd-panel-visible.fpd-go-toolbar:not(.fpd-layout-small)
+  > .fpd-close-sub-panel {
+  position: absolute !important;
+  top: 50% !important;
+  right: 8px !important;
+  bottom: auto !important;
+  left: auto !important;
+  transform: translateY(-50%) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 28px !important;
+  min-width: 28px !important;
+  max-width: 28px !important;
+  height: 28px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  line-height: 1 !important;
+  border-radius: 8px !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  z-index: 2 !important;
+}
+
+body fpd-element-toolbar.fpd-smart.fpd-layout-large.fpd-panel-visible.fpd-go-toolbar:not(.fpd-layout-small)
+  > .fpd-close-sub-panel
+  > .fpd-label {
+  display: none !important;
+}
+
+/* ---------- Mobile: four tiles, centred, no leftover offsets ------------ */
+
+fpd-element-toolbar.fpd-layout-small.fpd-go-toolbar #SecondaryIconBoxHeader {
+  justify-content: center !important;
+}
+
+fpd-element-toolbar.fpd-layout-small.fpd-go-toolbar
+  #SecondaryIconBoxHeader
+  > :is(.fpd-tool-transform, .fpd-tool-remove) {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  left: 0 !important;
+}

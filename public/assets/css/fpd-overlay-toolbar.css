@@ -1,0 +1,219 @@
+/*
+  Overlay layer toolbar: only Opacity, Rotate (Transform) and Delete.
+
+  Scope: ONLY the `fpd-ov-toolbar` class, which the toolbar render in
+  fpd-src/05-element-toolbar-interactions.js sets while the selected
+  element's title is "Overlay" (canvas or Layers selection) and removes for
+  every other element. No other toolbar gets it.
+
+  The three kept controls are not changed in behaviour; Opacity still opens
+  #fpd-opacity-panel and Rotate still opens the Transform panel.
+  The class is repeated only to out-rank existing show rules in styles.scss
+  and the other fpd-*.css overrides.
+*/
+
+/* ---------- Hide everything except Opacity / Transform / Remove --------- */
+
+html body fpd-element-toolbar.fpd-ov-toolbar.fpd-ov-toolbar.fpd-ov-toolbar
+  .fpd-tools-nav
+  > :not(#fpd-opacity-btn):not(#fpd-opacity-panel):not(#SecondaryIconBoxHeader),
+html body fpd-element-toolbar.fpd-ov-toolbar.fpd-ov-toolbar.fpd-ov-toolbar
+  #SecondaryIconBoxHeader
+  > :not(.fpd-tool-transform):not(.fpd-tool-remove) {
+  display: none !important;
+}
+
+/* ---------- Desktop layout ---------------------------------------------- */
+
+body fpd-element-toolbar.fpd-smart.fpd-layout-large.fpd-ov-toolbar:not(.fpd-layout-small) {
+  min-width: 0 !important;
+  padding-right: 44px !important;
+  box-sizing: border-box !important;
+}
+
+body fpd-element-toolbar.fpd-smart.fpd-layout-large.fpd-ov-toolbar:not(.fpd-layout-small)
+  > .fpd-tools-nav {
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  align-items: center !important;
+  gap: 4px !important;
+  min-height: 52px !important;
+  padding: 0 4px 0 10px !important;
+  margin: 0 !important;
+  box-sizing: border-box !important;
+}
+
+body fpd-element-toolbar.fpd-smart.fpd-layout-large.fpd-ov-toolbar:not(.fpd-layout-small)
+  #SecondaryIconBoxHeader {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  align-items: center !important;
+  gap: 4px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  height: auto !important;
+  border: 0 !important;
+}
+
+/* Uniform 32x32 cells. */
+body fpd-element-toolbar.fpd-smart.fpd-layout-large.fpd-ov-toolbar:not(.fpd-layout-small)
+  :is(#fpd-opacity-btn, #SecondaryIconBoxHeader > .fpd-tool-transform, #SecondaryIconBoxHeader > .fpd-tool-remove) {
+  display: inline-flex !important;
+  flex: 0 0 32px !important;
+  width: 32px !important;
+  min-width: 32px !important;
+  max-width: 32px !important;
+  height: 32px !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-direction: row !important;
+  position: relative !important;
+  top: 0 !important;
+  left: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 1px solid transparent !important;
+  border-radius: 8px !important;
+  background: transparent !important;
+  box-sizing: border-box !important;
+  cursor: pointer !important;
+  transition: background-color 0.15s ease;
+}
+
+body fpd-element-toolbar.fpd-smart.fpd-layout-large.fpd-ov-toolbar:not(.fpd-layout-small)
+  :is(#fpd-opacity-btn, #SecondaryIconBoxHeader > .fpd-tool-transform, #SecondaryIconBoxHeader > .fpd-tool-remove):hover {
+  background: #f3f4f6 !important;
+}
+
+body fpd-element-toolbar.fpd-smart.fpd-layout-large.fpd-ov-toolbar:not(.fpd-layout-small)
+  :is(#fpd-opacity-btn.fpd-active, #SecondaryIconBoxHeader > .fpd-tool-transform.fpd-active) {
+  background: rgba(232, 86, 36, 0.1) !important;
+  border-color: rgba(232, 86, 36, 0.35) !important;
+}
+
+/* Icons: 20x20, centred, no per-icon offsets; labels hidden. */
+body fpd-element-toolbar.fpd-smart.fpd-layout-large.fpd-ov-toolbar:not(.fpd-layout-small)
+  :is(#fpd-opacity-btn, #SecondaryIconBoxHeader > .fpd-tool-remove)
+  > svg,
+body fpd-element-toolbar.fpd-smart.fpd-layout-large.fpd-ov-toolbar:not(.fpd-layout-small)
+  #SecondaryIconBoxHeader
+  > .fpd-tool-transform
+  > span:first-child {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 20px !important;
+  min-width: 20px !important;
+  height: 20px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  position: static !important;
+  top: auto !important;
+  left: auto !important;
+  flex: 0 0 auto !important;
+}
+
+body fpd-element-toolbar.fpd-smart.fpd-layout-large.fpd-ov-toolbar:not(.fpd-layout-small)
+  #SecondaryIconBoxHeader
+  > .fpd-tool-transform
+  > span:first-child::before {
+  display: block !important;
+  width: 20px !important;
+  height: 20px !important;
+  position: static !important;
+  top: auto !important;
+  background-size: contain !important;
+  background-repeat: no-repeat !important;
+  background-position: center !important;
+}
+
+body fpd-element-toolbar.fpd-smart.fpd-layout-large.fpd-ov-toolbar:not(.fpd-layout-small)
+  #SecondaryIconBoxHeader
+  > :is(.fpd-tool-transform, .fpd-tool-remove)
+  > .fpd-label {
+  display: none !important;
+}
+
+/* One divider, between Rotate and Delete (no vendor divider after Rotate
+   pointing at removed tools). */
+body fpd-element-toolbar.fpd-smart.fpd-layout-large.fpd-ov-toolbar:not(.fpd-layout-small)
+  #SecondaryIconBoxHeader
+  > .fpd-tool-transform::after,
+body fpd-element-toolbar.fpd-smart.fpd-layout-large.fpd-ov-toolbar:not(.fpd-layout-small)
+  #SecondaryIconBoxHeader
+  > .fpd-tool-transform::before {
+  display: none !important;
+}
+
+body fpd-element-toolbar.fpd-smart.fpd-layout-large.fpd-ov-toolbar:not(.fpd-layout-small)
+  #SecondaryIconBoxHeader
+  > .fpd-tool-remove {
+  margin-left: 9px !important;
+}
+
+body fpd-element-toolbar.fpd-smart.fpd-layout-large.fpd-ov-toolbar:not(.fpd-layout-small)
+  #SecondaryIconBoxHeader
+  > .fpd-tool-remove::before {
+  content: '' !important;
+  display: block !important;
+  position: absolute !important;
+  left: -7px !important;
+  top: 5px !important;
+  width: 1px !important;
+  height: 20px !important;
+  background: #e5e7eb !important;
+}
+
+/* Close "x" inside the bar, vertically centred (as on the Base toolbar). */
+body fpd-element-toolbar.fpd-smart.fpd-layout-large.fpd-ov-toolbar:not(.fpd-layout-small)
+  > .fpd-close {
+  position: absolute !important;
+  top: 50% !important;
+  right: 8px !important;
+  bottom: auto !important;
+  left: auto !important;
+  transform: translateY(-50%) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 28px !important;
+  min-width: 28px !important;
+  height: 28px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  line-height: 1 !important;
+  border-radius: 8px !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+body fpd-element-toolbar.fpd-smart.fpd-layout-large.fpd-ov-toolbar:not(.fpd-layout-small)
+  > .fpd-close::before {
+  content: '' !important;
+  position: absolute !important;
+  left: -6px !important;
+  top: 4px !important;
+  width: 1px !important;
+  height: 20px !important;
+  background: #e5e7eb !important;
+}
+
+body fpd-element-toolbar.fpd-smart.fpd-layout-large.fpd-ov-toolbar:not(.fpd-layout-small)
+  > .fpd-close:hover {
+  background: #f3f4f6 !important;
+}
+
+/* ---------- Mobile: three tiles, centred, no leftover offsets ----------- */
+
+fpd-element-toolbar.fpd-layout-small.fpd-ov-toolbar #SecondaryIconBoxHeader {
+  justify-content: center !important;
+}
+
+fpd-element-toolbar.fpd-layout-small.fpd-ov-toolbar
+  #SecondaryIconBoxHeader
+  > :is(.fpd-tool-transform, .fpd-tool-remove) {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  left: 0 !important;
+}

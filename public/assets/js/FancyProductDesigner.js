@@ -35954,9 +35954,10 @@
               (i.style.backgroundImage = `url(${n.preview})`),
               s.append(i),
               G(i, 'click', i => {
-                t.currentViewInstance.fabricCanvas.setElementOptions({
-                  filter: n.array || e
-                })
+                // CUSTOM (StyleFlip): keep the image visible and show a
+                // message when a filter cannot be applied (see
+                // sfIlApplyFilter). Same path for canvas and Layers selection.
+                sfIlApplyFilter(t, n.array || e)
               })
           }
           let copiedGroup = null;
@@ -38047,6 +38048,33 @@ function updateFPDLayersToSingleGroup(group) {
           // selected, so fpd-base-layer-toolbar.css styles only that toolbar
           // and never the regular Element Editor.
           J(this.container, ['fpd-bl-toolbar'], t.title === 'Base')
+          // ===== CUSTOM (StyleFlip): marks the toolbar while the Overlay
+          // layer is selected (canvas or Layers), so fpd-overlay-toolbar.css
+          // can reduce it to Opacity / Rotate (Transform) / Delete without
+          // touching any other toolbar.
+          J(
+            this.container,
+            ['fpd-ov-toolbar'],
+            /^overlay$/i.test(String(t.title || '').trim())
+          )
+          // ===== CUSTOM (StyleFlip): marks the toolbar while any product
+          // "Group Outline N" or "Group Text N" layer is selected (canvas or
+          // Layers), so fpd-group-outline-toolbar.css can reduce it to
+          // Opacity / Color / Rotate (Transform) / Delete without touching
+          // other toolbars. Customer text groups are also titled
+          // "Group Text N" but are fabric groups of texts (isTextGroup) with
+          // their own editor (fpd-tg-toolbar), so they are excluded.
+          {
+            const goTitle = String(t.title || '').trim()
+            J(
+              this.container,
+              ['fpd-go-toolbar'],
+              /^group outline\b/i.test(goTitle) ||
+                (/^group text\b/i.test(goTitle) &&
+                  !(t.isTextGroup && t.isTextGroup()) &&
+                  !(t.getType && 'text' === t.getType()))
+            )
+          }
           // ===== CUSTOM (StyleFlip): grouped text (Group Text N) ===========
           // Ungroup / Copy / Paste visibility was only synced on canvas
           // mouse:down, so re-selecting a text group any other way (Layers
@@ -38105,6 +38133,27 @@ function updateFPDLayersToSingleGroup(group) {
             const fill = at(t)
             const swatch = this.navElem.querySelector('.fpd-current-fill')
             if (fill && swatch) swatch.style.background = fill
+          }
+          // ===== CUSTOM (StyleFlip): no Color for non-colorizable images ====
+          // body.notgroup.is-svg is set when an SVG Element / group / text
+          // group is selected and is never cleared when a plain JPG/PNG is
+          // selected next, so styles.scss
+          //   .notgroup.is-svg fpd-element-toolbar.fpd-type-image
+          //   .fpd-tool-color { display:block !important }
+          // re-showed Color (with the previous element's fill) on images
+          // that cannot be recolored. Stamp `fpd-img-nocolor` for those so
+          // fpd-image-no-color.css hides it. Colorizable images, SVGs,
+          // groups, Base and Info are unaffected (canColor is true there).
+          {
+            const imgNoColor = Boolean(
+              t.getType &&
+                'image' === t.getType() &&
+                !canColor &&
+                !(t.isTextGroup && t.isTextGroup()) &&
+                'Info' !== t.title
+            )
+            J(this.container, ['fpd-img-nocolor'], imgNoColor)
+            imgNoColor && Kr(this, ia, ya).call(this, 'color', !1)
           }
           // Info chrome (customer mode): JUST COLOR CHANGE — hide every
           // other edit tool. Stamp fpd-doc-info-layer for CSS (opacity btn).
@@ -38270,6 +38319,82 @@ function updateFPDLayersToSingleGroup(group) {
           X(this.fpdInstance.container, [
             'fpd-toolbar-' + this.currentPlacement
           ])
+      }
+      // ===== CUSTOM (StyleFlip): safe filter apply ==========================
+      // fabric's Image.applyFilters() swaps the visible element for a new
+      // blank canvas BEFORE the filter backend runs. When the backend cannot
+      // process the image (cross-origin / tainted source, image larger than
+      // the WebGL texture limit, ...) it throws or leaves that canvas empty,
+      // so the image vanished from the product. Here the filter is applied,
+      // the result is checked, and on failure the previous filters are put
+      // back (original image stays visible) and a message is shown.
+      // Called from the Filters tab of the image toolbar.
+      function sfIlApplyFilter (fpd, filter) {
+        const MSG = 'Filter not applicable to this image.'
+        const canvas =
+          fpd.currentViewInstance && fpd.currentViewInstance.fabricCanvas
+        const el = fpd.currentElement
+        if (!canvas || !el) return
+        const notApplicable = () => {
+          window.FPDSnackbar && window.FPDSnackbar(MSG)
+        }
+        if (
+          !(el.isBitmap && el.isBitmap()) ||
+          'function' != typeof el.applyFilters ||
+          !el._originalElement
+        )
+          return notApplicable()
+        // true when the source has at least one visible pixel; throws for a
+        // tainted (cross-origin) source, which no filter backend can read.
+        const hasPixels = src => {
+          const w = src && (src.naturalWidth || src.width)
+          const h = src && (src.naturalHeight || src.height)
+          if (!w || !h) return !1
+          const c = document.createElement('canvas')
+          c.width = c.height = 64
+          const ctx = c.getContext('2d', { willReadFrequently: !0 })
+          ctx.drawImage(src, 0, 0, 64, 64)
+          const d = ctx.getImageData(0, 0, 64, 64).data
+          for (let k = 3; k < d.length; k += 4) if (d[k] > 0) return !0
+          return !1
+        }
+        let visibleBefore
+        try {
+          visibleBefore = hasPixels(el._originalElement)
+        } catch (err) {
+          return notApplicable()
+        }
+        const prevFilters = (el.filters || []).slice()
+        const prevFilter = el.filter
+        let ok = !0
+        try {
+          canvas.setElementOptions({ filter: filter }, el)
+          el.filters &&
+            el.filters.length &&
+            visibleBefore &&
+            (ok = hasPixels(el._element))
+        } catch (err) {
+          ok = !1
+        }
+        if (ok) return
+        try {
+          el.filters = prevFilters
+          el.applyFilters()
+          visibleBefore &&
+            prevFilters.length &&
+            !hasPixels(el._element) &&
+            (el.filters = [], el.applyFilters())
+        } catch (err) {
+          el.filters = []
+          el._element = el._originalElement
+          el._filteredEl = null
+          el._filterScalingX = 1
+          el._filterScalingY = 1
+        }
+        el.filter = prevFilter
+        el.set('dirty', !0)
+        canvas.renderAll()
+        notApplicable()
       }
       function Pa (t, e) {
         this.subPanel

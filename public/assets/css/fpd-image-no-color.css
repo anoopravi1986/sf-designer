@@ -1,0 +1,22 @@
+/*
+  No Color tool for images that cannot be recolored (plain JPG / PNG).
+
+  Scope: ONLY the `fpd-img-nocolor` class, which the toolbar render in
+  fpd-src/05-element-toolbar-interactions.js sets while the selected
+  element is an image with hasColorSelection() === false, and removes for
+  every other element. Colorizable images, SVG Elements, groups, text,
+  Base and Info never get it, so their Color tool is unchanged.
+
+  Why: body.notgroup.is-svg stays on the page after an SVG Element, group
+  or text group was selected, and styles.scss
+    .notgroup.is-svg fpd-element-toolbar.fpd-type-image .fpd-tool-color
+    { display: block !important }                     (specificity 0,4,1)
+  then showed Color (with the previous element's fill) on every image.
+  The class is repeated only to out-rank that rule and
+  fpd-doc-colorable-tools.css (up to 0,5,2).
+*/
+html body fpd-element-toolbar.fpd-img-nocolor.fpd-img-nocolor.fpd-img-nocolor.fpd-img-nocolor
+  .fpd-tools-nav
+  .fpd-tool-color {
+  display: none !important;
+}
