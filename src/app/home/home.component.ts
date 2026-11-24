@@ -404,7 +404,9 @@ export class HomeComponent implements AfterViewInit {
     // hover state, so the iOS "first tap only resolves hover" problem
     // described above cannot come back. While a tile's menu is open it keeps
     // its ⋯ via .fpd-menu-open (set in FancyProductDesigner.js).
-    const uploadTileOf = (el: any) => el?.closest?.('#extracontainer-data .fpd-item') as HTMLElement | null;
+    // Saved Designs tiles get the same mouse-only hover ⋯ on desktop.
+    const uploadTileOf = (el: any) =>
+      el?.closest?.('#extracontainer-data .fpd-item, fpd-module-save-load .fpd-item') as HTMLElement | null;
     document.addEventListener('pointerover', (e: PointerEvent) => {
       if (e.pointerType !== 'mouse') return;
       uploadTileOf(e.target)?.classList.add('fpd-dot-menu-hover');
@@ -5701,7 +5703,20 @@ export class HomeComponent implements AfterViewInit {
     const btn = document.getElementById('save-title-btn');
     const closeBtn = document.getElementById('close-title-popup-btn');
     const preparingLoader = document.getElementById('title-popup-loader');
+    const titleError = document.getElementById('design-title-error');
     if (!popup || !input || !btn) return;
+
+    // SAV-005: inline validation under the title field (replaces the old
+    // alert(), which showed nothing in the popup itself).
+    const setTitleError = (show: boolean) => {
+      input.classList.toggle('fpd-title-input-error', show);
+      input.setAttribute('aria-invalid', show ? 'true' : 'false');
+      if (titleError) titleError.hidden = !show;
+    };
+    setTitleError(false);
+    input.oninput = () => {
+      if (input.value.trim()) setTitleError(false);
+    };
 
     this.ensurePopupAboveMainBar(popup);
     popup.style.display = 'flex';
@@ -5721,6 +5736,10 @@ export class HomeComponent implements AfterViewInit {
     }
     input.onfocus = () => {
       if (this.titlePopupLoaderShown || !preparingLoader) return;
+      // SAV-006: the "preparing your design" loader is mobile-only (same
+      // breakpoint as the rest of this save flow). Desktop goes straight
+      // to typing.
+      if (window.innerWidth > 768) return;
       this.titlePopupLoaderShown = true;
       preparingLoader.style.display = 'flex';
       setTimeout(() => {
@@ -5732,10 +5751,15 @@ export class HomeComponent implements AfterViewInit {
       const value = input.value.trim();
 
       if (!value) {
-        alert('Please enter a title');
+        // Nothing is saved until a non-empty title is entered.
+        setTitleError(true);
+        // Desktop only: on mobile, focusing would trigger the preparing
+        // loader over the popup and hide the error that was just shown.
+        if (window.innerWidth > 768) input.focus();
         return;
       }
 
+      setTitleError(false);
       popup.style.display = 'none';
       this.saveDesign(value);
     };
@@ -5743,6 +5767,7 @@ export class HomeComponent implements AfterViewInit {
       closeBtn.onclick = () => {
         popup.style.display = 'none';
         input.value = '';
+        setTitleError(false);
       };
     }
 
@@ -5751,6 +5776,7 @@ export class HomeComponent implements AfterViewInit {
       if (e.target === popup) {
         popup.style.display = 'none';
         input.value = '';
+        setTitleError(false);
       }
     };
   }

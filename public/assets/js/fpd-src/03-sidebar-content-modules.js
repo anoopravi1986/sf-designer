@@ -1866,6 +1866,9 @@
           s.designId = t.design_id || ''
           s.sfLegacy = legacy ? sfLegacyFingerprint(t) : ''
           if (s.designId) s.dataset.designId = s.designId
+          // Saved Designs ⋯ menu offers Download / Delete only - no Share.
+          // (The shared tile builder $() adds Share for other lists.)
+          s.querySelectorAll('.fpd-share-menu .fpd-share-link-btn').forEach(b => b.remove())
           this.gridElem.append(s)
           G(s, 'click', () => this._openDesign(s))
           // Trash icon and the tile menu's "Delete" go through the backend.

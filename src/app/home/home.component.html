@@ -559,8 +559,11 @@
         type="text"
         id="design-title-input"
         placeholder="Enter design title..."
+        aria-describedby="design-title-error"
         style="width: 100%; padding: 10px 12px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 14px; box-sizing: border-box;"
       />
+      <!-- SAV-005: inline empty-title validation message (toggled in openTitlePopup) -->
+      <div id="design-title-error" class="fpd-title-input-error-msg" role="alert" hidden>Please enter a title.</div>
     </div>
 
     <div class="fpd-popup-footer" style="padding: 12px 16px; border-top: 1px solid #e5e7eb; display: flex; justify-content: flex-end;">

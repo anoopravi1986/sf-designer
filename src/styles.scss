@@ -3716,6 +3716,24 @@ html.sf-touch fpd-module-images #extracontainer-data .fpd-item .fpd-three-dot-me
   display: block !important;
 }
 
+/* Desktop: Saved Designs ⋯ shows while the MOUSE is over the tile
+   (.fpd-dot-menu-hover is set for mouse pointers only in home.component.ts,
+   so touch never gets a hover state) and stays while its menu is open. */
+fpd-module-save-load .fpd-item.fpd-dot-menu-hover .fpd-three-dot-menu,
+fpd-module-save-load .fpd-item:has(> .fpd-share-menu[style*="display: block"]) .fpd-three-dot-menu {
+  display: block !important;
+}
+
+/* SAV-015 - Mobile: Saved Designs ⋯ is always visible. On phones the ⋯ was
+   only revealed by .fpd-dot-menu-tapped (a tap on the tile), but tapping a
+   saved-design tile opens that design, so ⋯ / Download was unreachable.
+   Mobile only - desktop keeps the tap-to-reveal rules above. */
+@media (max-width: 768px) {
+  fpd-module-save-load .fpd-item .fpd-three-dot-menu {
+    display: block !important;
+  }
+}
+
 /* Mobile: FPD's snackbar (e.g. "Image not uploaded ... 6 MB or smaller")
    lives on <body> at z-index 100000, but the mobile bottom sheet
    (fpd-main-bar) sits at z-index 2147483647 and its nav bar covers the

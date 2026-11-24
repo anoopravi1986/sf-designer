@@ -1641,6 +1641,32 @@
       // Always available for Images-tab opens and upload-success reloads.
       window.fpdReloadUploadedImages = loadItems;
 
+      // SAV-015 (mobile): place a Saved Designs ⋯ menu under its ⋯ (above it
+      // when there is no room below), kept inside the screen and above the
+      // bottom nav. The menu is position:fixed, but an ancestor of the bottom
+      // sheet may be transformed (then fixed is relative to it), so the
+      // result is measured and corrected rather than assumed.
+      function sfPlaceSavedDesignMenu (menu, anchor) {
+        const gap = 6, pad = 8
+        menu.dataset.sfMobilePos = '1'
+        menu.style.marginTop = '0px'
+        menu.style.left = '0px'
+        menu.style.top = '0px'
+        const r = anchor.getBoundingClientRect()
+        const mw = menu.offsetWidth, mh = menu.offsetHeight
+        const vw = document.documentElement.clientWidth
+        let bottomLimit = window.innerHeight
+        const nav = anchor.closest('fpd-main-bar') && anchor.closest('fpd-main-bar').querySelector('.fpd-nav-item')
+        const navTop = nav && nav.parentElement ? nav.parentElement.getBoundingClientRect().top : 0
+        if (navTop > 0 && navTop < bottomLimit) bottomLimit = navTop
+        const left = Math.max(pad, Math.min(r.right - mw, vw - mw - pad))
+        let top = r.bottom + gap
+        if (top + mh > bottomLimit - pad) top = Math.max(pad, r.top - mh - gap)
+        const origin = menu.getBoundingClientRect()
+        menu.style.left = left - origin.left + 'px'
+        menu.style.top = top - origin.top + 'px'
+      }
+
       const N = t => '[object Object]' === Object.prototype.toString.call(t),
         H = (t, e) => {
           if (t && 'object' == typeof t) {
@@ -2016,23 +2042,36 @@
 
                   if (t.url) {
                     ;
+                    // SAV-015: on mobile close the menu once Download is tapped.
+                    if (window.matchMedia('(max-width: 768px)').matches) shareMenu.style.display = 'none';
 
-                    fetch(t.url, { mode: 'cors' }) // Add CORS handling if needed
+                    // SAV-015: no-store - the tile already loaded this
+                    // thumbnail WITHOUT CORS (<picture> / new Image()), and
+                    // S3 only adds Access-Control-Allow-Origin to requests
+                    // with an Origin, so reusing that cached copy failed
+                    // ("Image could not be downloaded").
+                    fetch(t.url, { mode: 'cors', cache: 'no-store' })
                       .then(response => {
                         if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
                         return response.blob();
                       })
                       .then(blob => {
                         const blobUrl = URL.createObjectURL(blob);
+                        // SAV-015: extension from the real file type (saved
+                        // thumbnails are PNG but were always named .jpg).
+                        const ext = ({ 'image/png': 'png', 'image/jpeg': 'jpg', 'image/webp': 'webp', 'image/gif': 'gif', 'image/svg+xml': 'svg' })[blob.type] || 'png';
 
                         const link = document.createElement('a');
                         link.href = blobUrl;
-                        link.download = (t.title || 'downloaded-image') + '.jpg'; // you can use .png if needed
+                        link.download = (t.title || 'downloaded-image') + '.' + ext;
                         document.body.appendChild(link);
                         link.click();
                         document.body.removeChild(link);
 
-                        URL.revokeObjectURL(blobUrl); // Clean up
+                        // SAV-015: revoking right after click() can cancel
+                        // the download on iOS Safari / some Android browsers
+                        // that read the blob asynchronously.
+                        setTimeout(() => URL.revokeObjectURL(blobUrl), 30000);
                       })
                       .catch(error => {
                         console.error("Download failed:", error);
@@ -2075,7 +2114,21 @@
               // Close all other open share menus (optional, for multiple items)
               document.querySelectorAll('.fpd-share-menu').forEach(menu => menu.style.display = 'none');
               shareMenu.style.display = isOpen ? 'none' : 'block';
-  
+
+              // SAV-015 (mobile only): the ⋯ is always visible on phones, so
+              // place the menu next to it inside the screen - it had no
+              // coordinates and could run off the right edge or under the
+              // bottom nav. Desktop keeps its original placement.
+              if (!isOpen) {
+                if (window.matchMedia('(max-width: 768px)').matches) {
+                  sfPlaceSavedDesignMenu(shareMenu, threeDot)
+                } else if (shareMenu.dataset.sfMobilePos) {
+                  delete shareMenu.dataset.sfMobilePos
+                  shareMenu.style.left = shareMenu.style.top = ''
+                  shareMenu.style.marginTop = '-80px'
+                }
+              }
+
               if (!isOpen) {
                 // Add a one-time event listener to close the menu when clicking outside
                 const closeMenu = function(event) {

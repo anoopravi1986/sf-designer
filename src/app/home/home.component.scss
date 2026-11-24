@@ -440,6 +440,27 @@
   padding: 0 20px;
 }
 
+// SAV-005: empty-title validation in #title-popup. Separate opt-in classes
+// toggled from openTitlePopup(); !important only because the input's
+// border is set inline in the template.
+#design-title-input.fpd-title-input-error {
+  border-color: #dc2626 !important;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.15);
+  outline: none;
+}
+
+.fpd-title-input-error-msg {
+  margin-top: 6px;
+  font-size: 12px;
+  line-height: 1.4;
+  color: #dc2626;
+  text-align: left;
+}
+
+.fpd-title-input-error-msg[hidden] {
+  display: none;
+}
+
 .fpd-title-popup-spinner {
   width: 40px;
   height: 40px;
