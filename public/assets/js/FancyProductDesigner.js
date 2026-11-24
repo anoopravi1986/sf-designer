@@ -36732,11 +36732,11 @@
   const fabricCanvas = this.fpdInstance.currentViewInstance?.fabricCanvas;
   if (!fabricCanvas) return;
 
-  // Mobile only. A phone cannot Shift+Click, so Group gathers every text
-  // on the design, shows the multi-select outline, then groups them.
-  // Desktop still groups only the texts the user Shift+Clicked.
-  const desktopGroup = window.matchMedia('(min-width: 991px)').matches
-  if (!desktopGroup) {
+  // Desktop + mobile (same behaviour). Unless 2+ texts are already
+  // multi-selected (Shift+Click on desktop), Group gathers every text on the
+  // design, shows the multi-select outline, then groups them - no manual
+  // multi-selection needed. Fewer than two texts: toast, nothing grouped.
+  {
     const isLooseText = o =>
       o &&
       o.visible !== false &&
