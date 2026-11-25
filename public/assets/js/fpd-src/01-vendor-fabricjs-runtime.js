@@ -47,16 +47,36 @@
             }
           })(fabric.Canvas.prototype.dispose)),
           (fabric.Canvas.prototype._historyNext = function () {
-            let t = {
-              version: fabric.version,
-              objects: this.getElementsJSON(!1, !1)
-            }
-            return (
-              t.objects.forEach(t => {
+            // CUSTOM (StyleFlip): every entry carries its element id (_hid,
+            // history only - not part of the element parameters) so undo/redo
+            // can update just the elements that changed instead of rebuilding
+            // the whole canvas (see _applyHistoryDiff). Grouped text (Group
+            // Text N) has no source, so getElementsJSON() skips it and it was
+            // never part of the history; it is now kept as a "_keepOnly"
+            // entry (restored by re-inserting its kept fabric object).
+            const json = this.getElementsJSON(!1, !1),
+              objects = []
+            let j = 0
+            this.getElements('all', !1).forEach(o => {
+              if (void 0 !== o.title && void 0 !== o.source) {
+                const t = json[j++]
+                if (!t) return
                 t.curved && delete t.path
-              }),
-              JSON.stringify(t)
-            )
+                null != o.id && (t._hid = String(o.id))
+                objects.push(t)
+              } else
+                o.isTextGroup &&
+                  o.isTextGroup() &&
+                  null != o.id &&
+                  objects.push({
+                    title: o.title,
+                    type: o.getType(),
+                    _hid: String(o.id),
+                    _keepOnly: 1,
+                    parameters: o.getElementJSON()
+                  })
+            })
+            return JSON.stringify({ version: fabric.version, objects: objects })
           }),
           (fabric.Canvas.prototype._historyEvents = function () {
             return {
@@ -69,10 +89,26 @@
             ;(this.historyUndo = []),
               (this.historyRedo = []),
               (this.historyNextState = this._historyNext()),
-              this.on(this._historyEvents())
+              this.on(this._historyEvents()),
+              // CUSTOM (StyleFlip): see _historyStashRemoved
+              (this._historyObjects = new Map()),
+              this.on('elementRemove', this._historyStashRemoved)
           }),
           (fabric.Canvas.prototype._historyDispose = function () {
-            this.off(this._historyEvents())
+            this.off(this._historyEvents()),
+              this.off('elementRemove', this._historyStashRemoved)
+          }),
+          // CUSTOM (StyleFlip): keep the fabric object of every removed element
+          // (deleted by the user, or removed by an undo/redo), so an undo/redo
+          // that brings it back re-inserts that same object instantly instead
+          // of downloading and decoding its image again. Bounded to the last
+          // 60 removals.
+          (fabric.Canvas.prototype._historyStashRemoved = function (t) {
+            const e = t && t.element
+            if (!e || null == e.id || !this._historyObjects) return
+            const i = this._historyObjects
+            i.delete(String(e.id)), i.set(String(e.id), e)
+            for (; i.size > 60; ) i.delete(i.keys().next().value)
           }),
           (fabric.Canvas.prototype.historySaveAction = function () {
             if (this.historyProcessing) return
@@ -82,32 +118,243 @@
               (this.historyNextState = this._historyNext()),
               this.fire('history:append', { json: t })
           }),
+          // CUSTOM (StyleFlip): a restore can be asynchronous (re-adding an
+          // image waits for it to load). An Undo/Redo clicked meanwhile used to
+          // start a second restore on top of the first: duplicated objects,
+          // history recorded mid-restore, and later Undo steps removing
+          // several actions at once. Such clicks now wait and run in order.
+          (fabric.Canvas.prototype._historyQueueStep = function (t, e) {
+            return (
+              !!this._historyBusy &&
+              ((this._historyQueue || (this._historyQueue = [])).push([t, e]),
+              !0)
+            )
+          }),
           (fabric.Canvas.prototype.undo = function (t) {
+            if (this._historyQueueStep('undo', t)) return
             ;(this.historyProcessing = !0), this.deselectElement()
             const e = this.historyUndo.pop()
             e
               ? (this.historyRedo.push(this._historyNext()),
                 (this.historyNextState = e),
+                (this._historyBusy = !0),
                 this._loadHistory(e, 'history:undo', t))
               : (this.historyProcessing = !1)
           }),
           (fabric.Canvas.prototype.redo = function (t) {
+            if (this._historyQueueStep('redo', t)) return
             ;(this.historyProcessing = !0), this.deselectElement()
             const e = this.historyRedo.pop()
             e
               ? (this.historyUndo.push(this._historyNext()),
                 (this.historyNextState = e),
+                (this._historyBusy = !0),
                 this._loadHistory(e, 'history:redo', t))
               : (this.historyProcessing = !1)
           }),
           (fabric.Canvas.prototype._loadHistory = function (t, e, i) {
-            'string' == typeof t && (t = JSON.parse(t)),
-              this.clear(),
-              this.addElements(t.objects, () => {
+            'string' == typeof t && (t = JSON.parse(t))
+            // CUSTOM (StyleFlip): the snapshot already holds each element's
+            // exact scale and position. Add-time "fit image to canvas" hooks
+            // (part 2 object:added, part 6 elementAdd) must not run while
+            // restoring: they measure the CURRENT on-screen canvas (shrunk to
+            // fit the window), so the Base skin came back smaller after Undo.
+            this._historyRestoring = !0
+            const n = () => {
+              ;(this._historyRestoring = !1),
                 this.fire(e),
-                  (this.historyProcessing = !1),
-                  i && 'function' == typeof i && i()
+                (this.historyProcessing = !1),
+                (this._historyBusy = !1),
+                i && 'function' == typeof i && i()
+              const t = this._historyQueue && this._historyQueue.shift()
+              t && this[t[0]](t[1])
+            }
+            // Update only what differs from the snapshot. The old restore
+            // cleared the canvas and re-added EVERY element (skin included),
+            // so the frame went blank and every image re-loaded on each step.
+            let s = !1
+            try {
+              s = this._applyHistoryDiff(t.objects || [], n)
+            } catch (r) {
+              console.warn('[history] in-place restore failed, full reload', r)
+              s = !1
+            }
+            s || (this.clear(), this.addElements(t.objects || [], n))
+          }),
+          // CUSTOM (StyleFlip): applies a history snapshot in place. Returns
+          // false (caller does the original full reload) when elements cannot
+          // be matched by id. Elements are matched by the id stored in the
+          // snapshot (_hid): missing ones are removed, changed ones get only
+          // their changed parameters (verified; otherwise that one element is
+          // re-added from the snapshot), absent ones are re-added with their
+          // original id, then the snapshot's stacking order is applied.
+          (fabric.Canvas.prototype._applyHistoryDiff = function (
+            snapshot,
+            onDone
+          ) {
+            // Derived / metadata keys: not compared or applied (stacking
+            // order is handled separately, width/height follow from content).
+            const IGNORED_KEYS = {
+              z: 1,
+              width: 1,
+              height: 1,
+              originParams: 1,
+              autoSelect: 1
+            }
+            const isElement = o =>
+              (void 0 !== o.title && void 0 !== o.source) ||
+              !!(o.isTextGroup && o.isTextGroup())
+            const same = (a, b) => JSON.stringify(a) === JSON.stringify(b)
+            const uniqueIds = ids => {
+              const set = new Set()
+              for (const id of ids) {
+                if (null == id || '' === id || set.has(String(id))) return null
+                set.add(String(id))
+              }
+              return set
+            }
+            const current = this.getElements('all', !1).filter(isElement)
+            const currentIds = uniqueIds(current.map(o => o.id))
+            const targetIds = uniqueIds(snapshot.map(entry => entry._hid))
+            if (!currentIds || !targetIds) return !1
+
+            const byId = new Map(current.map(o => [String(o.id), o]))
+            const toAdd = []
+            let structureChanged = !1
+            const readd = (obj, entry) => {
+              this.removeElement(obj), toAdd.push(entry)
+            }
+            // Brings an element's parameters to the snapshot's: applies only
+            // the changed ones, then verifies. false = not reproduced exactly.
+            const syncParams = (obj, entry) => {
+              const now = obj.getElementJSON()
+              const want = entry.parameters || {}
+              const changed = {}
+              let exact = !0
+              new Set(Object.keys(now).concat(Object.keys(want))).forEach(k => {
+                if (IGNORED_KEYS[k] || same(now[k], want[k])) return
+                // A key the snapshot does not have cannot be "unset" here.
+                k in want ? (changed[k] = want[k]) : (exact = !1)
               })
+              if (!exact) return !1
+              if (Object.keys(changed).length) {
+                this.setElementOptions(changed, obj)
+                const after = obj.getElementJSON()
+                if (Object.keys(changed).some(k => !same(after[k], want[k])))
+                  return !1
+              }
+              return want.originParams && (obj.originParams = want.originParams), !0
+            }
+
+            // 1) elements that are not in the snapshot
+            current.forEach(obj => {
+              targetIds.has(String(obj.id)) ||
+                (this.removeElement(obj), (structureChanged = !0))
+            })
+
+            // 2) elements in both: apply only the changed parameters
+            snapshot.forEach(entry => {
+              const obj = byId.get(entry._hid)
+              if (!obj) return void toAdd.push(entry)
+              if (
+                obj.source !== entry.source ||
+                obj.title !== entry.title ||
+                obj.getType() !== entry.type
+              )
+                return void readd(obj, entry)
+              // anything not reproduced exactly -> re-add it from the snapshot
+              // (a grouped text cannot be re-loaded; it stays as it is)
+              syncParams(obj, entry) || entry._keepOnly || readd(obj, entry)
+            })
+            toAdd.length && (structureChanged = !0)
+
+            // Elements to bring back: re-insert the kept fabric object when
+            // there is one (instant, no image download) - only what cannot be
+            // reproduced that way is loaded again below.
+            const toLoad = toAdd.filter(entry => {
+              const kept = this._historyObjects && this._historyObjects.get(entry._hid)
+              const cannotLoad = () =>
+                entry._keepOnly
+                  ? (console.warn('[history] grouped text could not be restored', entry.title), !1)
+                  : !0
+              if (
+                !kept ||
+                kept.canvas ||
+                kept.source !== entry.source ||
+                kept.title !== entry.title
+              )
+                return cannotLoad()
+              // A text group taken apart by Ungroup: put its texts back to the
+              // in-group transforms recorded before ungrouping (part 5).
+              kept.__sfChildStates &&
+                (kept.getObjects().forEach((c, n) => {
+                  const st = kept.__sfChildStates[n]
+                  st && c.set(st), (c.group = kept), c.setCoords && c.setCoords()
+                }),
+                delete kept.__sfChildStates,
+                (kept.dirty = !0))
+              if (kept.getType() !== entry.type) return cannotLoad()
+              this.add(kept)
+              // (a grouped text cannot be re-loaded, so it stays either way)
+              if (!syncParams(kept, entry) && !entry._keepOnly)
+                return this.remove(kept), !0
+              this._historyObjects.delete(entry._hid)
+              this.fire('elementAdd', { element: kept })
+              return !1
+            })
+
+            // 3) snapshot stacking order, Layers panel, done
+            const finish = () => {
+              const order = snapshot.map(entry => entry._hid)
+              const now = this.getElements('all', !1)
+                .filter(isElement)
+                .map(o => String(o.id))
+              if (now.join('|') !== order.filter(id => now.includes(id)).join('|')) {
+                order.forEach(id => {
+                  const obj = this.getElementByID(id)
+                  obj && this.bringToFront(obj)
+                })
+                this.currentBoundingObject &&
+                  this.currentBoundingObject.bringToFront()
+                this.printingBoxObject && this.printingBoxObject.bringToFront()
+                structureChanged = !0
+              }
+              structureChanged &&
+                'undefined' != typeof document &&
+                document
+                  .querySelectorAll('fpd-module-manage-layers')
+                  .forEach(el => {
+                    const layers = el.fpdLayersModule
+                    layers &&
+                      'function' == typeof layers.rebuildList &&
+                      layers.rebuildList()
+                  })
+              this.renderAll()
+              onDone()
+            }
+
+            // 4) load what could not be re-inserted (async for images),
+            // keeping their ids
+            if (!toLoad.length) return finish(), !0
+            let added = 0
+            const keepId = ev => {
+              const entry = toLoad[added++]
+              ev && ev.element && entry && (ev.element.id = entry._hid)
+            }
+            this.on('elementAdd', keepId)
+            this.addElements(
+              toLoad.map(entry => ({
+                type: entry.type,
+                source: entry.source,
+                title: entry.title,
+                parameters: entry.parameters
+              })),
+              () => {
+                this.off('elementAdd', keepId)
+                finish()
+              }
+            )
+            return !0
           }),
           (fabric.Canvas.prototype.clearHistory = function () {
             ;(this.historyUndo = []),

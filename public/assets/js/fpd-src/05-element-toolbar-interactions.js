@@ -1008,6 +1008,10 @@
   group.setCoords();
   updateFPDLayersToSingleGroup(group);
   fabricCanvas.requestRenderAll();
+  // Grouping is one Undo step. toGroup() removes / adds objects without
+  // elementAdd / elementRemove, so nothing recorded it before (Undo then
+  // jumped back past the group or duplicated its texts).
+  fabricCanvas.historySaveAction && fabricCanvas.historySaveAction();
 
   // --- UI TOGGLE ---
   document.querySelector('.fpd-ungroup1')?.classList.remove('fpd-hidden');
@@ -1508,6 +1512,19 @@ function updateFPDLayersToSingleGroup(group) {
 
             if (!activeObj || activeObj.type !== 'group') return;
 
+            // Ungroup is ONE Undo step: re-adding each text below would
+            // otherwise record one entry per text. History is paused here and
+            // saved once at the end (finally). The group's in-group text
+            // transforms are recorded so an Undo can put this same group back
+            // (see _applyHistoryDiff, part 1).
+            const sfHistoryWasOn = !canvas.historyProcessing;
+            canvas.historyProcessing = true;
+            activeObj.__sfChildStates = activeObj.getObjects().map(o => ({
+              left: o.left, top: o.top, scaleX: o.scaleX, scaleY: o.scaleY,
+              angle: o.angle, flipX: o.flipX, flipY: o.flipY, skewX: o.skewX, skewY: o.skewY
+            }));
+            try {
+
             // Restore original objects
             activeObj._restoreObjectsState();
             canvas.remove(activeObj);
@@ -1677,6 +1694,16 @@ function updateFPDLayersToSingleGroup(group) {
             document.querySelector('.fpd-ungroup')?.classList.remove('fpd-hidden');
             document.querySelector('.fpd-group-copy-by')?.classList.add('fpd-hidden');
             document.querySelector('.fpd-group-paste-by')?.classList.add('fpd-hidden');
+            } finally {
+              // canvas.remove(group) fires no elementRemove - keep the group
+              // for Undo explicitly, then record the ungroup as one step.
+              canvas._historyStashRemoved &&
+                canvas._historyStashRemoved.call(canvas, { element: activeObj });
+              if (sfHistoryWasOn) {
+                canvas.historyProcessing = false;
+                canvas.historySaveAction && canvas.historySaveAction();
+              }
+            }
           });
           // ===== END CUSTOM (StyleFlip: group/ungroup, copy/paste, toast) ===
 

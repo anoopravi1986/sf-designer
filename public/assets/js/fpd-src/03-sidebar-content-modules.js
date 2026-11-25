@@ -2440,6 +2440,10 @@
                   'beforeend',
                   '<input type="checkbox" class="fpd-switch" />'
                 ),
+              // CUSTOM (StyleFlip): hook for the desktop Undo/Redo hover fix
+              // (styles.scss, .sf-history-btn).
+              ('undo' === t.type || 'redo' === t.type) &&
+                e.classList.add('sf-history-btn'),
               this.uncollapsedMenu.append(e)
             const i = e.cloneNode(!0)
             this.collapsedMenu.querySelector('.fpd-dropdown-menu').append(i),

@@ -3852,3 +3852,18 @@ fpd-module-save-load .fpd-item:has(> .fpd-share-menu[style*="display: block"]) .
     background: linear-gradient(to left, #fff 60%, rgba(255, 255, 255, 0)) !important;
   }
 }
+
+/* Desktop Undo / Redo: the buttons are black with a white icon
+   (fpd-actions-bar ... .fpd-uncollapsed-menu div { background: #000 } above),
+   but the vendor hover rule `.fpd-container fpd-actions-bar .fpd-btn:hover`
+   (more specific) swapped that for rgba(255,255,255,.05) - the white icon then
+   sat on the light page and the button looked gone. Keep the black button on
+   hover with a slightly lighter shade as hover feedback. Only .sf-history-btn
+   (Undo / Redo, set in FancyProductDesigner part 3). */
+@media only screen and (min-width: 1200px) {
+  fpd-actions-bar div[data-pos="left"] .fpd-uncollapsed-menu .fpd-btn.sf-history-btn:hover,
+  fpd-actions-bar div[data-pos="left"] .fpd-uncollapsed-menu .fpd-btn.sf-history-btn:focus-visible {
+    background: #2b2b2b;
+    opacity: 1;
+  }
+}

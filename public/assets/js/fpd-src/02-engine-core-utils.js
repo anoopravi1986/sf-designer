@@ -5287,7 +5287,8 @@
                   (t._layerAddedAt = e._layerAddedAt),
                   (t._layerKind = e._layerKind),
                   n.add(t),
-                  n.setElementOptions(e, t),
+                  // One history entry per add (fired by elementAdd below).
+                  n._setOptionsWhileAdding(e, t),
                   (t.originParams.angle = t.angle),
                   (t.originParams.z = t.getZIndex()))
                 : n.fire('imageFail', { url: e.source }),
@@ -5415,7 +5416,8 @@
                 ] = u),
               (u._layerAddedAt = c._layerAddedAt),
               this.add(u),
-              this.setElementOptions(c, u),
+              // One history entry per add (fired by elementAdd below).
+              this._setOptionsWhileAdding(c, u),
               (u.originParams = z(u.toJSON(), u.originParams)),
               (u.originParams.z = u.getZIndex()),
               this.fire('elementAdd', { element: u })
@@ -5565,6 +5567,17 @@
             if (n.replace === t) return n
           }
           return null
+        }),
+        // CUSTOM (StyleFlip): applies an element's initial options inside
+        // addElement without recording a history entry - the elementAdd fired
+        // right after records the add, so each add is exactly one Undo step.
+        (St.fabric.Canvas.prototype._setOptionsWhileAdding = function (t, e) {
+          this._sfAddingElement = !0
+          try {
+            this.setElementOptions(t, e)
+          } finally {
+            this._sfAddingElement = !1
+          }
         }),
         (St.fabric.Canvas.prototype.setElementOptions = function (t, e) {
           if (!(e = void 0 === e ? this.getActiveObject() : e) || void 0 === t)
@@ -6027,7 +6040,9 @@
             this.renderAll().calcOffset(),
             this.fire('elementModify', { element: e, options: t }),
             e._checkContainment(),
-            this._doHistory && this.historySaveAction(),
+            // Skipped while an element is being added: elementAdd records
+            // that step, so saving here too made every add 2 Undo steps.
+            this._doHistory && !this._sfAddingElement && this.historySaveAction(),
             t.autoSelect &&
               e.isEditable &&
               !this.editorMode &&
@@ -6393,8 +6408,10 @@
                 document.querySelector('.fpd-group-copy-by').classList.add('fpd-hidden');
               }
 
-              // If object is an image, scale and center it proportionally
-              if (e.type === 'image') {
+              // If object is an image, scale and center it proportionally.
+              // Not while undo/redo restores a snapshot (exact scale/position
+              // are restored from it - see _loadHistory in part 1).
+              if (e.type === 'image' && !this.fabricCanvas._historyRestoring) {
                 ;
                 const stageW = this.fabricCanvas.getWidth();
                 const stageH = this.fabricCanvas.getHeight();

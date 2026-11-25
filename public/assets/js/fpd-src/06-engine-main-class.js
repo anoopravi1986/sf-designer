@@ -704,7 +704,10 @@
                 // e.uniScalingUnlockable = true;
                 // e.selectable = true;
                 if(e.getType() == 'text') {e.removable = true}
-                if (e.getType() == 'image' & e.draggable == '0') {
+                // Not while undo/redo restores a snapshot: e.canvas.width is
+                // the current on-screen canvas size, so re-fitting here made
+                // the Base skin smaller after Undo (see _loadHistory, part 1).
+                if (e.getType() == 'image' & e.draggable == '0' && !(e.canvas && e.canvas._historyRestoring)) {
                   ;
                   const scaleX = e.canvas.width / e.width;
                   const scaleY = e.canvas.width / e.height;
