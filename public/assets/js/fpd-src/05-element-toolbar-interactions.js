@@ -2520,6 +2520,22 @@ function updateFPDLayersToSingleGroup(group) {
           const e = t.querySelectorAll('[data-tab]:not(.fpd-hidden)')
           J(t, ['fpd-hidden'], e.length <= 1)
         })
+        // CUSTOM (StyleFlip): in the mobile Image Editor both copy/paste-style
+        // icons are hidden but their box (.extra-icon-main-div-box) stayed,
+        // leaving an empty slot between Reset and Duplicate. Mark it when it
+        // is empty there (sf-mobile-img-empty-tools, styles.scss). Checked
+        // after this frame's class updates; other editors / desktop unchanged.
+        const sfCopyBox = this.navElem.querySelector('.extra-icon-main-div-box')
+        sfCopyBox &&
+          requestAnimationFrame(() => {
+            const empty =
+              this.container.classList.contains('fpd-layout-small') &&
+              'image' === this.container.dataset.fabricType &&
+              Array.from(sfCopyBox.querySelectorAll('.extra-icon')).every(
+                k => 'none' === getComputedStyle(k).display
+              )
+            J(sfCopyBox, ['sf-mobile-img-empty-tools'], empty)
+          })
       }
       function ka () {
         if (

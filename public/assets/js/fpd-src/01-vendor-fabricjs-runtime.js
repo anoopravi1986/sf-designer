@@ -92,7 +92,11 @@
               this.on(this._historyEvents()),
               // CUSTOM (StyleFlip): see _historyStashRemoved
               (this._historyObjects = new Map()),
-              this.on('elementRemove', this._historyStashRemoved)
+              this.on('elementRemove', this._historyStashRemoved),
+              // CUSTOM (StyleFlip): see _historyInsertPending
+              (this._historyTokens = new WeakMap()),
+              (this._historyOps = 0),
+              (this._historyDeferred = [])
           }),
           (fabric.Canvas.prototype._historyDispose = function () {
             this.off(this._historyEvents()),
@@ -110,8 +114,20 @@
             i.delete(String(e.id)), i.set(String(e.id), e)
             for (; i.size > 60; ) i.delete(i.keys().next().value)
           }),
-          (fabric.Canvas.prototype.historySaveAction = function () {
-            if (this.historyProcessing) return
+          (fabric.Canvas.prototype.historySaveAction = function (ev) {
+            // CUSTOM (StyleFlip): an add the user requested before an image
+            // finished loading carries the history position of that request
+            // (set in addElement, part 2).
+            const el = ev && ev.element,
+              tk = el && el._sfHistoryToken
+            tk && delete el._sfHistoryToken
+            if (this.historyProcessing) {
+              // landed while an undo/redo was restoring: record it right
+              // after the restore instead of dropping it from the history
+              tk && this._historyDeferred && this._historyDeferred.push(el)
+              return
+            }
+            if (tk && this._historyInsertPending(tk, el)) return
             const t = this.historyNextState
             ;(this.isCustomized = this.initialElementsLoaded),
               this.historyUndo.push(t),
@@ -130,10 +146,52 @@
               !0)
             )
           }),
+          // CUSTOM (StyleFlip): an image added by the user can finish loading
+          // after later actions (e.g. Add Text clicked while the image was
+          // still downloading). Recording it when it landed put it AFTER
+          // those actions, so Undo removed the image before the text and the
+          // steps looked merged / reversed. This records the add at the
+          // position the user requested it: the states recorded since that
+          // request get the element too, and the add itself gets its own step
+          // before them. Returns false (normal recording) if nothing was
+          // recorded in between or an undo/redo happened meanwhile.
+          (fabric.Canvas.prototype._historyInsertPending = function (tk, el) {
+            if (
+              !tk ||
+              tk.ops !== this._historyOps ||
+              this.historyUndo.length <= tk.undoLen ||
+              null == el.id
+            )
+              return !1
+            const now = this._historyNext(),
+              current = JSON.parse(now).objects,
+              hid = String(el.id),
+              idx = current.findIndex(x => x._hid === hid)
+            if (idx < 0) return !1
+            const entry = current[idx],
+              below = new Set(current.slice(0, idx).map(x => x._hid)),
+              withEl = s => {
+                const o = JSON.parse(s)
+                if (o.objects.some(x => x._hid === hid)) return s
+                let pos = 0
+                o.objects.forEach((x, n) => {
+                  below.has(x._hid) && (pos = n + 1)
+                })
+                o.objects.splice(pos, 0, entry)
+                return JSON.stringify(o)
+              }
+            const later = this.historyUndo.splice(tk.undoLen)
+            this.historyUndo.push(later[0], ...later.map(withEl))
+            this.historyNextState = now
+            this.isCustomized = this.initialElementsLoaded
+            this.fire('history:append', { json: later[0] })
+            return !0
+          }),
           (fabric.Canvas.prototype.undo = function (t) {
             if (this._historyQueueStep('undo', t)) return
             ;(this.historyProcessing = !0), this.deselectElement()
             const e = this.historyUndo.pop()
+            e && this._historyOps++
             e
               ? (this.historyRedo.push(this._historyNext()),
                 (this.historyNextState = e),
@@ -145,6 +203,7 @@
             if (this._historyQueueStep('redo', t)) return
             ;(this.historyProcessing = !0), this.deselectElement()
             const e = this.historyRedo.pop()
+            e && this._historyOps++
             e
               ? (this.historyUndo.push(this._historyNext()),
                 (this.historyNextState = e),
@@ -164,8 +223,14 @@
               ;(this._historyRestoring = !1),
                 this.fire(e),
                 (this.historyProcessing = !1),
-                (this._historyBusy = !1),
-                i && 'function' == typeof i && i()
+                (this._historyBusy = !1)
+              // user adds that landed during this restore (see
+              // historySaveAction): recorded as one step after the restore
+              // (they are all on the canvas by now)
+              this._historyDeferred &&
+                this._historyDeferred.splice(0).some(el => el.canvas === this) &&
+                this.historySaveAction()
+              i && 'function' == typeof i && i()
               const t = this._historyQueue && this._historyQueue.shift()
               t && this[t[0]](t[1])
             }
@@ -357,6 +422,7 @@
             return !0
           }),
           (fabric.Canvas.prototype.clearHistory = function () {
+            this._historyOps = (this._historyOps || 0) + 1
             ;(this.historyUndo = []),
               (this.historyRedo = []),
               this.fire('history:clear')

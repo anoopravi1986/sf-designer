@@ -61,6 +61,9 @@ export class HomeComponent implements AfterViewInit {
   firstName: string = '';
   initialLetter: string = 'A';
   private savedContent: string = '';
+  // Images grid: image URLs currently being added to the canvas (guards
+  // duplicate clicks while one is loading).
+  private imageTileAdding = new Set<string>();
   fontArrayStr: any;
   private searchTimeout: any;
   // Whether the real product fetch (cache or fresh) has finished - gates
@@ -360,6 +363,36 @@ export class HomeComponent implements AfterViewInit {
           const source = clickedDiv.getAttribute('data-source');
           const title = clickedDiv.getAttribute('data-title');
           const parameter = { removable: true, positioned: true, autoSelect: true, uniScalingUnlockable: true };
+          // Immediate feedback on the tapped tile + no duplicate adds while
+          // this image is still being added (sf-img-tile-adding, styles.scss).
+          const key = String(source || '').split('?')[0];
+          // Shared with the Images grid builder (FancyProductDesigner part 2)
+          // so a tile re-rendered while its image is still being added keeps
+          // the "adding" state.
+          (window as any).__sfImageTileAdding = this.imageTileAdding;
+          if (!key || this.imageTileAdding.has(key)) return;
+          this.imageTileAdding.add(key);
+          clickedDiv.classList.add('sf-img-tile-adding');
+          const canvas = fpdvalue?.currentViewInstance?.fabricCanvas;
+          let timer: any = null;
+          const done = (ev?: any) => {
+            const landed = ev?.element?.source ?? ev?.url;
+            if (ev && String(landed || '').split('?')[0] !== key) return;
+            this.imageTileAdding.delete(key);
+            document
+              .querySelectorAll('#extracontainer-data .sf-img-tile-adding')
+              .forEach((el) => {
+                if (String(el.getAttribute('data-source') || '').split('?')[0] === key) {
+                  el.classList.remove('sf-img-tile-adding');
+                }
+              });
+            canvas?.off?.('elementAdd', done);
+            canvas?.off?.('imageFail', done);
+            clearTimeout(timer);
+          };
+          canvas?.on?.('elementAdd', done);
+          canvas?.on?.('imageFail', done);
+          timer = setTimeout(() => done(), 30000);
           fpdvalue.addCanvasDesign(source, title, parameter);
         });
 

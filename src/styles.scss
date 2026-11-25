@@ -3867,3 +3867,45 @@ fpd-module-save-load .fpd-item:has(> .fpd-share-menu[style*="display: block"]) .
     opacity: 1;
   }
 }
+
+/* Images grid: immediate feedback on the tapped tile while its image is
+   being added (class set in home.component.ts, removed when it lands).
+   New class only. */
+.sf-img-tile-adding {
+  position: relative;
+  pointer-events: none;
+}
+
+.sf-img-tile-adding > picture {
+  opacity: 0.45;
+}
+
+.sf-img-tile-adding::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 28px;
+  height: 28px;
+  margin: -14px 0 0 -14px;
+  border: 3px solid rgba(0, 0, 0, 0.15);
+  border-top-color: var(--theme-color, #e85a24);
+  border-radius: 50%;
+  animation: sf-img-tile-spin 0.8s linear infinite;
+  z-index: 2;
+}
+
+@keyframes sf-img-tile-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Mobile Image Editor: empty copy/paste-style box between Reset and
+   Duplicate (class set in FancyProductDesigner part 5 only when both its
+   icons are hidden in the mobile image toolbar). New class only. */
+@media (max-width: 768px) {
+  .sf-mobile-img-empty-tools {
+    display: none !important;
+  }
+}

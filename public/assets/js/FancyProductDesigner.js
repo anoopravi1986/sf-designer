@@ -92,7 +92,11 @@
               this.on(this._historyEvents()),
               // CUSTOM (StyleFlip): see _historyStashRemoved
               (this._historyObjects = new Map()),
-              this.on('elementRemove', this._historyStashRemoved)
+              this.on('elementRemove', this._historyStashRemoved),
+              // CUSTOM (StyleFlip): see _historyInsertPending
+              (this._historyTokens = new WeakMap()),
+              (this._historyOps = 0),
+              (this._historyDeferred = [])
           }),
           (fabric.Canvas.prototype._historyDispose = function () {
             this.off(this._historyEvents()),
@@ -110,8 +114,20 @@
             i.delete(String(e.id)), i.set(String(e.id), e)
             for (; i.size > 60; ) i.delete(i.keys().next().value)
           }),
-          (fabric.Canvas.prototype.historySaveAction = function () {
-            if (this.historyProcessing) return
+          (fabric.Canvas.prototype.historySaveAction = function (ev) {
+            // CUSTOM (StyleFlip): an add the user requested before an image
+            // finished loading carries the history position of that request
+            // (set in addElement, part 2).
+            const el = ev && ev.element,
+              tk = el && el._sfHistoryToken
+            tk && delete el._sfHistoryToken
+            if (this.historyProcessing) {
+              // landed while an undo/redo was restoring: record it right
+              // after the restore instead of dropping it from the history
+              tk && this._historyDeferred && this._historyDeferred.push(el)
+              return
+            }
+            if (tk && this._historyInsertPending(tk, el)) return
             const t = this.historyNextState
             ;(this.isCustomized = this.initialElementsLoaded),
               this.historyUndo.push(t),
@@ -130,10 +146,52 @@
               !0)
             )
           }),
+          // CUSTOM (StyleFlip): an image added by the user can finish loading
+          // after later actions (e.g. Add Text clicked while the image was
+          // still downloading). Recording it when it landed put it AFTER
+          // those actions, so Undo removed the image before the text and the
+          // steps looked merged / reversed. This records the add at the
+          // position the user requested it: the states recorded since that
+          // request get the element too, and the add itself gets its own step
+          // before them. Returns false (normal recording) if nothing was
+          // recorded in between or an undo/redo happened meanwhile.
+          (fabric.Canvas.prototype._historyInsertPending = function (tk, el) {
+            if (
+              !tk ||
+              tk.ops !== this._historyOps ||
+              this.historyUndo.length <= tk.undoLen ||
+              null == el.id
+            )
+              return !1
+            const now = this._historyNext(),
+              current = JSON.parse(now).objects,
+              hid = String(el.id),
+              idx = current.findIndex(x => x._hid === hid)
+            if (idx < 0) return !1
+            const entry = current[idx],
+              below = new Set(current.slice(0, idx).map(x => x._hid)),
+              withEl = s => {
+                const o = JSON.parse(s)
+                if (o.objects.some(x => x._hid === hid)) return s
+                let pos = 0
+                o.objects.forEach((x, n) => {
+                  below.has(x._hid) && (pos = n + 1)
+                })
+                o.objects.splice(pos, 0, entry)
+                return JSON.stringify(o)
+              }
+            const later = this.historyUndo.splice(tk.undoLen)
+            this.historyUndo.push(later[0], ...later.map(withEl))
+            this.historyNextState = now
+            this.isCustomized = this.initialElementsLoaded
+            this.fire('history:append', { json: later[0] })
+            return !0
+          }),
           (fabric.Canvas.prototype.undo = function (t) {
             if (this._historyQueueStep('undo', t)) return
             ;(this.historyProcessing = !0), this.deselectElement()
             const e = this.historyUndo.pop()
+            e && this._historyOps++
             e
               ? (this.historyRedo.push(this._historyNext()),
                 (this.historyNextState = e),
@@ -145,6 +203,7 @@
             if (this._historyQueueStep('redo', t)) return
             ;(this.historyProcessing = !0), this.deselectElement()
             const e = this.historyRedo.pop()
+            e && this._historyOps++
             e
               ? (this.historyUndo.push(this._historyNext()),
                 (this.historyNextState = e),
@@ -164,8 +223,14 @@
               ;(this._historyRestoring = !1),
                 this.fire(e),
                 (this.historyProcessing = !1),
-                (this._historyBusy = !1),
-                i && 'function' == typeof i && i()
+                (this._historyBusy = !1)
+              // user adds that landed during this restore (see
+              // historySaveAction): recorded as one step after the restore
+              // (they are all on the canvas by now)
+              this._historyDeferred &&
+                this._historyDeferred.splice(0).some(el => el.canvas === this) &&
+                this.historySaveAction()
+              i && 'function' == typeof i && i()
               const t = this._historyQueue && this._historyQueue.shift()
               t && this[t[0]](t[1])
             }
@@ -357,6 +422,7 @@
             return !0
           }),
           (fabric.Canvas.prototype.clearHistory = function () {
+            this._historyOps = (this._historyOps || 0) + 1
             ;(this.historyUndo = []),
               (this.historyRedo = []),
               this.fire('history:clear')
@@ -21063,6 +21129,40 @@
       // call is dropped: re-rendering identical data replaced the tiles while
       // a just-opened ⋯ menu still pointed at the old ones, so Delete removed
       // a detached copy and the visible tile stayed.
+      // ===== CUSTOM (StyleFlip): shared CORS image downloads ==============
+      // The Images grid drew each image as a CSS background (a request
+      // without CORS), and adding it to the canvas needs a CORS request.
+      // S3 only sends CORS headers when asked, so the grid's copy could not
+      // be reused and every add downloaded the full image again (2.6-3.7 s
+      // for a 1.6 MB, 5000 px photo). The grid now downloads each image once
+      // WITH CORS and shows it through a blob: URL; addElement (raster path)
+      // decodes those same bytes. One download, same pixels. A failed fetch
+      // (offline / no CORS) falls back to the original URLs.
+      const sfCorsImages = new Map()
+      const sfCorsKey = url => String(url || '').split('?')[0]
+      function sfLoadCorsImage (url) {
+        const key = sfCorsKey(url)
+        if (!/^https?:\/\//i.test(key)) return null
+        if (sfCorsImages.has(key)) return sfCorsImages.get(key)
+        const get = cacheMode =>
+          fetch(key, { mode: 'cors', cache: cacheMode }).then(r => {
+            if (!r.ok) throw new Error('HTTP ' + r.status)
+            return r.blob()
+          })
+        // 'reload' if a non-CORS copy of this URL in the HTTP cache makes the
+        // first attempt fail (it also replaces that cached copy).
+        const p = get('default')
+          .catch(() => get('reload'))
+          .then(b => URL.createObjectURL(b))
+          .catch(() => (sfCorsImages.delete(key), null))
+        sfCorsImages.set(key, p)
+        return p
+      }
+      // Pending or finished download for a URL, or null (never starts one).
+      function sfCorsImageFor (url) {
+        return sfCorsImages.get(sfCorsKey(url)) || null
+      }
+
       let itemsLoadPromise = null;
       let itemsReloadQueued = false;
       function loadItems(force, dataChanged) {
@@ -21199,7 +21299,17 @@
               if (!imageUrl) return;
               const i = document.createElement("picture");
               i.dataset.img = t.thumbnailUrl ? t.thumbnailUrl : imageUrl;
-              i.style.backgroundImage = `url("${imageUrl}")`;
+              // One CORS download, shared with the canvas add (see
+              // sfLoadCorsImage). Falls back to the plain URL.
+              // Still being added to the canvas (clicked before this re-render)?
+              // Keep its "adding" state (see home.component.ts).
+              window.__sfImageTileAdding &&
+                window.__sfImageTileAdding.has(sfCorsKey(imageUrl)) &&
+                e.classList.add('sf-img-tile-adding');
+              const sfTileImg = sfLoadCorsImage(imageUrl);
+              sfTileImg
+                ? sfTileImg.then(u => { i.style.backgroundImage = `url("${u || imageUrl}")`; })
+                : (i.style.backgroundImage = `url("${imageUrl}")`);
               e.append(i);
               e.dataset.source = imageUrl;
   
@@ -25264,6 +25374,16 @@
             // Stamp add-order before async image load so a slow photo cannot
             // leap above texts clicked/typed after it (LYR-014).
             this.stampLayerAddedAt(c),
+            // History position of this add = when it was requested, not when
+            // its image finished loading (see _historyInsertPending, part 1).
+            // Not for elements re-added by undo/redo or product loading.
+            this._historyTokens &&
+              !this.historyProcessing &&
+              this._doHistory &&
+              this._historyTokens.set(c, {
+                undoLen: this.historyUndo.length,
+                ops: this._historyOps
+              }),
             c.isCustom &&
               ('engraving' == W(this.viewOptions, 'industry.type') &&
                 (c.opacity = W(this.viewOptions, 'industry.opts.opacity', 0.5)),
@@ -25314,6 +25434,10 @@
                   (t.originParams.angle = t.angle),
                   (t.originParams.z = t.getZIndex()))
                 : n.fire('imageFail', { url: e.source }),
+                t &&
+                  n._historyTokens &&
+                  n._historyTokens.has(e) &&
+                  (t._sfHistoryToken = n._historyTokens.get(e)),
                 n.fire('elementAdd', { element: t })
             }
             if (void 0 === e || 0 === e.length)
@@ -25405,14 +25529,33 @@
                     !this.proxyFileServer &&
                     'object' == typeof i &&
                     i.searchParams.append('t', n),
-                  'object' == typeof i && (i = i.toString())),
+                  'object' == typeof i && (i = i.toString()))
+              // CUSTOM (StyleFlip): if the Images grid already downloaded this
+              // image (with CORS, see sfLoadCorsImage), decode those same
+              // bytes instead of downloading the full file again (that was
+              // ~85% of the time an image took to appear). Same pixels, same
+              // element source; getSrc() still reports the URL it would have
+              // loaded, so saving / SVG export are unchanged.
+              const sfLoad = url =>
                 new St.fabric.Image.fromURL(
-                  i,
+                  url,
                   function (e) {
-                    ;(e = '' === e.getSrc() ? null : e), t(e, c, !1)
+                    ;(e = '' === e.getSrc() ? null : e),
+                      e &&
+                        url !== i &&
+                        (e.getSrc = function () {
+                          const s = St.fabric.Image.prototype.getSrc.apply(this, arguments)
+                          return s === url ? i : s
+                        }),
+                      t(e, c, !1)
                   },
                   { crossOrigin: 'anonymous' }
                 )
+              const sfCached =
+                !e.includes('data:image/') && sfCorsImageFor(e)
+              sfCached
+                ? sfCached.then(u => sfLoad(u || i), () => sfLoad(i))
+                : sfLoad(i)
             }
           } else if (t.toLowerCase().includes('text')) {
             var u
@@ -38652,6 +38795,22 @@ function updateFPDLayersToSingleGroup(group) {
           const e = t.querySelectorAll('[data-tab]:not(.fpd-hidden)')
           J(t, ['fpd-hidden'], e.length <= 1)
         })
+        // CUSTOM (StyleFlip): in the mobile Image Editor both copy/paste-style
+        // icons are hidden but their box (.extra-icon-main-div-box) stayed,
+        // leaving an empty slot between Reset and Duplicate. Mark it when it
+        // is empty there (sf-mobile-img-empty-tools, styles.scss). Checked
+        // after this frame's class updates; other editors / desktop unchanged.
+        const sfCopyBox = this.navElem.querySelector('.extra-icon-main-div-box')
+        sfCopyBox &&
+          requestAnimationFrame(() => {
+            const empty =
+              this.container.classList.contains('fpd-layout-small') &&
+              'image' === this.container.dataset.fabricType &&
+              Array.from(sfCopyBox.querySelectorAll('.extra-icon')).every(
+                k => 'none' === getComputedStyle(k).display
+              )
+            J(sfCopyBox, ['sf-mobile-img-empty-tools'], empty)
+          })
       }
       function ka () {
         if (

@@ -1041,6 +1041,40 @@
       // call is dropped: re-rendering identical data replaced the tiles while
       // a just-opened ⋯ menu still pointed at the old ones, so Delete removed
       // a detached copy and the visible tile stayed.
+      // ===== CUSTOM (StyleFlip): shared CORS image downloads ==============
+      // The Images grid drew each image as a CSS background (a request
+      // without CORS), and adding it to the canvas needs a CORS request.
+      // S3 only sends CORS headers when asked, so the grid's copy could not
+      // be reused and every add downloaded the full image again (2.6-3.7 s
+      // for a 1.6 MB, 5000 px photo). The grid now downloads each image once
+      // WITH CORS and shows it through a blob: URL; addElement (raster path)
+      // decodes those same bytes. One download, same pixels. A failed fetch
+      // (offline / no CORS) falls back to the original URLs.
+      const sfCorsImages = new Map()
+      const sfCorsKey = url => String(url || '').split('?')[0]
+      function sfLoadCorsImage (url) {
+        const key = sfCorsKey(url)
+        if (!/^https?:\/\//i.test(key)) return null
+        if (sfCorsImages.has(key)) return sfCorsImages.get(key)
+        const get = cacheMode =>
+          fetch(key, { mode: 'cors', cache: cacheMode }).then(r => {
+            if (!r.ok) throw new Error('HTTP ' + r.status)
+            return r.blob()
+          })
+        // 'reload' if a non-CORS copy of this URL in the HTTP cache makes the
+        // first attempt fail (it also replaces that cached copy).
+        const p = get('default')
+          .catch(() => get('reload'))
+          .then(b => URL.createObjectURL(b))
+          .catch(() => (sfCorsImages.delete(key), null))
+        sfCorsImages.set(key, p)
+        return p
+      }
+      // Pending or finished download for a URL, or null (never starts one).
+      function sfCorsImageFor (url) {
+        return sfCorsImages.get(sfCorsKey(url)) || null
+      }
+
       let itemsLoadPromise = null;
       let itemsReloadQueued = false;
       function loadItems(force, dataChanged) {
@@ -1177,7 +1211,17 @@
               if (!imageUrl) return;
               const i = document.createElement("picture");
               i.dataset.img = t.thumbnailUrl ? t.thumbnailUrl : imageUrl;
-              i.style.backgroundImage = `url("${imageUrl}")`;
+              // One CORS download, shared with the canvas add (see
+              // sfLoadCorsImage). Falls back to the plain URL.
+              // Still being added to the canvas (clicked before this re-render)?
+              // Keep its "adding" state (see home.component.ts).
+              window.__sfImageTileAdding &&
+                window.__sfImageTileAdding.has(sfCorsKey(imageUrl)) &&
+                e.classList.add('sf-img-tile-adding');
+              const sfTileImg = sfLoadCorsImage(imageUrl);
+              sfTileImg
+                ? sfTileImg.then(u => { i.style.backgroundImage = `url("${u || imageUrl}")`; })
+                : (i.style.backgroundImage = `url("${imageUrl}")`);
               e.append(i);
               e.dataset.source = imageUrl;
   
@@ -5242,6 +5286,16 @@
             // Stamp add-order before async image load so a slow photo cannot
             // leap above texts clicked/typed after it (LYR-014).
             this.stampLayerAddedAt(c),
+            // History position of this add = when it was requested, not when
+            // its image finished loading (see _historyInsertPending, part 1).
+            // Not for elements re-added by undo/redo or product loading.
+            this._historyTokens &&
+              !this.historyProcessing &&
+              this._doHistory &&
+              this._historyTokens.set(c, {
+                undoLen: this.historyUndo.length,
+                ops: this._historyOps
+              }),
             c.isCustom &&
               ('engraving' == W(this.viewOptions, 'industry.type') &&
                 (c.opacity = W(this.viewOptions, 'industry.opts.opacity', 0.5)),
@@ -5292,6 +5346,10 @@
                   (t.originParams.angle = t.angle),
                   (t.originParams.z = t.getZIndex()))
                 : n.fire('imageFail', { url: e.source }),
+                t &&
+                  n._historyTokens &&
+                  n._historyTokens.has(e) &&
+                  (t._sfHistoryToken = n._historyTokens.get(e)),
                 n.fire('elementAdd', { element: t })
             }
             if (void 0 === e || 0 === e.length)
@@ -5383,14 +5441,33 @@
                     !this.proxyFileServer &&
                     'object' == typeof i &&
                     i.searchParams.append('t', n),
-                  'object' == typeof i && (i = i.toString())),
+                  'object' == typeof i && (i = i.toString()))
+              // CUSTOM (StyleFlip): if the Images grid already downloaded this
+              // image (with CORS, see sfLoadCorsImage), decode those same
+              // bytes instead of downloading the full file again (that was
+              // ~85% of the time an image took to appear). Same pixels, same
+              // element source; getSrc() still reports the URL it would have
+              // loaded, so saving / SVG export are unchanged.
+              const sfLoad = url =>
                 new St.fabric.Image.fromURL(
-                  i,
+                  url,
                   function (e) {
-                    ;(e = '' === e.getSrc() ? null : e), t(e, c, !1)
+                    ;(e = '' === e.getSrc() ? null : e),
+                      e &&
+                        url !== i &&
+                        (e.getSrc = function () {
+                          const s = St.fabric.Image.prototype.getSrc.apply(this, arguments)
+                          return s === url ? i : s
+                        }),
+                      t(e, c, !1)
                   },
                   { crossOrigin: 'anonymous' }
                 )
+              const sfCached =
+                !e.includes('data:image/') && sfCorsImageFor(e)
+              sfCached
+                ? sfCached.then(u => sfLoad(u || i), () => sfLoad(i))
+                : sfLoad(i)
             }
           } else if (t.toLowerCase().includes('text')) {
             var u
