@@ -264,7 +264,9 @@
               width: 1,
               height: 1,
               originParams: 1,
-              autoSelect: 1
+              autoSelect: 1,
+              // internal "options applied" flag set by setElementOptions
+              _optionsSet: 1
             }
             const isElement = o =>
               (void 0 !== o.title && void 0 !== o.source) ||
@@ -298,6 +300,12 @@
               let exact = !0
               new Set(Object.keys(now).concat(Object.keys(want))).forEach(k => {
                 if (IGNORED_KEYS[k] || same(now[k], want[k])) return
+                // A key missing from the snapshot was undefined then (JSON
+                // drops it). An empty value now (0 / '' / null / false) means
+                // the same "not set" - e.g. a text group's shadow fields are
+                // filled in by the toolbar after the snapshot, which made
+                // every moved group fail here and Undo left it in place.
+                if (!(k in want) && (null == now[k] || 0 === now[k] || '' === now[k] || !1 === now[k])) return
                 // A key the snapshot does not have cannot be "unset" here.
                 k in want ? (changed[k] = want[k]) : (exact = !1)
               })

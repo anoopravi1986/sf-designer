@@ -2021,6 +2021,18 @@ export class HomeComponent implements AfterViewInit {
 
       if (!obj) return;
 
+      // Grouped text: real deep copy (fpd-src 05 sfTextGroupClipboard);
+      // confirm only when it worked. Any other copy clears it.
+      const groupClip = (window as any).__sfTextGroupClipboard;
+      if (groupClip && groupClip.isTextGroup(obj)) {
+        groupClip.copy(obj, (ok: boolean) => {
+          if (ok) copiedObject = null;
+          this.showToast(ok ? 'Copied successfully!' : 'Could not copy this group. Please try again.');
+        });
+        return;
+      }
+      groupClip && groupClip.clear();
+
       if (obj.type === 'curved-text') {
         copiedObject = {
           type: 'curved-text',
@@ -2056,6 +2068,18 @@ export class HomeComponent implements AfterViewInit {
 
         if (!obj) return;
 
+        // Grouped text: real deep copy (fpd-src 05 sfTextGroupClipboard);
+        // confirm only when it worked. Any other copy clears it.
+        const groupClip = (window as any).__sfTextGroupClipboard;
+        if (groupClip && groupClip.isTextGroup(obj)) {
+          groupClip.copy(obj, (ok: boolean) => {
+            if (ok) copiedObject = null;
+            this.showToast(ok ? 'Copied successfully!' : 'Could not copy this group. Please try again.');
+          });
+          return;
+        }
+        groupClip && groupClip.clear();
+
         if (obj.type === 'image') {
           if (!Array.isArray(obj.filters)) {
             obj.filters = [];
@@ -2080,6 +2104,16 @@ export class HomeComponent implements AfterViewInit {
       const view = this.designer.currentViewInstance;
       const canvas = view.fabricCanvas;
       ;
+      // Grouped text: duplicateElement() cannot rebuild a text group (no
+      // source, getType() 'image') - it added nothing yet reported success.
+      // Paste a real new group and confirm only when it is on the canvas.
+      const groupClip = (window as any).__sfTextGroupClipboard;
+      if (groupClip && groupClip.has()) {
+        groupClip.paste(canvas, (g: any) => {
+          this.showToast(g ? 'Paste successfully!' : 'Could not paste the group. Please copy it again.');
+        });
+        return;
+      }
       if (!copiedObject) return;
 
       if (copiedObject.type === 'curved-text') {
@@ -2136,6 +2170,22 @@ export class HomeComponent implements AfterViewInit {
     document.addEventListener('keydown', (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'v') {
         e.preventDefault();
+
+        // Grouped text: paste a real new group; confirm only when it is on
+        // the canvas (duplicateElement() below cannot rebuild a text group).
+        const groupClip = (window as any).__sfTextGroupClipboard;
+        const pasteTarget = e.target as HTMLElement;
+        const typingInField =
+          !!pasteTarget &&
+          (pasteTarget.tagName === 'INPUT' ||
+            pasteTarget.tagName === 'TEXTAREA' ||
+            pasteTarget.isContentEditable);
+        if (groupClip && groupClip.has() && !typingInField) {
+          groupClip.paste(this.designer.currentViewInstance.fabricCanvas, (g: any) => {
+            this.showToast(g ? 'Paste successfully!' : 'Could not paste the group. Please copy it again.');
+          });
+          return;
+        }
 
         if (copiedObject) {
           this.designer.currentViewInstance.fabricCanvas.duplicateElement(

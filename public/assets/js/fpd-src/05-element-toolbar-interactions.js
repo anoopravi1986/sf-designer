@@ -214,6 +214,15 @@
                 return;
               const fabricCanvas = this.fpdInstance.currentViewInstance?.fabricCanvas;
               if (!fabricCanvas) return;
+              // Grouped text is copied / pasted by home.component.ts through
+              // the shared clipboard (unique ids, Layers row, one Undo step).
+              // The raw clone below kept the original id and broke Undo.
+              const sfClip = window.__sfTextGroupClipboard;
+              if (sfClip && key === 'c' && sfClip.isTextGroup(fabricCanvas.getActiveObject())) {
+                copiedGroup = null;
+                return;
+              }
+              if (sfClip && key === 'v' && sfClip.has()) return;
               if (key === 'c') {
                 const obj = fabricCanvas.getActiveObject();
                 if (obj && obj.type === 'group') {
@@ -1088,6 +1097,135 @@ function showToast(message, duration = 3000) {
     }, duration);
 }
 
+// ===== CUSTOM (StyleFlip): text group clipboard ===========================
+// Copy / Paste of a grouped text ("Group Text N"). Before this:
+//  - desktop #copytext / #pastetext (home.component.ts) pasted through
+//    duplicateElement(), which re-adds by getType() + source. A text group
+//    is a fabric.Group with no source, so it called addElement('image',
+//    undefined) - nothing was added, yet "Paste successfully!" showed.
+//  - mobile Copy / Paste Group and Ctrl+V added a raw clone that kept the
+//    original's id, recorded no Undo step and crashed on this.showToast,
+//    so Undo removed both groups (same id) and Redo lost them.
+// One deep copy is taken at Copy time; every Paste makes a new group from
+// it with unique group / child ids, a new "Group Text N" title, the same
+// setup as the Group action, its own Layers row and ONE Undo step. Callers
+// report success only when copy() / paste() really succeeded.
+const sfTextGroupClipboard = (() => {
+  const CHILD_KEYS = ['title', 'colors', 'curvable', 'curved', 'curveSpacing',
+    'curveRadius', 'curveReverse', 'textTransform', 'letterSpacing', 'editable',
+    'isCustom', 'boundingBox', 'boundingBoxMode', 'evented']
+  const GROUP_KEYS = ['opacity', 'scaleX', 'scaleY', 'angle', 'flipX', 'flipY',
+    'skewX', 'skewY', 'colors', 'fill', 'textAlign']
+  let snap = null
+  let pasteCount = 0
+  const isTextGroup = o => Boolean(o && o.isTextGroup && o.isTextGroup())
+  const cloneGroup = (src, done) => {
+    try {
+      src.clone(cl => {
+        if (!cl || !cl.getObjects || cl.getObjects().length !== src.getObjects().length)
+          return done(null)
+        cl.getObjects().forEach((c, i) => {
+          const s = src.getObjects()[i]
+          CHILD_KEYS.forEach(k => { s[k] !== undefined && (c[k] = s[k]) })
+        })
+        GROUP_KEYS.forEach(k => { src[k] !== undefined && cl.set(k, src[k]) })
+        cl.title = src.title
+        cl.__savedTextProps = Array.isArray(src.__savedTextProps)
+          ? JSON.parse(JSON.stringify(src.__savedTextProps))
+          : undefined
+        cl.__sfCenter = src.getCenterPoint()
+        done(cl)
+      })
+    } catch (err) {
+      console.warn('[text group copy]', err)
+      done(null)
+    }
+  }
+  const nextTitle = canvas => {
+    let n = 1
+    canvas.getObjects().forEach(o => {
+      const m = /^Group Text (\d+)$/.exec(String(o.title || ''))
+      m && (n = Math.max(n, Number(m[1]) + 1))
+    })
+    return `Group Text ${n}`
+  }
+  const placeBelowOverlay = (canvas, obj) => {
+    if (canvas.placeBelowKnobs) return canvas.placeBelowKnobs(obj)
+    const overlay = canvas.getObjects().find(o => o.title === 'Overlay')
+    overlay && canvas.moveTo(obj, canvas.getObjects().indexOf(overlay))
+  }
+  return {
+    isTextGroup,
+    has: () => Boolean(snap),
+    clear: () => { snap = null },
+    // done(ok): ok only when the group and all its texts were captured
+    copy (obj, done = () => {}) {
+      if (!isTextGroup(obj)) return done(!1)
+      cloneGroup(obj, cl => {
+        cl && ((snap = cl), (pasteCount = 0))
+        done(Boolean(cl))
+      })
+    },
+    // done(group|null): group only when it is really on the canvas
+    paste (canvas, done = () => {}) {
+      if (!snap || !canvas) return done(null)
+      cloneGroup(snap, g => {
+        if (!g) return done(null)
+        pasteCount++
+        const base = 'group_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7)
+        g.set({
+          title: nextTitle(canvas),
+          id: base,
+          autoSelect: true,
+          selectable: true,
+          evented: true,
+          hasControls: true,
+          removable: true,
+          resizable: true,
+          draggable: true,
+          rotatable: true,
+          zChangeable: true,
+          locked: false,
+          originX: 'center',
+          originY: 'center',
+          autoCenter: false,
+          lockUniScaling: true,
+          boundingBox: 'Base',
+          boundingBoxMode: 'clipping',
+          clipPath: null,
+          objectCaching: false
+        })
+        g.getObjects().forEach((c, i) => {
+          c.id = base + '_t' + i
+          c.evented = false
+          c.clipPath = null
+          c.boundingBox = null
+          c.boundingBoxMode = 'none'
+          c.objectCaching = false
+        })
+        const off = 20 * pasteCount
+        g.setPositionByOrigin(
+          new fabric.Point(snap.__sfCenter.x + off, snap.__sfCenter.y + off),
+          'center',
+          'center'
+        )
+        delete g.__sfCenter
+        g.setCoords()
+        canvas.add(g)
+        placeBelowOverlay(canvas, g)
+        if (canvas.getObjects().indexOf(g) === -1) return done(null)
+        updateFPDLayersToSingleGroup(g)
+        canvas.historySaveAction && canvas.historySaveAction()
+        canvas.discardActiveObject()
+        canvas.setActiveObject(g)
+        canvas.requestRenderAll()
+        done(g)
+      })
+    }
+  }
+})()
+window.__sfTextGroupClipboard = sfTextGroupClipboard
+
 
 
 function updateFPDLayersToSingleGroup(group) {
@@ -1248,7 +1386,19 @@ function updateFPDLayersToSingleGroup(group) {
                 const activeObj = fabricCanvas.getActiveObject();
                 ;
 
-                if (activeObj.type === 'image') {
+                // Grouped text: real deep copy; confirm only when it worked.
+                if (sfTextGroupClipboard.isTextGroup(activeObj)) {
+                  sfTextGroupClipboard.copy(activeObj, ok => {
+                    if (ok) {
+                      copiedGroup = null;
+                      copiedImage = null;
+                      showToast('Group copied successfully!');
+                    } else showToast('Could not copy this group. Please try again.');
+                  });
+                  return;
+                }
+
+                if (activeObj && activeObj.type === 'image') {
                     ;
                     
                     // 🔒 Backup filters
@@ -1262,6 +1412,7 @@ function updateFPDLayersToSingleGroup(group) {
                     activeObj.clone(cloned => {
                       copiedImage = cloned;
                       copiedGroup = null;
+                      sfTextGroupClipboard.clear();
                       copiedImage.__originalTransform = {
                         title: activeObj.title,
                         id: activeObj.id,
@@ -1342,9 +1493,18 @@ function updateFPDLayersToSingleGroup(group) {
                 ;
                 if (!fabricCanvas) return;
 
+                // Grouped text: a real new group on the canvas, or an error.
+                if (sfTextGroupClipboard.has()) {
+                  sfTextGroupClipboard.paste(fabricCanvas, g => {
+                    showToast(g ? 'Group pasted successfully!' : 'Could not paste the group. Please copy it again.');
+                  });
+                  return;
+                }
+
                 // ❌ Nothing copied
+                // (this.showToast does not exist on the toolbar and threw.)
                 if (!copiedGroup && !copiedImage) {
-                  this.showToast('Nothing to paste. Copy a group or image first.', 'error');
+                  showToast('Nothing to paste. Copy a group or image first.');
                   return;
                 }
                 /* =========================
@@ -1485,7 +1645,7 @@ function updateFPDLayersToSingleGroup(group) {
                     fabricCanvas.setActiveObject(clonedObj);
                     fabricCanvas.requestRenderAll();
 
-                    this.showToast('Group pasted successfully 🎉');
+                    showToast('Group pasted successfully 🎉');
                   });
 
                   return;
