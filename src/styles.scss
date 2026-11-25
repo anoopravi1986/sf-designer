@@ -3752,3 +3752,103 @@ fpd-module-save-load .fpd-item:has(> .fpd-share-menu[style*="display: block"]) .
     max-width: 100%;
   }
 }
+
+/* ELM-034 - Elements tab tag strip, desktop/laptop only (new classes set in
+   FancyProductDesigner part 3; mobile keeps its swipe strip with no arrows).
+   The prev/next arrows were 50x40 floating circles with different vertical
+   offsets, drawn on top of the tags, so tag text was cut and the arrows
+   collided with it. Each arrow is now a full-height edge panel fading from
+   solid white with a small round chevron button, so tags slide under it
+   cleanly. The track gets an end spacer covering its 5px left margin, so
+   the last tag scrolls fully into view. Arrows still hide when disabled (ends). */
+@media (min-width: 769px) {
+  // Clicking a tag appends its filtered results (.main-div-first) INSIDE this
+  // strip, so the strip grew to the results' height and the full-height
+  // arrows (and their centred chevrons) moved down with it. Row 1 = tag
+  // track + arrows (abs-pos grid items are sized to their grid area, so the
+  // arrows always match the tag row), row 2 = anything appended later.
+  // minmax(0, 1fr) keeps the column at the strip width (the track's
+  // min-content is every tag side by side).
+  fpd-module-designs .our-elements.sf-elm-tags {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  // The visible strip is also matched by the existing
+  // `.fpd-grid.fpd-grid-contain.fpd-padding.one .w-full.our-elements:first-child
+  // { display: block }` (which shows only the first strip). Same scope +
+  // the new class, so the grid wins for that strip only; the other strips
+  // stay hidden by the existing rule.
+  fpd-module-designs .fpd-grid.fpd-grid-contain.fpd-padding.one .w-full.our-elements.sf-elm-tags:first-child {
+    display: grid;
+  }
+
+  // Explicit end lines: for absolutely positioned grid items an `auto` end
+  // line means the grid container's edge, not "span 1".
+  fpd-module-designs .our-elements.sf-elm-tags > .sf-elm-tags-track,
+  fpd-module-designs .our-elements.sf-elm-tags > .sf-elm-tag-arrow {
+    grid-area: 1 / 1 / 2 / 2;
+  }
+
+  fpd-module-designs .our-elements.sf-elm-tags > :not(.sf-elm-tags-track):not(.sf-elm-tag-arrow) {
+    grid-area: 2 / 1 / 3 / 2;
+  }
+
+  // End spacer (1px + the 8px gap, counted in the track's scrollWidth -
+  // padding and zero-size boxes are not) so the scroll limit covers the 5px
+  // left margin and the last tag is not clipped.
+  fpd-module-designs .our-elements.sf-elm-tags > .sf-elm-tags-track::after {
+    content: '';
+    flex: 0 0 1px;
+  }
+
+  fpd-module-designs .our-elements.sf-elm-tags > button.sf-elm-tag-arrow {
+    top: 0 !important;
+    bottom: 0 !important;
+    width: 44px;
+    height: auto;
+    margin: 0 !important;
+    padding: 0 !important;
+    transform: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    align-items: center;
+    z-index: 9;
+    cursor: pointer;
+
+    &:not(:disabled) {
+      display: flex;
+    }
+
+    svg {
+      flex: none;
+      width: 28px;
+      height: 28px;
+      color: #0d1216;
+      background: #fff;
+      border: 1px solid #35475a33;
+      border-radius: 50%;
+      box-shadow: 0 1px 3px rgba(13, 18, 22, 0.12);
+      transition: background-color 0.15s ease;
+    }
+
+    &:hover svg {
+      background: #f3f5f7;
+    }
+  }
+
+  fpd-module-designs .our-elements.sf-elm-tags > button.sf-elm-tag-arrow--prev {
+    left: 0 !important;
+    right: auto !important;
+    justify-content: flex-start;
+    background: linear-gradient(to right, #fff 60%, rgba(255, 255, 255, 0)) !important;
+  }
+
+  fpd-module-designs .our-elements.sf-elm-tags > button.sf-elm-tag-arrow--next {
+    right: 0 !important;
+    left: auto !important;
+    justify-content: flex-end;
+    background: linear-gradient(to left, #fff 60%, rgba(255, 255, 255, 0)) !important;
+  }
+}

@@ -4178,12 +4178,14 @@
 
         // Step 1: Create container with overflow hidden
         const container = document.createElement('div')
-        container.className = 'w-full mt-2 overflow-hidden our-elements'
+        // sf-elm-tags / sf-elm-tags-track / sf-elm-tag-arrow: desktop-only
+        // layout fix for the tag strip (ELM-034, see styles.scss).
+        container.className = 'w-full mt-2 overflow-hidden our-elements sf-elm-tags'
 
         // Step 2: Create flex wrapper that will slide using translateX
         const flexWrapper = document.createElement('div')
         flexWrapper.className =
-          'flex gap-2 ml-[5px] transition-transform duration-300 ease-in-out'
+          'flex gap-2 ml-[5px] transition-transform duration-300 ease-in-out sf-elm-tags-track'
         flexWrapper.style.transform = `translateX(${currentOffset}px)`
 
         // Step 3: Create tag elements
@@ -4357,7 +4359,8 @@
  </svg>
 `
         leftArrow.className =
-          'absolute left-2 -translate-y-1/2 z-[9] bg-gradient-to-r from-white/0 to-white shadow p-0 rounded-full hover:bg-gray-100 disabled:hidden mt-[16px]'
+          'absolute left-2 -translate-y-1/2 z-[9] bg-gradient-to-r from-white/0 to-white shadow p-0 rounded-full hover:bg-gray-100 disabled:hidden mt-[16px] sf-elm-tag-arrow sf-elm-tag-arrow--prev'
+        leftArrow.setAttribute('aria-label', 'Previous tags')
         leftArrow.disabled = true // initially disabled
 
         // Step 6: Create right arrow
@@ -4368,7 +4371,8 @@
 </svg>
 `
         rightArrow.className =
-          'absolute right-0 z-[9] mt-[-20px] -translate-y-1/2 bg-gradient-to-r from-white/0 to-white shadow p-0 rounded-full hover:bg-gray-100 disabled:hidden'
+          'absolute right-0 z-[9] mt-[-20px] -translate-y-1/2 bg-gradient-to-r from-white/0 to-white shadow p-0 rounded-full hover:bg-gray-100 disabled:hidden sf-elm-tag-arrow sf-elm-tag-arrow--next'
+        rightArrow.setAttribute('aria-label', 'Next tags')
 
         // Update arrow states
         function updateArrows () {
