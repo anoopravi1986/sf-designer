@@ -626,6 +626,26 @@ export class HomeComponent implements AfterViewInit {
           // cut off under Safari's toolbars (sf-msheet-fit, styles.scss).
           // The CSS only applies in the mobile layout.
           mainBar.classList.add('sf-msheet-fit');
+          // Designs header lines up with the other tabs (sf-dsn-head).
+          mainBar
+            .querySelector('fpd-module-productsnew .fpd-head.flex.items-center')
+            ?.classList.add('sf-dsn-head');
+          // Products "back to products" arrow (#backbuttonStoP) is
+          // positioned against fpd-module-products but sits inside the
+          // grid's scroll area; iOS Safari clips such elements in a touch-
+          // scrolling container, so it was invisible after picking a
+          // product. Move it directly into the module (its positioning
+          // parent, so its place on screen is unchanged). Mobile only.
+          const sfBack = document.getElementById('backbuttonStoP');
+          const sfProducts = mainBar.querySelector('fpd-module-products');
+          if (
+            window.innerWidth <= 768 &&
+            sfBack &&
+            sfProducts &&
+            sfBack.parentElement !== sfProducts
+          ) {
+            sfProducts.appendChild(sfBack);
+          }
 
           // The mobile bottom-sheet nav bar (fpd-main-bar) renders at
           // z-index:999999999999 in the vendor CSS - our own loader

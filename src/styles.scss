@@ -4099,3 +4099,31 @@ fpd-module-save-load .fpd-item:has(> .fpd-share-menu[style*="display: block"]) .
     }
   }
 }
+
+/* Mobile panels - remaining iPhone Safari issues after sf-msheet-fit
+   (all NEW selectors; the rules they relate to are unchanged).
+
+   1. Panel content (.fpd-module-content) is still sized 101vh by the
+      existing rule. With the sheet now sized to the visible viewport
+      (100dvh - 40px), 101vh is ~87px taller than the visible area on
+      iPhone Safari, so each tab's scroll area ran under the bottom nav and
+      the last products could not be scrolled into view. Same 101, in dvh.
+      Specificity is deliberately between the 101vh rule (0,5,0) and the
+      Designs/Images :has() rules (0,6,1), so those two keep their own
+      calc(100% - 72px) sizing. */
+@media (max-width: 768px) {
+  @supports (height: 100dvh) {
+    .fpd-sidebar.fpd-layout-small.fpd-module-visible fpd-main-bar.sf-msheet-fit > .fpd-module-content {
+      height: 101dvh !important;
+    }
+  }
+
+  /* 2. Designs header: the mobile rule `.fpd-head.flex.items-center
+        { margin-top: 50px }` (unchanged) leaves an empty 50px band above
+        the Designs search - only that header has these classes - so it sat
+        50px lower than every other tab and lost that space. sf-dsn-head is
+        added to the Designs header only (home.component.ts). */
+  fpd-module-productsnew .fpd-head.flex.items-center.sf-dsn-head {
+    margin-top: 0;
+  }
+}
