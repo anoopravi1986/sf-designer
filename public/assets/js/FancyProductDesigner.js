@@ -40327,6 +40327,36 @@ function updateFPDLayersToSingleGroup(group) {
             arguments.length > 0 && void 0 !== arguments[0] ? arguments[0] : []
           ;(this.productsnew = [])
 
+          // CUSTOM (StyleFlip): premade designs (Design tab) only. The Guitar
+          // premade's artwork layer ("Image", the tiger) is saved with
+          // topped:1, so isKnobLayer() treated it as a knob and pinned it on
+          // top - new Text / Elements were then always placed under it. Only
+          // real knob layers (Overlay / Group Text N / Group Outline N /
+          // *knob*) may be topped; a premade's own artwork is loaded unpinned
+          // so it orders like any design image. Laptop premades (only
+          // Overlay topped) and the Products tab are not touched.
+          const sfUnpinPremadeArt = views =>
+            (Array.isArray(views) ? views : [views]).forEach(view =>
+              ((view && view.elements) || []).forEach(el => {
+                const p = el && el.parameters
+                const title = String((el && el.title) || '').trim()
+                if (
+                  p &&
+                  p.topped &&
+                  !p.isCustom &&
+                  'Base' !== title &&
+                  !p.adminLocked &&
+                  !/^(overlay$|group text\b|group outline\b)|knob/i.test(title)
+                )
+                  p.topped = 0
+              })
+            )
+          t.forEach(tItem =>
+            tItem && tItem.hasOwnProperty('category')
+              ? (tItem.products || []).forEach(sfUnpinPremadeArt)
+              : sfUnpinPremadeArt(tItem)
+          )
+
           t.forEach(tItem => {
             const category = tItem.category
 
