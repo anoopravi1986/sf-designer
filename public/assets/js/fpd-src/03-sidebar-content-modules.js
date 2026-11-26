@@ -3445,8 +3445,10 @@
 
               //Search
               const filterContainerSearch = document.createElement('div')
+              // sf-txt-search-fit (styles.scss, mobile only): lines this
+              // search up with the hidden .fpd-head band it overlays.
               filterContainerSearch.className =
-                'filter-controls mb-4 absolute top-0 left-0 ml-[15px] right-[11px] border border-[#35475a33] border-solid !rounded-[8px] mr-[10px]'
+                'filter-controls mb-4 absolute top-0 left-0 ml-[15px] right-[11px] border border-[#35475a33] border-solid !rounded-[8px] mr-[10px] sf-txt-search-fit'
 
               const searchIcon = document.createElementNS(
                 'http://www.w3.org/2000/svg',

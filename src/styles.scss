@@ -4127,3 +4127,17 @@ fpd-module-save-load .fpd-item:has(> .fpd-share-menu[style*="display: block"]) .
     margin-top: 0;
   }
 }
+
+/* Add Text search (mobile). The text-templates search box (.filter-controls,
+   built in FPD part 3) is `absolute top-0` against the Add Text wrapper
+   (div.relative.p-[10px]), so it sat on the wrapper's top EDGE - 10px above
+   the band the hidden .fpd-head reserves for it (inside that 10px padding)
+   and 10px higher than every other tab's search, where the sheet's top
+   strip clipped its upper border. NEW class sf-txt-search-fit (only on that
+   box) places it at the padding edge, i.e. exactly on the reserved band.
+   Mobile only; desktop unchanged. */
+@media (max-width: 768px) {
+  fpd-module-text .filter-controls.sf-txt-search-fit {
+    top: 10px;
+  }
+}
