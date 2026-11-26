@@ -622,7 +622,10 @@ export class HomeComponent implements AfterViewInit {
         ) as HTMLElement;
 
         if (hideIcon && mainBar) {
-          ;
+          // Mobile sheet sized to the visible viewport, so its top is not
+          // cut off under Safari's toolbars (sf-msheet-fit, styles.scss).
+          // The CSS only applies in the mobile layout.
+          mainBar.classList.add('sf-msheet-fit');
 
           // The mobile bottom-sheet nav bar (fpd-main-bar) renders at
           // z-index:999999999999 in the vendor CSS - our own loader
