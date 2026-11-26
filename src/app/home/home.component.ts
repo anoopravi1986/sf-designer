@@ -476,6 +476,15 @@ export class HomeComponent implements AfterViewInit {
     // (full or abbreviated), never skipped outright.
     const firstLoaderModules = ['productsnew', 'designs', 'text', 'images', 'manage-layers', 'save-load'];
 
+    // Mobile onboarding (the 3-step tap loader) is shown once per browser,
+    // not once per page load: the "already shown" flags below were
+    // in-memory only, so every reload ran the full sequence again. Restore
+    // them from localStorage (set in finishProductsTabLoader()).
+    if (this.readMobileOnboardingDone()) {
+      this.hasShownFirstEditorTabLoader = true;
+      this.hasShownProductsLoaderFinalWait = true;
+    }
+
     document.addEventListener('click', (e: any) => {
       const navItem = e.target?.closest?.('.fpd-nav-item[data-module]');
       if (!navItem) return;
@@ -500,10 +509,10 @@ export class HomeComponent implements AfterViewInit {
 
       if (isAlreadyActive) {
         this.stopProductsTabLoader();
-      } else if (module === 'products') {
-        // Always runs - full sequence the very first time this session
-        // (on any tab), abbreviated single-tap every time after - see
-        // startProductsTabLoader().
+      } else if (module === 'products' && !this.hasShownFirstEditorTabLoader) {
+        // Full sequence only until it has been completed once. Products
+        // used to run an extra single-tap popup on every later open (the
+        // "abbreviated" loader) - that repeat popup is no longer shown.
         this.startProductsTabLoader();
       } else if (!this.hasShownFirstEditorTabLoader && firstLoaderModules.includes(module)) {
         // Some other tab (Designs/Elements/Add Text/Image) is the very
@@ -560,7 +569,9 @@ export class HomeComponent implements AfterViewInit {
         // all, but guard here too in case that ever changes.
         if (!this.productsDataReady) return;
         if (!this.suppressLoaderCategorySelect) this.selectProductsCategory(2);
-        this.setProductsLoaderStep(3);
+        // Onboarding is 2 popups: step 2 now finishes it (step 3, "Now let's
+        // load the overlay images...", is no longer shown).
+        this.finishProductsTabLoader();
       } else if (this.currentProductsLoaderStep === 3) {
         if (!this.suppressLoaderCategorySelect) this.selectProductsCategory(3);
         this.finishProductsTabLoader();
@@ -4649,6 +4660,7 @@ export class HomeComponent implements AfterViewInit {
       this.appOptions
     );
     ;
+    this.setupMobileStageFit();
 
     // The zoom slider (.fpd-zoom-wrapper) is only ever built by the vendor
     // lazily, the first time someone taps the "zoom" action icon
@@ -6214,6 +6226,8 @@ export class HomeComponent implements AfterViewInit {
   // the 5s wait is pure polish and doesn't need repeating every time.
   private finishProductsTabLoader() {
     this.hasShownFirstEditorTabLoader = true;
+    // Remember it across reloads (see readMobileOnboardingDone()).
+    this.writeMobileOnboardingDone();
     this.setProductsLoaderStep(0);
 
     if (this.hasShownProductsLoaderFinalWait) {
@@ -6226,7 +6240,8 @@ export class HomeComponent implements AfterViewInit {
     if (finalWait) finalWait.style.display = 'flex';
 
     clearInterval(this.productsFinalWaitInterval);
-    let remaining = 5;
+    // Cosmetic wait only (all required taps are done) - 2s, was 5s.
+    let remaining = 2;
     const countdownEl = document.getElementById('fpd-loader-final-countdown');
     if (countdownEl) countdownEl.textContent = String(remaining);
     this.productsFinalWaitInterval = setInterval(() => {
@@ -6239,6 +6254,141 @@ export class HomeComponent implements AfterViewInit {
       clearInterval(this.productsFinalWaitInterval);
       this.stopProductsTabLoader();
     }, 1000);
+  }
+
+  // ===== Mobile product display (<=768px) =================================
+  // The product was squeezed and cut off on phones (iPhone Safari):
+  //  1. .fpd-view-staage-mains.fpd-view-stage is width:85% on mobile and
+  //     the vendor's `.fpd-container * { max-width:100% }` then narrows the
+  //     canvas to 85% of its width while its height stays - the product was
+  //     squeezed horizontally by 15%.
+  //  2. The same rule's fixed scale(1.15) + margin-top:70px only fit a tall
+  //     screen; with Safari's toolbars (~660px visible) the bottom ~80px of
+  //     the product ran under the zoom row / bottom nav and was clipped.
+  // sf-mstage-fit (styles.scss) gives the canvas holder the canvas's real
+  // width and a scale / offset measured from the space actually visible
+  // (header -> zoom row / nav, screen width) so the whole product is
+  // centred, undistorted, at most at the former 1.15. Desktop: never set.
+  private mobileStageFitRaf = 0;
+  private setupMobileStageFit(): void {
+    const schedule = () => {
+      cancelAnimationFrame(this.mobileStageFitRaf);
+      this.mobileStageFitRaf = requestAnimationFrame(() => this.fitMobileStage());
+    };
+    const scheduleSoon = () => {
+      schedule();
+      // product images / panels settle a little later
+      setTimeout(schedule, 300);
+      setTimeout(schedule, 1200);
+    };
+    ['productCreate', 'viewSelect'].forEach((ev) =>
+      this.designer.addEventListener(ev, scheduleSoon)
+    );
+    this.designer.addEventListener('elementAdd', (evt: any) => {
+      const el = evt?.detail?.element;
+      if (el && (el.title === 'Base' || el.title === 'Overlay')) schedule();
+    });
+    window.addEventListener('resize', scheduleSoon);
+    window.addEventListener('orientationchange', scheduleSoon);
+    window.visualViewport?.addEventListener('resize', schedule);
+    scheduleSoon();
+  }
+
+  private fitMobileStage(): void {
+    const view = this.designer?.currentViewInstance;
+    const C = view?.fabricCanvas;
+    const holder = C?.wrapperEl as HTMLElement | undefined;
+    if (!C || !holder) return;
+    const mobile = window.innerWidth <= 768;
+    document
+      .querySelectorAll('.sf-mstage-fit')
+      .forEach((el) => el !== holder && el.classList.remove('sf-mstage-fit'));
+    if (!mobile || !holder.classList.contains('fpd-view-staage-mains')) {
+      holder.classList.remove('sf-mstage-fit');
+      return;
+    }
+    const canvasW = C.getWidth();
+    const opts = view.options || C.viewOptions || {};
+    const k = C.responsiveScale || C.getZoom() || 1; // css px per stage unit
+    if (!canvasW || !opts.stageWidth) return;
+
+    // Product = the product's own layers (Base / Overlay), else every
+    // non-custom layer, else the whole stage. Stage coordinates, so a user
+    // zoom / pan does not change the fit.
+    const objs = C.getObjects().filter((o: any) => !o._ignore && o.visible !== false);
+    let parts = objs.filter((o: any) => o.title === 'Base' || o.title === 'Overlay');
+    if (!parts.length) parts = objs.filter((o: any) => !o.isCustom);
+    let x0 = 0, y0 = 0, x1 = opts.stageWidth, y1 = opts.stageHeight || opts.stageWidth;
+    if (parts.length) {
+      x0 = y0 = Infinity;
+      x1 = y1 = -Infinity;
+      parts.forEach((o: any) => {
+        const b = o.getBoundingRect(true, true);
+        x0 = Math.min(x0, b.left);
+        y0 = Math.min(y0, b.top);
+        x1 = Math.max(x1, b.left + b.width);
+        y1 = Math.max(y1, b.top + b.height);
+      });
+    }
+    const pw = (x1 - x0) * k, ph = (y1 - y0) * k;
+    const pcx = ((x0 + x1) / 2) * k, pcy = ((y0 + y1) / 2) * k;
+    if (!(pw > 0 && ph > 0)) return;
+
+    // Neutral first, to read the untransformed layout position.
+    holder.style.setProperty('--sf-mstage-w', canvasW + 'px');
+    holder.style.setProperty('--sf-mstage-top', '0px');
+    holder.style.setProperty('--sf-mstage-dx', '0px');
+    holder.style.setProperty('--sf-mstage-scale', '1');
+    holder.classList.add('sf-mstage-fit');
+    const lay = holder.getBoundingClientRect();
+
+    // Visible space: below the header, above the zoom row and bottom nav,
+    // inside the clipping main wrapper.
+    const pad = 10;
+    const stage = holder.parentElement?.getBoundingClientRect();
+    const wrap = document.querySelector('.fpd-main-wrapper')?.getBoundingClientRect();
+    let top = stage ? stage.top : lay.top;
+    let bottom = wrap ? wrap.bottom : window.innerHeight;
+    const zoomRow = document.querySelector('.fpd-container .fpd-zoom-wrapper') as HTMLElement | null;
+    if (zoomRow && zoomRow.getClientRects().length) {
+      const z = zoomRow.getBoundingClientRect();
+      if (z.top > top + 100) bottom = Math.min(bottom, z.top);
+    }
+    const nav = document.querySelector('fpd-main-bar .fpd-navigation, .fpd-navigation') as HTMLElement | null;
+    if (nav && nav.getClientRects().length) {
+      const n = nav.getBoundingClientRect();
+      if (n.top > top + 100) bottom = Math.min(bottom, n.top);
+    }
+    top += pad;
+    bottom -= pad;
+    const availH = bottom - top, availW = window.innerWidth - 2 * pad;
+    if (availH <= 40) return;
+
+    const s = Math.max(0.3, Math.min(1.15, availH / ph, availW / pw));
+    // transform-origin is top centre of the holder
+    const visCx = lay.left + lay.width / 2 + s * (pcx - lay.width / 2);
+    const dx = window.innerWidth / 2 - visCx;
+    const marginTop = (top + bottom) / 2 - lay.top - s * pcy;
+    holder.style.setProperty('--sf-mstage-top', marginTop.toFixed(1) + 'px');
+    holder.style.setProperty('--sf-mstage-dx', dx.toFixed(1) + 'px');
+    holder.style.setProperty('--sf-mstage-scale', s.toFixed(4));
+    C.calcOffset();
+  }
+
+  // Persistent "mobile onboarding completed" flag (own key, nothing else
+  // in localStorage is touched). Guarded: storage can be unavailable.
+  private readonly mobileOnboardingKey = 'sfMobileOnboardingDone';
+  private readMobileOnboardingDone(): boolean {
+    try {
+      return localStorage.getItem(this.mobileOnboardingKey) === '1';
+    } catch {
+      return false;
+    }
+  }
+  private writeMobileOnboardingDone(): void {
+    try {
+      localStorage.setItem(this.mobileOnboardingKey, '1');
+    } catch {}
   }
 
   private stopProductsTabLoader() {

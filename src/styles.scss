@@ -3909,3 +3909,19 @@ fpd-module-save-load .fpd-item:has(> .fpd-share-menu[style*="display: block"]) .
     display: none !important;
   }
 }
+
+// Mobile product display (home.component.ts fitMobileStage). New class on
+// the canvas holder only, mobile only: the canvas's real width (no 85%
+// squeeze) and a measured scale / offset that keeps the whole product
+// centred in the visible area. Higher specificity than the existing
+// .fpd-view-staage-mains.fpd-view-stage rule, which is left unchanged.
+@media (max-width: 768px) {
+  .fpd-view-stage.fpd-view-staage-mains.sf-mstage-fit {
+    width: var(--sf-mstage-w) !important;
+    max-width: none !important;
+    flex: none !important;
+    margin-top: var(--sf-mstage-top) !important;
+    transform: translateX(var(--sf-mstage-dx)) scale(var(--sf-mstage-scale)) !important;
+    transform-origin: top center !important;
+  }
+}

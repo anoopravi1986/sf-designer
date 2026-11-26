@@ -25980,6 +25980,18 @@
             }
           }
           if ('text' === i) {
+            // CUSTOM (StyleFlip, TXT-017): a font size that is not a usable
+            // number (NaN, Infinity, 0, negative, text) used to slip past
+            // the min/max check below (`t.fontSize && ...` is false for 0 /
+            // NaN) and was applied as-is. Ignore it; real numbers continue to
+            // the existing minFontSize / maxFontSize clamp.
+            if (void 0 !== t.fontSize) {
+              const sfFs = Number(t.fontSize)
+              !isFinite(sfFs) || sfFs <= 0
+                ? delete t.fontSize
+                : (t.fontSize = sfFs)
+            }
+            e._sfFontSizeBefore = e.fontSize
             if ('string' == typeof t.text) {
               let i = t.text
               if (
@@ -26107,6 +26119,25 @@
               (t = parseInt(t)),
               e.set('fontSize', t)
           }
+          // CUSTOM (StyleFlip, TXT-017): a bigger font size could push the
+          // text past the product - the 200 maximum is a fixed number that
+          // ignores the text length and the product size. When the size is
+          // raised and the text no longer fits the product (Base layer,
+          // else the element's bounding box, else the stage) the size is
+          // lowered to the largest that fits and the text is moved back
+          // inside. Smaller sizes and other options are left as they are.
+          // (not while an element is being added / a design loaded, nor
+          // while Undo / Redo restores a state)
+          void 0 !== t.fontSize &&
+            'text' === e.getType() &&
+            !this._sfAddingElement &&
+            !this._historyRestoring &&
+            !this.historyProcessing &&
+            e.fontSize > (e._sfFontSizeBefore || 0) &&
+            this._sfFitTextToProduct &&
+            this._sfFitTextToProduct(e) &&
+            (t.fontSize = e.fontSize)
+          delete e._sfFontSizeBefore
           if (
             (e.updateTextPosition && e.updateTextPosition(),
             t.autoCenter && e.centerElement(),
@@ -26224,6 +26255,62 @@
                 this.setActiveObject(e), this.renderAll()
               }, 200),
             (e._optionsSet = !0)
+        }),
+        // CUSTOM (StyleFlip, TXT-017): keeps a text inside the product after
+        // its font size was raised (see setElementOptions). Returns true when
+        // the size or position was changed.
+        (St.fabric.Canvas.prototype._sfFitTextToProduct = function (e) {
+          if (!e || !e.canvas) return !1
+          const base = this.getObjects().find(
+            o => o && 'Base' === o.title && o.visible !== !1
+          )
+          let r = null
+          if (base) r = base.getBoundingRect(!0, !0)
+          else {
+            const bb = e.getBoundingBoxCoords && e.getBoundingBoxCoords()
+            r = bb
+              ? { left: bb.left, top: bb.top, width: bb.width, height: bb.height }
+              : {
+                  left: 0,
+                  top: 0,
+                  width: this.viewOptions.stageWidth,
+                  height: this.viewOptions.stageHeight
+                }
+          }
+          if (!r || !(r.width > 0) || !(r.height > 0)) return !1
+          let changed = !1
+          const box = () => (e.setCoords(), e.getBoundingRect(!0, !0))
+          // 1) largest size that fits (text width is not exactly linear in
+          //    the size, so re-measure a few times)
+          for (let n = 0; n < 4; n++) {
+            const b = box()
+            if (b.width <= r.width && b.height <= r.height) break
+            const f = Math.min(r.width / b.width, r.height / b.height) * 0.98
+            const fs = Math.max(
+              e.minFontSize || 1,
+              Math.floor(e.fontSize * f)
+            )
+            if (fs >= e.fontSize) break
+            e.set('fontSize', fs), e.updateTextPosition && e.updateTextPosition()
+            changed = !0
+          }
+          // 2) move it back inside
+          const b = box()
+          let dx = 0,
+            dy = 0
+          b.left < r.left
+            ? (dx = r.left - b.left)
+            : b.left + b.width > r.left + r.width &&
+              (dx = r.left + r.width - (b.left + b.width))
+          b.top < r.top
+            ? (dy = r.top - b.top)
+            : b.top + b.height > r.top + r.height &&
+              (dy = r.top + r.height - (b.top + b.height))
+          ;(dx || dy) &&
+            (e.set({ left: e.left + dx, top: e.top + dy }),
+            e.setCoords(),
+            (changed = !0))
+          return changed
         }),
         (St.fabric.Canvas.prototype.duplicateElement = function (t) {
           var e = t.getElementJSON()
@@ -30106,6 +30193,19 @@
             return
           }
 
+          // CUSTOM (StyleFlip, DSN-009): the Design-tab "replace product?"
+          // popup only closed with its X - the shared modal helper wires
+          // nothing to the overlay. A click / tap on the overlay itself
+          // (outside the box) now closes it exactly like the X (no product
+          // change). Clicks inside the box never target the overlay.
+          const sfCloseOnOutside = modalEl => {
+            modalEl &&
+              modalEl.addEventListener('click', ev => {
+                if (ev.target !== modalEl) return
+                const x = modalEl.querySelector('.fpd-modal-close')
+                x ? x.click() : modalEl.remove()
+              })
+          }
           if (
             (e.preventDefault(),
             this.fpdInstance.mainOptions.swapProductConfirmation)
@@ -30119,6 +30219,7 @@
               'confirm',
               this.fpdInstance.container
             )
+            sfCloseOnOutside(n)
             const eBtn = n.querySelector('.fpd-confirm')
             eBtn.innerText = this.fpdInstance.translator.getTranslation(
               'modules',
@@ -30144,6 +30245,7 @@
               'confirm',
               this.fpdInstance.container
             )
+            sfCloseOnOutside(modal)
             const confirmBtn = modal.querySelector('.fpd-confirm')
             confirmBtn.innerText = this.fpdInstance.translator.getTranslation(
               'modules',
@@ -36730,6 +36832,18 @@
             G(this.subPanel.querySelectorAll('.fpd-number'), 'change', e => {
               const i = e.currentTarget
               let n = {}
+              // CUSTOM (StyleFlip, TXT-017): an empty / non-numeric font size
+              // (a number input reports '' for "abc") was turned into the
+              // minimum (1), making the text practically invisible. Ignore it
+              // and show the current size again instead.
+              if (
+                'fontSize' === i.dataset.control &&
+                ('' === String(i.value).trim() || !isFinite(Number(i.value)))
+              ) {
+                const cur = t.currentElement && t.currentElement.fontSize
+                cur && (i.value = cur)
+                return
+              }
               i.value > Number(i.max) && (i.value = Number(i.max)),
                 i.value < Number(i.min) && (i.value = Number(i.min))
               let s = Number(i.value)

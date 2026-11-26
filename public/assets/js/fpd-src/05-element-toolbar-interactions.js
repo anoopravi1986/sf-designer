@@ -447,6 +447,18 @@
             G(this.subPanel.querySelectorAll('.fpd-number'), 'change', e => {
               const i = e.currentTarget
               let n = {}
+              // CUSTOM (StyleFlip, TXT-017): an empty / non-numeric font size
+              // (a number input reports '' for "abc") was turned into the
+              // minimum (1), making the text practically invisible. Ignore it
+              // and show the current size again instead.
+              if (
+                'fontSize' === i.dataset.control &&
+                ('' === String(i.value).trim() || !isFinite(Number(i.value)))
+              ) {
+                const cur = t.currentElement && t.currentElement.fontSize
+                cur && (i.value = cur)
+                return
+              }
               i.value > Number(i.max) && (i.value = Number(i.max)),
                 i.value < Number(i.min) && (i.value = Number(i.min))
               let s = Number(i.value)

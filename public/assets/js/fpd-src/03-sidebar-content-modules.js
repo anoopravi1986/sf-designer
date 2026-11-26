@@ -3184,6 +3184,19 @@
             return
           }
 
+          // CUSTOM (StyleFlip, DSN-009): the Design-tab "replace product?"
+          // popup only closed with its X - the shared modal helper wires
+          // nothing to the overlay. A click / tap on the overlay itself
+          // (outside the box) now closes it exactly like the X (no product
+          // change). Clicks inside the box never target the overlay.
+          const sfCloseOnOutside = modalEl => {
+            modalEl &&
+              modalEl.addEventListener('click', ev => {
+                if (ev.target !== modalEl) return
+                const x = modalEl.querySelector('.fpd-modal-close')
+                x ? x.click() : modalEl.remove()
+              })
+          }
           if (
             (e.preventDefault(),
             this.fpdInstance.mainOptions.swapProductConfirmation)
@@ -3197,6 +3210,7 @@
               'confirm',
               this.fpdInstance.container
             )
+            sfCloseOnOutside(n)
             const eBtn = n.querySelector('.fpd-confirm')
             eBtn.innerText = this.fpdInstance.translator.getTranslation(
               'modules',
@@ -3222,6 +3236,7 @@
               'confirm',
               this.fpdInstance.container
             )
+            sfCloseOnOutside(modal)
             const confirmBtn = modal.querySelector('.fpd-confirm')
             confirmBtn.innerText = this.fpdInstance.translator.getTranslation(
               'modules',
