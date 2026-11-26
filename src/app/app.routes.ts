@@ -10,5 +10,9 @@ export const routes: Routes = [
     { path: 'savedesign', component: HomeComponent },
 
     { path : 'designer', component: DesignerComponent},
-    { path : 'privacy', component: PrivacyComponent}
+    { path : 'privacy', component: PrivacyComponent},
+    // Any other path (wrong product link like /foo or /a/b/c) used to
+    // match nothing and render a blank page. It opens the editor, which
+    // shows "product not available" + related products for it.
+    { path: '**', component: HomeComponent }
 ];

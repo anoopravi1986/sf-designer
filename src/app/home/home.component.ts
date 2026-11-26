@@ -124,6 +124,12 @@ export class HomeComponent implements AfterViewInit {
   // loader (three genuine physical taps, same UI) stays identical - cleared
   // in finishProductsTabLoader() once this loader run is done.
   private suppressLoaderCategorySelect = false;
+  // True while the onboarding popups / 2s loading are on screen (set in
+  // startProductsTabLoader, cleared in stopProductsTabLoader).
+  private onboardingRunning = false;
+  // Set right before our own code clicks a bottom-nav tab on the user's
+  // behalf, so that click is treated like a real tap (nav listener).
+  private onboardingTapOverride = false;
   // Reset to false each time openTitlePopup() opens #title-popup, flipped to
   // true the first time #design-title-input gains focus - gates the 5s
   // "preparing your design" loader (#title-popup-loader) shown over the
@@ -174,7 +180,8 @@ export class HomeComponent implements AfterViewInit {
         .get<any[]>('https://styleflip-backend-jdm5.ithemes.xyz/api/product/getAllProducts')
         .subscribe({
           next: (data) => {
-            ;
+            // Kept for the product-link check (sfResolveProductLink).
+            if (Array.isArray(data)) this.sfProductCatalog = data;
             for (
               let categoryIndex = 0;
               categoryIndex < data.length;
@@ -285,11 +292,29 @@ export class HomeComponent implements AfterViewInit {
           } | ${manufacturerSlug.replace(/-/g, ' ')} - Design Your Product`;
 
         this.titleService.setTitle(pageTitle);
-        let { categoryIndex, productIndex, childIndex }: any =
-          await this.getCategoryAndProductIndex(
-            this.reversedManufacturerSlugMap[manufacturerSlug],
-            titleSlug
-          );
+        // PRD (wrong product link): a /brand/product link is checked against
+        // the real catalog. While that runs the stage shows a small loader
+        // instead of the default product; see sfResolveProductLink().
+        const sfLink = this.sfReadProductLink();
+        if (sfLink) this.sfShowProductLinkState('loading', sfLink);
+        // A failed request used to reject here and stop everything below
+        // (product click handlers included). Fall back to "nothing to
+        // restore" instead.
+        let { categoryIndex, productIndex, childIndex }: any = {
+          categoryIndex: -1,
+          productIndex: -1,
+          childIndex: -1,
+        };
+        try {
+          ({ categoryIndex, productIndex, childIndex } =
+            await this.getCategoryAndProductIndex(
+              this.reversedManufacturerSlugMap[manufacturerSlug],
+              titleSlug
+            ));
+        } catch (err) {
+          console.error('Product list request failed:', err);
+        }
+        if (sfLink) this.sfResolveProductLink(sfLink);
         localStorage.setItem('productIndex', productIndex);
         localStorage.setItem('categoryIndex', categoryIndex);
         localStorage.setItem('childIndex', childIndex);
@@ -476,13 +501,13 @@ export class HomeComponent implements AfterViewInit {
     // (full or abbreviated), never skipped outright.
     const firstLoaderModules = ['productsnew', 'designs', 'text', 'images', 'manage-layers', 'save-load'];
 
-    // Mobile onboarding (the 3-step tap loader) is shown once per browser,
-    // not once per page load: the "already shown" flags below were
-    // in-memory only, so every reload ran the full sequence again. Restore
-    // them from localStorage (set in finishProductsTabLoader()).
-    if (this.readMobileOnboardingDone()) {
-      this.hasShownFirstEditorTabLoader = true;
-      this.hasShownProductsLoaderFinalWait = true;
+    // Mobile onboarding (2 popups + 2s loading) runs once per PAGE LOAD:
+    // its "already shown" flags are in-memory only, so every reload runs it
+    // again on the first menu/tab tap. On the very first visit in this
+    // browser tab it starts by itself (no tap needed) - see
+    // autoStartMobileOnboarding(). No permanent flag is stored.
+    if (this.isFirstVisitThisTab() && window.innerWidth <= 768) {
+      this.autoStartMobileOnboarding();
     }
 
     document.addEventListener('click', (e: any) => {
@@ -506,6 +531,15 @@ export class HomeComponent implements AfterViewInit {
       if (!isAlreadyActive && module === 'images') {
         (window as any).fpdReloadUploadedImages?.(true);
       }
+
+      // Only a real tap (or our own deliberate start, see
+      // onboardingTapOverride) counts as "the user opened a menu". The
+      // editor itself clicks the Products tab programmatically at startup
+      // (initialActiveModule) and then closes the panel again - that used
+      // to start the popups invisibly and leave them half-done.
+      const sfGenuineTap = e.isTrusted || this.onboardingTapOverride;
+      this.onboardingTapOverride = false;
+      if (!sfGenuineTap) return;
 
       if (isAlreadyActive) {
         this.stopProductsTabLoader();
@@ -5045,6 +5079,7 @@ export class HomeComponent implements AfterViewInit {
     ;
 
     if (searchTerm.length < 2) {
+      this.sfClearSearchUnavailable();
       const allThumbnails = document.querySelectorAll('.fpd-item.fpd-hover-thumbnail');
       ;
       allThumbnails.forEach((thumb: Element) => {
@@ -5069,6 +5104,8 @@ export class HomeComponent implements AfterViewInit {
 
     let totalMatches = 0;
     let totalItems = 0;
+    // Clear the previous "not available" note before re-filtering.
+    this.sfClearSearchUnavailable();
 
     containers.forEach((container) => {
       const thumbnails = container.querySelectorAll('.fpd-item.fpd-hover-thumbnail');
@@ -5107,6 +5144,16 @@ export class HomeComponent implements AfterViewInit {
       );
       (container as HTMLElement).style.display = anyVisible ? 'block' : 'none';
     });
+
+    // PRD: nothing left in the Products tab -> explain it and suggest
+    // related products instead of an empty grid.
+    const productsModule = document.querySelector('fpd-module-products');
+    const visibleProducts = productsModule
+      ? Array.from(
+          productsModule.querySelectorAll('.fpd-item.fpd-hover-thumbnail')
+        ).filter((el) => (el as HTMLElement).style.display !== 'none').length
+      : 1;
+    if (!visibleProducts) this.sfShowSearchUnavailable(search);
   }
 
   doesTitleMatchSearch(title: string, search: string): boolean {
@@ -6079,6 +6126,11 @@ export class HomeComponent implements AfterViewInit {
   showFPDLoading(show: boolean) {
     const loader = document.getElementById('fpd-loader');
     if (!loader) return;
+    // The product fetch finishing used to hide #fpd-loader in the middle of
+    // the onboarding popups (same element), leaving the sequence half-done
+    // so it started over on the next tab. Only stopProductsTabLoader() ends
+    // it now.
+    if (!show && this.onboardingRunning) return;
     if (show) {
       this.recalculateLoaderHeight();
     }
@@ -6141,6 +6193,13 @@ export class HomeComponent implements AfterViewInit {
     // query, so without this check the popup would still get force-shown
     // via the inline style.display below, just unstyled, on desktop.
     if (window.innerWidth > 768) return;
+    // Already on screen (another tab tapped mid-sequence): continue the
+    // same popup instead of starting over - never more than 2 popups.
+    if (this.onboardingRunning) {
+      this.keepOnboardingLoaderVisible();
+      return;
+    }
+    this.onboardingRunning = true;
     this.showFPDLoading(true);
     // Once the mandatory first-session loader has completed on ANY tab
     // (see hasShownFirstEditorTabLoader), skip straight to the abbreviated
@@ -6148,6 +6207,49 @@ export class HomeComponent implements AfterViewInit {
     // isAbbreviatedProductsLoader.
     this.isAbbreviatedProductsLoader = this.hasShownFirstEditorTabLoader;
     this.setProductsLoaderStep(1);
+    // The tab's own panel switch runs right after this (our nav listener
+    // is capture phase), so re-check where the popup can be seen then.
+    [0, 150].forEach((ms) => setTimeout(() => this.keepOnboardingLoaderVisible(), ms));
+    clearInterval(this.onboardingVisibleTimer);
+    this.onboardingVisibleTimer = setInterval(() => this.keepOnboardingLoaderVisible(), 300);
+  }
+
+  // #fpd-loader lives in fpd-main-bar's .fpd-module-content. On mobile the
+  // Images tab shows its upload panel in .fpd-secondary-content instead and
+  // hides .fpd-module-content, so the popups were invisible there and the
+  // sequence never finished (it restarted on every later tab). While the
+  // onboarding runs, keep the loader in whichever of the two is visible -
+  // same fpd-main-bar home, so its stacking is unchanged. Moved back in
+  // stopProductsTabLoader().
+  //
+  // The editor also closes the mobile panel by itself (e.g. while it adds a
+  // product's layers), which used to hide the popups half-way. With no
+  // panel open, the loader goes to its original top-level spot - exactly
+  // what the Save flow already does (openSaveConfirmPopup) - and returns to
+  // the panel as soon as one is open again.
+  private onboardingLoaderOnBody = false;
+  private onboardingVisibleTimer: any = null;
+  private keepOnboardingLoaderVisible(): void {
+    if (!this.onboardingRunning) return;
+    const loader = document.getElementById('fpd-loader');
+    const mainBar = document.querySelector('fpd-main-bar');
+    if (!loader || !mainBar) return;
+    // Placed on body by the Save flow itself - leave that flow alone.
+    if (loader.parentElement === document.body && !this.onboardingLoaderOnBody) return;
+    const shown = (el: Element | null) =>
+      !!el && (el as HTMLElement).getClientRects().length > 0 && getComputedStyle(el).display !== 'none';
+    const moduleContent = mainBar.querySelector('.fpd-module-content');
+    const secondary = mainBar.querySelector('.fpd-secondary-content');
+    const host = (shown(moduleContent)
+      ? moduleContent
+      : shown(secondary)
+        ? secondary
+        : document.body) as Element;
+    if (loader.parentElement !== host) {
+      host.appendChild(loader);
+      this.onboardingLoaderOnBody = host === document.body;
+      this.recalculateLoaderHeight();
+    }
   }
 
   // Step 1/2/3 copy shown in #fpd-loader-active-text - see setProductsLoaderStep().
@@ -6196,6 +6298,7 @@ export class HomeComponent implements AfterViewInit {
     }
     this.updateProductsLoaderStep2State();
     this.recalculateLoaderHeight();
+    this.keepOnboardingLoaderVisible();
   }
 
   // Step 2 ("Load Products") stays disabled until the real product fetch
@@ -6226,8 +6329,6 @@ export class HomeComponent implements AfterViewInit {
   // the 5s wait is pure polish and doesn't need repeating every time.
   private finishProductsTabLoader() {
     this.hasShownFirstEditorTabLoader = true;
-    // Remember it across reloads (see readMobileOnboardingDone()).
-    this.writeMobileOnboardingDone();
     this.setProductsLoaderStep(0);
 
     if (this.hasShownProductsLoaderFinalWait) {
@@ -6254,6 +6355,390 @@ export class HomeComponent implements AfterViewInit {
       clearInterval(this.productsFinalWaitInterval);
       this.stopProductsTabLoader();
     }, 1000);
+  }
+
+  // ===== PRD: wrong / unavailable product link and search ================
+  // Root cause: a /brand/product link was matched against each face's
+  // title ("Inside", "Lid ...") instead of the product's title, so no link
+  // ever matched and every link - valid or not - silently showed the
+  // default product. Paths that fit no route (/foo, /a/b/c) matched nothing
+  // at all and left a blank page. Links are now checked against the
+  // catalog: a real product is opened, anything else gets a clear message
+  // plus related products from the requested product / brand.
+  private sfProductCatalog: any[] | null = null;
+  private sfLinkTimer: any = null;
+  private readonly sfStopWords = new Set([
+    'inch', 'in', 'skin', 'skins', 'cover', 'covers', 'decal', 'decals',
+    'custom', 'the', 'and', 'for', 'with', 'of', 'product', 'products',
+    'new', 'model', 'series', 'edition', 'gen', 'generation', 'x',
+  ]);
+
+  // { brand, title } slugs of the current URL, or null when the URL is
+  // not a product link (home, savedesign, designer...).
+  private sfReadProductLink(): { brand: string; title: string } | null {
+    const snap = this.route.snapshot;
+    const m = snap.paramMap.get('manufacturer');
+    const s = snap.paramMap.get('slug');
+    if (m && s) {
+      return { brand: this.slugify(m) || '', title: this.slugify(s) || '' };
+    }
+    if (snap.routeConfig?.path !== '**') return null;
+    const segs = window.location.pathname
+      .split('/')
+      .filter(Boolean)
+      .map((p) => {
+        try {
+          return decodeURIComponent(p);
+        } catch {
+          return p;
+        }
+      });
+    if (!segs.length) return null;
+    const brand = this.slugify(segs[0]) || '';
+    const title =
+      this.slugify((segs.length > 1 ? segs.slice(1) : segs).join(' ')) || '';
+    return { brand, title };
+  }
+
+  // Flat list of every product (one entry per product, faces in `views`).
+  private sfCatalogEntries(): any[] {
+    // Live API list first (the bundled startup copy has old thumbnail URLs).
+    const cats: any[] =
+      this.sfProductCatalog ||
+      (this.designer?.products?.length ? this.designer.products : null) ||
+      [];
+    const out: any[] = [];
+    const seen = new Set<string>();
+    cats.forEach((cat: any, catIndex: number) => {
+      (cat?.products || []).forEach((views: any, groupIndex: number) => {
+        if (!Array.isArray(views) || !views.length) return;
+        const v = views[0] || {};
+        const title = String(v.productTitle || v.title || '').trim();
+        const brand = String(v.manufacturer || '').trim();
+        if (!title) return;
+        const titleSlug = this.slugify(title) || '';
+        const brandSlug = this.slugify(brand || 'Styleflip') || '';
+        const key = brandSlug + '/' + titleSlug;
+        if (seen.has(key)) return;
+        seen.add(key);
+        out.push({
+          views, title, brand, titleSlug, brandSlug, catIndex, groupIndex,
+          thumb: v.productThumbnail || v.thumbnail || '',
+        });
+      });
+    });
+    return out;
+  }
+
+  private sfWords(text: string): string[] {
+    return String(text || '')
+      .toLowerCase()
+      .split(/[^a-z0-9]+/)
+      .filter((w) => w.length >= 2 && !this.sfStopWords.has(w));
+  }
+
+  // Related products for the requested words / brand. Only products that
+  // share a real word with the request (numbers alone do not count), or -
+  // when the brand exists but nothing matches by name - that brand's own
+  // products. Nothing unrelated is suggested.
+  private sfSuggest(
+    entries: any[],
+    words: string[],
+    brandSlug: string,
+    prefix: boolean,
+    limit = 6
+  ): any[] {
+    const hasWord = (tokens: string[], w: string) =>
+      tokens.some((t) => t === w || (prefix || w.length >= 3 ? t.startsWith(w) : false));
+    const brandKnown = !!brandSlug && entries.some((e) => e.brandSlug === brandSlug);
+    const scored = entries
+      .map((e) => {
+        const tokens = this.sfWords(e.title + ' ' + e.brand);
+        let score = 0;
+        let textHit = false;
+        words.forEach((w) => {
+          if (hasWord(tokens, w)) {
+            score += 1;
+            if (!/^\d+$/.test(w)) textHit = true;
+          }
+        });
+        if (!textHit) score = 0;
+        if (score && brandKnown && e.brandSlug === brandSlug) score += 0.5;
+        return { e, score };
+      })
+      .filter((x) => x.score > 0)
+      .sort((a, b) => b.score - a.score);
+    const list = scored.length
+      ? scored.map((x) => x.e)
+      : brandKnown
+        ? entries.filter((e) => e.brandSlug === brandSlug)
+        : [];
+    // One tile per product name (some products are listed twice).
+    const names = new Set<string>();
+    return list
+      .filter((e) => !names.has(e.titleSlug) && !!names.add(e.titleSlug))
+      .slice(0, limit);
+  }
+
+  private sfResolveProductLink(link: { brand: string; title: string }): void {
+    const entries = this.sfCatalogEntries();
+    if (!entries.length) {
+      this.sfShowProductLinkState('error', link);
+      return;
+    }
+    const match = entries.find(
+      (e) => e.titleSlug === link.title && e.brandSlug === link.brand
+    );
+    if (!match) {
+      const suggestions = this.sfSuggest(
+        entries,
+        this.sfWords(link.title.replace(/-/g, ' ')),
+        link.brand,
+        false
+      );
+      this.sfShowProductLinkState('unavailable', link, suggestions);
+      return;
+    }
+    this.sfOpenProduct(match, false);
+  }
+
+  // Loads a product's first face on the canvas (same call a Skin pick
+  // makes) once the editor is ready, then removes the stage message.
+  private sfOpenProduct(entry: any, updateUrl: boolean): void {
+    this.sfShowProductLinkState('loading', null);
+    const started = Date.now();
+    const go = () => {
+      const d = this.designer;
+      if (!d?.productCreated || !d.currentViewInstance) {
+        if (Date.now() - started > 60000) {
+          this.sfShowProductLinkState('error', null);
+          return;
+        }
+        setTimeout(go, 200);
+        return;
+      }
+      let finished = false;
+      const finish = () => {
+        if (finished) return;
+        finished = true;
+        d.removeEventListener('productCreate', finish);
+        clearTimeout(this.sfLinkTimer);
+        this.sfHideProductLinkState();
+      };
+      d.addEventListener('productCreate', finish);
+      clearTimeout(this.sfLinkTimer);
+      // Never leave the loader up: stop it after 30s whatever happened.
+      this.sfLinkTimer = setTimeout(finish, 30000);
+      try {
+        localStorage.setItem('selectedSlug', entry.titleSlug);
+        localStorage.setItem('selectedManufacturer', entry.brandSlug);
+        d.loadProduct([entry.views[0]], d.mainOptions?.replaceInitialElements);
+      } catch (err) {
+        console.error('Could not open product:', err);
+        finish();
+        this.sfShowProductLinkState('error', null);
+        return;
+      }
+      if (updateUrl) {
+        this.router.navigate([entry.brandSlug, entry.titleSlug]);
+      }
+    };
+    go();
+  }
+
+  // Message shown over the product stage: 'loading' (checking / opening
+  // the product), 'unavailable' (+ suggestions) or 'error' (+ Retry).
+  private sfShowProductLinkState(
+    state: 'loading' | 'unavailable' | 'error',
+    link: { brand: string; title: string } | null,
+    suggestions: any[] = []
+  ): void {
+    // The stage area (already position:relative on desktop and mobile);
+    // the sidebar / bottom nav stay usable.
+    const host = document.querySelector('#clothing-designer fpd-main-wrapper') as HTMLElement | null;
+    if (!host) return;
+    let box = host.querySelector(':scope > .sf-pna-overlay') as HTMLElement | null;
+    if (!box) {
+      box = document.createElement('div');
+      box.className = 'sf-pna-overlay';
+      host.appendChild(box);
+    }
+    box.innerHTML = '';
+    const card = document.createElement('div');
+    card.className = 'sf-pna-card';
+    box.appendChild(card);
+    const el = (tag: string, cls: string, text?: string) => {
+      const n = document.createElement(tag);
+      n.className = cls;
+      if (text != null) n.textContent = text;
+      return n;
+    };
+
+    if (state === 'loading') {
+      card.appendChild(el('div', 'sf-pna-spinner'));
+      card.appendChild(el('p', 'sf-pna-text', 'Loading product...'));
+      return;
+    }
+
+    if (state === 'error') {
+      card.appendChild(el('h2', 'sf-pna-title', "We couldn't load this product right now."));
+      card.appendChild(el('p', 'sf-pna-text', 'Please check your connection and try again.'));
+    } else {
+      card.appendChild(el('h2', 'sf-pna-title', 'Sorry, this product is currently not available.'));
+      if (link?.title) {
+        card.appendChild(
+          el('p', 'sf-pna-text', `We couldn't find "${link.title.replace(/-/g, ' ')}".`)
+        );
+      }
+      if (suggestions.length) {
+        card.appendChild(el('p', 'sf-pna-sub', 'You may be looking for:'));
+        const grid = el('div', 'sf-pna-grid');
+        suggestions.forEach((s) => grid.appendChild(this.sfSuggestionTile(s, () => this.sfOpenProduct(s, true))));
+        card.appendChild(grid);
+      }
+    }
+
+    const actions = el('div', 'sf-pna-actions');
+    if (state === 'error') {
+      const retry = el('button', 'sf-pna-btn', 'Retry') as HTMLButtonElement;
+      retry.type = 'button';
+      retry.addEventListener('click', () => {
+        const again = link || this.sfReadProductLink();
+        if (!again) {
+          this.sfHideProductLinkState();
+          return;
+        }
+        this.sfShowProductLinkState('loading', again);
+        this.getCategoryAndProductIndex('', '')
+          .catch(() => null)
+          .then(() => this.sfResolveProductLink(again));
+      });
+      actions.appendChild(retry);
+    }
+    const browse = el('button', 'sf-pna-btn sf-pna-btn-light', 'Browse all products') as HTMLButtonElement;
+    browse.type = 'button';
+    browse.addEventListener('click', () => {
+      this.sfHideProductLinkState();
+      const nav = Array.from(
+        document.querySelectorAll('.fpd-nav-item[data-module="products"]')
+      ).find((n) => (n as HTMLElement).getClientRects().length) as HTMLElement | undefined;
+      if (nav && !nav.classList.contains('fpd-active')) {
+        // A real tap on "Browse all products" = opening a menu.
+        this.onboardingTapOverride = true;
+        nav.click();
+        this.onboardingTapOverride = false;
+      }
+    });
+    actions.appendChild(browse);
+    card.appendChild(actions);
+  }
+
+  private sfHideProductLinkState(): void {
+    clearTimeout(this.sfLinkTimer);
+    document.querySelectorAll('.sf-pna-overlay').forEach((n) => n.remove());
+  }
+
+  private sfSuggestionTile(s: any, onPick: () => void): HTMLElement {
+    const tile = document.createElement('button');
+    tile.type = 'button';
+    tile.className = 'sf-pna-item';
+    tile.title = s.title;
+    if (s.thumb) {
+      const img = document.createElement('img');
+      img.className = 'sf-pna-item-img';
+      img.loading = 'lazy';
+      img.alt = '';
+      img.onerror = () => img.remove();
+      img.src = s.thumb;
+      tile.appendChild(img);
+    }
+    const name = document.createElement('span');
+    name.className = 'sf-pna-item-name';
+    name.textContent = s.title;
+    tile.appendChild(name);
+    if (s.brand) {
+      const brand = document.createElement('span');
+      brand.className = 'sf-pna-item-brand';
+      brand.textContent = s.brand;
+      tile.appendChild(brand);
+    }
+    tile.addEventListener('click', (ev) => {
+      ev.preventDefault();
+      ev.stopPropagation();
+      onPick();
+    });
+    return tile;
+  }
+
+  // Products-tab search with no result in the open category.
+  private sfShowSearchUnavailable(search: string): void {
+    const module = document.querySelector('fpd-module-products');
+    // The products grid's own scroll area (the category dropdown has one too).
+    const area = module?.querySelector('.ProductModule')?.closest('.fpd-scroll-area');
+    if (!area) return;
+    const entries = this.sfCatalogEntries();
+    const words = search.toLowerCase().split(/[^a-z0-9]+/).filter((w) => w.length >= 2);
+    // Exact hits elsewhere (every word matches) mean the product exists,
+    // just in another category.
+    const exact = entries
+      .filter((e) => this.doesTitleMatchSearch(`${e.title} ${e.brand}`, search))
+      .slice(0, 6);
+    const related = exact.length ? exact : this.sfSuggest(entries, this.sfWords(words.join(' ')), '', true);
+    const note = document.createElement('div');
+    note.className = 'sf-pna-search';
+    const title = document.createElement('p');
+    title.className = 'sf-pna-search-title';
+    title.textContent = exact.length
+      ? 'Not in this category. Found in other categories:'
+      : 'Sorry, this product is currently not available.';
+    note.appendChild(title);
+    if (related.length) {
+      if (!exact.length) {
+        const sub = document.createElement('p');
+        sub.className = 'sf-pna-search-sub';
+        sub.textContent = 'Related products:';
+        note.appendChild(sub);
+      }
+      const grid = document.createElement('div');
+      grid.className = 'sf-pna-grid sf-pna-grid-panel';
+      related.forEach((s) => grid.appendChild(this.sfSuggestionTile(s, () => this.sfOpenFromSearch(s))));
+      note.appendChild(grid);
+    }
+    area.insertBefore(note, area.firstChild);
+  }
+
+  private sfClearSearchUnavailable(): void {
+    document.querySelectorAll('.sf-pna-search').forEach((n) => n.remove());
+  }
+
+  // Opens a suggested product the normal way: its category, then its
+  // tile (which lists its skins; picking one asks before replacing).
+  private sfOpenFromSearch(s: any): void {
+    const module = document.querySelector('fpd-module-products') as HTMLElement | null;
+    if (!module) return;
+    const input = document.getElementById('searchInput') as HTMLInputElement | null;
+    if (input) input.value = '';
+    this.filterThumbnailsP('');
+    const catItem = module.querySelector(
+      `.fpd-product-categories .fpd-item[data-index="${s.catIndex}"]`
+    ) as HTMLElement | null;
+    catItem?.click();
+    setTimeout(() => {
+      const tile = Array.from(
+        module.querySelectorAll('.ProductModule > .fpd-item')
+      ).find(
+        (t) =>
+          (t as HTMLElement).dataset['index'] === String(s.groupIndex) &&
+          String((t as HTMLElement).dataset['title'] || '').trim() === s.title
+      ) as HTMLElement | undefined;
+      if (tile) {
+        tile.scrollIntoView({ block: 'nearest' });
+        tile.click();
+      } else {
+        // Fallback: open it on the canvas directly.
+        this.sfOpenProduct(s, true);
+      }
+    }, 150);
   }
 
   // ===== Mobile product display (<=768px) =================================
@@ -6375,25 +6860,79 @@ export class HomeComponent implements AfterViewInit {
     C.calcOffset();
   }
 
-  // Persistent "mobile onboarding completed" flag (own key, nothing else
-  // in localStorage is touched). Guarded: storage can be unavailable.
-  private readonly mobileOnboardingKey = 'sfMobileOnboardingDone';
-  private readMobileOnboardingDone(): boolean {
+  // True only for the first page load in this browser tab (sessionStorage
+  // marker - cleared when the tab closes, never permanent). Reloads and
+  // later loads in the same tab return false. Also drops the old permanent
+  // localStorage flag, which suppressed the popups on every later reload.
+  private isFirstVisitThisTab(): boolean {
     try {
-      return localStorage.getItem(this.mobileOnboardingKey) === '1';
+      localStorage.removeItem('sfMobileOnboardingDone');
+    } catch {}
+    try {
+      if (sessionStorage.getItem('sfOnboardingVisited') === '1') return false;
+      sessionStorage.setItem('sfOnboardingVisited', '1');
+      return true;
     } catch {
       return false;
     }
   }
-  private writeMobileOnboardingDone(): void {
-    try {
-      localStorage.setItem(this.mobileOnboardingKey, '1');
-    } catch {}
+
+  // First visit: open the Products tab once the editor is ready, which
+  // starts the normal onboarding (same nav-tap path a user tap takes). Skipped
+  // if the user already opened a tab / ran the sequence meanwhile.
+  private autoStartMobileOnboarding(): void {
+    const started = Date.now();
+    let settled = 0;
+    const tryStart = () => {
+      if (this.hasShownFirstEditorTabLoader || this.onboardingRunning) return;
+      if (window.innerWidth > 768) return;
+      const nav = document.querySelector(
+        '.fpd-nav-item[data-module="products"]'
+      ) as HTMLElement | null;
+      const loader = document.getElementById('fpd-loader');
+      // Editor settled: product on stage, loader in its panel slot, and no
+      // product-link check still loading a product (adding elements closes
+      // the mobile panel). Must hold on two checks 800ms apart.
+      const ready =
+        !!this.designer?.productCreated &&
+        !!nav &&
+        !!loader?.closest('.fpd-module-content') &&
+        !document.querySelector('.sf-pna-overlay .sf-pna-spinner');
+      settled = ready ? settled + 1 : 0;
+      if (settled < 2) {
+        if (Date.now() - started < 60000) setTimeout(tryStart, ready ? 800 : 300);
+        return;
+      }
+      // A tab is already open (user tapped first) - its own tap started it.
+      if (document.querySelector('.fpd-nav-item.fpd-active[data-module]')) return;
+      this.onboardingTapOverride = true;
+      nav!.click();
+      this.onboardingTapOverride = false;
+    };
+    tryStart();
   }
 
   private stopProductsTabLoader() {
     clearInterval(this.productsFinalWaitInterval);
+    // Onboarding over (finished or abandoned): data-loading calls may hide
+    // #fpd-loader again, and the step card goes back to its CSS default so
+    // a later plain "loading" use of #fpd-loader doesn't show stale steps.
+    this.onboardingRunning = false;
+    const sfCard = document.getElementById('fpd-loader-active-card');
+    if (sfCard) sfCard.style.display = '';
+    this.currentProductsLoaderStep = 0;
     this.showFPDLoading(false);
+    // Back to its usual home if keepOnboardingLoaderVisible() moved it.
+    clearInterval(this.onboardingVisibleTimer);
+    const sfLoader = document.getElementById('fpd-loader');
+    if (
+      sfLoader &&
+      (sfLoader.parentElement?.classList.contains('fpd-secondary-content') ||
+        (this.onboardingLoaderOnBody && sfLoader.parentElement === document.body))
+    ) {
+      document.querySelector('fpd-main-bar .fpd-module-content')?.appendChild(sfLoader);
+    }
+    this.onboardingLoaderOnBody = false;
     // Always clear, same reasoning as pendingLoaderCompletionCallback below -
     // whether this loader run just genuinely finished or was abandoned
     // mid-sequence, it shouldn't affect any LATER, real .fpd-nav-item tab's
